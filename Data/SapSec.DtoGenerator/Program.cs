@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SAPSec.Data.Common;
+using SAPSec.Data.Common.Catalogue;
+using SAPSec.Data.Common.Catalogue.Definitions;
 using System.Text;
 
 namespace SAPSec.DtoGenerator;
@@ -36,6 +38,13 @@ public class Program
         [$"{PrimarySubFolder}\\LASubjectEntries"] = "KS2\\Performance",
         [$"{PrimarySubFolder}\\EnglandPerformance"] = "KS2\\Performance",
     };
+
+    // Measures the pipeline stores as numbers (clean_numeric). Typed from the catalogue rather than the JSON,
+    // because a column's first value may be null.
+    private static readonly HashSet<string> NumericMeasures = CatalogueDefinitions.Rows()
+        .Where(r => r.DataType == DataType.Double.DataMapValue())
+        .Select(r => r.PropertyName)
+        .ToHashSet(StringComparer.Ordinal);
 
     public static async Task Main(string[] args)
     {
@@ -108,7 +117,7 @@ public class Program
 
                 foreach (var (key, value) in first)
                 {
-                    var (type, deflt) = value switch
+                    var (type, deflt) = NumericMeasures.Contains(key) ? ("decimal?", "null") : value switch
                     {
                         int or long => ("int?", "null"),
                         double or float or decimal => ("decimal?", "null"),

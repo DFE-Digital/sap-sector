@@ -79,9 +79,9 @@ internal static class Ks2PerformanceMeasures
         }
 
         private static (
-            Func<Ks2PerformanceData?, string?> Current,
-            Func<Ks2PerformanceData?, string?> Previous,
-            Func<Ks2PerformanceData?, string?> Previous2) ResolveEstablishmentAccessors(string subject, string characteristic)
+            Func<Ks2PerformanceData?, decimal?> Current,
+            Func<Ks2PerformanceData?, decimal?> Previous,
+            Func<Ks2PerformanceData?, decimal?> Previous2) ResolveEstablishmentAccessors(string subject, string characteristic)
         {
             return subject switch
             {
@@ -213,12 +213,12 @@ internal static class Ks2PerformanceMeasures
         }
 
         private static (
-            Func<Ks2PerformanceData?, string?> LACurrent,
-            Func<Ks2PerformanceData?, string?> LAPrevious,
-            Func<Ks2PerformanceData?, string?> LAPrevious2,
-            Func<Ks2PerformanceData?, string?> EnglandCurrent,
-            Func<Ks2PerformanceData?, string?> EnglandPrevious,
-            Func<Ks2PerformanceData?, string?> EnglandPrevious2) ResolveLocalAuthorityAndEnglandAccessors(string subject, string characteristic)
+            Func<Ks2PerformanceData?, decimal?> LACurrent,
+            Func<Ks2PerformanceData?, decimal?> LAPrevious,
+            Func<Ks2PerformanceData?, decimal?> LAPrevious2,
+            Func<Ks2PerformanceData?, decimal?> EnglandCurrent,
+            Func<Ks2PerformanceData?, decimal?> EnglandPrevious,
+            Func<Ks2PerformanceData?, decimal?> EnglandPrevious2) ResolveLocalAuthorityAndEnglandAccessors(string subject, string characteristic)
         {
             // "Non-mobile pupils" is not published at LA or England level in the source data (DfE
             // performance tables only break this characteristic out at establishment level) - this
@@ -484,9 +484,9 @@ internal static class Ks2PerformanceMeasures
         }
 
         private static (
-            Func<Ks2PerformanceData?, string?> Current,
-            Func<Ks2PerformanceData?, string?> Previous,
-            Func<Ks2PerformanceData?, string?> Previous2) ResolveEstablishmentAccessors(string subject, string characteristic)
+            Func<Ks2PerformanceData?, decimal?> Current,
+            Func<Ks2PerformanceData?, decimal?> Previous,
+            Func<Ks2PerformanceData?, decimal?> Previous2) ResolveEstablishmentAccessors(string subject, string characteristic)
         {
             return subject switch
             {
@@ -618,12 +618,12 @@ internal static class Ks2PerformanceMeasures
         }
 
         private static (
-            Func<Ks2PerformanceData?, string?> LACurrent,
-            Func<Ks2PerformanceData?, string?> LAPrevious,
-            Func<Ks2PerformanceData?, string?> LAPrevious2,
-            Func<Ks2PerformanceData?, string?> EnglandCurrent,
-            Func<Ks2PerformanceData?, string?> EnglandPrevious,
-            Func<Ks2PerformanceData?, string?> EnglandPrevious2) ResolveLocalAuthorityAndEnglandAccessors(string subject, string characteristic)
+            Func<Ks2PerformanceData?, decimal?> LACurrent,
+            Func<Ks2PerformanceData?, decimal?> LAPrevious,
+            Func<Ks2PerformanceData?, decimal?> LAPrevious2,
+            Func<Ks2PerformanceData?, decimal?> EnglandCurrent,
+            Func<Ks2PerformanceData?, decimal?> EnglandPrevious,
+            Func<Ks2PerformanceData?, decimal?> EnglandPrevious2) ResolveLocalAuthorityAndEnglandAccessors(string subject, string characteristic)
         {
             // "Non-mobile pupils" is not published at LA or England level in the source data (DfE
             // performance tables only break this characteristic out at establishment level) - this

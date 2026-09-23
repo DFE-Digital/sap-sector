@@ -22,7 +22,7 @@ public record TopPerformer(
             .Select(x => new TopPerformerCandidate(
                 x.SchoolInfo.Urn,
                 x.SchoolInfo.Name,
-                MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(x.Data)),
+                fieldSelector.SchoolCurrent(x.Data),
                 IsCurrentSchool: x == currentSchool))
 
             // Exclude missing data

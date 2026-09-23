@@ -59,8 +59,8 @@ public record SimilarSchool
             TrustSchoolFlag = new(currentEstab.TrustSchoolFlagId, currentEstab.TrustSchoolFlagName),
             OfficialSixthForm = new(currentEstab.OfficialSixthFormId, currentEstab.OfficialSixthFormName),
             ResourcedProvision = new(currentEstab.ResourcedProvisionId, currentEstab.ResourcedProvisionName),
-            OverallAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Tot_Est_Current_Pct),
-            PersistentAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Persistent_Est_Current_Pct)
+            OverallAbsenceRate = DataWithAvailability.FromNullable(absence?.Abs_Tot_Est_Current_Pct),
+            PersistentAbsenceRate = DataWithAvailability.FromNullable(absence?.Abs_Persistent_Est_Current_Pct)
         };
     }
 }

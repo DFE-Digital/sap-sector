@@ -1,6 +1,7 @@
 ﻿using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools;
@@ -3046,12 +3047,12 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100007" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "50.00" },
-            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "50.01" },
-            new() { Id = "100005", Abs_Tot_Est_Current_Pct = "51.00" },
-            new() { Id = "100006", Abs_Tot_Est_Current_Pct = "51.01" },
-            new() { Id = "100007", Abs_Tot_Est_Current_Pct = "52" }
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = 50.00m },
+            new() { Id = "100004", Abs_Tot_Est_Current_Pct = 50.01m },
+            new() { Id = "100005", Abs_Tot_Est_Current_Pct = 51.00m },
+            new() { Id = "100006", Abs_Tot_Est_Current_Pct = 51.01m },
+            new() { Id = "100007", Abs_Tot_Est_Current_Pct = 52m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3101,13 +3102,13 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100008" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "0.5" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "50.00" },
-            new() { Id = "100005", Abs_Tot_Est_Current_Pct = "50.01" },
-            new() { Id = "100006", Abs_Tot_Est_Current_Pct = "51.00" },
-            new() { Id = "100007", Abs_Tot_Est_Current_Pct = "51.01" },
-            new() { Id = "100008", Abs_Tot_Est_Current_Pct = "52" }
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 0.5m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100004", Abs_Tot_Est_Current_Pct = 50.00m },
+            new() { Id = "100005", Abs_Tot_Est_Current_Pct = 50.01m },
+            new() { Id = "100006", Abs_Tot_Est_Current_Pct = 51.00m },
+            new() { Id = "100007", Abs_Tot_Est_Current_Pct = 51.01m },
+            new() { Id = "100008", Abs_Tot_Est_Current_Pct = 52m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3140,9 +3141,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "" },
-            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "XXX" },
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = null },
+            new() { Id = "100004", Abs_Tot_Est_Current_Pct = null },
             new() { Id = "100005" }
         );
         _similarSchoolsRepo.SetupGroups(
@@ -3173,9 +3174,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "" },
-            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "XXX" },
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = null },
+            new() { Id = "100004", Abs_Tot_Est_Current_Pct = null },
             new() { Id = "100005" }
         );
         _similarSchoolsRepo.SetupGroups(
@@ -3204,9 +3205,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Tot_Est_Current_Pct = "48.0" },
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Tot_Est_Current_Pct = 48.0m },
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3246,9 +3247,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Tot_Est_Current_Pct = "48.0" },
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Tot_Est_Current_Pct = 48.0m },
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3288,9 +3289,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Tot_Est_Current_Pct = currentSchoolValue },
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Tot_Est_Current_Pct = MeasureValue.Parse(currentSchoolValue) },
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3340,12 +3341,12 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100007" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "50.00" },
-            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = "50.01" },
-            new() { Id = "100005", Abs_Persistent_Est_Current_Pct = "51.00" },
-            new() { Id = "100006", Abs_Persistent_Est_Current_Pct = "51.01" },
-            new() { Id = "100007", Abs_Persistent_Est_Current_Pct = "52" }
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = 50.00m },
+            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = 50.01m },
+            new() { Id = "100005", Abs_Persistent_Est_Current_Pct = 51.00m },
+            new() { Id = "100006", Abs_Persistent_Est_Current_Pct = 51.01m },
+            new() { Id = "100007", Abs_Persistent_Est_Current_Pct = 52m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3395,13 +3396,13 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100008" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "0.5" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = "50.00" },
-            new() { Id = "100005", Abs_Persistent_Est_Current_Pct = "50.01" },
-            new() { Id = "100006", Abs_Persistent_Est_Current_Pct = "51.00" },
-            new() { Id = "100007", Abs_Persistent_Est_Current_Pct = "51.01" },
-            new() { Id = "100008", Abs_Persistent_Est_Current_Pct = "52" }
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 0.5m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = 50.00m },
+            new() { Id = "100005", Abs_Persistent_Est_Current_Pct = 50.01m },
+            new() { Id = "100006", Abs_Persistent_Est_Current_Pct = 51.00m },
+            new() { Id = "100007", Abs_Persistent_Est_Current_Pct = 51.01m },
+            new() { Id = "100008", Abs_Persistent_Est_Current_Pct = 52m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3434,9 +3435,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "" },
-            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = "XXX" },
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = null },
+            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = null },
             new() { Id = "100005" }
         );
         _similarSchoolsRepo.SetupGroups(
@@ -3467,9 +3468,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "" },
-            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = "XXX" },
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = null },
+            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = null },
             new() { Id = "100005" }
         );
         _similarSchoolsRepo.SetupGroups(
@@ -3498,9 +3499,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = "48.0" },
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = 48.0m },
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3540,9 +3541,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = "48.0" },
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = 48.0m },
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3582,9 +3583,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = currentSchoolValue },
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = MeasureValue.Parse(currentSchoolValue) },
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3619,10 +3620,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", RwmExpected_Tot_Cohort_Est_Current_Num = "10" },
-            new() { Id = "100003", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-            new() { Id = "100004", RwmExpected_Tot_Cohort_Est_Current_Num = "30" },
-            new() { Id = "100005", RwmExpected_Tot_Cohort_Est_Current_Num = "20" }
+            new() { Id = "100002", RwmExpected_Tot_Cohort_Est_Current_Num = 10m },
+            new() { Id = "100003", RwmExpected_Tot_Cohort_Est_Current_Num = null },
+            new() { Id = "100004", RwmExpected_Tot_Cohort_Est_Current_Num = 30m },
+            new() { Id = "100005", RwmExpected_Tot_Cohort_Est_Current_Num = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3660,9 +3661,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100004", EstablishmentName = "Maple School" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", RwmExpected_Tot_Cohort_Est_Current_Num = "50" },
-            new() { Id = "100003", RwmExpected_Tot_Cohort_Est_Current_Num = "50" },
-            new() { Id = "100004", RwmExpected_Tot_Cohort_Est_Current_Num = "50" }
+            new() { Id = "100002", RwmExpected_Tot_Cohort_Est_Current_Num = 50m },
+            new() { Id = "100003", RwmExpected_Tot_Cohort_Est_Current_Num = 50m },
+            new() { Id = "100004", RwmExpected_Tot_Cohort_Est_Current_Num = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3687,8 +3688,8 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         // Both round to 30.0 for display, but are not exactly equal underneath -
         // the tie-break should still be based on what the user sees.
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", RwmExpected_Tot_Cohort_Est_Current_Num = "30.04" },
-            new() { Id = "100003", RwmExpected_Tot_Cohort_Est_Current_Num = "29.96" }
+            new() { Id = "100002", RwmExpected_Tot_Cohort_Est_Current_Num = 30.04m },
+            new() { Id = "100003", RwmExpected_Tot_Cohort_Est_Current_Num = 29.96m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3712,10 +3713,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", RwmExpected_Tot_Cohort_Est_Current_Num = "10" },
-            new() { Id = "100003", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-            new() { Id = "100004", RwmExpected_Tot_Cohort_Est_Current_Num = "30" },
-            new() { Id = "100005", RwmExpected_Tot_Cohort_Est_Current_Num = "20" }
+            new() { Id = "100002", RwmExpected_Tot_Cohort_Est_Current_Num = 10m },
+            new() { Id = "100003", RwmExpected_Tot_Cohort_Est_Current_Num = null },
+            new() { Id = "100004", RwmExpected_Tot_Cohort_Est_Current_Num = 30m },
+            new() { Id = "100005", RwmExpected_Tot_Cohort_Est_Current_Num = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3756,10 +3757,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", RwmExpected_Tot_Cohort_Est_Current_Num = "10" },
-            new() { Id = "100003", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-            new() { Id = "100004", RwmExpected_Tot_Cohort_Est_Current_Num = "30" },
-            new() { Id = "100005", RwmExpected_Tot_Cohort_Est_Current_Num = "20" }
+            new() { Id = "100002", RwmExpected_Tot_Cohort_Est_Current_Num = 10m },
+            new() { Id = "100003", RwmExpected_Tot_Cohort_Est_Current_Num = null },
+            new() { Id = "100004", RwmExpected_Tot_Cohort_Est_Current_Num = 30m },
+            new() { Id = "100005", RwmExpected_Tot_Cohort_Est_Current_Num = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3800,10 +3801,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", RwmHigher_Tot_Cohort_Est_Current_Num = "10" },
-            new() { Id = "100003", RwmHigher_Tot_Cohort_Est_Current_Num = "z" },
-            new() { Id = "100004", RwmHigher_Tot_Cohort_Est_Current_Num = "30" },
-            new() { Id = "100005", RwmHigher_Tot_Cohort_Est_Current_Num = "20" }
+            new() { Id = "100002", RwmHigher_Tot_Cohort_Est_Current_Num = 10m },
+            new() { Id = "100003", RwmHigher_Tot_Cohort_Est_Current_Num = null },
+            new() { Id = "100004", RwmHigher_Tot_Cohort_Est_Current_Num = 30m },
+            new() { Id = "100005", RwmHigher_Tot_Cohort_Est_Current_Num = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3844,10 +3845,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", ReadingScaledScore_Tot_Cohort_Est_Current_Num = "10" },
-            new() { Id = "100003", ReadingScaledScore_Tot_Cohort_Est_Current_Num = "z" },
-            new() { Id = "100004", ReadingScaledScore_Tot_Cohort_Est_Current_Num = "30" },
-            new() { Id = "100005", ReadingScaledScore_Tot_Cohort_Est_Current_Num = "20" }
+            new() { Id = "100002", ReadingScaledScore_Tot_Cohort_Est_Current_Num = 10m },
+            new() { Id = "100003", ReadingScaledScore_Tot_Cohort_Est_Current_Num = null },
+            new() { Id = "100004", ReadingScaledScore_Tot_Cohort_Est_Current_Num = 30m },
+            new() { Id = "100005", ReadingScaledScore_Tot_Cohort_Est_Current_Num = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3888,10 +3889,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", MathsScaledScore_Tot_Cohort_Est_Current_Num = "10" },
-            new() { Id = "100003", MathsScaledScore_Tot_Cohort_Est_Current_Num = "z" },
-            new() { Id = "100004", MathsScaledScore_Tot_Cohort_Est_Current_Num = "30" },
-            new() { Id = "100005", MathsScaledScore_Tot_Cohort_Est_Current_Num = "20" }
+            new() { Id = "100002", MathsScaledScore_Tot_Cohort_Est_Current_Num = 10m },
+            new() { Id = "100003", MathsScaledScore_Tot_Cohort_Est_Current_Num = null },
+            new() { Id = "100004", MathsScaledScore_Tot_Cohort_Est_Current_Num = 30m },
+            new() { Id = "100005", MathsScaledScore_Tot_Cohort_Est_Current_Num = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3932,10 +3933,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", GpsExpected_Tot_Cohort_Est_Current_Num = "10" },
-            new() { Id = "100003", GpsExpected_Tot_Cohort_Est_Current_Num = "z" },
-            new() { Id = "100004", GpsExpected_Tot_Cohort_Est_Current_Num = "30" },
-            new() { Id = "100005", GpsExpected_Tot_Cohort_Est_Current_Num = "20" }
+            new() { Id = "100002", GpsExpected_Tot_Cohort_Est_Current_Num = 10m },
+            new() { Id = "100003", GpsExpected_Tot_Cohort_Est_Current_Num = null },
+            new() { Id = "100004", GpsExpected_Tot_Cohort_Est_Current_Num = 30m },
+            new() { Id = "100005", GpsExpected_Tot_Cohort_Est_Current_Num = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3976,10 +3977,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", GpsHigher_Tot_Cohort_Est_Current_Num = "10" },
-            new() { Id = "100003", GpsHigher_Tot_Cohort_Est_Current_Num = "z" },
-            new() { Id = "100004", GpsHigher_Tot_Cohort_Est_Current_Num = "30" },
-            new() { Id = "100005", GpsHigher_Tot_Cohort_Est_Current_Num = "20" }
+            new() { Id = "100002", GpsHigher_Tot_Cohort_Est_Current_Num = 10m },
+            new() { Id = "100003", GpsHigher_Tot_Cohort_Est_Current_Num = null },
+            new() { Id = "100004", GpsHigher_Tot_Cohort_Est_Current_Num = 30m },
+            new() { Id = "100005", GpsHigher_Tot_Cohort_Est_Current_Num = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -4188,14 +4189,14 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100009" }
        );
         _performanceRepo.SetupEstablishmentPerformance(
-           new() { Id = "100002", RwmHigher_Tot_Cohort_Est_Current_Num = "10", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-           new() { Id = "100003", RwmHigher_Tot_Cohort_Est_Current_Num = "z", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-           new() { Id = "100004", RwmHigher_Tot_Cohort_Est_Current_Num = "30", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-           new() { Id = "100005", RwmHigher_Tot_Cohort_Est_Current_Num = "20", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-           new() { Id = "100006", RwmHigher_Tot_Cohort_Est_Current_Num = "z", RwmExpected_Tot_Cohort_Est_Current_Num = "10" },
-           new() { Id = "100007", RwmHigher_Tot_Cohort_Est_Current_Num = "z", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-           new() { Id = "100008", RwmHigher_Tot_Cohort_Est_Current_Num = "z", RwmExpected_Tot_Cohort_Est_Current_Num = "30" },
-           new() { Id = "100009", RwmHigher_Tot_Cohort_Est_Current_Num = "z", RwmExpected_Tot_Cohort_Est_Current_Num = "20" }
+           new() { Id = "100002", RwmHigher_Tot_Cohort_Est_Current_Num = 10m, RwmExpected_Tot_Cohort_Est_Current_Num = null },
+           new() { Id = "100003", RwmHigher_Tot_Cohort_Est_Current_Num = null, RwmExpected_Tot_Cohort_Est_Current_Num = null },
+           new() { Id = "100004", RwmHigher_Tot_Cohort_Est_Current_Num = 30m, RwmExpected_Tot_Cohort_Est_Current_Num = null },
+           new() { Id = "100005", RwmHigher_Tot_Cohort_Est_Current_Num = 20m, RwmExpected_Tot_Cohort_Est_Current_Num = null },
+           new() { Id = "100006", RwmHigher_Tot_Cohort_Est_Current_Num = null, RwmExpected_Tot_Cohort_Est_Current_Num = 10m },
+           new() { Id = "100007", RwmHigher_Tot_Cohort_Est_Current_Num = null, RwmExpected_Tot_Cohort_Est_Current_Num = null },
+           new() { Id = "100008", RwmHigher_Tot_Cohort_Est_Current_Num = null, RwmExpected_Tot_Cohort_Est_Current_Num = 30m },
+           new() { Id = "100009", RwmHigher_Tot_Cohort_Est_Current_Num = null, RwmExpected_Tot_Cohort_Est_Current_Num = 20m }
        );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -4243,14 +4244,14 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             new() { URN = "100009", UrbanRuralId = "UF1" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-           new() { Id = "100002", RwmHigher_Tot_Cohort_Est_Current_Num = "10", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-           new() { Id = "100003", RwmHigher_Tot_Cohort_Est_Current_Num = "z", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-           new() { Id = "100004", RwmHigher_Tot_Cohort_Est_Current_Num = "30", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-           new() { Id = "100005", RwmHigher_Tot_Cohort_Est_Current_Num = "20", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-           new() { Id = "100006", RwmHigher_Tot_Cohort_Est_Current_Num = "z", RwmExpected_Tot_Cohort_Est_Current_Num = "10" },
-           new() { Id = "100007", RwmHigher_Tot_Cohort_Est_Current_Num = "z", RwmExpected_Tot_Cohort_Est_Current_Num = "z" },
-           new() { Id = "100008", RwmHigher_Tot_Cohort_Est_Current_Num = "z", RwmExpected_Tot_Cohort_Est_Current_Num = "30" },
-           new() { Id = "100009", RwmHigher_Tot_Cohort_Est_Current_Num = "z", RwmExpected_Tot_Cohort_Est_Current_Num = "20" }
+           new() { Id = "100002", RwmHigher_Tot_Cohort_Est_Current_Num = 10m, RwmExpected_Tot_Cohort_Est_Current_Num = null },
+           new() { Id = "100003", RwmHigher_Tot_Cohort_Est_Current_Num = null, RwmExpected_Tot_Cohort_Est_Current_Num = null },
+           new() { Id = "100004", RwmHigher_Tot_Cohort_Est_Current_Num = 30m, RwmExpected_Tot_Cohort_Est_Current_Num = null },
+           new() { Id = "100005", RwmHigher_Tot_Cohort_Est_Current_Num = 20m, RwmExpected_Tot_Cohort_Est_Current_Num = null },
+           new() { Id = "100006", RwmHigher_Tot_Cohort_Est_Current_Num = null, RwmExpected_Tot_Cohort_Est_Current_Num = 10m },
+           new() { Id = "100007", RwmHigher_Tot_Cohort_Est_Current_Num = null, RwmExpected_Tot_Cohort_Est_Current_Num = null },
+           new() { Id = "100008", RwmHigher_Tot_Cohort_Est_Current_Num = null, RwmExpected_Tot_Cohort_Est_Current_Num = 30m },
+           new() { Id = "100009", RwmHigher_Tot_Cohort_Est_Current_Num = null, RwmExpected_Tot_Cohort_Est_Current_Num = 20m }
        );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },

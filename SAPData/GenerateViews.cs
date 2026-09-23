@@ -1124,7 +1124,7 @@ public sealed class GenerateViews
         {
             "int" => $"clean_int(t.\"{col}\")",
             "percentage" => $"clean_numeric(t.\"{col}\")",
-            "numeric" => $"clean_numeric(t.\"{col}\")",
+            "numeric" or "double" => $"clean_numeric(t.\"{col}\")",
             _ => $"t.\"{col}\""
         };
     }

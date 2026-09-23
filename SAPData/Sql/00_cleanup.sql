@@ -52,12 +52,22 @@ RETURNS NUMERIC
 LANGUAGE plpgsql
 IMMUTABLE
 AS $$
+DECLARE
+    result NUMERIC;
 BEGIN
     IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN
         RETURN NULL;
     END IF;
 
-    RETURN value::NUMERIC;
+    -- Same rules as the website's parser (SAPSec.Core MeasureHelper.ParseNullableDecimal):
+    -- a trailing '%' is ignored, and anything that isn't a finite number is NULL.
+    result := regexp_replace(trim(value), '%$', '')::NUMERIC;
+
+    IF result IN ('NaN'::NUMERIC, 'Infinity'::NUMERIC, '-Infinity'::NUMERIC) THEN
+        RETURN NULL;
+    END IF;
+
+    RETURN result;
 
 EXCEPTION WHEN others THEN
     RETURN NULL;
