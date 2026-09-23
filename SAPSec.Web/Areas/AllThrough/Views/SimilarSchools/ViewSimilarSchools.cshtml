@@ -4,7 +4,7 @@
 
 @model AllThroughSimilarSchoolsPageViewModel
 @{
-    Layout = "_Layout";
+    Layout = "~/Areas/AllThrough/Views/School/_Layout.cshtml";
     ViewData[ViewDataKeys.Title] = "View similar schools";
     var selectedSimilarSchools = Model.SelectedSimilarSchools;
     if (selectedSimilarSchools is not null)

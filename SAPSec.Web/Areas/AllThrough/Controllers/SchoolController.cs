@@ -9,10 +9,8 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
-using SAPSec.Data.Repositories;
 using SAPSec.Web.Areas.AllThrough.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels;
-using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
@@ -31,13 +29,13 @@ public class SchoolController(
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
         IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
-        IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
-        IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse> findSecondarySimilarSchoolsUseCase,
-        ISimilarSchoolsPrimaryRepository similarSchoolsPrimaryRepository,
-        ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository,
+        IUseCase<GetAllThroughSimilarSchoolPhasesRequest, GetAllThroughSimilarSchoolPhasesResponse> getAllThroughSimilarSchoolPhasesUseCase,
         IFeatureFlagService featureFlagService)
     : Controller
 {
+    private const string SharedKs2PerformanceMeasuresView = "~/Areas/Shared/Views/School/Ks2PerformanceMeasures.cshtml";
+    private const string SharedKs4CoreSubjectsView = "~/Areas/Shared/Views/School/Ks4CoreSubjects.cshtml";
+
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
@@ -65,6 +63,8 @@ public class SchoolController(
         var model = new Ks2PerformanceMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            WhatIsASimilarSchoolUrl = Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
+            SimilarSchoolDefinitionLinkText = "how DfE identifies what a similar school is",
             MeetingExpectedStandardRwm = MeasureViewModel.FromAllThroughPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School, response.SimilarSchoolsCount > 0),
             AchievedHigherStandardRwm = MeasureViewModel.FromAllThroughPrimaryMeasure(response.AchievedHigherStandardRwm, response.School, response.SimilarSchoolsCount > 0),
             AverageScaledScoreReading = MeasureViewModel.FromAllThroughPrimaryMeasure(response.AverageScaledScoreReading, response.School, response.SimilarSchoolsCount > 0),
@@ -73,7 +73,7 @@ public class SchoolController(
             AchievedHigherStandardGps = MeasureViewModel.FromAllThroughPrimaryMeasure(response.AchievedHigherStandardGps, response.School, response.SimilarSchoolsCount > 0)
         };
 
-        return View(model);
+        return View(SharedKs2PerformanceMeasuresView, model);
     }
 
     [HttpGet]
@@ -94,6 +94,8 @@ public class SchoolController(
         var model = new Ks4CoreSubjectsPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            WhatIsASimilarSchoolUrl = Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
+            SimilarSchoolDefinitionLinkText = "how DfE identifies what a similar school is",
             Measures = [
                 MeasureViewModel.FromAllThroughSecondaryMeasure(response.EnglishLanguage, response.School, hasSimilarSecondarySchools),
                 MeasureViewModel.FromAllThroughSecondaryMeasure(response.EnglishLiterature, response.School, hasSimilarSecondarySchools),
@@ -105,7 +107,7 @@ public class SchoolController(
             ]
         };
 
-        return View(model);
+        return View(SharedKs4CoreSubjectsView, model);
     }
 
     [HttpGet]
@@ -116,82 +118,6 @@ public class SchoolController(
         await PopulateViewData(response.School);
 
         return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
-    }
-
-    [HttpGet]
-    [Route("view-similar-schools")]
-    public async Task<IActionResult> ViewSimilarSchools(
-        string urn,
-        [FromQuery] string? phase = null,
-        [FromQuery] string? sortBy = null,
-        [FromQuery] string? page = null,
-        [FromQuery] string? primaryQuery = null,
-        [FromQuery] string? secondaryQuery = null)
-    {
-        var schoolResponse = await getSchoolInfoUseCase.Execute(new(urn));
-        await PopulateViewData(schoolResponse.School);
-
-        var similarSchoolPhases = await GetSimilarSchoolPhasesAsync(urn);
-        var selectedPhase = phase?.Equals("secondary", StringComparison.OrdinalIgnoreCase) == true
-            ? "secondary"
-            : "primary";
-
-        SimilarSchoolsPageViewModel? primarySimilarSchools = null;
-        SimilarSchoolsPageViewModel? secondarySimilarSchools = null;
-        if (selectedPhase == "primary" && similarSchoolPhases.HasPrimary)
-        {
-            var filterBy = SimilarSchoolsPageViewModel.BuildCoreFilters(Request.Query);
-            var response = await findPrimarySimilarSchoolsUseCase.Execute(new(
-                urn,
-                filterBy,
-                sortBy,
-                page));
-
-            primarySimilarSchools = SimilarSchoolsPageViewModel.Build(
-                "primary",
-                Request.Query,
-                response.CurrentSchool,
-                response.SortOptions,
-                response.FilterOptions,
-                response.ResultsPage,
-                response.AllResults,
-                response.ValidationErrors,
-                Routes.AllThroughSchool(urn).ViewSimilarSchools,
-                Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
-                comparatorUrn => Routes.AllThroughSchool(urn).PrimaryComparison(comparatorUrn).Similarity);
-        }
-        else if (selectedPhase == "secondary" && similarSchoolPhases.HasSecondary)
-        {
-            var filterBy = SimilarSchoolsPageViewModel.BuildCoreFilters(Request.Query);
-            var response = await findSecondarySimilarSchoolsUseCase.Execute(new(
-                urn,
-                filterBy,
-                sortBy,
-                page));
-
-            secondarySimilarSchools = SimilarSchoolsPageViewModel.Build(
-                "secondary",
-                Request.Query,
-                response.CurrentSchool,
-                response.SortOptions,
-                response.FilterOptions,
-                response.ResultsPage,
-                response.AllResults,
-                response.ValidationErrors,
-                $"{Routes.AllThroughSchool(urn).ViewSimilarSchools}?phase=secondary",
-                Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
-                comparatorUrn => Routes.AllThroughSchool(urn).SecondaryComparison(comparatorUrn).Similarity);
-        }
-
-        return View(AllThroughSimilarSchoolsPageViewModel.FromSchoolInfo(
-            schoolResponse.School,
-            selectedPhase,
-            BuildPrimaryTabUrl(urn, selectedPhase, primaryQuery, secondaryQuery),
-            BuildSecondaryTabUrl(urn, selectedPhase, secondaryQuery),
-            primarySimilarSchools,
-            secondarySimilarSchools,
-            similarSchoolPhases.HasPrimary,
-            similarSchoolPhases.HasSecondary));
     }
 
     [HttpGet]
@@ -247,90 +173,14 @@ public class SchoolController(
             await GetSimilarSchoolPhasesAsync(urn),
             await IsRiseResourcesEnabledAsync());
 
-    private async Task<AllThroughSimilarSchoolPhases> GetSimilarSchoolPhasesAsync(string urn) =>
-        new(
-            (await similarSchoolsPrimaryRepository.GetGroupAsync(urn)).Any(),
-            (await similarSchoolsSecondaryRepository.GetGroupAsync(urn)).Any());
+    private async Task<AllThroughSimilarSchoolPhases> GetSimilarSchoolPhasesAsync(string urn)
+    {
+        var response = await getAllThroughSimilarSchoolPhasesUseCase.Execute(new(urn));
+
+        return new(response.HasPrimary, response.HasSecondary);
+    }
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>
         featureFlagService is not null
         && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
-
-    private string BuildPrimaryTabUrl(string urn, string selectedPhase, string? primaryQuery, string? secondaryQuery)
-    {
-        var url = Routes.AllThroughSchool(urn).ViewSimilarSchools;
-        if (!string.IsNullOrWhiteSpace(primaryQuery) && primaryQuery.StartsWith('?'))
-        {
-            url += primaryQuery;
-        }
-        else if (selectedPhase == "primary")
-        {
-            url += BuildPhaseQueryString();
-        }
-
-        var secondaryQueryString = selectedPhase == "secondary"
-            ? BuildPhaseQueryString()
-            : secondaryQuery;
-
-        return AppendStoredQuery(url, "secondaryQuery", secondaryQueryString);
-    }
-
-    private string BuildSecondaryTabUrl(string urn, string selectedPhase, string? secondaryQuery)
-    {
-        var url = $"{Routes.AllThroughSchool(urn).ViewSimilarSchools}?phase=secondary";
-        var secondaryQueryString = selectedPhase == "secondary"
-            ? BuildPhaseQueryString()
-            : secondaryQuery;
-
-        if (!string.IsNullOrWhiteSpace(secondaryQueryString) && secondaryQueryString.StartsWith('?'))
-        {
-            url += "&" + secondaryQueryString.TrimStart('?');
-        }
-
-        var primaryQueryString = selectedPhase == "primary"
-            ? BuildPhaseQueryString()
-            : Request.Query.TryGetValue("primaryQuery", out var primaryValue)
-                ? primaryValue.FirstOrDefault()
-                : null;
-
-        url = AppendStoredQuery(url, "primaryQuery", primaryQueryString);
-
-        return url;
-    }
-
-    private string BuildPhaseQueryString()
-    {
-        var queryParts = new List<string>();
-
-        foreach (var (key, values) in Request.Query)
-        {
-            if (key.Equals("phase", StringComparison.InvariantCultureIgnoreCase)
-                || key.Equals("primaryQuery", StringComparison.InvariantCultureIgnoreCase)
-                || key.Equals("secondaryQuery", StringComparison.InvariantCultureIgnoreCase))
-            {
-                continue;
-            }
-
-            foreach (var value in values)
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    queryParts.Add($"{Uri.EscapeDataString(key)}={Uri.EscapeDataString(value!)}");
-                }
-            }
-        }
-
-        return queryParts.Count > 0 ? "?" + string.Join("&", queryParts) : string.Empty;
-    }
-
-    private static string AppendStoredQuery(string url, string key, string? queryString)
-    {
-        if (string.IsNullOrWhiteSpace(queryString))
-        {
-            return url;
-        }
-
-        var separator = url.Contains('?') ? "&" : "?";
-        return $"{url}{separator}{key}={Uri.EscapeDataString(queryString)}";
-    }
 }

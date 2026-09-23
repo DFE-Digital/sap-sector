@@ -24,6 +24,12 @@
                id="similar-schools-focus-target"
                name="@SimilarSchoolsPageViewModel.FocusTargetQueryParameter"
                value="" />
+        @foreach (var field in Model.HiddenFormFields)
+        {
+            <input type="hidden"
+                   name="@field.Name"
+                   value="@field.Value" />
+        }
 
         <div class="moj-filter app-filter" data-testid="@(Model.PhaseLabel)-similar-schools-filter">
             <div class="moj-filter__header app-filter__header">

@@ -4,6 +4,7 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Features.Sorting;
 using SAPSec.Web.Helpers;
+using System.Net;
 
 namespace SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 
@@ -24,6 +25,8 @@ public class SimilarSchoolsPageViewModel
     public required string PhaseLabel { get; init; }
     public required string ViewSimilarSchoolsUrl { get; init; }
     public required string WhatIsASimilarSchoolUrl { get; init; }
+    public IReadOnlyCollection<SimilarSchoolsHiddenFormFieldViewModel> HiddenFormFields =>
+        BuildHiddenFormFields(ViewSimilarSchoolsUrl);
 
     public required IReadOnlyCollection<SimilarSchoolViewModel> SimilarSchools { get; init; }
     public required IReadOnlyCollection<SimilarSchoolViewModel> MapSchools { get; init; }
@@ -198,4 +201,45 @@ public class SimilarSchoolsPageViewModel
         || key.Equals("phase", StringComparison.InvariantCultureIgnoreCase)
         || key.Equals("primaryQuery", StringComparison.InvariantCultureIgnoreCase)
         || key.Equals("secondaryQuery", StringComparison.InvariantCultureIgnoreCase);
+
+    private static IReadOnlyCollection<SimilarSchoolsHiddenFormFieldViewModel> BuildHiddenFormFields(string url)
+    {
+        var queryStartIndex = url.IndexOf('?');
+        if (queryStartIndex < 0 || queryStartIndex == url.Length - 1)
+        {
+            return [];
+        }
+
+        return url[(queryStartIndex + 1)..]
+            .Split('&', StringSplitOptions.RemoveEmptyEntries)
+            .Select(ParseQueryPart)
+            .Where(field => field is not null && IsPreservedFormQueryParameter(field.Name))
+            .Cast<SimilarSchoolsHiddenFormFieldViewModel>()
+            .ToList();
+    }
+
+    private static SimilarSchoolsHiddenFormFieldViewModel? ParseQueryPart(string queryPart)
+    {
+        var separatorIndex = queryPart.IndexOf('=');
+        if (separatorIndex < 0)
+        {
+            return new(Decode(queryPart), string.Empty);
+        }
+
+        return new(
+            Decode(queryPart[..separatorIndex]),
+            Decode(queryPart[(separatorIndex + 1)..]));
+    }
+
+    private static bool IsPreservedFormQueryParameter(string key) =>
+        key.Equals("phase", StringComparison.InvariantCultureIgnoreCase)
+        || key.Equals("primaryQuery", StringComparison.InvariantCultureIgnoreCase)
+        || key.Equals("secondaryQuery", StringComparison.InvariantCultureIgnoreCase);
+
+    private static string Decode(string value) =>
+        WebUtility.UrlDecode(value);
 }
+
+public record SimilarSchoolsHiddenFormFieldViewModel(
+    string Name,
+    string Value);

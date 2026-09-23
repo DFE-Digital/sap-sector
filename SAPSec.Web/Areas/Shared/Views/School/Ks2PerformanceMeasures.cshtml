@@ -1,9 +1,9 @@
-@using SAPSec.Web.Areas.AllThrough.ViewModels
+@using SAPSec.Web.Areas.Shared.ViewModels.School
 @using SAPSec.Web.Constants
 
 @model Ks2PerformanceMeasuresPageViewModel
 @{
-    Layout = "_Layout";
+    Layout = "~/Areas/Shared/Views/School/_Layout.cshtml";
     ViewData[ViewDataKeys.Title] = "KS2 performance measures";
 }
 
@@ -22,7 +22,7 @@
     </ul>
 
     <p class="govuk-body">
-        Find out <a href="@Routes.AllThroughSchool(Model.School.Urn).WhatIsASimilarSchool" class="govuk-link">how DfE identifies what a similar school is</a>.
+        Find out <a href="@Model.WhatIsASimilarSchoolUrl" class="govuk-link">@Model.SimilarSchoolDefinitionLinkText</a>.
     </p>
 
     <form action="" method="get">
