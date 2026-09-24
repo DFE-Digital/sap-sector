@@ -19,7 +19,7 @@ public class SchoolSchoolDetailsPageEndToEndTests(EndToEndTestsFixture fixture)
     {
         await base.InitializeAsync();
         await NavigateTo(Routes.FindASchool());
-        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(CurrentSchoolUrn);
+        await Page.GetByLabel("Compare and connect with similar schools", new() { Exact = true }).FillAsync(CurrentSchoolUrn);
         await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.Overview);
         await Page.GetByText("School details", new() { Exact = true }).ClickAsync();

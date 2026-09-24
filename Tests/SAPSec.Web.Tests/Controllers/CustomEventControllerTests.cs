@@ -28,16 +28,16 @@ public class CustomEventControllerTests
             SignIn = "/auth/signin",
             MailTo = "mailto:",
             ServiceUrls = [
-                "https://get-school-improvement-insights.education.gov.uk",
-                "https://get-school-improvement-insights-test.test.teacherservices.cloud",
-                "https://test.get-school-improvement-insights.gov.uk"]
+                "https://compare-connect-similar-schools.education.gov.uk",
+                "https://compare-connect-similar-schools-test.test.teacherservices.cloud",
+                "https://test.compare-connect-similar-schools.gov.uk"]
         });
         _sut = new CustomEventController(_customEventServiceMock.Object, _optionsMock.Object);
     }
 
     [Theory]
     [InlineData("https://forms.cloud.microsoft/Pages", "feedback_link_click")]
-    [InlineData("https://get-school-improvement-insights.education.gov.uk/auth/signin", "cta_start_now_click")]
+    [InlineData("https://compare-connect-similar-schools.education.gov.uk/auth/signin", "cta_start_now_click")]
     [InlineData("https://www.example.com", "outbound_link_click")]
     [InlineData("mailto:test@example.com", "mailto_link_click")]
     public async Task CustomEventTracking_SendsCustomEvent(string url, string eventName)
@@ -52,10 +52,10 @@ public class CustomEventControllerTests
     }
 
     [Theory]
-    [InlineData("https://get-school-improvement-insights.education.gov.uk/school/123456")]
-    [InlineData("https://get-school-improvement-insights-test.test.teacherservices.cloud/school/123456")]
-    [InlineData("https://test.get-school-improvement-insights.gov.uk/school/123456")]
-    [InlineData("https://get-school-improvement-insights-pr-240.test.teacherservices.cloud/school/123456")]
+    [InlineData("https://compare-connect-similar-schools.education.gov.uk/school/123456")]
+    [InlineData("https://compare-connect-similar-schools-test.test.teacherservices.cloud/school/123456")]
+    [InlineData("https://test.compare-connect-similar-schools.gov.uk/school/123456")]
+    [InlineData("https://compare-connect-similar-schools-pr-240.test.teacherservices.cloud/school/123456")]
     public async Task PostCustomEventTracking_DoesNotSendEventForNonMatchingUrls(string url)
     {
         var clickData = new ClickData { Text = "text", Url = url };
