@@ -175,7 +175,7 @@ public class SchoolPagesIntegrationTests(
             && x.GetAttribute("rel") == "noopener noreferrer");
 
         links.Should().Contain(x =>
-            x.TextContent.Trim() == "View your education data (VYED) (opens in new tab)"
+            x.TextContent.Trim() == "View your education data (opens in new tab)"
             && x.GetAttribute("href") == "https://viewyourdata.education.gov.uk/"
             && x.GetAttribute("target") == "_blank"
             && x.GetAttribute("rel") == "noopener noreferrer");
