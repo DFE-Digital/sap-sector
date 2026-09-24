@@ -1,0 +1,471 @@
+<title>KS4 Data Map Fixes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #f6f7f9;
+    --surface: #ffffff;
+    --ink: #17202c;
+    --muted: #556070;
+    --rule: #dbe0e7;
+    --accent: #0e6a70;
+    --accent-soft: #e3f1f1;
+    --visible: #9a4a07;
+    --visible-soft: #fcefe0;
+    --quiet: #4e5b6e;
+    --quiet-soft: #e9edf2;
+    --good: #1c6f47;
+    --good-soft: #e2f3ea;
+    --bad: #9b2c2c;
+    --code-bg: #eef1f5;
+    --sans: "Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #11161d;
+      --surface: #171e27;
+      --ink: #e6ebf1;
+      --muted: #9aa6b5;
+      --rule: #2b3542;
+      --accent: #5cc2c6;
+      --accent-soft: #15302f;
+      --visible: #f0a25a;
+      --visible-soft: #3a2614;
+      --quiet: #a9b4c3;
+      --quiet-soft: #232c38;
+      --good: #6fcf9c;
+      --good-soft: #15301f;
+      --bad: #f08a8a;
+      --code-bg: #1f2833;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #11161d;
+    --surface: #171e27;
+    --ink: #e6ebf1;
+    --muted: #9aa6b5;
+    --rule: #2b3542;
+    --accent: #5cc2c6;
+    --accent-soft: #15302f;
+    --visible: #f0a25a;
+    --visible-soft: #3a2614;
+    --quiet: #a9b4c3;
+    --quiet-soft: #232c38;
+    --good: #6fcf9c;
+    --good-soft: #15301f;
+    --bad: #f08a8a;
+    --code-bg: #1f2833;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    padding-inline: 16px;
+    padding-block: 40px 64px;
+  }
+  .page { max-width: 820px; margin: 0 auto; display: grid; gap: 40px; }
+  h1, h2, h3 { text-wrap: balance; line-height: 1.25; margin: 0; }
+  h1 { font-size: clamp(28px, 4.2vw, 38px); font-weight: 700; letter-spacing: -0.01em; }
+  h2 { font-size: 22px; font-weight: 700; }
+  h3 { font-size: 18px; font-weight: 600; }
+  p { margin: 0; max-width: 68ch; }
+  ul, ol { margin: 0; padding-left: 1.25em; display: grid; gap: 6px; max-width: 68ch; }
+  code, .mono { font-family: var(--mono); font-size: 0.86em; }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  a { color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent);
+  }
+  header.masthead { display: grid; gap: 14px; padding-bottom: 28px; border-bottom: 1px solid var(--rule); }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 24px; color: var(--muted); font-size: 14px; }
+  .meta span b { color: var(--ink); font-weight: 600; }
+  .lede { font-size: 18px; color: var(--ink); }
+
+  section { display: grid; gap: 16px; }
+  .section-head { display: grid; gap: 6px; }
+
+  .facts {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px;
+    background: var(--rule); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;
+  }
+  .fact { background: var(--surface); padding: 16px; display: grid; gap: 4px; align-content: start; }
+  .fact .n { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .fact .l { font-size: 13px; color: var(--muted); line-height: 1.4; }
+  @media (max-width: 640px) { .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+  }
+  .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .chip.visible { color: var(--visible); background: var(--visible-soft); }
+  .chip.quiet { color: var(--quiet); background: var(--quiet-soft); }
+  .chip.good { color: var(--good); background: var(--good-soft); }
+
+  .issue {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
+    padding: 24px; display: grid; gap: 18px;
+  }
+  .issue-head { display: grid; gap: 10px; }
+  .issue-head .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  dl.kv { margin: 0; display: grid; grid-template-columns: 148px 1fr; gap: 12px 20px; }
+  dl.kv dt { font-size: 13px; font-weight: 600; color: var(--muted); padding-top: 2px; }
+  dl.kv dd { margin: 0; }
+  @media (max-width: 600px) { dl.kv { grid-template-columns: 1fr; gap: 4px; } dl.kv dd { margin-bottom: 10px; } }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); background: var(--ground); }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; }
+  td.before { color: var(--bad); }
+  td.after { color: var(--good); font-weight: 600; }
+  .blank { font-style: italic; }
+
+  .callout {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    padding: 14px 18px; border-radius: 0 8px 8px 0; display: grid; gap: 6px;
+  }
+  .callout p { max-width: none; }
+
+  .steps { counter-reset: step; list-style: none; padding: 0; display: grid; gap: 10px; }
+  .steps li { counter-increment: step; display: grid; grid-template-columns: 28px 1fr; gap: 10px; }
+  .steps li::before {
+    content: counter(step); width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 12px; font-weight: 700; color: var(--accent); background: var(--accent-soft);
+  }
+
+  .tag { font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .tag.fixed { color: var(--good); }
+  .tag.improved { color: var(--accent); }
+  .tag.open { color: var(--visible); }
+  .sub { color: var(--muted); font-size: 14px; }
+
+  footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--muted); font-size: 13px; display: grid; gap: 6px; }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <div class="eyebrow">School data pipeline · Data map migration</div>
+    <h1>Data map migration: errors fixed, platform improvements and follow-ups</h1>
+    <p class="lede">The Excel data map (<code>datamap.csv</code>, 4,948 rows) has been replaced by code, and the pipeline now reloads only what changed. Along the way we found and fixed four KS4 mapping errors and several pipeline problems, including the daily establishment file not being reloaded. One change is visible on the website: around 3,650 schools now show a 2023 to 2024 grade 7+ figure for English language, English literature and Maths that was previously blank. Everything else the website shows is unchanged.</p>
+    <div class="meta">
+      <span><b>Pull request</b> #372 (13 commits)</span>
+      <span><b>Branch</b> <span class="mono">spike-data-map-restructure</span></span>
+      <span><b>Status</b> In review; pipeline run in CI, review app 372 front-end testing</span>
+      <span><b>Updated</b> 24 September 2026</span>
+    </div>
+  </header>
+
+  <section aria-labelledby="glance">
+    <div class="section-head">
+      <h2 id="glance">At a glance</h2>
+    </div>
+    <div class="facts">
+      <div class="fact"><span class="n">4</span><span class="l">mapping errors fixed</span></div>
+      <div class="fact"><span class="n">1</span><span class="l">visible on the website</span></div>
+      <div class="fact"><span class="n">~3,650</span><span class="l">schools gain a 2023 to 2024 grade 7+ figure (per subject)</span></div>
+      <div class="fact"><span class="n">0</span><span class="l">other values changed across 1,330 KS4 columns</span></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="glance-platform">
+    <div class="section-head">
+      <h2 id="glance-platform">Platform at a glance</h2>
+    </div>
+    <div class="facts">
+      <div class="fact"><span class="n">4,948 → ~730</span><span class="l">spreadsheet rows replaced by lines of code</span></div>
+      <div class="fact"><span class="n">2 s</span><span class="l">pipeline database step when nothing changed (was a 16 min full rebuild)</span></div>
+      <div class="fact"><span class="n">22 / 22</span><span class="l">views identical to the spreadsheet-built ones, cell for cell</span></div>
+      <div class="fact"><span class="n">0</span><span class="l">errors in a full rebuild into a new database</span></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="context">
+    <div class="section-head">
+      <h2 id="context">How these were found</h2>
+    </div>
+    <p>The KS4 Performance part of <code>datamap.csv</code> (1,329 spreadsheet rows) was converted into a code-defined catalogue (commit <span class="mono">90939c42</span>). That commit reproduces the spreadsheet exactly, including its mistakes, and a test proves the output is identical. Converting the rows into structured code made three inconsistencies stand out. Each was checked against the raw DfE source files before being fixed.</p>
+    <p>The fixes are in their own commits (<span class="mono">a60a0573</span> for errors 1–3, <span class="mono">20a0dc99</span> for error 4) so they can be reviewed, tested and, if needed, reverted separately from the migration. Error 4 was found by the automated data map validation added afterwards, which checks every field and filter value against the real source files.</p>
+  </section>
+
+  <section aria-labelledby="issues">
+    <div class="section-head">
+      <h2 id="issues">The four errors</h2>
+    </div>
+
+    <article class="issue" aria-labelledby="i1">
+      <div class="issue-head">
+        <div class="chips"><span class="chip visible">Visible on website</span><span class="chip good">Fixed</span></div>
+        <h3 id="i1">Grade 7+ for 2023 to 2024 was blank for every school (English language, English literature, Maths)</h3>
+      </div>
+      <dl class="kv">
+        <dt>What users saw</dt>
+        <dd>On the KS4 core subjects page with “Grade 7 and above” selected, the school’s 2023 to 2024 figure was missing for these three subjects. The other two years, and Biology, Chemistry, Physics and Combined Science, were fine.</dd>
+        <dt>Root cause</dt>
+        <dd>For the 2023 to 2024 school file only, these three subjects were mapped to filter on grades <code>7</code>, <code>8</code> and <code>9</code>. That file doesn’t contain single grades: it has grade bands (<code>9 to 4</code>, <code>9 to 5</code>, <code>9 to 7</code>). The filter matched nothing, so every school got a blank value.</dd>
+        <dt>Fix</dt>
+        <dd>Filter on the <code>9 to 7</code> band, the same as every other year and subject.</dd>
+        <dt>Columns</dt>
+        <dd><code>EngLang79</code>, <code>EngLit79</code>, <code>Maths79</code> <code>_Sum_Est_Previous_Num</code> / <code>_Pct</code> in <code>v_establishment_performance</code> (6 columns)</dd>
+      </dl>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Subject</th><th class="num">Schools with a value, before</th><th class="num">Schools with a value, after</th></tr></thead>
+          <tbody>
+            <tr><td>English language</td><td class="num before">0</td><td class="num after">3,700</td></tr>
+            <tr><td>English literature</td><td class="num before">0</td><td class="num after">3,656</td></tr>
+            <tr><td>Maths</td><td class="num before">0</td><td class="num after">3,652</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Example school (URN)</th><th class="num">Maths 7+ 2022 to 2023</th><th class="num">2023 to 2024 before</th><th class="num">2023 to 2024 after</th><th class="num">2024 to 2025</th></tr></thead>
+          <tbody>
+            <tr><td>Woodmansterne School (100590)</td><td class="num">32%</td><td class="num before blank">blank</td><td class="num after">33%</td><td class="num">26%</td></tr>
+            <tr><td>Trinity CofE School, Lewisham (100749)</td><td class="num">18%</td><td class="num before blank">blank</td><td class="num after">18%</td><td class="num">18%</td></tr>
+            <tr><td>Loreto High School Chorlton (105574)</td><td class="num">17%</td><td class="num before blank">blank</td><td class="num after">19%</td><td class="num">19%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The new values sit in line with the years either side, which is what we’d expect.</p>
+    </article>
+
+    <article class="issue" aria-labelledby="i2">
+      <div class="issue-head">
+        <div class="chips"><span class="chip quiet">Not currently displayed</span><span class="chip good">Fixed</span></div>
+        <h3 id="i2">England figure for mobile pupils, English and maths grade 5+, showed the grade 4+ number</h3>
+      </div>
+      <dl class="kv">
+        <dt>What users saw</dt>
+        <dd>Nothing today. No page shows the England mobile-pupil breakdown for this measure. It would have been wrong as soon as a page started using it.</dd>
+        <dt>Root cause</dt>
+        <dd>The grade 5+ measure for the England “Mobile” breakdown pointed at the grade 4+ columns in the source file (<code>engmath_94_*</code> instead of <code>engmath_95_*</code>). It looks like a copy-and-paste slip in the spreadsheet.</dd>
+        <dt>Fix</dt>
+        <dd>Read the grade 5+ columns, like every other breakdown of this measure.</dd>
+        <dt>Columns</dt>
+        <dd><code>EngMaths59_Mob_Eng_{Current,Previous,Previous2}_{Num,Pct}</code> in <code>v_england_performance</code> (6 columns)</dd>
+      </dl>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>England, mobile pupils</th><th class="num">Grade 5+ before (actually 4+)</th><th class="num">Grade 5+ after</th></tr></thead>
+          <tbody>
+            <tr><td>2024 to 2025, percentage</td><td class="num before">39.5%</td><td class="num after">23.4%</td></tr>
+            <tr><td>2024 to 2025, pupils</td><td class="num before">12,328</td><td class="num after">7,306</td></tr>
+            <tr><td>2023 to 2024, percentage</td><td class="num before">41.5%</td><td class="num after">25.2%</td></tr>
+            <tr><td>2022 to 2023, percentage</td><td class="num before">39.9%</td><td class="num after">24.2%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="issue" aria-labelledby="i3">
+      <div class="issue-head">
+        <div class="chips"><span class="chip quiet">Not currently displayed</span><span class="chip good">Fixed</span></div>
+        <h3 id="i3">Local authority Progress 8 was one mislabelled, unreliable value</h3>
+      </div>
+      <dl class="kv">
+        <dt>What users saw</dt>
+        <dd>Nothing today. No page shows LA Progress 8.</dd>
+        <dt>Root cause</dt>
+        <dd>Three spreadsheet rows (one per year) all used the same name, <code>Prog8_Avg_LA_Previous2_Num</code>, so only the first one was used. That row read 2024 to 2025 rather than 2022 to 2023, and filtered only on <code>sex = Total</code>. Every pupil group in the file (ethnicity, SEN, mobility and so on) has a <code>sex = Total</code> row, so the value was the largest across all of them, compared as text. For 2024 to 2025, Progress 8 isn’t published (<code>z</code>), so the result was <code>z</code>.</dd>
+        <dt>Fix</dt>
+        <dd>One properly named value per year (<code>Prog8_Tot_LA_Current_Num</code>, <code>_Previous_Num</code>, <code>_Previous2_Num</code>), each filtered to the all-pupils total row. This matches how school-level Progress 8 is named.</dd>
+        <dt>Columns</dt>
+        <dd>In <code>v_la_performance</code>: 1 removed, 3 added. Nothing in the website reads the removed column.</dd>
+      </dl>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Example: LA 202</th><th class="num">2022 to 2023</th><th class="num">2023 to 2024</th><th class="num">2024 to 2025</th></tr></thead>
+          <tbody>
+            <tr><td>Before (one column, labelled “2022 to 2023”)</td><td class="num before">z</td><td class="num blank">—</td><td class="num blank">—</td></tr>
+            <tr><td>After</td><td class="num after">−0.03</td><td class="num after">−0.14</td><td class="num after">z (not published)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+    <article class="issue" aria-labelledby="i4">
+      <div class="issue-head">
+        <div class="chips"><span class="chip quiet">Not currently displayed</span><span class="chip good">Fixed</span></div>
+        <h3 id="i4">School EAL (2024 to 2025) and not-disadvantaged (2023 to 2024) figures were blank for every school</h3>
+      </div>
+      <dl class="kv">
+        <dt>What users saw</dt>
+        <dd>Nothing today. The KS4 pages don’t offer a pupil-group filter, so these breakdowns aren’t shown. They would have appeared blank as soon as one was added.</dd>
+        <dt>Root cause</dt>
+        <dd>DfE renamed two pupil groups in the school performance tables between years. EAL went from <code>Other than English</code> (2023 to 2024) to <code>Known or believed to be other than English</code> (2024 to 2025). Not disadvantaged went from <code>Disadvantaged all other</code> to <code>Not known to be disadvantaged</code>. The data map used one label for both years, so each matched nothing in one of the years. <a href="renamed-labels-demo.html">Walk-through of this issue</a>.</dd>
+        <dt>Fix</dt>
+        <dd>Each year’s source now uses that year’s labels.</dd>
+        <dt>How found</dt>
+        <dd>By the new validation (Story 4), which reported that these filter values don’t exist in the source files.</dd>
+        <dt>Columns</dt>
+        <dd>Attainment 8 and English and maths 4+/5+ for EAL (2024 to 2025) and not disadvantaged (2023 to 2024) in <code>v_establishment_performance</code> (10 columns)</dd>
+      </dl>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Breakdown</th><th class="num">Schools with a value, before</th><th class="num">After</th></tr></thead>
+          <tbody>
+            <tr><td>EAL, 2024 to 2025</td><td class="num before">0</td><td class="num after">5,755</td></tr>
+            <tr><td>Not disadvantaged, 2023 to 2024</td><td class="num before">0</td><td class="num after">5,709</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Example: Attainment 8</th><th class="num">EAL 2023 to 2024</th><th class="num">EAL 2024 to 2025</th><th class="num">Not disadv. 2023 to 2024</th><th class="num">Not disadv. 2024 to 2025</th></tr></thead>
+          <tbody>
+            <tr><td>Woodmansterne School (100590)</td><td class="num">51.9</td><td class="num after">50.7</td><td class="num after">52.6</td><td class="num">52.1</td></tr>
+            <tr><td>Loreto High School Chorlton (105574)</td><td class="num">50.3</td><td class="num after">52.5</td><td class="num after">55.5</td><td class="num">50.1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  <section aria-labelledby="platform">
+    <div class="section-head">
+      <h2 id="platform">Platform improvements</h2>
+      <p class="sub">Problems in how the pipeline loads and serves data, fixed as part of the migration.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Problem</th><th>Why it mattered</th><th>Now</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Daily establishment (GIAS) file was not reloaded.</strong> The rebuild lists named it <code>edubasealldataYYYYmmDD</code>, which never matches the dated daily file.</td>
+            <td>School names, statuses, closures and links probably only refreshed when someone ran a full rebuild.</td>
+            <td>Each day’s file loads automatically; the establishment view and the 6 school views that use it rebuild; yesterday’s tables are removed. Tested with a simulated next-day file.</td>
+            <td><span class="tag fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><strong>Hand-kept rebuild lists</strong> decided which tables reload.</td>
+            <td>Every new file needed a list edit; data map changes were never picked up; every run reloaded the listed tables whether or not they changed.</td>
+            <td>The pipeline reloads a table only when its file changes and rebuilds a view only when its data or definition changes. No-change run: 2 s instead of 16 min.</td>
+            <td><span class="tag fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><strong>Numbers stored as text.</strong></td>
+            <td>Taking the largest of several values compared them alphabetically (“9.66” beat “20.53”), which caused one of the KS4 errors. Every page had to convert text to numbers.</td>
+            <td>Measures are numbers from the database through to the website. Checked cell by cell: no value the website shows changed.</td>
+            <td><span class="tag fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><strong>Two copies of the same dataset loaded into one table</strong> where both a manual and a downloaded copy existed.</td>
+            <td>Duplicated rows.</td>
+            <td>One file per dataset (the manual copy wins).</td>
+            <td><span class="tag fixed">Fixed</span></td>
+          </tr>
+          <tr>
+            <td><strong>Year labels hard-coded in 34 places</strong> on the website, separately from the data.</td>
+            <td>A new data year could update the figures but not the labels.</td>
+            <td>One shared setting per dataset drives both the data loaded and the labels shown.</td>
+            <td><span class="tag improved">Improved</span></td>
+          </tr>
+          <tr>
+            <td><strong>No checks on the data map.</strong></td>
+            <td>Mistakes were found in production, or not at all.</td>
+            <td>Automatic checks run on every pull request and before each pipeline run. They found error 4 and would have caught all four KS4 errors.</td>
+            <td><span class="tag improved">Improved</span></td>
+          </tr>
+          <tr>
+            <td><strong>New data year was a large manual edit</strong> (about 1,300 spreadsheet rows for KS4).</td>
+            <td>Slow, error-prone and hard to review.</td>
+            <td>Change one year setting and the file names; a runbook and a dry run show what the checks report if files are missing or changed.</td>
+            <td><span class="tag improved">Improved</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="cleanup">
+    <div class="section-head">
+      <h2 id="cleanup">Data map clean-up</h2>
+      <p class="sub">Removed with the spreadsheet; no change to any figure.</p>
+    </div>
+    <ul>
+      <li><strong>1,994 rows marked ignore</strong> and <strong>60 exact duplicate rows</strong> (pupil absence).</li>
+      <li><strong>Establishment documentation rows</strong> that no code read and that had drifted from the real establishment view.</li>
+      <li><strong>KS4 destinations year labels</strong> were a year ahead of the data (labels only; the website already showed the right years).</li>
+      <li><strong>An unused LA Progress 8 field</strong> in the website’s data classes, replaced by the corrected per-year fields.</li>
+      <li>KS4 destinations, pupil absence, KS2, email, workforce and similar schools were migrated with <strong>no data errors found</strong>; each matches the spreadsheet exactly and passes the new checks.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="verify">
+    <div class="section-head">
+      <h2 id="verify">How the fixes were verified</h2>
+    </div>
+    <ol class="steps">
+      <li><div><strong>Checked against source files.</strong> Each issue was confirmed in the raw DfE CSVs before changing anything, e.g. that the 2023 to 2024 file has a <code>9 to 7</code> band and no single grades, and that the <code>engmath_95_*</code> columns hold the grade 5+ figures.</div></li>
+      <li><div><strong>Automated tests.</strong> All 68 data map tests pass. The golden test compares the new catalogue with the old spreadsheet and fails unless the only differences are exactly these 26 columns, so any unplanned change is caught. The new validation checks every field and filter value against the source files and now runs in CI and before each pipeline run.</div></li>
+      <li><div><strong>Full pipeline run.</strong> The real pipeline was run end to end on PostgreSQL 16 (the production version) with the real source files, in a throwaway local database. It completed without errors and built all 23 views.</div></li>
+      <li><div><strong>Cell-by-cell comparison.</strong> The three KS4 views were built both ways (old spreadsheet and new catalogue) from the same raw data and compared value by value.</div></li>
+      <li><div><strong>All datasets, without the spreadsheet.</strong> After every dataset moved to code, all 22 views were rebuilt without <code>datamap.csv</code> and compared with the spreadsheet-built ones: identical, row for row. A full rebuild into a brand-new database ran all 52 pipeline scripts with no errors.</div></li>
+      <li><div><strong>Loading only what changed.</strong> Tested with no changes (nothing reloaded, 2 s), one changed file (only that table and its one view), a data map change (only the affected view) and a new day’s establishment file (3 tables, 9 views, old tables removed).</div></li>
+      <li><div><strong>In CI.</strong> The real pipeline ran from the branch against the test environment for review app 372: build, SQL generation and the database load all succeeded, and the review app backup was created.</div></li>
+    </ol>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>View</th><th class="num">Rows</th><th class="num">Columns compared</th><th class="num">Columns changed</th><th>Changed</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">v_establishment_performance</td><td class="num">6,034</td><td class="num">364</td><td class="num">16</td><td>Errors 1 and 4 only</td></tr>
+          <tr><td class="mono">v_la_performance</td><td class="num">155</td><td class="num">483</td><td class="num">0</td><td>Error 3: 1 column removed, 3 added</td></tr>
+          <tr><td class="mono">v_england_performance</td><td class="num">3</td><td class="num">483</td><td class="num">6</td><td>Error 2 only</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <p><strong>Result:</strong> the intended columns are the only differences. Row counts are unchanged, and every other KS4 value is identical to what the spreadsheet produced.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="users">
+    <div class="section-head">
+      <h2 id="users">What changes for users</h2>
+    </div>
+    <ul>
+      <li><strong>KS4 core subjects page</strong> (<code>/school/secondary/{urn}/ks4-core-subjects</code>), with “Grade 7 and above” selected for English language, English literature or Maths: the school’s 2023 to 2024 figure now appears instead of being blank.</li>
+      <li><strong>Similar schools average</strong> for those measures in 2023 to 2024 may change, because schools that were previously missing a value now count towards it.</li>
+      <li><strong>Compare with a similar school</strong> (<code>compare-ks4-core-subjects</code>): both schools now show a 2023 to 2024 grade 7+ value for these subjects.</li>
+      <li><strong>No change</strong> to grade 4+ and 5+, the other four subjects, KS4 headline measures, attendance, destinations, school details or primary pages.</li>
+    </ul>
+    <p>Front-end testing is in progress on review app 372, using the example schools above.</p>
+  </section>
+
+  <section aria-labelledby="risks">
+    <div class="section-head">
+      <h2 id="risks">Risks and considerations</h2>
+    </div>
+    <ul>
+      <li><strong>New figures appearing.</strong> Users will see 2023 to 2024 grade 7+ values for the first time. They come straight from the published DfE file, but it may be worth a release note if these pages have been discussed with schools.</li>
+      <li><strong>When it goes live.</strong> Nothing changes in any environment until the branch is merged and the data pipeline next runs.</li>
+      <li><strong>Establishment data may start changing more often.</strong> If the daily file really hasn’t been reloaded in production, the first run after merge will bring school details up to date in one step. Worth checking before release (see follow-ups).</li>
+      <li><strong>First run in each environment reloads everything once</strong> (about the time of a full rebuild), because there’s no record yet of what was loaded. After that, runs only reload what changed.</li>
+      <li><strong>Website and pipeline must go out together.</strong> The website now expects numbers from the database; deploying one without the other would break the measure pages. They ship in the same pull request.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="next">
+    <div class="section-head">
+      <h2 id="next">Next steps</h2>
+    </div>
+    <ul>
+      <li><strong>Front-end sign-off</strong> on review app 372 (in progress).</li>
+      <li><strong>15 October KS4 release:</strong> every run now checks the downloaded files before loading, so a renamed column or pupil group stops the run and the website keeps its previous figures. If the files match, the new file loads automatically; showing the new year is a small code change following the new-data-year runbook.</li>
+    </ul>
+  </section>
+
+</div>

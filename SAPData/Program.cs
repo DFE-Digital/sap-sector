@@ -302,7 +302,8 @@ internal partial class Program
 
         throw new InvalidOperationException(
             $"The downloaded source files don't match the data map ({issues.Count} issue(s), listed above). Nothing has been loaded. " +
-            "Update the catalogue for the new files (docs/operational/003-new-data-year.md), " +
+            "Update the catalogue for the new files (docs/operational/003-new-data-year.md), or for [establishment] issues " +
+            "the columns in GenerateViews.GenerateEstablishmentDimensionView, " +
             "or set SOURCE_FILE_CHECK=warn to load anyway.");
     }
 
