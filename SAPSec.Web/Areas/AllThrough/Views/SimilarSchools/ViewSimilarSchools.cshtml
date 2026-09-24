@@ -1,0 +1,113 @@
+@using SAPSec.Web.Areas.AllThrough.ViewModels
+@using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools
+@using SAPSec.Web.Constants
+
+@model AllThroughSimilarSchoolsPageViewModel
+@{
+    Layout = "~/Areas/AllThrough/Views/School/_Layout.cshtml";
+    ViewData[ViewDataKeys.Title] = "View similar schools";
+    var selectedSimilarSchools = Model.SelectedSimilarSchools;
+    if (selectedSimilarSchools is not null)
+    {
+        ViewData[ViewDataKeys.PageTitle] = $"{selectedSimilarSchools.TotalResults} similar schools - {ViewData[ViewDataKeys.Title]}";
+    }
+}
+
+@if (selectedSimilarSchools?.ValidationErrors.Any() == true)
+{
+    <div class="govuk-error-summary" data-module="govuk-error-summary">
+        <div role="alert">
+            <h2 class="govuk-error-summary__title">
+                There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                @foreach (var error in selectedSimilarSchools.ValidationErrors)
+                {
+                    <li>
+                        @{
+                            var key = !error.Key.EndsWith("_f") && !error.Key.EndsWith("_t")
+                                ? error.Key + "_f"
+                                : error.Key;
+                        }
+                        <a href="#@(key)">@error.Message</a>
+                    </li>
+                }
+                </ul>
+            </div>
+        </div>
+    </div>
+}
+
+@if (selectedSimilarSchools is not null)
+{
+    <link rel="stylesheet" href="~/css/leaflet.css"/>
+    <link rel="stylesheet" href="~/css/MarkerCluster.css"/>
+}
+
+<span class="govuk-caption-xl">@Model.School.Name</span>
+<h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
+
+<div class="app-all-through-similar-schools">
+    <p class="govuk-body">
+        We've identified <strong>50</strong> similar primary phase schools (including all-throughs) and
+        <strong>50</strong> similar secondary phase schools (including all-throughs). Select primary or
+        secondary then choose a school to compare further and connect with for support. You can also
+        refine the results by applying filters.
+    </p>
+
+    <p class="govuk-body">
+        Find out <a href="@Model.WhatIsASimilarSchoolUrl" class="govuk-link">how DfE identifies what a similar school is</a>.
+    </p>
+
+    <nav class="app-phase-tabs" aria-label="Similar school phase">
+        <ul class="app-phase-tabs__list" role="tablist">
+            <li class="app-phase-tabs__list-item @(Model.IsPrimarySelected ? "app-phase-tabs__list-item--selected" : string.Empty)" role="presentation">
+                <a class="app-phase-tabs__tab"
+                   href="@Model.PrimaryTabUrl"
+                   id="tab_primary"
+                   role="tab"
+                   aria-selected="@(Model.IsPrimarySelected ? "true" : "false")">
+                    Primary
+                </a>
+            </li>
+            <li class="app-phase-tabs__list-item @(!Model.IsPrimarySelected ? "app-phase-tabs__list-item--selected" : string.Empty)" role="presentation">
+                <a class="app-phase-tabs__tab"
+                   href="@Model.SecondaryTabUrl"
+                   id="tab_secondary"
+                   role="tab"
+                   aria-selected="@(!Model.IsPrimarySelected ? "true" : "false")">
+                    Secondary
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+@if (selectedSimilarSchools is not null)
+{
+    <partial name="~/Areas/Shared/Views/SimilarSchools/_SimilarSchoolsContent.cshtml" model="selectedSimilarSchools" />
+}
+else if (Model.ShouldShowPrimaryEmptyState)
+{
+    <p class="govuk-body" data-testid="primary-similar-schools-empty-state">
+        Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.
+    </p>
+}
+else if (Model.ShouldShowSecondaryEmptyState)
+{
+    <p class="govuk-body" data-testid="secondary-similar-schools-empty-state">
+        Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.
+    </p>
+}
+
+@section Scripts {
+    @if (selectedSimilarSchools is not null)
+    {
+        <script src="~/js/similar-schools-filter.js"></script>
+        <script src="~/js/school-search-toggle.js"></script>
+        <script src="~/js/map-schools.js"></script>
+        <script src="~/js/leaflet.js"></script>
+        <script src="~/js/leaflet.markercluster.js"></script>
+    }
+}

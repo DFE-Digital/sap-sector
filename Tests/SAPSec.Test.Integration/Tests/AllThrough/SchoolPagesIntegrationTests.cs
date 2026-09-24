@@ -195,8 +195,7 @@ public class SchoolPagesIntegrationTests(
     [Fact]
     public async Task ViewSimilarSchoolsPage_ShowsAllThroughStaticContentAndPrimaryTabByDefault()
     {
-        SetupAllThroughSchool();
-        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(Build.PrimaryGroup(Urn, ["100002"]));
+        SetupAllThroughSchoolWithPrimarySimilarSchools();
         Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
@@ -226,11 +225,65 @@ public class SchoolPagesIntegrationTests(
     }
 
     [Fact]
-    public async Task ViewSimilarSchoolsPage_WithSecondaryPhase_ShowsSecondaryTabAsActive()
+    public async Task ViewSimilarSchoolsPage_PrimaryTab_ShowsPrimarySimilarSchoolsList()
+    {
+        SetupAllThroughSchoolWithPrimarySimilarSchools();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+
+        page.ElementWithTestIdShouldExist("primary-similar-schools-filter");
+        page.QuerySelector(".app-similar-schools-sort label")!.TextContent.Trim().Should().Be("Sort by");
+        page.QuerySelector("#sort-by option[selected]")!.TextContent.Trim()
+            .Should().Be("Meeting expected standard in reading, writing and maths");
+        page.QuerySelector("#similar-schools-results-count")!.TextContent.Trim()
+            .Should().Be("Showing 1-10 of 50 similar schools");
+        page.QuerySelector("#toggleViewLink")!.TextContent.Trim().Should().Contain("View on map");
+
+        var list = page.ElementWithTestIdShouldExist("primary-similar-schools-list");
+        var results = list.QuerySelectorAll(".app-school-result").ToArray();
+        results.Should().HaveCount(10);
+
+        var firstLink = results[0].QuerySelector("a")!;
+        firstLink.TextContent.Trim().Should().Be("Similar School 50");
+        firstLink.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).PrimaryComparison("100051").Similarity);
+        results[0].TextContent.Should().Contain("50 Test Street");
+        results[0].TextContent.Should().Contain("Meeting expected standard in reading, writing and maths: 100%");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_PrimaryTab_ShowsPaginationForPrimarySimilarSchools()
+    {
+        SetupAllThroughSchoolWithPrimarySimilarSchools();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+
+        page.QuerySelectorAll(".govuk-pagination__list .govuk-pagination__link")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal("1", "2", "3", "4", "5");
+
+        page.QuerySelector(".govuk-pagination__next a")!
+            .GetAttribute("href").Should().Be($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?page=2&sortBy=RwmExpected");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_PrimaryTab_EmptyStateDoesNotShowFiltersMapOrSort()
     {
         SetupAllThroughSchool();
-        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(Build.PrimaryGroup(Urn, ["100002"]));
         Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+
+        page.ElementWithTestIdShouldExist("primary-similar-schools-empty-state")
+            .TextContent.Trim().Should().Be("Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.");
+        page.QuerySelector("[data-testid='primary-similar-schools-filter']").Should().BeNull();
+        page.QuerySelector("#sort-by").Should().BeNull();
+        page.QuerySelector("#map").Should().BeNull();
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_WithSecondaryPhase_ShowsSecondaryTabAsActive()
+    {
+        SetupAllThroughSchoolWithSecondarySimilarSchools();
 
         var page = await Fixture.RequestPageAsync($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
 
@@ -238,6 +291,60 @@ public class SchoolPagesIntegrationTests(
         tabs[0].GetAttribute("aria-selected").Should().Be("false");
         tabs[1].GetAttribute("aria-selected").Should().Be("true");
         tabs[1].ParentElement!.ClassList.Should().Contain("app-phase-tabs__list-item--selected");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_SecondaryTab_ShowsSecondarySimilarSchoolsList()
+    {
+        SetupAllThroughSchoolWithSecondarySimilarSchools();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+
+        page.ElementWithTestIdShouldExist("secondary-similar-schools-filter");
+        page.QuerySelector(".app-similar-schools-sort label")!.TextContent.Trim().Should().Be("Sort by");
+        page.QuerySelector("#sort-by option[selected]")!.TextContent.Trim().Should().Be("Attainment 8");
+        page.QuerySelector("#similar-schools-results-count")!.TextContent.Trim()
+            .Should().Be("Showing 1-10 of 50 similar schools");
+        page.QuerySelector("#toggleViewLink")!.TextContent.Trim().Should().Contain("View on map");
+
+        var list = page.ElementWithTestIdShouldExist("secondary-similar-schools-list");
+        var results = list.QuerySelectorAll(".app-school-result").ToArray();
+        results.Should().HaveCount(10);
+
+        var firstLink = results[0].QuerySelector("a")!;
+        firstLink.TextContent.Trim().Should().Be("Secondary Similar School 50");
+        firstLink.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).SecondaryComparison("200051").Similarity);
+        results[0].TextContent.Should().Contain("50 Secondary Street");
+        results[0].TextContent.Should().Contain("Attainment 8: 100.0");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_SecondaryTab_ShowsPaginationForSecondarySimilarSchools()
+    {
+        SetupAllThroughSchoolWithSecondarySimilarSchools();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+
+        page.QuerySelectorAll(".govuk-pagination__list .govuk-pagination__link")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal("1", "2", "3", "4", "5");
+
+        page.QuerySelector(".govuk-pagination__next a")!
+            .GetAttribute("href").Should().Be($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary&page=2&sortBy=Att8");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_SecondaryTab_EmptyStateDoesNotShowFiltersMapOrSort()
+    {
+        SetupAllThroughSchoolWithPrimarySimilarSchools();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+
+        page.ElementWithTestIdShouldExist("secondary-similar-schools-empty-state")
+            .TextContent.Trim().Should().Be("Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.");
+        page.QuerySelector("[data-testid='secondary-similar-schools-filter']").Should().BeNull();
+        page.QuerySelector("#sort-by").Should().BeNull();
+        page.QuerySelector("#map").Should().BeNull();
     }
 
     [Fact]
@@ -769,6 +876,60 @@ public class SchoolPagesIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28").WithAddress("1 Test Street", "", "", "Test Town", "TT1 1TT")),
             Build.Establishment("100002", "Test School 2", x => x.Open().AllThrough().InLA("001")));
+    }
+
+    private void SetupAllThroughSchoolWithPrimarySimilarSchools(int count = 50)
+    {
+        Fixture.FeatureFlagService.Override(FeatureFlags.EnableAllThroughSchools, true);
+        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+
+        var neighbourUrns = Enumerable.Range(2, count)
+            .Select(i => $"100{i:000}")
+            .ToArray();
+
+        var establishments = new[]
+        {
+            Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28").WithAddress("1 Test Street", "", "", "Test Town", "TT1 1TT"))
+        }.Concat(neighbourUrns.Select((urn, index) =>
+            Build.Establishment(urn, $"Similar School {index + 1:00}", x => x
+                .Open()
+                .Primary()
+                .InLA("001")
+                .WithAddress($"{index + 1} Test Street", "", "", "Test Town", "TT1 1TT"))));
+
+        Fixture.EstablishmentRepository.SetupEstablishments(establishments.ToArray());
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(Build.PrimaryGroup(Urn, neighbourUrns));
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(Build.PrimaryValues([Urn, .. neighbourUrns]));
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            neighbourUrns.Select((urn, index) =>
+                Build.Ks2Performance.Establishment(urn, x => x.WithRwmExpected((index + 51).ToString(), "", ""))).ToArray());
+    }
+
+    private void SetupAllThroughSchoolWithSecondarySimilarSchools(int count = 50)
+    {
+        Fixture.FeatureFlagService.Override(FeatureFlags.EnableAllThroughSchools, true);
+        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+
+        var neighbourUrns = Enumerable.Range(2, count)
+            .Select(i => $"200{i:000}")
+            .ToArray();
+
+        var establishments = new[]
+        {
+            Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28").WithAddress("1 Test Street", "", "", "Test Town", "TT1 1TT"))
+        }.Concat(neighbourUrns.Select((urn, index) =>
+            Build.Establishment(urn, $"Secondary Similar School {index + 1:00}", x => x
+                .Open()
+                .Secondary()
+                .InLA("001")
+                .WithAddress($"{index + 1} Secondary Street", "", "", "Test Town", "TT1 1TT"))));
+
+        Fixture.EstablishmentRepository.SetupEstablishments(establishments.ToArray());
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, neighbourUrns));
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(Build.SecondaryValues([Urn, .. neighbourUrns]));
+        Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
+            neighbourUrns.Select((urn, index) =>
+                Build.Ks4Performance.Establishment(urn, x => x.WithAttainment8((index + 51).ToString(), "", ""))).ToArray());
     }
 
     private static void AssertNavigation(IDocument page, (string Text, string Href)[] expectedItems)

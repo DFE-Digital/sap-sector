@@ -16,33 +16,21 @@
     @if (Model.HasSimilarSchools)
     {
         <section class="app-overview__section">
-            @if (Model.HasPrimarySimilarSchools && Model.HasSecondarySimilarSchools)
-            {
-                <p class="govuk-body app-overview__lead">
-                    For all-through schools or cross-phase middle schools, we identify:
-                </p>
-                <ul class="govuk-list govuk-list--bullet app-overview__list">
+            <p class="govuk-body app-overview__lead">
+                For all-through schools or cross-phase middle schools, we identify:
+            </p>
+            <ul class="govuk-list govuk-list--bullet app-overview__list">
+                @if (Model.HasPrimarySimilarSchools)
+                {
                     <li><strong>50</strong> primary schools, including all-throughs, similar to the school&rsquo;s primary phase</li>
+                }
+                @if (Model.HasSecondarySimilarSchools)
+                {
                     <li><strong>50</strong> secondary schools, including all-throughs, similar to the school&rsquo;s secondary phase</li>
-                </ul>
-            }
-            else if (Model.HasPrimarySimilarSchools)
-            {
-                <p class="govuk-body app-overview__lead">
-                    We've identified <strong>50</strong> similar primary phase schools (including all-throughs) to help you:
-                </p>
-            }
-            else
-            {
-                <p class="govuk-body app-overview__lead">
-                    We've identified <strong>50</strong> similar secondary phase schools (including all-throughs) to help you:
-                </p>
-            }
+                }
+            </ul>
 
-            @if (Model.HasPrimarySimilarSchools && Model.HasSecondarySimilarSchools)
-            {
-                <p class="govuk-body">Use this data to:</p>
-            }
+            <p class="govuk-body">Use this data to:</p>
             <ul class="govuk-list govuk-list--bullet app-overview__list">
                 <li>compare performance data</li>
                 <li>find improvement opportunities</li>
