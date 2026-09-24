@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
 
         services.AddJsonFile<Establishment>(JsonDataSource.Generated);
         services.AddJsonFile<EstablishmentEmail>(JsonDataSource.Generated);
+        services.AddJsonFile<EstablishmentLinks>(JsonDataSource.Generated);
 
         services.AddJsonFile<SimilarSchoolsPrimaryGroupsEntry>(JsonDataSource.Generated);
         services.AddJsonFile<SimilarSchoolsPrimaryValuesEntry>(JsonDataSource.Generated);

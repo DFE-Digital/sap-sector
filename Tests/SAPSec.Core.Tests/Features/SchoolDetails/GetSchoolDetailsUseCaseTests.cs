@@ -16,7 +16,11 @@ public class GetSchoolDetailsUseCaseTests
     public GetSchoolDetailsUseCaseTests()
     {
         _sut = new GetSchoolDetailsUseCase(
-            new SchoolDetailsService(_establishmentRepo, _loggerMock.Object));
+            new SchoolDetailsService(
+                _establishmentRepo,
+                new SchoolClosureEligibilityService(_establishmentRepo, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
+                new SchoolPredecessorRelationshipService(_establishmentRepo, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
+                _loggerMock.Object));
     }
 
     [Fact]

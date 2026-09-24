@@ -19,7 +19,11 @@ public class GetPrimaryComparisonSchoolDetailsUseCaseTests
         _sut = new GetPrimaryComparisonSchoolDetailsUseCase(
             _establishmentRepo,
             _similarSchoolsRepo,
-            new SchoolDetailsService(_establishmentRepo, _loggerMock.Object));
+            new SchoolDetailsService(
+                _establishmentRepo,
+                new SchoolClosureEligibilityService(_establishmentRepo, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
+                new SchoolPredecessorRelationshipService(_establishmentRepo, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
+                _loggerMock.Object));
     }
 
     [Fact]
