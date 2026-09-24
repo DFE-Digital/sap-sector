@@ -52,6 +52,11 @@ function initialiseToggle(toggle, activeIndex) {
         var activeName = activePanel.getAttribute("data-content-toggle-name") || "";
         var nextName = nextPanel.getAttribute("data-content-toggle-name") || "";
 
+        button.setAttribute("aria-label", index === 0
+          ? "Show year by year line chart, click to activate"
+          : `Show ${nextName} bar charts, click to activate`);
+
+
         panels.forEach(function (panel, panelIndex) {
             panel.classList.toggle("app-content-toggle__panel--active", panelIndex === index);
             setHidden(panel, panelIndex !== index);
@@ -59,8 +64,6 @@ function initialiseToggle(toggle, activeIndex) {
 
         title.textContent = activeName;
         button.textContent = "Show " + nextName.toLowerCase();
-        button.setAttribute("aria-pressed", index === 0 ? "false" : "true");
-
         resizeCharts(activePanel);
     }
 

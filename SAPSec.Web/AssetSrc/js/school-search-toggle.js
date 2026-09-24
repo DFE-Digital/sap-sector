@@ -27,9 +27,7 @@
 
         setToggleText(toggle, "View as a list");
         toggle.dataset.view = "map";
-        toggle.setAttribute("aria-expanded", "true");
 
-        // mount into map header (sometimes needs a tick after display change)
         requestAnimationFrame(() => mountToggle(MAP_SLOT_ID));
         setTimeout(() => mountToggle(MAP_SLOT_ID), 0);
 
@@ -49,12 +47,19 @@
 
         setToggleText(toggle, "View on map");
         toggle.dataset.view = "list";
-        toggle.setAttribute("aria-expanded", "false");
 
         mountToggle(LIST_SLOT_ID);
 
         if (persist) sessionStorage.setItem(STORAGE_KEY, "list");
     }
+
+    document.addEventListener("click", () => {
+        const toggle = document.getElementById("toggleViewLink");
+        const notificationContainer = document.getElementById("notification-container");
+
+        const itemName = toggle.dataset.view === "list" ? "map" : "list";
+        notificationContainer.textContent = `Showing ${itemName} of similar schools.`;
+        })
 
     document.addEventListener("DOMContentLoaded", function () {
         // Default view is list unless previously stored
@@ -72,8 +77,12 @@
         if (toggleLink) {
             e.preventDefault();
             const isList = toggleLink.dataset.view === "list";
-            if (isList) showMap();
-            else showList();
+            if (isList) { 
+                showMap();
+            }
+            else {
+                showList();
+            }
             return;
         }
 

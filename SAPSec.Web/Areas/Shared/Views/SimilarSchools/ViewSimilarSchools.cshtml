@@ -90,21 +90,25 @@
             </div>
         }
 
-        <div id="listView">
-            @* Results list *@
-            <partial name="_SimilarSchoolsResults" model="Model" />
 
-            @* Pagination *@
-            <partial name="_SimilarSchoolsPagination" model="Model" />
-        </div>
+        <div class="govuk-visually-hidden" id="notification-container" aria-live="polite"></div>
 
-        @if (hasVisibleResults)
-        {
-            <div id="mapView" class="govuk-!-display-none">
-                <partial name="_SimilarSchoolsMap" model="Model" />
+            <div id="listView">
+                @* Results list *@
+                <partial name="_SimilarSchoolsResults" model="Model" />
+
+                @* Pagination *@
+                <partial name="_SimilarSchoolsPagination" model="Model" />
             </div>
-        }
 
+            @if (hasVisibleResults)
+            {
+                <div id="mapView" class="govuk-!-display-none">
+                    <partial name="_SimilarSchoolsMap" model="Model" />
+                </div>
+            }
+
+        </div>
     </div>
 </div>
 
