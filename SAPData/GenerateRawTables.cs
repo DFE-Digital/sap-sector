@@ -17,6 +17,7 @@ public class GenerateRawTables
 
     private readonly Dictionary<string, string> _tableMappings = new(StringComparer.OrdinalIgnoreCase);
     private readonly List<string> _loadedTables = [];
+    private readonly Dictionary<string, string> _sourceFilesByTable = new(StringComparer.OrdinalIgnoreCase);
 
     public GenerateRawTables(
         string inputDir,
@@ -39,6 +40,12 @@ public class GenerateRawTables
         _rebuildAllRawTables = rebuildAllRawTables;
         _incremental = incremental;
     }
+
+    /// <summary>Dataset key (file name, alias or version) to raw table, as written to tablemapping.csv.</summary>
+    public IReadOnlyDictionary<string, string> TableMappings => _tableMappings;
+
+    /// <summary>Raw table to the cleaned file it is loaded from (available after <see cref="Run"/>).</summary>
+    public IReadOnlyDictionary<string, string> SourceFilesByTable => _sourceFilesByTable;
 
     public void Run()
     {
@@ -129,6 +136,7 @@ public class GenerateRawTables
         _tableMappings[fileKey] = tableName;
 
         string cleanCsvPath = Path.Combine(_cleanDir, fileKey + ".clean.csv");
+        _sourceFilesByTable[tableName] = cleanCsvPath;
 
         Console.WriteLine($"Processing: {fileKey}");
 

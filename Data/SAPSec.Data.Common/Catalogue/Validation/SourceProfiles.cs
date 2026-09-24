@@ -52,17 +52,24 @@ public sealed class SourceProfiles
     /// Reads every file the rows refer to from <paramref name="sourceDir"/>, preferring the "manual_" copy as the
     /// pipeline does. Only filter columns have their values collected, so the snapshot stays small.
     /// </summary>
-    public static SourceProfiles Build(IEnumerable<DataMapRow> rows, string sourceDir)
+    public static SourceProfiles Build(IEnumerable<DataMapRow> rows, string sourceDir) =>
+        Build(rows, file => new[] { $"manual_{file}.csv", $"{file}.csv" }
+            .Select(name => Path.Combine(sourceDir, name))
+            .FirstOrDefault(File.Exists));
+
+    /// <summary>
+    /// Profiles the files the rows refer to, using <paramref name="resolvePath"/> to find each one
+    /// (e.g. the pipeline's own mapping to downloaded, versioned files). Files it can't find are left out.
+    /// </summary>
+    public static SourceProfiles Build(IEnumerable<DataMapRow> rows, Func<string, string?> resolvePath)
     {
         var profiles = new SourceProfiles();
 
         foreach (var fileRows in rows.GroupBy(r => r.FileName.Trim(), StringComparer.OrdinalIgnoreCase))
         {
-            var path = new[] { $"manual_{fileRows.Key}.csv", $"{fileRows.Key}.csv" }
-                .Select(name => Path.Combine(sourceDir, name))
-                .FirstOrDefault(File.Exists);
+            var path = resolvePath(fileRows.Key);
 
-            if (path is null)
+            if (path is null || !File.Exists(path))
                 continue;
 
             var filterColumns = fileRows

@@ -42,6 +42,19 @@ public sealed class SourceProfilesTests : IDisposable
     }
 
     [Fact]
+    public void Resolves_files_with_the_given_resolver()
+    {
+        // e.g. the pipeline maps "schools" to the downloaded, versioned file it will load.
+        var versioned = Path.Combine(_dir, "schools_v2.0.clean.csv");
+        File.WriteAllText(versioned, "Break Down,Value\nRenamed,1\n");
+
+        var profiles = SourceProfiles.Build([Row("schools"), Row("missing")], file => file == "schools" ? versioned : null);
+
+        profiles.Files.Keys.Should().Equal("schools");
+        profiles.Files["schools"].Values["break_down"].Should().Equal("Renamed");
+    }
+
+    [Fact]
     public void Skips_files_that_are_not_present() =>
         SourceProfiles.Build([Row("missing")], _dir).Files.Should().BeEmpty();
 

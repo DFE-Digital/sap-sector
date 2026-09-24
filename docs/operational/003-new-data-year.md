@@ -70,6 +70,10 @@ dotnet test Tests/SAPSec.Data.Common.Tests
 
 Fix the definition, not the test.
 
+The pipeline runs the same check against the files it downloads, before loading anything. If a new file arrives
+before the catalogue has been updated for it (for example an automatically published EES version with renamed
+columns), the run stops with the same messages and the website keeps the previous data until the catalogue is fixed.
+
 ### 6. Check the output locally (recommended)
 
 Run the generator and load the views as described in `SAPData/README.md`, then spot-check a few schools on the website against the published figures.

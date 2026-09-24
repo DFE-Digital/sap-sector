@@ -125,8 +125,8 @@ Typical local workflow:
 
 The data map is defined in code under `Data/SAPSec.Data.Common/Catalogue/Definitions` (every dataset is listed in
 `CatalogueDefinitions`). Each definition declares its source files, years, breakdowns and measures once, and
-expands to the rows the SQL generators read. To roll a dataset to a new year, bump its `CurrentYear` and point
-its sources at the new files.
+expands to the rows the SQL generators read. To roll a dataset to a new year, bump its year in
+`Data/SAPSec.Data/DataYears.cs` and point its sources at the new files (see `docs/operational/003-new-data-year.md`).
 
 Before any SQL is generated, the catalogue is validated and the run stops if it finds:
 - a property whose name says one year but whose row, or `time_period` filter, is for another
@@ -142,6 +142,14 @@ dotnet run --project SAPData -- profile-sources
 ```
 
 Commit the updated `source-profiles.json` with the catalogue change.
+
+### Checking the downloaded files
+
+Every pipeline run also checks the files it has just downloaded, before any SQL runs (and before the maintenance
+page): every column and filter value the catalogue uses, and every GIAS column `v_establishment` reads, must be in
+the files that will be loaded. If DfE renames a column or breakdown, or a file doesn't yet contain a year the
+catalogue expects, the run stops with a list of the problems and the live views keep their previous data. Fix the
+catalogue as for a new data year. To load anyway (the affected values will be blank), set `SOURCE_FILE_CHECK=warn`.
 
 ---
 

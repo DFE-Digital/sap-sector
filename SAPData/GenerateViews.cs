@@ -40,7 +40,7 @@ public sealed class GenerateViews
         string Type,
         string ModelName);
 
-    private sealed record RawSource(
+    internal sealed record RawSource(
         string Type,
         string Subtype,
         string Year,
@@ -630,7 +630,7 @@ public sealed class GenerateViews
     // ESTABLISHMENT DIMENSION (curated)
     // =====================================================
 
-    private static string GenerateEstablishmentDimensionView(string? rawTable)
+    internal static string GenerateEstablishmentDimensionView(string? rawTable)
     {
         var sb = new StringBuilder();
 
@@ -867,7 +867,7 @@ public sealed class GenerateViews
     // RAW_SOURCES + RESOLUTION
     // =====================================================
 
-    private static List<RawSource> LoadRawSources()
+    internal static List<RawSource> LoadRawSources()
     {
         var path = RawSourcesCandidates.FirstOrDefault(File.Exists);
         if (path == null)
@@ -881,7 +881,7 @@ public sealed class GenerateViews
         return sources.Where(s => !string.IsNullOrWhiteSpace(s.FileName)).ToList();
     }
 
-    private static bool TryResolveManagedDatasetKey(
+    internal static bool TryResolveManagedDatasetKey(
         List<RawSource> sources,
         Dictionary<string, string> tableMap,
         string sourceOrg,
@@ -1012,7 +1012,7 @@ public sealed class GenerateViews
     // HELPERS
     // =====================================================
 
-    private static bool TryResolveRawTable(
+    internal static bool TryResolveRawTable(
         Dictionary<string, string> tableMap,
         string? datasetKey,
         out string? rawTable)
