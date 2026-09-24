@@ -600,14 +600,14 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2020 to 2021", "2021 to 2022", "2022 to 2023"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Similar schools average", "69%", "70%", "71%"],
-            ["Local authority schools average", "89%", "90%", "91%"],
-            ["Schools in England average", "99%", "100%", "101%"]);
+            ["Test School 1", "79.0%", "80.0%", "81.0%"],
+            ["Similar schools average", "69.0%", "70.0%", "71.0%"],
+            ["Local authority schools average", "89.0%", "90.0%", "91.0%"],
+            ["Schools in England average", "99.0%", "100.0%", "101.0%"]);
     }
 
     [Fact]
-    public async Task Destinations_TableView_ValuesRoundTo0DecimalPlaces()
+    public async Task Destinations_TableView_ValuesRoundTo1DecimalPlace()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")),
@@ -634,10 +634,10 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2020 to 2021", "2021 to 2022", "2022 to 2023"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Similar schools average", "69%", "70%", "71%"],
-            ["Local authority schools average", "89%", "90%", "91%"],
-            ["Schools in England average", "99%", "100%", "101%"]);
+            ["Test School 1", "78.9%", "80.3%", "81.0%"],
+            ["Similar schools average", "69.1%", "70.3%", "70.6%"],
+            ["Local authority schools average", "89.1%", "89.7%", "91.0%"],
+            ["Schools in England average", "99.5%", "99.5%", "101.3%"]);
     }
 
     [Fact]
@@ -666,9 +666,9 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["Rank", "School", "2022 to 2023"],
-            ["1", "Test School 4", "22%"],
-            ["2", "Test School 3", "21%"],
-            ["3", "Test School 2", "20%"]);
+            ["1", "Test School 4", "22.0%"],
+            ["2", "Test School 3", "21.0%"],
+            ["3", "Test School 2", "20.0%"]);
     }
 
     [Fact]
@@ -720,8 +720,8 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
             ("axis-min", "0"),
             ("axis-step", "25"),
             ("axis-max", "100"),
-            ("label-decimals", "0"),
-            ("tooltip-decimals", "0"));
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
 
         var yearByYearChart = page.ElementWithTestIdShouldExist("destinations-year-by-year-chart");
         yearByYearChart.Dataset.Should().Contain(
@@ -729,8 +729,8 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
             ("axis-step", "25"),
             ("axis-max", "100"),
             ("axis-auto-skip", "false"),
-            ("label-decimals", "0"),
-            ("tooltip-decimals", "0"));
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
         AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "rect", "rectRot");
     }
 
@@ -763,9 +763,9 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
         filter.ChildTrimmedTextContent().Should().Equal(["All destinations", "Education", "Apprenticeships", "Employment"]);
     }
 
-    [InlineData("Education", new[] { "70%", "71%", "72%" }, new[] { "69%", "70%", "71%" }, new[] { "71%", "72%", "73%" }, new[] { "72%", "73%", "74%" })]
-    [InlineData("Apprenticeships", new[] { "50%", "51%", "52%" }, new[] { "49%", "50%", "51%" }, new[] { "51%", "52%", "53%" }, new[] { "52%", "53%", "54%" })]
-    [InlineData("Employment", new[] { "60%", "61%", "62%" }, new[] { "59%", "60%", "61%" }, new[] { "61%", "62%", "63%" }, new[] { "62%", "63%", "64%" })]
+    [InlineData("Education", new[] { "70.0%", "71.0%", "72.0%" }, new[] { "69.0%", "70.0%", "71.0%" }, new[] { "71.0%", "72.0%", "73.0%" }, new[] { "72.0%", "73.0%", "74.0%" })]
+    [InlineData("Apprenticeships", new[] { "50.0%", "51.0%", "52.0%" }, new[] { "49.0%", "50.0%", "51.0%" }, new[] { "51.0%", "52.0%", "53.0%" }, new[] { "52.0%", "53.0%", "54.0%" })]
+    [InlineData("Employment", new[] { "60.0%", "61.0%", "62.0%" }, new[] { "59.0%", "60.0%", "61.0%" }, new[] { "61.0%", "62.0%", "63.0%" }, new[] { "62.0%", "63.0%", "64.0%" })]
     [Theory]
     public async Task Destinations_DestinationFilter_UpdatesTableViewWithSubjectValues(string filterOption, string[] currentSchool, string[] similarSchools, string[] la, string[] england)
     {
