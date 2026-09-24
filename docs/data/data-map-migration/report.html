@@ -253,8 +253,8 @@
         <div class="section-head">
             <h2 id="context">How these were found</h2>
         </div>
-        <p>The KS4 Performance part of <code>datamap.csv</code> (1,329 spreadsheet rows) was converted into a code-defined catalogue (commit <span class="mono">90939c42</span>). That commit reproduces the spreadsheet exactly, including its mistakes, and a test proves the output is identical. Converting the rows into structured code made three inconsistencies stand out. Each was checked against the raw DfE source files before being fixed.</p>
-        <p>The fixes are in their own commits (<span class="mono">a60a0573</span> for errors 1–3, <span class="mono">20a0dc99</span> for error 4) so they can be reviewed, tested and, if needed, reverted separately from the migration. Error 4 was found by the automated data map validation added afterwards, which checks every field and filter value against the real source files.</p>
+        <p>The KS4 Performance part of <code>datamap.csv</code> (1,329 spreadsheet rows) was converted into a code-defined catalogue (Story 2). That step reproduces the spreadsheet exactly, including its mistakes, and a test proves the output is identical. Converting the rows into structured code made three inconsistencies stand out. Each was checked against the raw DfE source files before being fixed.</p>
+        <p>The fixes are in their own commits in pull request #372 (one for errors 1–3, one for error 4) so they can be reviewed, tested and, if needed, reverted separately from the migration. Error 4 was found by the automated data map validation added afterwards, which checks every field and filter value against the real source files.</p>
     </section>
 
     <section aria-labelledby="issues">
