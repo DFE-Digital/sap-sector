@@ -20,11 +20,15 @@ BEGIN
     SELECT schemaname, tablename
     FROM pg_tables
     WHERE schemaname = v_schema
-      AND tablename LIKE 't\_%' ESCAPE '\'
+      AND tablename = ANY(tables_to_rebuild)
   LOOP
     EXECUTE format('DROP TABLE IF EXISTS %I.%I CASCADE', r.schemaname, r.tablename);
   END LOOP;
 END $$;
+
+-- Fingerprints of what each raw table and view was last built from (incremental loads).
+CREATE TABLE IF NOT EXISTS raw_table_loads (table_name text PRIMARY KEY, source_file text NOT NULL, fingerprint text NOT NULL, loaded_at timestamptz NOT NULL);
+CREATE TABLE IF NOT EXISTS view_builds (view_name text PRIMARY KEY, fingerprint text NOT NULL, built_at timestamptz NOT NULL);
 
 -- =========================
 -- Cleaning helpers
@@ -52,12 +56,22 @@ RETURNS NUMERIC
 LANGUAGE plpgsql
 IMMUTABLE
 AS $$
+DECLARE
+    result NUMERIC;
 BEGIN
     IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN
         RETURN NULL;
     END IF;
 
-    RETURN value::NUMERIC;
+    -- Same rules as the website's parser (SAPSec.Core MeasureHelper.ParseNullableDecimal):
+    -- a trailing '%' is ignored, and anything that isn't a finite number is NULL.
+    result := regexp_replace(trim(value), '%$', '')::NUMERIC;
+
+    IF result IN ('NaN'::NUMERIC, 'Infinity'::NUMERIC, '-Infinity'::NUMERIC) THEN
+        RETURN NULL;
+    END IF;
+
+    RETURN result;
 
 EXCEPTION WHEN others THEN
     RETURN NULL;

@@ -21,7 +21,7 @@ public class SecondarySimilarSchoolsSorting(string sortBy)
                 items,
                 "EngMat",
                 "English and maths GCSEs (Grade 5 and above)",
-                i => DataWithAvailability.FromDecimalString(i?.EngMaths59_Tot_Est_Current_Pct),
+                i => DataWithAvailability.FromNullable(i?.EngMaths59_Tot_Est_Current_Pct),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -29,7 +29,7 @@ public class SecondarySimilarSchoolsSorting(string sortBy)
                 items,
                 "EngLang",
                 "English language GCSE (Grade 5 and above)",
-                i => DataWithAvailability.FromDecimalString(i?.EngLang59_Sum_Est_Current_Pct),
+                i => DataWithAvailability.FromNullable(i?.EngLang59_Sum_Est_Current_Pct),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -37,7 +37,7 @@ public class SecondarySimilarSchoolsSorting(string sortBy)
                 items,
                 "EngLit",
                 "English literature GCSE (Grade 5 and above)",
-                i => DataWithAvailability.FromDecimalString(i?.EngLit59_Sum_Est_Current_Pct),
+                i => DataWithAvailability.FromNullable(i?.EngLit59_Sum_Est_Current_Pct),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -45,7 +45,7 @@ public class SecondarySimilarSchoolsSorting(string sortBy)
                 items,
                 "Maths",
                 "Mathematics GCSE (Grade 5 and above)",
-                i => DataWithAvailability.FromDecimalString(i?.Maths59_Sum_Est_Current_Pct),
+                i => DataWithAvailability.FromNullable(i?.Maths59_Sum_Est_Current_Pct),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -53,7 +53,7 @@ public class SecondarySimilarSchoolsSorting(string sortBy)
                 items,
                 "CombSci",
                 "Combined science (double award) GCSE (Grade 5-5 and above)",
-                i => DataWithAvailability.FromDecimalString(i?.CombSci59_Sum_Est_Current_Pct),
+                i => DataWithAvailability.FromNullable(i?.CombSci59_Sum_Est_Current_Pct),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -61,7 +61,7 @@ public class SecondarySimilarSchoolsSorting(string sortBy)
                 items,
                 "Bio",
                 "Biology GCSE (Grade 5 and above)",
-                i => DataWithAvailability.FromDecimalString(i?.Bio59_Sum_Est_Current_Pct),
+                i => DataWithAvailability.FromNullable(i?.Bio59_Sum_Est_Current_Pct),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -69,7 +69,7 @@ public class SecondarySimilarSchoolsSorting(string sortBy)
                 items,
                 "Chem",
                 "Chemistry GCSE (Grade 5 and above)",
-                i => DataWithAvailability.FromDecimalString(i?.Chem59_Sum_Est_Current_Pct),
+                i => DataWithAvailability.FromNullable(i?.Chem59_Sum_Est_Current_Pct),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -77,7 +77,7 @@ public class SecondarySimilarSchoolsSorting(string sortBy)
                 items,
                 "Phys",
                 "Physics GCSE (Grade 5 and above)",
-                i => DataWithAvailability.FromDecimalString(i?.Physics59_Sum_Est_Current_Pct),
+                i => DataWithAvailability.FromNullable(i?.Physics59_Sum_Est_Current_Pct),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -85,7 +85,7 @@ public class SecondarySimilarSchoolsSorting(string sortBy)
                 items,
                 "Att8",
                 "Attainment 8",
-                i => DataWithAvailability.FromDecimalString(i?.Attainment8_Tot_Est_Current_Num),
+                i => DataWithAvailability.FromNullable(i?.Attainment8_Tot_Est_Current_Num),
                 ScaledScoreFormat,
                 ScaledScoreDecimalPlaces)
         };

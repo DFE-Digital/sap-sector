@@ -21,7 +21,7 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "RwmHigher",
                 "Achieved a higher standard in reading, writing and maths",
-                i => DataWithAvailability.FromDecimalString(i?.RwmHigher_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromNullable(i?.RwmHigher_Tot_Cohort_Est_Current_Num),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -29,7 +29,7 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "ReadingScaledScore",
                 "Average scaled score in reading",
-                i => DataWithAvailability.FromDecimalString(i?.ReadingScaledScore_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromNullable(i?.ReadingScaledScore_Tot_Cohort_Est_Current_Num),
                 ScaledScoreFormat,
                 ScaledScoreDecimalPlaces),
 
@@ -37,7 +37,7 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "MathsScaledScore",
                 "Average scaled score in maths",
-                i => DataWithAvailability.FromDecimalString(i?.MathsScaledScore_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromNullable(i?.MathsScaledScore_Tot_Cohort_Est_Current_Num),
                 ScaledScoreFormat,
                 ScaledScoreDecimalPlaces),
 
@@ -45,7 +45,7 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "GpsExpected",
                 "Meeting expected standard in grammar, punctuation and spelling",
-                i => DataWithAvailability.FromDecimalString(i?.GpsExpected_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromNullable(i?.GpsExpected_Tot_Cohort_Est_Current_Num),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -53,7 +53,7 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "GpsHigher",
                 "Achieved a higher standard in grammar, punctuation and spelling",
-                i => DataWithAvailability.FromDecimalString(i?.GpsHigher_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromNullable(i?.GpsHigher_Tot_Cohort_Est_Current_Num),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -61,7 +61,7 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "RwmExpected",
                 "Meeting expected standard in reading, writing and maths",
-                i => DataWithAvailability.FromDecimalString(i?.RwmExpected_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromNullable(i?.RwmExpected_Tot_Cohort_Est_Current_Num),
                 PercentFormat,
                 PercentDecimalPlaces)
         };

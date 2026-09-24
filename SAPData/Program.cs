@@ -1,14 +1,16 @@
-using CsvHelper;
 using Microsoft.Extensions.Configuration;
 using Sentry;
 using SAPData.Models;
 using SAPSec.Data.Common;
-using System.Globalization;
+using SAPSec.Data.Common.Catalogue;
+using SAPSec.Data.Common.Catalogue.Definitions;
+using SAPSec.Data.Common.Catalogue.Validation;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SAPData;
 
-internal class Program
+internal partial class Program
 {
     static void Main(string[] args)
     {
@@ -34,7 +36,6 @@ internal class Program
             string dataMapDir = Path.Combine(baseDir, "DataMap");
             string rawInputDir = Path.Combine(dataMapDir, "SourceFiles");
             string cleanedDir = Path.Combine(dataMapDir, "CleanedFiles");
-            string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
             string sqlDir = Path.Combine(baseDir, "Sql");
             string rawTablesToRebuildPath = ResolveRawTablesToRebuildPath(baseDir, configuration);
             string runAllSqlFile = Path.Combine(sqlDir, "run_all.sql");
@@ -45,6 +46,19 @@ internal class Program
             string generatedJsonDir = Path.Combine(jsonDir, "Generated");
             string primaryJsonDir = Path.Combine(jsonDir, "PrimarySchools");
             string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");
+            string sourceProfilesPath = Path.Combine(dataMapDir, "source-profiles.json");
+
+            if (args.Contains("profile-sources"))
+            {
+                WriteSourceProfiles(rawInputDir, sourceProfilesPath);
+                return;
+            }
+
+            if (args.Contains("catalogue-summary"))
+            {
+                WriteCatalogueSummary(rawInputDir);
+                return;
+            }
 
             Directory.CreateDirectory(cleanedDir);
             Directory.CreateDirectory(sqlDir);
@@ -53,39 +67,44 @@ internal class Program
             Directory.CreateDirectory(primaryJsonDir);
 
             // -------------------------------------------------
-            // 1. Load DataMap
+            // 1. Load the data map (defined in code: SAPSec.Data.Common/Catalogue/Definitions)
             // -------------------------------------------------
-            List<DataMapRow> dataMaps;
-            using (var reader = new StreamReader(dataMapCsv))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
-                csv.Context.RegisterClassMap<DataMapMapping>();
-                dataMaps = csv.GetRecords<DataMapRow>().ToList();
-            }
+            var dataMaps = CatalogueDefinitions.Rows().ToList();
+            ValidateCatalogue(dataMaps);
 
             Console.WriteLine($"Loaded {dataMaps.Count} DataMap rows");
 
             var rebuildAllRawTables = ShouldRebuildAllRawTables(configuration);
+            var incremental = IsIncremental(configuration);
             var logicalKeysToRebuild = rebuildAllRawTables
                 ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 : LoadLogicalKeysToRebuild(rawTablesToRebuildPath);
+
+            // Incremental: the database reloads and rebuilds only what changed, so the SQL covers everything.
+            // Listed raw tables are still forced to reload.
+            var generateAllSql = rebuildAllRawTables || incremental;
+
             WriteCleanupSql(
                 Path.Combine(sqlDir, "00_cleanup.sql"),
-                logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName),
-                rebuildAllRawTables);
+                incremental ? [] : logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName),
+                rebuildAllRawTables,
+                incremental);
 
             // -------------------------------------------------
             // 2. Generate raw tables + cleaned files + mapping
             // -------------------------------------------------
-            new GenerateRawTables(
+            var rawTables = new GenerateRawTables(
                 rawInputDir,
                 cleanedDir,
                 sqlDir,
                 tableMappingPath,
                 sqlFiles,
                 logicalKeysToRebuild,
-                rebuildAllRawTables
-            ).Run();
+                rebuildAllRawTables,
+                incremental);
+            rawTables.Run();
+
+            CheckSourceFiles(dataMaps, rawTables, configuration);
 
             // -------------------------------------------------
             // 3. Generate views
@@ -98,7 +117,7 @@ internal class Program
                 generatedJsonDir,
                 sqlFiles,
                 logicalKeysToRebuild,
-                rebuildAllRawTables
+                generateAllSql
             ).Run();
 
             // -------------------------------------------------
@@ -119,7 +138,7 @@ internal class Program
                 generatedJsonDir,
                 sqlFiles,
                 logicalKeysToRebuild,
-                rebuildAllRawTables
+                generateAllSql
             ).Run();
 
             // -------------------------------------------------
@@ -141,7 +160,17 @@ internal class Program
 
             foreach (var line in sqlFiles.Order())
             {
-                runAllSql.AppendLine(@$"\ir {line}");
+                var view = ViewFile().Match(line);
+                if (incremental && view.Success)
+                {
+                    // A view is rebuilt when it's missing (reloading a raw table drops its views) or its SQL changed.
+                    var fingerprint = IncrementalLoad.Fingerprint(File.ReadAllText(Path.Combine(sqlDir, line)) + HelperFunctionsSql());
+                    runAllSql.Append(IncrementalLoad.View(view.Groups["view"].Value, line, fingerprint));
+                }
+                else
+                {
+                    runAllSql.AppendLine(@$"\ir {line}");
+                }
             }
 
             File.WriteAllText(runAllSqlFile, runAllSql.ToString());
@@ -163,6 +192,177 @@ internal class Program
             }
             throw;
         }
+    }
+
+    // Helper functions the generated views call. Part of each view's fingerprint, so changing one rebuilds the views.
+    private static string HelperFunctionsSql()
+    {
+        var helpers = new StringBuilder();
+        helpers.AppendLine("-- =========================");
+        helpers.AppendLine("-- Cleaning helpers");
+        helpers.AppendLine("-- =========================");
+        helpers.AppendLine();
+        helpers.AppendLine("CREATE OR REPLACE FUNCTION clean_int(value TEXT)");
+        helpers.AppendLine("RETURNS INT");
+        helpers.AppendLine("LANGUAGE plpgsql");
+        helpers.AppendLine("IMMUTABLE");
+        helpers.AppendLine("AS $$");
+        helpers.AppendLine("BEGIN");
+        helpers.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN");
+        helpers.AppendLine("        RETURN NULL;");
+        helpers.AppendLine("    END IF;");
+        helpers.AppendLine();
+        helpers.AppendLine("    RETURN value::INT;");
+        helpers.AppendLine();
+        helpers.AppendLine("EXCEPTION WHEN others THEN");
+        helpers.AppendLine("    RETURN NULL;");
+        helpers.AppendLine("END;");
+        helpers.AppendLine("$$;");
+        helpers.AppendLine();
+        helpers.AppendLine("CREATE OR REPLACE FUNCTION clean_numeric(value TEXT)");
+        helpers.AppendLine("RETURNS NUMERIC");
+        helpers.AppendLine("LANGUAGE plpgsql");
+        helpers.AppendLine("IMMUTABLE");
+        helpers.AppendLine("AS $$");
+        helpers.AppendLine("DECLARE");
+        helpers.AppendLine("    result NUMERIC;");
+        helpers.AppendLine("BEGIN");
+        helpers.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN");
+        helpers.AppendLine("        RETURN NULL;");
+        helpers.AppendLine("    END IF;");
+        helpers.AppendLine();
+        helpers.AppendLine("    -- Same rules as the website's parser (SAPSec.Core MeasureHelper.ParseNullableDecimal):");
+        helpers.AppendLine("    -- a trailing '%' is ignored, and anything that isn't a finite number is NULL.");
+        helpers.AppendLine("    result := regexp_replace(trim(value), '%$', '')::NUMERIC;");
+        helpers.AppendLine();
+        helpers.AppendLine("    IF result IN ('NaN'::NUMERIC, 'Infinity'::NUMERIC, '-Infinity'::NUMERIC) THEN");
+        helpers.AppendLine("        RETURN NULL;");
+        helpers.AppendLine("    END IF;");
+        helpers.AppendLine();
+        helpers.AppendLine("    RETURN result;");
+        helpers.AppendLine();
+        helpers.AppendLine("EXCEPTION WHEN others THEN");
+        helpers.AppendLine("    RETURN NULL;");
+        helpers.AppendLine("END;");
+        helpers.AppendLine("$$;");
+        helpers.AppendLine();
+        helpers.AppendLine("CREATE OR REPLACE FUNCTION clean_date(value TEXT)");
+        helpers.AppendLine("RETURNS DATE");
+        helpers.AppendLine("LANGUAGE plpgsql");
+        helpers.AppendLine("IMMUTABLE");
+        helpers.AppendLine("AS $$");
+        helpers.AppendLine("BEGIN");
+        helpers.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'na', 'n/a', 'N/A', '.', '-', '--') THEN");
+        helpers.AppendLine("        RETURN NULL;");
+        helpers.AppendLine("    END IF;");
+        helpers.AppendLine();
+        helpers.AppendLine("    RETURN value::DATE;");
+        helpers.AppendLine();
+        helpers.AppendLine("EXCEPTION WHEN others THEN");
+        helpers.AppendLine("    RETURN NULL;");
+        helpers.AppendLine("END;");
+        helpers.AppendLine("$$;");
+        helpers.AppendLine();
+        return helpers.ToString();
+    }
+
+    [GeneratedRegex(@"^(03|04|50)_(?<view>v_\w+)\.sql$")]
+    private static partial Regex ViewFile();
+
+    private static bool IsIncremental(IConfiguration configuration)
+    {
+        var mode = configuration["RawTableRebuildMode"] ?? Environment.GetEnvironmentVariable("RAW_TABLE_REBUILD_MODE");
+        var incremental = !string.Equals(mode?.Trim(), "list", StringComparison.OrdinalIgnoreCase);
+        Console.WriteLine(incremental
+            ? "Raw table rebuild mode: incremental (reload what changed)."
+            : "Raw table rebuild mode: list (reload only the listed tables).");
+        return incremental;
+    }
+
+    // Checks the files about to be loaded against the data map and the establishment view. Runs before the ETL step
+    // (and the maintenance page), so a schema change in a new file stops the run and the live views keep their data.
+    private static void CheckSourceFiles(IReadOnlyList<DataMapRow> rows, GenerateRawTables rawTables, IConfiguration configuration)
+    {
+        var issues = SourceFileCheck.Run(rows, rawTables.TableMappings, rawTables.SourceFilesByTable);
+        if (issues.Count == 0)
+        {
+            Console.WriteLine("Source files checked: every column and filter value the data map and establishment view use is present.");
+            return;
+        }
+
+        foreach (var issue in issues)
+            Console.Error.WriteLine(issue);
+
+        var mode = configuration["SourceFileCheck"] ?? Environment.GetEnvironmentVariable("SOURCE_FILE_CHECK");
+        if (string.Equals(mode?.Trim(), "warn", StringComparison.OrdinalIgnoreCase))
+        {
+            Console.Error.WriteLine($"WARNING: {issues.Count} source file issue(s) found; continuing because SOURCE_FILE_CHECK=warn. Affected values may be blank.");
+            return;
+        }
+
+        throw new InvalidOperationException(
+            $"The downloaded source files don't match the data map ({issues.Count} issue(s), listed above). Nothing has been loaded. " +
+            "Update the catalogue for the new files (docs/operational/003-new-data-year.md), or for [establishment] issues " +
+            "the columns in GenerateViews.GenerateEstablishmentDimensionView, " +
+            "or set SOURCE_FILE_CHECK=warn to load anyway.");
+    }
+
+    // Fails before any SQL is generated, so a data map mistake never reaches the ETL step.
+    private static void ValidateCatalogue(IReadOnlyList<DataMapRow> rows)
+    {
+        var issues = CatalogueValidator.Validate(rows);
+        if (issues.Count == 0)
+        {
+            Console.WriteLine($"Catalogue validated: {rows.Count} rows, no issues.");
+            return;
+        }
+
+        foreach (var issue in issues)
+            Console.Error.WriteLine(issue);
+
+        throw new InvalidOperationException($"Data map catalogue has {issues.Count} validation issue(s); see the log above.");
+    }
+
+    // Snapshot of the source files' columns and filter values, committed so catalogue tests can check fields and
+    // filter values in CI. Regenerate after adding or changing a source file: dotnet run --project SAPData -- profile-sources
+    private static void WriteSourceProfiles(string sourceDir, string path)
+    {
+        var rows = CatalogueDefinitions.Rows();
+        var profiles = SourceProfiles.Build(rows, sourceDir);
+        profiles.Save(path);
+
+        var missing = rows.Select(r => r.FileName.Trim()).Distinct(StringComparer.OrdinalIgnoreCase)
+            .Where(f => !profiles.Files.ContainsKey(f))
+            .ToList();
+
+        Console.WriteLine($"Wrote {profiles.Files.Count} source profile(s) to {path}");
+        foreach (var file in missing)
+            Console.Error.WriteLine($"Not found in {sourceDir}: {file}.csv (or manual_{file}.csv)");
+    }
+
+    // Lists each dataset's years and the source files it reads, marking any missing from the source folder.
+    // Use when preparing a new data year: dotnet run --project SAPData -- catalogue-summary
+    private static void WriteCatalogueSummary(string sourceDir)
+    {
+        bool Present(string file) =>
+            File.Exists(Path.Combine(sourceDir, $"{file}.csv")) || File.Exists(Path.Combine(sourceDir, $"manual_{file}.csv"));
+
+        foreach (var type in CatalogueDefinitions.Rows().GroupBy(r => r.Type))
+        {
+            Console.WriteLine(type.Key);
+
+            foreach (var period in type.GroupBy(r => r.YearDesc).OrderBy(g => g.Key))
+            {
+                var label = string.IsNullOrEmpty(period.Key) ? "(no year)" : $"{period.Key} {period.First().Year}";
+                Console.WriteLine($"  {label}");
+
+                foreach (var file in period.Select(r => r.FileName.Trim()).Distinct().Order())
+                    Console.WriteLine($"    {(Present(file) ? "  " : "! ")}{file}");
+            }
+        }
+
+        Console.WriteLine();
+        Console.WriteLine($"! = not found in {sourceDir}");
     }
 
     private static IDisposable? InitialiseSentry(IConfiguration configuration)
@@ -243,7 +443,7 @@ internal class Program
         return keys;
     }
 
-    private static void WriteCleanupSql(string path, IEnumerable<string> tableNamesToRebuild, bool rebuildAllRawTables)
+    private static void WriteCleanupSql(string path, IEnumerable<string> tableNamesToRebuild, bool rebuildAllRawTables, bool incremental)
     {
         var tablesToRebuild = tableNamesToRebuild
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -293,61 +493,14 @@ internal class Program
         sql.AppendLine("  END LOOP;");
         sql.AppendLine("END $$;");
         sql.AppendLine();
-        sql.AppendLine("-- =========================");
-        sql.AppendLine("-- Cleaning helpers");
-        sql.AppendLine("-- =========================");
-        sql.AppendLine();
-        sql.AppendLine("CREATE OR REPLACE FUNCTION clean_int(value TEXT)");
-        sql.AppendLine("RETURNS INT");
-        sql.AppendLine("LANGUAGE plpgsql");
-        sql.AppendLine("IMMUTABLE");
-        sql.AppendLine("AS $$");
-        sql.AppendLine("BEGIN");
-        sql.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN");
-        sql.AppendLine("        RETURN NULL;");
-        sql.AppendLine("    END IF;");
-        sql.AppendLine();
-        sql.AppendLine("    RETURN value::INT;");
-        sql.AppendLine();
-        sql.AppendLine("EXCEPTION WHEN others THEN");
-        sql.AppendLine("    RETURN NULL;");
-        sql.AppendLine("END;");
-        sql.AppendLine("$$;");
-        sql.AppendLine();
-        sql.AppendLine("CREATE OR REPLACE FUNCTION clean_numeric(value TEXT)");
-        sql.AppendLine("RETURNS NUMERIC");
-        sql.AppendLine("LANGUAGE plpgsql");
-        sql.AppendLine("IMMUTABLE");
-        sql.AppendLine("AS $$");
-        sql.AppendLine("BEGIN");
-        sql.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN");
-        sql.AppendLine("        RETURN NULL;");
-        sql.AppendLine("    END IF;");
-        sql.AppendLine();
-        sql.AppendLine("    RETURN value::NUMERIC;");
-        sql.AppendLine();
-        sql.AppendLine("EXCEPTION WHEN others THEN");
-        sql.AppendLine("    RETURN NULL;");
-        sql.AppendLine("END;");
-        sql.AppendLine("$$;");
-        sql.AppendLine();
-        sql.AppendLine("CREATE OR REPLACE FUNCTION clean_date(value TEXT)");
-        sql.AppendLine("RETURNS DATE");
-        sql.AppendLine("LANGUAGE plpgsql");
-        sql.AppendLine("IMMUTABLE");
-        sql.AppendLine("AS $$");
-        sql.AppendLine("BEGIN");
-        sql.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'na', 'n/a', 'N/A', '.', '-', '--') THEN");
-        sql.AppendLine("        RETURN NULL;");
-        sql.AppendLine("    END IF;");
-        sql.AppendLine();
-        sql.AppendLine("    RETURN value::DATE;");
-        sql.AppendLine();
-        sql.AppendLine("EXCEPTION WHEN others THEN");
-        sql.AppendLine("    RETURN NULL;");
-        sql.AppendLine("END;");
-        sql.AppendLine("$$;");
-        sql.AppendLine();
+        if (incremental)
+        {
+            sql.AppendLine("-- Fingerprints of what each raw table and view was last built from (incremental loads).");
+            sql.Append(IncrementalLoad.LogTablesSql(rebuildAllRawTables));
+            sql.AppendLine();
+        }
+
+        sql.Append(HelperFunctionsSql());
         sql.AppendLine(@"\echo 'Cleanup complete.'");
 
         File.WriteAllText(path, sql.ToString(), new UTF8Encoding(false));

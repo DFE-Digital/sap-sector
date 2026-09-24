@@ -1,0 +1,279 @@
+<title>Renamed Breakdown Labels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #f6f7f9;
+    --surface: #ffffff;
+    --ink: #17202c;
+    --muted: #556070;
+    --rule: #dbe0e7;
+    --accent: #0e6a70;
+    --accent-soft: #e3f1f1;
+    --miss: #a3312f;
+    --miss-soft: #fbe9e8;
+    --hit: #1c6f47;
+    --hit-soft: #e2f3ea;
+    --warn: #9a4a07;
+    --warn-soft: #fcefe0;
+    --code-bg: #eef1f5;
+    --bar-empty: #e6e9ee;
+    --sans: "Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #11161d; --surface: #171e27; --ink: #e6ebf1; --muted: #9aa6b5; --rule: #2b3542;
+      --accent: #5cc2c6; --accent-soft: #15302f; --miss: #f08a8a; --miss-soft: #3a1c1c;
+      --hit: #6fcf9c; --hit-soft: #15301f; --warn: #f0a25a; --warn-soft: #3a2614; --code-bg: #1f2833; --bar-empty: #26303c;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #11161d; --surface: #171e27; --ink: #e6ebf1; --muted: #9aa6b5; --rule: #2b3542;
+    --accent: #5cc2c6; --accent-soft: #15302f; --miss: #f08a8a; --miss-soft: #3a1c1c;
+    --hit: #6fcf9c; --hit-soft: #15301f; --warn: #f0a25a; --warn-soft: #3a2614; --code-bg: #1f2833; --bar-empty: #26303c;
+  }
+
+  body { background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.6;
+         padding-inline: 16px; padding-block: 40px 72px; }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; }
+  .page { max-width: 880px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 44px; }
+  h1, h2, h3 { margin: 0; line-height: 1.25; text-wrap: balance; }
+  h1 { font-size: clamp(28px, 4.4vw, 40px); font-weight: 700; letter-spacing: -0.01em; }
+  h2 { font-size: 22px; font-weight: 700; }
+  h3 { font-size: 16px; font-weight: 600; }
+  p { margin: 0; max-width: 68ch; }
+  code, .mono { font-family: var(--mono); font-size: 0.86em; }
+  code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+  .sub { color: var(--muted); }
+  a { color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  a.eyebrow { text-decoration: none; }
+  section { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .step { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+
+  header { display: grid; gap: 14px; padding-bottom: 28px; border-bottom: 1px solid var(--rule); }
+  .lede { font-size: 18px; }
+
+  /* Label map: data map label vs each year's file labels */
+  .labelmap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 800px) { .labelmap { grid-template-columns: minmax(0, 1fr); } }
+  .year { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; display: grid; gap: 12px; align-content: start; }
+  .year h3 { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .year h3 .mono { color: var(--muted); font-weight: 400; font-size: 12px; }
+  .labels { display: flex; flex-wrap: wrap; gap: 6px; }
+  .label { font-family: var(--mono); font-size: 12.5px; padding: 3px 9px; border-radius: 6px; background: var(--code-bg); color: var(--muted); }
+  .label.eal, .label.ndi { color: var(--ink); background: var(--accent-soft); font-weight: 500; }
+  .lookup { display: grid; gap: 8px; border-top: 1px solid var(--rule); padding-top: 12px; }
+  .ask { display: grid; grid-template-columns: minmax(0, 130px) minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 14px; }
+  @media (max-width: 480px) { .ask { grid-template-columns: 1fr auto; } .ask .group { grid-column: 1 / -1; } }
+  .ask .group { color: var(--muted); font-size: 13px; }
+  .result { font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+  .result.hit { color: var(--hit); background: var(--hit-soft); }
+  .result.miss { color: var(--miss); background: var(--miss-soft); }
+
+  /* Before / after toggle */
+  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--surface); }
+  .seg button { font: inherit; font-size: 14px; font-weight: 600; padding: 7px 14px; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  select { font: inherit; font-size: 14px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
+  select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+  th { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); background: var(--ground); }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; }
+  .blank { color: var(--miss); font-style: italic; }
+  .fixed { color: var(--hit); font-weight: 600; }
+
+  /* Coverage bars */
+  .bars { display: grid; gap: 14px; }
+  .bar-row { display: grid; grid-template-columns: 220px 1fr 64px; gap: 12px; align-items: center; font-size: 14px; }
+  @media (max-width: 560px) { .bar-row { grid-template-columns: 1fr 64px; } .bar-row .bar-label { grid-column: 1 / -1; } }
+  .track { height: 14px; background: var(--bar-empty); border-radius: 4px; overflow: hidden; }
+  .fill { height: 100%; background: var(--accent); border-radius: 4px; width: 0; transition: width 500ms ease; }
+  .bar-row .count { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  @media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
+
+  /* Code */
+  pre { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px;
+        font-family: var(--mono); font-size: 13px; line-height: 1.6; overflow-x: auto; }
+  .hl { background: var(--accent-soft); border-radius: 3px; padding: 0 2px; }
+  .cm { color: var(--muted); }
+
+  .callout { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 14px 18px; border-radius: 0 8px 8px 0; display: grid; gap: 6px; }
+  .callout p { max-width: none; }
+  .msg { font-family: var(--mono); font-size: 13px; background: var(--miss-soft); color: var(--miss); padding: 12px 14px; border-radius: 8px; overflow-wrap: anywhere; }
+
+  ol.flow { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: f; }
+  ol.flow li { counter-increment: f; display: grid; grid-template-columns: 28px 1fr; gap: 10px; }
+  ol.flow li::before { content: counter(f); width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+                       font-size: 12px; font-weight: 700; color: var(--accent); background: var(--accent-soft); }
+  footer { border-top: 1px solid var(--rule); padding-top: 18px; color: var(--muted); font-size: 13px; }
+</style>
+
+<div class="page">
+
+  <header>
+    <a class="eyebrow" href="report.html">← Data map migration report</a>
+    <div class="eyebrow">KS4 performance · School pupil groups</div>
+    <h1>When DfE renamed two pupil groups, a year of school figures went blank</h1>
+    <p class="lede">The KS4 school performance tables label each row with a pupil group. Between 2023-24 and 2024-25, DfE changed the wording for two groups. The data map asked for one wording for both years, so one year of each group matched nothing, and every school’s figure came out blank.</p>
+  </header>
+
+  <section aria-labelledby="s1">
+    <div class="step">Step 1 · What the files contain</div>
+    <h2 id="s1">The same pupil groups, worded differently each year</h2>
+    <p class="sub">Values of the <code>breakdown</code> column in each year’s school performance tables file. The two groups in question are highlighted.</p>
+
+    <div class="labelmap">
+      <div class="year">
+        <h3>2023 to 2024 <span class="mono">202324_performance_tables_schools_final</span></h3>
+        <div class="labels">
+          <span class="label">Total</span><span class="label">Boys</span><span class="label">Girls</span>
+          <span class="label">Disadvantaged</span><span class="label ndi">Disadvantaged all other</span>
+          <span class="label eal">Other than English</span><span class="label">Non mobile</span>
+          <span class="label">High prior</span><span class="label">Mid prior</span><span class="label">Low prior</span>
+        </div>
+        <div class="lookup" aria-label="What the data map asked for in 2023 to 2024">
+          <div class="ask"><span class="group">EAL</span><code>Other than English</code><span class="result hit">Found</span></div>
+          <div class="ask"><span class="group">Not disadvantaged</span><code>Not known to be disadvantaged</code><span class="result miss">No rows</span></div>
+        </div>
+      </div>
+      <div class="year">
+        <h3>2024 to 2025 <span class="mono">202425_performance_tables_schools_final</span></h3>
+        <div class="labels">
+          <span class="label">Total</span><span class="label">Boys</span><span class="label">Girls</span>
+          <span class="label">Disadvantaged</span><span class="label ndi">Not known to be disadvantaged</span>
+          <span class="label eal">Known or believed to be other than English</span><span class="label">Non mobile</span>
+        </div>
+        <div class="lookup" aria-label="What the data map asked for in 2024 to 2025">
+          <div class="ask"><span class="group">EAL</span><code>Other than English</code><span class="result miss">No rows</span></div>
+          <div class="ask"><span class="group">Not disadvantaged</span><code>Not known to be disadvantaged</code><span class="result hit">Found</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout">
+      <p><strong>The data map used one label per group for both years.</strong> Each label only exists in one year’s file, so each group lost one year: EAL for 2024 to 2025, not disadvantaged for 2023 to 2024.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="s2">
+    <div class="step">Step 2 · What it did to the figures</div>
+    <h2 id="s2">Schools with a value</h2>
+    <p class="sub">Number of schools with an Attainment 8 value for the two group-years that were blank. English and maths 4+ and 5+ (numbers and percentages) were affected the same way: 10 columns in total.</p>
+
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Show figures">
+        <button type="button" id="btn-before" aria-pressed="true">Before the fix</button>
+        <button type="button" id="btn-after" aria-pressed="false">After the fix</button>
+      </div>
+    </div>
+
+    <div class="bars" id="bars" aria-live="polite">
+      <div class="bar-row"><span class="bar-label"><strong>EAL, 2024 to 2025</strong></span><div class="track"><div class="fill" data-before="0" data-after="5755"></div></div><span class="count" data-before="0" data-after="5,755"></span></div>
+      <div class="bar-row"><span class="bar-label"><strong>Not disadvantaged, 2023 to 2024</strong></span><div class="track"><div class="fill" data-before="0" data-after="5709"></div></div><span class="count" data-before="0" data-after="5,709"></span></div>
+    </div>
+
+    <div class="controls">
+      <label for="school" class="sub">Example school</label>
+      <select id="school">
+        <option value="100590">Woodmansterne School (100590)</option>
+        <option value="105574">Loreto High School Chorlton (105574)</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Attainment 8</th><th class="num">2023 to 2024</th><th class="num">2024 to 2025</th></tr></thead>
+        <tbody id="school-rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="s3">
+    <div class="step">Step 3 · How it was found</div>
+    <h2 id="s3">The new checks compare the data map with the real files</h2>
+    <p>Nobody reported it, because no page shows these groups yet. It was found automatically: the data map validation compares every filter value with the values that actually occur in each source file, and reported:</p>
+    <div class="msg">[unknown-value] KS4_Performance/Establishment.Attainment8_EAL_Est_Current_Num: filter breakdown = 'Other than English' matches no rows in 202425_performance_tables_schools_final</div>
+    <div class="msg">[unknown-value] KS4_Performance/Establishment.Attainment8_NDi_Est_Previous_Num: filter breakdown = 'Not known to be disadvantaged' matches no rows in 202324_performance_tables_schools_final</div>
+  </section>
+
+  <section aria-labelledby="s4">
+    <div class="step">Step 4 · The fix</div>
+    <h2 id="s4">Each year’s file now uses its own wording</h2>
+    <p>In the code-based data map, the school performance tables source takes each year’s labels, so the difference is written down in one place instead of being lost across hundreds of spreadsheet rows.</p>
+<pre><span class="cm">// Ks4Performance.cs</span>
+var schoolsCurrent = PerformanceTables("202425_performance_tables_schools_final", Current,
+    eal: <span class="hl">"Known or believed to be other than English"</span>, notDisadvantaged: <span class="hl">"Not known to be disadvantaged"</span>);
+var schoolsPrevious = PerformanceTables("202324_performance_tables_schools_final", Previous,
+    eal: <span class="hl">"Other than English"</span>, notDisadvantaged: <span class="hl">"Disadvantaged all other"</span>);</pre>
+  </section>
+
+  <section aria-labelledby="s5">
+    <div class="step">Step 5 · Stopping it happening again</div>
+    <h2 id="s5">The same kind of change is now caught before it reaches the website</h2>
+    <ol class="flow">
+      <li><div><strong>On every pull request:</strong> the data map is checked against a snapshot of every source file, so a wrong label fails the build.</div></li>
+      <li><div><strong>On every pipeline run:</strong> the files just downloaded are checked before anything is loaded. If DfE renames a group, column or year in a new release (such as the 15 October KS4 data), the run stops and the website keeps its previous figures.</div></li>
+      <li><div><strong>On a new data year:</strong> the runbook’s dry run lists every label and column the new files no longer have, so the change can be fixed before release day.</div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="s6">
+    <h2 id="s6">Impact</h2>
+    <ul>
+      <li><strong>Not visible today:</strong> the KS4 pages dont yet offer a pupil-group filter, so users havent seen these blanks. They would have appeared as soon as one was added.</li>
+      <li><strong>Now:</strong> about 5,700 schools have values for each of the two affected group-years, which is the full set of schools in those files.</li>
+      <li><strong>Where:</strong> pull request #372, commit “Fix KS4 school breakdown labels that changed between years”.</li>
+    </ul>
+  </section>
+
+  <footer>Figures from a local pipeline run on the current DfE source files, before and after the fix.</footer>
+</div>
+
+<script>
+  const schools = {
+    "100590": [
+      { group: "EAL", before: ["51.9", null], after: ["51.9", "50.7"] },
+      { group: "Not disadvantaged", before: [null, "52.1"], after: ["52.6", "52.1"] },
+    ],
+    "105574": [
+      { group: "EAL", before: ["50.3", null], after: ["50.3", "52.5"] },
+      { group: "Not disadvantaged", before: [null, "50.1"], after: ["55.5", "50.1"] },
+    ],
+  };
+  const max = 5755;
+  let state = "before";
+
+  function cell(beforeValue, value) {
+    if (value === null) return '<td class="num blank">blank</td>';
+    const fixed = state === "after" && beforeValue === null;
+    return `<td class="num${fixed ? " fixed" : ""}">${value}</td>`;
+  }
+
+  function render() {
+    document.querySelectorAll(".fill").forEach(el => {
+      el.style.width = (Number(el.dataset[state]) / max * 100) + "%";
+    });
+    document.querySelectorAll(".count").forEach(el => { el.textContent = el.dataset[state]; });
+    const rows = schools[document.getElementById("school").value];
+    document.getElementById("school-rows").innerHTML = rows.map(r =>
+      `<tr><td>${r.group}</td>${cell(r.before[0], r[state][0])}${cell(r.before[1], r[state][1])}</tr>`).join("");
+    document.getElementById("btn-before").setAttribute("aria-pressed", state === "before");
+    document.getElementById("btn-after").setAttribute("aria-pressed", state === "after");
+  }
+
+  document.getElementById("btn-before").addEventListener("click", () => { state = "before"; render(); });
+  document.getElementById("btn-after").addEventListener("click", () => { state = "after"; render(); });
+  document.getElementById("school").addEventListener("change", render);
+  render();
+</script>

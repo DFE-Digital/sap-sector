@@ -153,9 +153,9 @@ public class ViewSimilarSchoolsPageIntegrationTests(
             });
 
         Fixture.AbsenceRepository.SetupEstablishmentAbsence(
-            new EstablishmentAbsence { Id = "100001", Abs_Tot_Est_Current_Pct = "4.5", Abs_Persistent_Est_Current_Pct = "12.0" },
-            new EstablishmentAbsence { Id = "100002", Abs_Tot_Est_Current_Pct = "5.1", Abs_Persistent_Est_Current_Pct = "13.0" },
-            new EstablishmentAbsence { Id = "100003", Abs_Tot_Est_Current_Pct = "6.1", Abs_Persistent_Est_Current_Pct = "14.0" });
+            new EstablishmentAbsence { Id = "100001", Abs_Tot_Est_Current_Pct = 4.5m, Abs_Persistent_Est_Current_Pct = 12.0m },
+            new EstablishmentAbsence { Id = "100002", Abs_Tot_Est_Current_Pct = 5.1m, Abs_Persistent_Est_Current_Pct = 13.0m },
+            new EstablishmentAbsence { Id = "100003", Abs_Tot_Est_Current_Pct = 6.1m, Abs_Persistent_Est_Current_Pct = 14.0m });
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100002", x => x.WithAttainment8("81", "", "").WithEngMaths59("70", "", "")),
             Build.Ks4Performance.Establishment("100003", x => x.WithAttainment8("78", "", "").WithEngMaths59("75", "", "")));

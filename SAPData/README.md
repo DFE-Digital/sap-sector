@@ -121,6 +121,58 @@ Typical local workflow:
 
 ---
 
+## Data map catalogue and validation
+
+The data map is defined in code under `Data/SAPSec.Data.Common/Catalogue/Definitions` (every dataset is listed in
+`CatalogueDefinitions`). Each definition declares its source files, years, breakdowns and measures once, and
+expands to the rows the SQL generators read. To roll a dataset to a new year, bump its year in
+`Data/SAPSec.Data/DataYears.cs` and point its sources at the new files (see `docs/operational/003-new-data-year.md`).
+
+Before any SQL is generated, the catalogue is validated and the run stops if it finds:
+- a property whose name says one year but whose row, or `time_period` filter, is for another
+- two properties reading exactly the same file, field and filters
+- one file keyed by different columns within a view
+
+Unit tests also check every field, key column and filter value against `DataMap/source-profiles.json`, a snapshot
+of each source file's columns and filter values. After adding a source file or pointing the catalogue at a new
+one (for example a new year), place the files in `DataMap/SourceFiles` and refresh the snapshot:
+
+```
+dotnet run --project SAPData -- profile-sources
+```
+
+Commit the updated `source-profiles.json` with the catalogue change.
+
+### Checking the downloaded files
+
+Every pipeline run also checks the files it has just downloaded, before any SQL runs (and before the maintenance
+page): every column and filter value the catalogue uses, and every GIAS column `v_establishment` reads, must be in
+the files that will be loaded. If DfE renames a column or breakdown, or a file doesn't yet contain a year the
+catalogue expects, the run stops with a list of the problems and the live views keep their previous data. Fix the
+catalogue as for a new data year. To load anyway (the affected values will be blank), set `SOURCE_FILE_CHECK=warn`.
+
+---
+
+## Incremental loads
+
+By default the pipeline reloads only what changed, decided by the database when `run_all.sql` runs:
+
+- a **raw table** is dropped and reloaded when its source file (or column list) differs from the one it was last
+  loaded from, or it doesn't exist. Dropping uses `CASCADE`, so the views built on it are dropped too
+- a **view** is rebuilt when it doesn't exist, or its SQL (including the helper functions it uses) has changed, for
+  example after a data map change
+
+Fingerprints are recorded in the `raw_table_loads` and `view_builds` tables. The first run in an environment
+without them reloads everything once.
+
+Overrides:
+- `REBUILD_ALL_RAW_TABLES=true` (workflow input `rebuild-all-raw-tables`) drops and reloads everything
+- datasets listed in `raw_tables_to_rebuild.<environment>.txt` are always reloaded; normally these are empty
+- `RAW_TABLE_REBUILD_MODE=list` restores the old behaviour: only listed tables are reloaded and nothing is
+  detected automatically
+
+---
+
 ## Design principles
 
 - SQL-first transformations
