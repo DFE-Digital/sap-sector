@@ -1,6 +1,5 @@
-@using SAPSec.Web.Constants
-@using SAPSec.Web.Areas.Primary.ViewModels
 @using SAPSec.Web.Areas.Shared.ViewModels.Comparison
+@using SAPSec.Web.Constants
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -10,7 +9,9 @@
     ViewData[ViewDataKeys.Title] = layout!.ComparatorSchool.Name;
 
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
-    string active(bool condition) => condition ? "govuk-service-navigation__item--active" : "";
+    string active(ComparisonNavigationItem item) => item.ActiveActionNames.Contains(currentAction ?? string.Empty)
+        ? "govuk-service-navigation__item--active"
+        : "";
 }
 
 @section Breadcrumbs {
@@ -21,7 +22,7 @@
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link"
-                   href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).ViewSimilarSchools">
+                   href="@layout.ViewSimilarSchoolsUrl">
                     View similar schools
                 </a>
             </li>
@@ -34,7 +35,7 @@
     @* LEFT: back link *@
     <div class="app-side-navigation-container">
         <a class="govuk-back-link"
-           href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).ViewSimilarSchools">
+           href="@layout.ViewSimilarSchoolsUrl">
             Back
         </a>
     </div>
@@ -59,37 +60,17 @@
                 <nav aria-label="Compare sections" class="govuk-service-navigation__wrapper">
                     <ul class="govuk-service-navigation__list">
 
-                        <li class="govuk-service-navigation__item @active(currentAction == "Index" || currentAction == "Similarity")">
-                            <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).Similarity"
-                               aria-current="@(currentAction == "Index" || currentAction == "Similarity" ? "page" : null)">
-                                Similarity
-                            </a>
-                        </li>
-
-                        <li class="govuk-service-navigation__item @active(currentAction == "Ks2PerformanceMeasures")">
-                            <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).Ks2"
-                               aria-current="@(currentAction == "Ks2PerformanceMeasures" ? "page" : null)">
-                                KS2
-                            </a>
-                        </li>
-
-                        <li class="govuk-service-navigation__item @active(currentAction == "Attendance")">
-                            <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).Attendance"
-                               aria-current="@(currentAction == "Attendance" ? "page" : null)">
-                                Attendance
-                            </a>
-                        </li>
-
-                        <li class="govuk-service-navigation__item @active(currentAction == "SchoolDetails")">
-                            <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).SchoolDetails"
-                               aria-current="@(currentAction == "SchoolDetails" ? "page" : null)">
-                                School details
-                            </a>
-                        </li>
+                        @foreach (var item in layout.NavigationItems)
+                        {
+                            var isCurrent = item.ActiveActionNames.Contains(currentAction ?? string.Empty);
+                            <li class="govuk-service-navigation__item @active(item)">
+                                <a class="govuk-service-navigation__link"
+                                   href="@item.Href"
+                                   aria-current="@(isCurrent ? "page" : null)">
+                                    @item.Text
+                                </a>
+                            </li>
+                        }
 
                     </ul>
                 </nav>

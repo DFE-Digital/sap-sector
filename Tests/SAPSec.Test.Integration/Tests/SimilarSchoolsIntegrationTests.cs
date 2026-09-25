@@ -114,7 +114,7 @@ public class SimilarSchoolsIntegrationTests(JsonRepositoryIntegrationTestFixture
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         GetCanvasMarkup(content, "attainment8-current-year-chart").Should().Contain("data-label-decimals=\"1\"");
         GetCanvasMarkup(content, "eng-maths-current-year-chart").Should().Contain("data-label-decimals=\"0\"");
-        GetCanvasMarkup(content, "destinations-current-year-chart").Should().Contain("data-label-decimals=\"0\"");
+        GetCanvasMarkup(content, "destinations-current-year-chart").Should().Contain("data-label-decimals=\"1\"");
     }
 
     [Fact]

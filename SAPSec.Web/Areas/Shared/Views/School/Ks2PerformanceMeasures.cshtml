@@ -1,11 +1,9 @@
-@using SAPSec.Core.Model
-@using SAPSec.Web.Constants;
-@using SAPSec.Web.ViewModels
-@using SAPSec.Web.Areas.Primary.ViewModels.School
+@using SAPSec.Web.Areas.Shared.ViewModels.School
+@using SAPSec.Web.Constants
 
 @model Ks2PerformanceMeasuresPageViewModel
 @{
-    Layout = "_Layout";
+    Layout = "~/Areas/Shared/Views/School/_Layout.cshtml";
     ViewData[ViewDataKeys.Title] = "KS2 performance measures";
 }
 
@@ -24,11 +22,11 @@
     </ul>
 
     <p class="govuk-body">
-        Find out <a href="@Routes.PrimarySchool(Model.School.Urn).WhatIsASimilarSchool" class="govuk-link">how DfE defines what a similar school is</a>.
+        Find out <a href="@Model.WhatIsASimilarSchoolUrl" class="govuk-link">@Model.SimilarSchoolDefinitionLinkText</a>.
     </p>
 
     <form action="" method="get">
-        <partial name="_Ks2ProgressRWMInfo" />
+        <partial name="~/Areas/Primary/Views/Shared/_Ks2ProgressRWMInfo.cshtml" />
 
         <section class="app-measure-section" aria-labelledby="expected-rwm-heading">
             <h2 class="govuk-heading-m" id="expected-rwm-heading" data-testid="expected-rwm-heading">@Model.MeetingExpectedStandardRwm.MeasureInfo.Name</h2>
@@ -45,7 +43,7 @@
                     </p>
                 </div>
             </details>
-            
+
             <partial name="Measures/_Measure" model=@Model.MeetingExpectedStandardRwm />
         </section>
 
@@ -63,7 +61,7 @@
                     </p>
                 </div>
             </details>
-            
+
             <partial name="Measures/_Measure" model=@Model.AchievedHigherStandardRwm />
         </section>
 
@@ -76,7 +74,7 @@
                 </summary>
                 <div class="govuk-details__text">
                     <p class="govuk-body-s govuk-!-margin-bottom-2">
-                        This score shows how well pupils performed in the key stage 2 reading test. It is the 
+                        This score shows how well pupils performed in the key stage 2 reading test. It is the
                         mean scaled score of all pupils who took the test and achieved a scaled score.
                     </p>
                     <p class="govuk-body-s govuk-!-margin-bottom-2">
@@ -87,7 +85,7 @@
 
             <partial name="Measures/_Measure" model=@Model.AverageScaledScoreReading />
         </section>
-        
+
         <section class="app-measure-section" aria-labelledby="maths-score-heading">
             <h2 class="govuk-heading-m" id="maths-score-heading" data-testid="maths-score-heading">@Model.AverageScaledScoreMaths.MeasureInfo.Name</h2>
 
@@ -97,7 +95,7 @@
                 </summary>
                 <div class="govuk-details__text">
                     <p class="govuk-body-s govuk-!-margin-bottom-2">
-                        This score shows how well pupils performed in the key stage 2 maths test. It is the mean 
+                        This score shows how well pupils performed in the key stage 2 maths test. It is the mean
                         scaled score of all pupils who took the test and achieved a scaled score.
                     </p>
                     <p class="govuk-body-s govuk-!-margin-bottom-2">

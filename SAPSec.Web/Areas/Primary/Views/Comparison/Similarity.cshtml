@@ -4,6 +4,9 @@
 @model SimilarityPageViewModel
 @{
     Layout = "_Layout";
+    var layout = ViewData[ViewDataKeys.ComparisonLayout] as ComparisonLayoutModel;
+    var whatIsASimilarSchoolUrl = layout?.WhatIsASimilarSchoolUrl
+        ?? Routes.PrimarySchool(Model.CurrentSchool.Urn).WhatIsASimilarSchool;
 }
 
 <h2 class="govuk-heading-l">How these schools compare</h2>
@@ -13,7 +16,7 @@
 </p>
 
 <p class="govuk-body">
-    Find out more about <a href="@Routes.PrimarySchool(Model.CurrentSchool.Urn).WhatIsASimilarSchool" class="govuk-link" data-testid="what-is-a-similar-school-link">
+    Find out more about <a href="@whatIsASimilarSchoolUrl" class="govuk-link" data-testid="what-is-a-similar-school-link">
         the characteristics to measure similarity.
     </a>
 </p>

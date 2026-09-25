@@ -1,14 +1,97 @@
-@using SAPSec.Web.Areas.Shared.ViewModels
+@using SAPSec.Web.Areas.AllThrough.ViewModels
 @using SAPSec.Web.Constants
 
-@model SchoolInfoViewModel
+@model AllThroughOverviewViewModel
 @{
     Layout = "_Layout";
-    ViewData[ViewDataKeys.Title] = Model.Name;
+    ViewData[ViewDataKeys.Title] = Model.School.Name;
 }
 
 <div class="app-overview">
     <header class="app-overview__header">
         <h1 class="govuk-heading-xl app-overview__title">@ViewData[ViewDataKeys.Title]</h1>
+        <p class="govuk-body-l app-overview__address">@Model.School.Address</p>
     </header>
+
+    @if (Model.HasSimilarSchools)
+    {
+        <section class="app-overview__section">
+            <p class="govuk-body app-overview__lead">
+                For all-through schools or cross-phase middle schools, we identify:
+            </p>
+            <ul class="govuk-list govuk-list--bullet app-overview__list">
+                @if (Model.HasPrimarySimilarSchools)
+                {
+                    <li><strong>50</strong> primary schools, including all-throughs, similar to the school&rsquo;s primary phase</li>
+                }
+                @if (Model.HasSecondarySimilarSchools)
+                {
+                    <li><strong>50</strong> secondary schools, including all-throughs, similar to the school&rsquo;s secondary phase</li>
+                }
+            </ul>
+
+            <p class="govuk-body">Use this data to:</p>
+            <ul class="govuk-list govuk-list--bullet app-overview__list">
+                <li>compare performance data</li>
+                <li>find improvement opportunities</li>
+                <li>connect with school leaders and share insights</li>
+            </ul>
+
+            <p class="govuk-body">
+                We use 9 characteristics to find schools similar to yours. Similar schools will not
+                match every characteristic but they will be similar across a large number of them.
+            </p>
+            <p class="govuk-body">
+                Find out more about <a href="@Routes.AllThroughSchool(Model.School.Urn).WhatIsASimilarSchool" class="govuk-link">how the DfE defines what a similar school is</a>.
+            </p>
+        </section>
+
+        <section class="app-overview__section">
+            <h2 class="govuk-heading-m app-overview__section-heading">Compare school performance</h2>
+            <p class="govuk-body">
+                Explore this school's performance data across all education phases and compare:
+            </p>
+            <ul class="govuk-list govuk-list--bullet app-overview__list">
+                <li>similar school averages</li>
+                <li>the local authority average</li>
+                <li>the national average</li>
+            </ul>
+        </section>
+
+        <section class="app-overview__section">
+            <h2 class="govuk-heading-m app-overview__section-heading">View similar schools to connect with</h2>
+            <p class="govuk-body">
+                Review the full list of schools this school has matched with individually to compare their
+                performance and find top-performing schools with similar characteristics. After
+                finding the right match, use their contact details to connect with them.
+            </p>
+        </section>
+
+        <section class="app-overview__section">
+            <h2 class="govuk-heading-m app-overview__section-heading">Missing data for multi-phase schools</h2>
+            <p class="govuk-body">
+                If data is not available for one phase of an all-through school or cross-phase middle
+                school, you will not see data for that phase until the data becomes available. You
+                can still view data for the other phases.
+            </p>
+        </section>
+    }
+    else
+    {
+        <section class="app-overview__section">
+            <h2 class="govuk-heading-m app-overview__section-heading">There are no similar schools available for this school</h2>
+            <p class="govuk-body">
+                DfE has not identified similar schools for this all-through school's primary or secondary phase.
+            </p>
+            <p class="govuk-body">
+                You can still use this service to view this school's performance data and compare it with:
+            </p>
+            <ul class="govuk-list govuk-list--bullet app-overview__list">
+                <li>the local authority primary average</li>
+                <li>the local authority secondary average</li>
+                <li>the national primary average</li>
+                <li>the national secondary average</li>
+            </ul>
+        </section>
+    }
 </div>

@@ -78,6 +78,7 @@ public enum MeasureDataType
     Score,
     ScaledScore,
     GradePercentage,
+    DestinationPercentage,
     OverallAbsencePercentage,
     PersistentAbsencePercentage
 }

@@ -1,10 +1,9 @@
-@using SAPSec.Core.Model
-@using SAPSec.Web.ViewModels
-@using SAPSec.Web.Constants 
+@using SAPSec.Web.Areas.Shared.ViewModels.School
+@using SAPSec.Web.Constants
 
-@model SAPSec.Web.Areas.Secondary.ViewModels.School.Ks4CoreSubjectsPageViewModel
+@model Ks4CoreSubjectsPageViewModel
 @{
-    Layout = "_Layout";
+    Layout = "~/Areas/Shared/Views/School/_Layout.cshtml";
     ViewData[ViewDataKeys.Title] = "KS4 core subject GCSE results";
 }
 
@@ -23,7 +22,7 @@
     </ul>
 
     <p class="govuk-body">
-        Find out <a href="@Routes.SecondarySchool(Model.School.Urn).WhatIsASimilarSchool" class="govuk-link">how DfE defines what a similar school is</a>.
+        Find out <a href="@Model.WhatIsASimilarSchoolUrl" class="govuk-link">@Model.SimilarSchoolDefinitionLinkText</a>.
     </p>
 
     <form action="" method="get">
