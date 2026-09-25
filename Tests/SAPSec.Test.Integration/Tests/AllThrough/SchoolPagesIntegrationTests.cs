@@ -59,9 +59,15 @@ public class SchoolPagesIntegrationTests(
         page.QuerySelector("h1.govuk-heading-xl")!.TextContent.Trim().Should().Be("Test School 1");
         page.QuerySelector(".app-overview__address")!.TextContent.Trim().Should().Be("1 Test Street, Test Town, TT1 1TT");
         page.QuerySelector(".app-overview__lead")!.TextContent.Trim()
-            .Should().Be("We've identified 50 similar secondary phase schools (including all-throughs) to help you:");
+            .Should().Be("For all-through schools or cross-phase middle schools, we identify:");
 
-        page.QuerySelectorAll(".app-overview__list").First().QuerySelectorAll("li")
+        var lists = page.QuerySelectorAll(".app-overview__list");
+
+        lists.First().QuerySelectorAll("li")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal("50 secondary schools, including all-throughs, similar to the school’s secondary phase");
+
+        lists.Skip(1).First().QuerySelectorAll("li")
             .Select(x => x.TextContent.Trim())
             .Should().Equal(
                 "compare performance data",
