@@ -495,95 +495,26 @@
 .app-phase-tabs {
   margin-top: govuk-spacing(7);
   margin-bottom: govuk-spacing(6);
-}
-
-.app-phase-tabs__list {
-  display: flex;
-  gap: govuk-spacing(4);
-  margin: 0;
-  padding: 0;
   border-bottom: 1px solid govuk-colour("blue");
-  list-style: none;
+  background-color: transparent !important;
 }
 
-.app-phase-tabs__list-item {
+.app-phase-tabs .govuk-service-navigation__container {
+  max-width: none;
   margin: 0;
-  padding: 0 0 govuk-spacing(2);
-}
-
-.app-phase-tabs__list-item--selected {
-  padding-bottom: govuk-spacing(1);
-  border-bottom: 5px solid govuk-colour("blue");
-}
-
-.app-phase-tabs__tab {
-  @include govuk-font($size: 19);
-  display: inline-block;
   padding: 0;
-  color: govuk-colour("blue");
-  text-decoration: none;
 }
 
-.app-phase-tabs__tab:visited {
-  color: govuk-colour("blue");
-}
-
-.app-phase-tabs__tab:hover {
-  color: govuk-colour("dark-blue");
-  text-decoration: none;
-}
-
-.app-phase-tabs__tab:focus {
-  outline: 3px solid transparent;
-  color: govuk-colour("black");
-  background-color: govuk-colour("yellow");
-  box-shadow: 0 -2px govuk-colour("yellow"), 0 4px govuk-colour("black");
-  text-decoration: none;
-}
-
-.app-phase-tabs__list-item--selected .app-phase-tabs__tab {
+.app-phase-tabs .govuk-service-navigation__item--active .govuk-service-navigation__link {
   font-weight: 700;
   color: govuk-colour("black");
+  text-decoration: none;
 }
 
 @media (max-width: 40.0625em) {
   .app-phase-tabs {
     margin-top: govuk-spacing(8);
     margin-bottom: govuk-spacing(6);
-  }
-
-  .app-phase-tabs__list {
-    display: block;
-    gap: 0;
-    padding-bottom: govuk-spacing(2);
-  }
-
-  .app-phase-tabs__list-item {
-    display: block;
-    margin-right: 0;
-    margin-bottom: govuk-spacing(1);
-    padding: 0 0 0 govuk-spacing(4);
-  }
-
-  .app-phase-tabs__list-item--selected {
-    position: relative;
-    display: flex;
-    align-items: center;
-    min-height: 30px;
-    padding-left: govuk-spacing(4);
-    border-bottom: 0;
-    border-left: 0;
-  }
-
-  .app-phase-tabs__list-item--selected::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 5px;
-    height: 20px;
-    background-color: govuk-colour("blue");
-    transform: translateY(-50%);
   }
 
   .app-primary-overview__header {
