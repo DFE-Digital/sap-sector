@@ -24,6 +24,12 @@
                id="similar-schools-focus-target"
                name="@SimilarSchoolsPageViewModel.FocusTargetQueryParameter"
                value="" />
+        @foreach (var field in Model.HiddenFormFields)
+        {
+            <input type="hidden"
+                   name="@field.Name"
+                   value="@field.Value" />
+        }
 
         <div class="moj-filter app-filter" data-testid="@(Model.PhaseLabel)-similar-schools-filter">
             <div class="moj-filter__header app-filter__header">
@@ -82,7 +88,7 @@
                             {
                                 var filter = group.Filters[i];
                                 var isLastInGroup = i == group.Filters.Count - 1;
-                                <partial name="_SimilarSchoolsFilterSection"
+                                <partial name="~/Areas/Shared/Views/SimilarSchools/_SimilarSchoolsFilterSection.cshtml"
                                          model="filter"
                                          view-data='new ViewDataDictionary(ViewData) { ["IsLastInGroup"] = isLastInGroup }' />
                             }

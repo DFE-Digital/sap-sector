@@ -1,17 +1,21 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Measures.Primary;
+using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
-using SAPSec.Data.Repositories;
+using SAPSec.Web.Areas.AllThrough.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.AllThrough.Controllers;
 
@@ -23,23 +27,54 @@ namespace SAPSec.Web.Areas.AllThrough.Controllers;
 public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
-        ISimilarSchoolsPrimaryRepository similarSchoolsPrimaryRepository,
-        ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository,
+        IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
+        IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
+        IUseCase<GetAllThroughSimilarSchoolPhasesRequest, GetAllThroughSimilarSchoolPhasesResponse> getAllThroughSimilarSchoolPhasesUseCase,
         IFeatureFlagService featureFlagService)
     : Controller
 {
+    private const string SharedKs2PerformanceMeasuresView = "~/Areas/Shared/Views/School/Ks2PerformanceMeasures.cshtml";
+    private const string SharedKs4CoreSubjectsView = "~/Areas/Shared/Views/School/Ks4CoreSubjects.cshtml";
+
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
         await PopulateViewData(response.School);
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+        var similarSchoolPhases = await GetSimilarSchoolPhasesAsync(urn);
+
+        var model = new AllThroughOverviewViewModel(
+            SchoolInfoViewModel.FromSchoolInfo(response.School),
+            similarSchoolPhases.HasPrimary,
+            similarSchoolPhases.HasSecondary);
+
+        return View(model);
     }
 
     [HttpGet]
     [Route("ks2")]
-    public Task<IActionResult> Ks2PerformanceMeasures(string urn) =>
-        HeadingPage(urn, "KS2 performance measures");
+    public async Task<IActionResult> Ks2PerformanceMeasures(string urn)
+    {
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, filters));
+
+        await PopulateViewData(response.School);
+
+        var model = new Ks2PerformanceMeasuresPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            WhatIsASimilarSchoolUrl = Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
+            SimilarSchoolDefinitionLinkText = "how DfE identifies what a similar school is",
+            MeetingExpectedStandardRwm = MeasureViewModel.FromAllThroughPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School, response.SimilarSchoolsCount > 0),
+            AchievedHigherStandardRwm = MeasureViewModel.FromAllThroughPrimaryMeasure(response.AchievedHigherStandardRwm, response.School, response.SimilarSchoolsCount > 0),
+            AverageScaledScoreReading = MeasureViewModel.FromAllThroughPrimaryMeasure(response.AverageScaledScoreReading, response.School, response.SimilarSchoolsCount > 0),
+            AverageScaledScoreMaths = MeasureViewModel.FromAllThroughPrimaryMeasure(response.AverageScaledScoreMaths, response.School, response.SimilarSchoolsCount > 0),
+            MeetingExpectedStandardGps = MeasureViewModel.FromAllThroughPrimaryMeasure(response.MeetingExpectedStandardGps, response.School, response.SimilarSchoolsCount > 0),
+            AchievedHigherStandardGps = MeasureViewModel.FromAllThroughPrimaryMeasure(response.AchievedHigherStandardGps, response.School, response.SimilarSchoolsCount > 0)
+        };
+
+        return View(SharedKs2PerformanceMeasuresView, model);
+    }
 
     [HttpGet]
     [Route("ks4-headline-measures")]
@@ -48,8 +83,32 @@ public class SchoolController(
 
     [HttpGet]
     [Route("ks4-core-subjects")]
-    public Task<IActionResult> Ks4CoreSubjects(string urn) =>
-        HeadingPage(urn, "KS4 core subject GCSE results");
+    public async Task<IActionResult> Ks4CoreSubjects(string urn)
+    {
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await getKs4CoreSubjectsUseCase.Execute(new(urn, filters));
+
+        await PopulateViewData(response.School);
+
+        var hasSimilarSecondarySchools = response.SimilarSchoolsCount > 0;
+        var model = new Ks4CoreSubjectsPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            WhatIsASimilarSchoolUrl = Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
+            SimilarSchoolDefinitionLinkText = "how DfE identifies what a similar school is",
+            Measures = [
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.EnglishLanguage, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.EnglishLiterature, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.Maths, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.CombinedScience, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.Biology, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.Chemistry, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.Physics, response.School, hasSimilarSecondarySchools)
+            ]
+        };
+
+        return View(SharedKs4CoreSubjectsView, model);
+    }
 
     [HttpGet]
     [Route("attendance")]
@@ -60,11 +119,6 @@ public class SchoolController(
 
         return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
-
-    [HttpGet]
-    [Route("view-similar-schools")]
-    public Task<IActionResult> ViewSimilarSchools(string urn) =>
-        HeadingPage(urn, "View similar schools");
 
     [HttpGet]
     [Route("school-details")]
@@ -80,8 +134,15 @@ public class SchoolController(
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
+        var similarSchoolPhases = await GetSimilarSchoolPhasesAsync(urn);
         await PopulateViewData(response.School);
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+
+        var model = new AllThroughWhatIsASimilarSchoolViewModel(
+            SchoolInfoViewModel.FromSchoolInfo(response.School),
+            similarSchoolPhases.HasPrimary,
+            similarSchoolPhases.HasSecondary);
+
+        return View(model);
     }
 
     [HttpGet]
@@ -116,12 +177,15 @@ public class SchoolController(
             Url,
             urn,
             ControllerContext.ActionDescriptor.ActionName,
-            await HasSimilarSchoolsAsync(urn),
+            await GetSimilarSchoolPhasesAsync(urn),
             await IsRiseResourcesEnabledAsync());
 
-    private async Task<bool> HasSimilarSchoolsAsync(string urn) =>
-        (await similarSchoolsPrimaryRepository.GetGroupAsync(urn)).Any()
-        || (await similarSchoolsSecondaryRepository.GetGroupAsync(urn)).Any();
+    private async Task<AllThroughSimilarSchoolPhases> GetSimilarSchoolPhasesAsync(string urn)
+    {
+        var response = await getAllThroughSimilarSchoolPhasesUseCase.Execute(new(urn));
+
+        return new(response.HasPrimary, response.HasSecondary);
+    }
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>
         featureFlagService is not null

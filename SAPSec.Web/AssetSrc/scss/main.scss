@@ -488,7 +488,35 @@
   margin-bottom: 0;
 }
 
+.app-all-through-similar-schools {
+  max-width: 960px;
+}
+
+.app-phase-tabs {
+  margin-top: govuk-spacing(7);
+  margin-bottom: govuk-spacing(6);
+  border-bottom: 1px solid govuk-colour("blue");
+  background-color: transparent !important;
+}
+
+.app-phase-tabs .govuk-service-navigation__container {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.app-phase-tabs .govuk-service-navigation__item--active .govuk-service-navigation__link {
+  font-weight: 700;
+  color: govuk-colour("black");
+  text-decoration: none;
+}
+
 @media (max-width: 40.0625em) {
+  .app-phase-tabs {
+    margin-top: govuk-spacing(8);
+    margin-bottom: govuk-spacing(6);
+  }
+
   .app-primary-overview__header {
     margin-bottom: 40px;
   }

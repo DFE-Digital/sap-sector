@@ -63,7 +63,7 @@ public sealed class SchoolSideNavigationViewModel
         IUrlHelper url,
         string urn,
         string? currentAction,
-        bool includeSimilarSchools,
+        AllThroughSimilarSchoolPhases similarSchoolPhases,
         bool includeRiseResources = false)
     {
         var items = new List<SchoolSideNavigationItemViewModel>
@@ -75,7 +75,7 @@ public sealed class SchoolSideNavigationViewModel
             new() { Text = "Attendance", Href = Routes.AllThroughSchool(urn).Attendance, IsSelected = currentAction == "Attendance" }
         };
 
-        if (includeSimilarSchools)
+        if (similarSchoolPhases.HasAny)
         {
             items.Add(new() { Text = "View similar schools", Href = Routes.AllThroughSchool(urn).ViewSimilarSchools, IsSelected = currentAction == "ViewSimilarSchools" });
         }
