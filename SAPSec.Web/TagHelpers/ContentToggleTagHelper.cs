@@ -41,14 +41,17 @@ public class ContentToggleTagHelper : TagHelper
         var header = new TagBuilder("div");
         header.AddCssClass("app-content-toggle__header");
 
+
+        //this needs an id
         var title = new TagBuilder("h3");
+        title.Attributes["id"] = "chart-title";
         title.AddCssClass("govuk-heading-m");
         title.AddCssClass("app-content-toggle__title");
         title.InnerHtml.Append(items[activeIndex].Name);
-        if (!string.IsNullOrWhiteSpace(items[activeIndex].AriaLabel))
-        {
-            title.Attributes["aria-label"] = items[activeIndex].AriaLabel;
-        }
+        //if (!string.IsNullOrWhiteSpace(items[activeIndex].AriaLabel))
+        //{
+        //    title.Attributes["aria-label"] = items[activeIndex].AriaLabel;
+        //}
 
         var button = new TagBuilder("button");
         button.Attributes["type"] = "button";
@@ -56,10 +59,10 @@ public class ContentToggleTagHelper : TagHelper
         button.AddCssClass("govuk-button--secondary");
         button.Attributes["data-module"] = "govuk-button";
         button.InnerHtml.Append($"Show {items[(activeIndex + 1) % items.Count].Name.ToLowerInvariant()}");
-        if (!string.IsNullOrWhiteSpace(items[(activeIndex + 1) % items.Count].AriaLabel))
-        {
-            button.Attributes["aria-label"] = $"Show {items[(activeIndex + 1) % items.Count].AriaLabel!.ToLowerInvariant()}";
-        }
+        //if (!string.IsNullOrWhiteSpace(items[(activeIndex + 1) % items.Count].AriaLabel))
+        //{
+        //    button.Attributes["aria-label"] = $"Show {items[(activeIndex + 1) % items.Count].AriaLabel!.ToLowerInvariant()}";
+        //}
 
         header.InnerHtml.AppendHtml(title);
         header.InnerHtml.AppendHtml(button);

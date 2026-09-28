@@ -53,6 +53,8 @@
         if (persist) sessionStorage.setItem(STORAGE_KEY, "list");
     }
 
+
+
     document.addEventListener("click", () => {
         const toggle = document.getElementById("toggleViewLink");
         const notificationContainer = document.getElementById("notification-container");
@@ -60,6 +62,8 @@
         const itemName = toggle.dataset.view === "list" ? "map" : "list";
         notificationContainer.textContent = `Showing ${itemName} of similar schools.`;
         })
+
+
 
     document.addEventListener("DOMContentLoaded", function () {
         // Default view is list unless previously stored

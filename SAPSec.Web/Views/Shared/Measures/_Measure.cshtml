@@ -5,10 +5,10 @@
 <partial name="Measures/_Filters" model=@Model.MeasureInfo />
 
 <div id="@Model.MeasureInfo.HtmlPrefix">
-    <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
+    <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix" year="@Model.MeasureInfo.Year">
         <tab-content id="charts" name="Charts" aria-label="Charts">
             <content-toggle>
-                <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)" aria-label="Charts" active="true">
+                <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)" active="true">
                     <partial name="Measures/_CurrentYearChart" model=@Model.CurrentYear />
                 </toggle-content>
                 <toggle-content id="year-by-year" name="Year by year" aria-label="Year by year chart">
