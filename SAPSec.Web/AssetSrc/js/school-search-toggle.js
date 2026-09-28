@@ -53,18 +53,6 @@
         if (persist) sessionStorage.setItem(STORAGE_KEY, "list");
     }
 
-
-
-    document.addEventListener("click", () => {
-        const toggle = document.getElementById("toggleViewLink");
-        const notificationContainer = document.getElementById("notification-container");
-
-        const itemName = toggle.dataset.view === "list" ? "map" : "list";
-        notificationContainer.textContent = `Showing ${itemName} of similar schools.`;
-        })
-
-
-
     document.addEventListener("DOMContentLoaded", function () {
         // Default view is list unless previously stored
         const saved = sessionStorage.getItem(STORAGE_KEY);
@@ -78,13 +66,18 @@
 
     document.addEventListener("click", function (e) {
         const toggleLink = e.target.closest("#toggleViewLink");
+        const notificationContainer = document.getElementById("notification-container");
         if (toggleLink) {
             e.preventDefault();
             const isList = toggleLink.dataset.view === "list";
-            if (isList) { 
+            if (isList) {
+                //sends notification to aria-live container
+                notificationContainer.textContent = "Showing map of similar schools";
                 showMap();
             }
             else {
+                //sends notification to aria-live container
+                notificationContainer.textContent = "Showing list of similar schools";
                 showList();
             }
             return;
