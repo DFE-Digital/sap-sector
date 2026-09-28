@@ -153,7 +153,7 @@ public sealed class MeasureSet : IDataMapDefinition
         return row;
     }
 
-    internal static void SetFilter(DataMapRow row, int index, Filter filter)
+    private static void SetFilter(DataMapRow row, int index, Filter filter)
     {
         var (column, value) = (filter.Column, filter.EncodedValue);
 

@@ -210,12 +210,16 @@
   <section aria-labelledby="s4">
     <div class="step">Step 4 · The fix</div>
     <h2 id="s4">Each year’s file now uses its own wording</h2>
-    <p>In the code-based data map, the school performance tables source takes each year’s labels, so the difference is written down in one place instead of being lost across hundreds of spreadsheet rows.</p>
-<pre><span class="cm">// Ks4Performance.cs</span>
-var schoolsCurrent = PerformanceTables("202425_performance_tables_schools_final", Current,
-    eal: <span class="hl">"Known or believed to be other than English"</span>, notDisadvantaged: <span class="hl">"Not known to be disadvantaged"</span>);
-var schoolsPrevious = PerformanceTables("202324_performance_tables_schools_final", Previous,
-    eal: <span class="hl">"Other than English"</span>, notDisadvantaged: <span class="hl">"Disadvantaged all other"</span>);</pre>
+    <p>In the data map, each year’s school performance tables source has its own labels, so the difference is written down in one place instead of being lost across hundreds of spreadsheet rows.</p>
+<pre><span class="cm">// SAPData/DataMap/Definitions/ks4-performance.json</span>
+{ "id": "schoolsCurrent", "file": "202425_performance_tables_schools_final", …
+  "pupilGroups": {
+    "NotDisadvantaged": { "breakdown": <span class="hl">"Not known to be disadvantaged"</span> },
+    "Eal": { "breakdown": <span class="hl">"Known or believed to be other than English"</span> }, … } },
+{ "id": "schoolsPrevious", "file": "202324_performance_tables_schools_final", …
+  "pupilGroups": {
+    "NotDisadvantaged": { "breakdown": <span class="hl">"Disadvantaged all other"</span> },
+    "Eal": { "breakdown": <span class="hl">"Other than English"</span> }, … } }</pre>
   </section>
 
   <section aria-labelledby="s5">

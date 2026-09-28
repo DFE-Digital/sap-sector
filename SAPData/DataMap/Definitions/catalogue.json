@@ -1,0 +1,12 @@
+{
+  "description": "Every dataset in the data map, in order. To add a dataset, add its file here. The format is described in dataset.schema.json and Data/SAPSec.Data.Common/Catalogue/README.md.",
+  "datasets": [
+    "ks4-performance.json",
+    "ks4-destinations.json",
+    "pupil-absence.json",
+    "ks2-performance.json",
+    "school-email.json",
+    "workforce.json",
+    "similar-schools.json"
+  ]
+}

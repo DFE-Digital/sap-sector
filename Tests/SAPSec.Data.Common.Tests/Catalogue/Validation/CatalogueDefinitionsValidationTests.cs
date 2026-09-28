@@ -22,7 +22,7 @@ public class CatalogueDefinitionsValidationTests
             .Split('\n');
 
         committed.Should().Equal(
-            DataMapExport.ToJson(CatalogueDefinitions.CodeRows(), MappingOverrides.Embedded()).Split('\n'),
+            DataMapExport.ToJson(CatalogueDefinitions.Rows()).Split('\n'),
             $"datamap.generated.json must match the definitions; regenerate it with: {DataMapExport.Command}");
     }
 
@@ -35,11 +35,11 @@ public class CatalogueDefinitionsValidationTests
     }
 
     [Theory]
-    [InlineData(Ks4Performance.Type, DataYears.Ks4Performance)]
-    [InlineData(Ks4Destinations.Type, DataYears.Ks4Destinations)]
-    [InlineData(Ks2Performance.Type, DataYears.Ks2Performance)]
-    [InlineData(PupilAbsence.Type, DataYears.PupilAbsence)]
-    [InlineData(Workforce.Type, DataYears.Workforce)]
+    [InlineData("KS4_Performance", DataYears.Ks4Performance)]
+    [InlineData("KS4_Destinations", DataYears.Ks4Destinations)]
+    [InlineData("KS2_Performance", DataYears.Ks2Performance)]
+    [InlineData("PupilAbsence", DataYears.PupilAbsence)]
+    [InlineData("Workforce", DataYears.Workforce)]
     public void Current_year_matches_the_year_the_website_labels(string type, int year)
     {
         CatalogueDefinitions.Rows()

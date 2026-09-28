@@ -1,0 +1,24 @@
+{
+  "$schema": "./dataset.schema.json",
+  "description": "School contact email addresses (GIAS extract). Point the file at a new extract to refresh.",
+  "columnSets": [
+    {
+      "dataset": "Email",
+      "scope": "Establishment",
+      "publisher": "GIAS",
+      "file": "school-email-addresses-24-08-2026",
+      "key": "URN",
+      "columns": {
+        "URN": "URN",
+        "EstablishmentNumber": "EstablishmentNumber",
+        "EstablishmentName": "EstablishmentName",
+        "TypeOfEstablishmentName": "TypeOfEstablishment (name)",
+        "EstablishmentTypeGroupName": "EstablishmentTypeGroup (name)",
+        "EstablishmentStatusName": "EstablishmentStatus (name)",
+        "CloseDate": "CloseDate",
+        "PhaseOfEducationName": "PhaseOfEducation (name)",
+        "MainEmail": "MainEmail"
+      }
+    }
+  ]
+}

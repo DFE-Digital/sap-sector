@@ -277,9 +277,9 @@
         </div>
 
         <div class="flow" role="img" aria-label="Definitions are expanded into one row per property, which is checked by the validation rules and the source file check, then built into views for the website.">
-            <div class="flow-box main"><span class="flow-k">1 · Define</span><strong><code>Definitions/*.cs</code>, one file per dataset</strong><span>Which files, years, pupil groups, measures and filters. Replaces the spreadsheet.</span></div>
+            <div class="flow-box main"><span class="flow-k">1 · Define</span><strong><code>SAPData/DataMap/Definitions/*.json</code>, one file per dataset</strong><span>Which files, years, pupil groups, measures and filters. Replaces the spreadsheet; edited by developers and data engineers alike, no C# needed.</span></div>
             <div class="flow-arrow" aria-hidden="true">↓</div>
-            <div class="flow-box"><span class="flow-k">2 · Expand</span><strong>One row per property</strong><span>File, key column, value column and filters: the same shape as a spreadsheet row, built by <code>MeasureSet</code> and <code>ColumnSet</code>.</span></div>
+            <div class="flow-box"><span class="flow-k">2 · Expand</span><strong>One row per property</strong><span>File, key column, value column and filters: the same shape as a spreadsheet row. Listed in <code>datamap.generated.json</code> for review.</span></div>
             <div class="flow-arrow" aria-hidden="true">↓</div>
             <div class="flow-row">
                 <div class="flow-box"><span class="flow-k">3 · Check the map</span><strong><code>Validation/Rules</code></strong><span>7 rules, one class each. Run on every pull request and pipeline run.</span></div>
@@ -296,13 +296,13 @@
                 <thead><tr><th>Question</th><th>Where</th></tr></thead>
                 <tbody>
                     <tr><td>Which file, column and filters does a figure use?</td><td><code>SAPData/DataMap/datamap.generated.json</code>: every property on one line, generated from the definitions and kept current by a test. Or run <code>dotnet run --project SAPData -- explain &lt;PropertyName&gt;</code></td></tr>
-                    <tr><td>Where is a mapping changed?</td><td>Developers: the dataset’s file in <code>Data/SAPSec.Data.Common/Catalogue/Definitions</code>, then <code>export-map</code>. Data engineers, without C#: edit or add lines in <code>datamap.generated.json</code> and run <code>import-map</code>, which checks every change with the validation rules before saving it as an override</td></tr>
-                    <tr><td>Which rows are read (filters)?</td><td>The same definition: <code>Source.Where</code>, <code>Source.Provides</code> and <code>Metric.Where</code> (below)</td></tr>
+                    <tr><td>Where is a mapping changed?</td><td>The dataset’s JSON file in <code>SAPData/DataMap/Definitions</code> (a schema gives autocomplete in VS Code and Visual Studio), then <code>export-map</code> so the pull request shows the changed mappings</td></tr>
+                    <tr><td>Which rows are read (filters)?</td><td>The same file: a source’s <code>where</code> and <code>pupilGroups</code>, and a measure’s <code>where</code> (below)</td></tr>
                     <tr><td>Which years are shown?</td><td><code>Data/SAPSec.Data/DataYears.cs</code>, shared with the website</td></tr>
                     <tr><td>What is checked, and how?</td><td><code>Catalogue/Validation/Rules</code>, one class per rule</td></tr>
                     <tr><td>Which views are built?</td><td><code>SAPData/GenerateViews.cs</code>, the <code>Views</code> list</td></tr>
                     <tr><td>School details (GIAS)?</td><td><code>GenerateViews.GenerateEstablishmentDimensionView</code>; its columns are checked against each day’s file too</td></tr>
-                    <tr><td>A guide for developers</td><td><code>Data/SAPSec.Data.Common/Catalogue/README.md</code></td></tr>
+                    <tr><td>A guide to the format</td><td><code>SAPData/DataMap/Definitions/README.md</code>; the engine is described in <code>Data/SAPSec.Data.Common/Catalogue/README.md</code></td></tr>
                 </tbody>
             </table>
         </div>
@@ -313,9 +313,9 @@
             <table>
                 <thead><tr><th>Where</th><th>Applies to</th><th>Example</th></tr></thead>
                 <tbody>
-                    <tr><td><code>Source.Where</code></td><td>every figure from that file</td><td><code>.Where("time_period", "202425")</code></td></tr>
-                    <tr><td><code>Source.Provides</code></td><td>one pupil group in that file</td><td><code>.Provides(Breakdowns.Eal, ("breakdown", "Known or believed to be other than English"))</code></td></tr>
-                    <tr><td><code>Metric.Where</code></td><td>one measure</td><td><code>.Where("subject", "Biology")</code></td></tr>
+                    <tr><td>a source’s <code>where</code></td><td>every figure from that file</td><td><code>"where": { "time_period": "{year}" }</code></td></tr>
+                    <tr><td>a source’s <code>pupilGroups</code></td><td>one pupil group in that file</td><td><code>"Eal": { "breakdown": "Known or believed to be other than English" }</code></td></tr>
+                    <tr><td>a measure’s <code>where</code></td><td>one measure</td><td><code>"where": { "subject": "Biology" }</code></td></tr>
                 </tbody>
             </table>
         </div>
@@ -326,8 +326,8 @@ Attainment8_EAL_Est_Current_Num
   File:        202425_performance_tables_schools_final (EES)
   Key column:  school_urn
   Value from:  attainment8_average
-  Rows where:  <span class="hl">breakdown = 'Known or believed to be other than English'</span>   <span class="cm">← Source.Provides</span>
-          and  <span class="hl">time_period = '202425'</span>                                      <span class="cm">← Source.Where</span></pre>
+  Rows where:  <span class="hl">breakdown = 'Known or believed to be other than English'</span>   <span class="cm">← source pupilGroups</span>
+          and  <span class="hl">time_period = '202425'</span>                                      <span class="cm">← source where</span></pre>
 
         <h3 class="sub-head">Validation rules</h3>
         <p>Each rule is its own class, based on a real error. To add a rule, write a class and add it to the list in <code>CatalogueValidator.Rules</code>; to change one, edit only its class.</p>
@@ -351,20 +351,19 @@ Attainment8_EAL_Est_Current_Num
             <table>
                 <thead><tr><th>To add or change</th><th>Edit</th></tr></thead>
                 <tbody>
-                    <tr><td>A measure</td><td>one <code>.Metric(...)</code> line in the dataset’s definition</td></tr>
-                    <tr><td>A pupil group, or a label DfE renamed</td><td>one <code>.Provides(...)</code> line on that file’s source</td></tr>
+                    <tr><td>A measure</td><td>an entry in the dataset’s <code>measures</code></td></tr>
+                    <tr><td>A pupil group, or a label DfE renamed</td><td>that file’s source <code>pupilGroups</code></td></tr>
                     <tr><td>A new data year</td><td><code>DataYears.cs</code> and the file names; see the new-data-year runbook</td></tr>
-                    <tr><td>A dataset</td><td>a new file in <code>Definitions</code>, listed in <code>CatalogueDefinitions</code></td></tr>
+                    <tr><td>A dataset</td><td>a new JSON file in <code>SAPData/DataMap/Definitions</code>, listed in <code>catalogue.json</code></td></tr>
                     <tr><td>A view</td><td>one line in <code>GenerateViews.Views</code></td></tr>
                     <tr><td>A check</td><td>a new class in <code>Validation/Rules</code>, added to <code>CatalogueValidator.Rules</code></td></tr>
-                    <tr><td>A mapping, without C#</td><td>a line in <code>SAPData/DataMap/datamap.generated.json</code>, then <code>import-map</code>; the change is checked, saved as an override and marked <code>"overridden": true</code> in the list</td></tr>
                 </tbody>
             </table>
         </div>
 
         <div class="callout">
             <p><strong>Design.</strong> Each part has one job: a definition says <em>what</em> to read, a rule checks <em>one</em> thing, a view line says <em>where</em> a view’s data comes from. New measures, rules and views are added alongside the existing ones rather than written into shared code, and the validator runs any class that follows the rule interface, so each rule can be tested on its own.</p>
-            <p><strong>Proof.</strong> The restructure changed no output: the SQL generated before and after was compared in three pipeline modes (55 scripts each). Every table and view script is identical; the JSON export scripts differ only in spacing.</p>
+            <p><strong>Proof.</strong> The restructure changed no output: the SQL generated before and after was compared in three pipeline modes (55 scripts each). Every table and view script is identical; the JSON export scripts differ only in spacing. Moving the definitions from C# to JSON also changed nothing: all 2,762 data map rows are identical, field for field, in every view.</p>
         </div>
     </section>
 

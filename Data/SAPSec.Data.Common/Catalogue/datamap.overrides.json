@@ -1,4 +1,0 @@
-{
-  "about": "Mapping changes imported from SAPData/DataMap/datamap.generated.json. Each line replaces the definitions' mapping with the same dataset, scope and property, or adds one. Written by import-map; move them into the definitions when convenient.",
-  "overrides": []
-}

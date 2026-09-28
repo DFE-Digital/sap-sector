@@ -1,0 +1,184 @@
+{
+  "$schema": "./dataset.schema.json",
+  "dataset": "PupilAbsence",
+  "description": "Pupil absence: overall and persistent absence rates, for schools and, by phase, for LAs and England. Totals and pupil groups come from different files in some years, so each file has its own measure set. Property names: Abs_{Tot|Persistent}[_{group}][_{Primary|Secondary}]_{scope}_{period}_Pct, with no group for all pupils and the phase only for LAs and England. To roll to a new year, bump PupilAbsence in DataYears.cs and point each source at the new files.",
+  "lists": {
+    "measures": [
+      { "name": "Tot", "column": "sess_overall_percent", "schoolFile": "oa" },
+      { "name": "Persistent", "column": "enrolments_pa_10_exact_percent", "schoolFile": "pa" }
+    ],
+    "phases": [
+      { "name": "Primary", "educationPhase": "State-funded primary" },
+      { "name": "Secondary", "educationPhase": "State-funded secondary" }
+    ]
+  },
+  "pupilGroupSets": {
+    "characteristics": {
+      "Boys": { "breakdown": "Male" },
+      "Girls": { "breakdown": "Female" },
+      "Disadvantaged": { "breakdown": "FSM eligible in last 6 years" },
+      "NotDisadvantaged": { "breakdown": "FSM not eligible in last 6 years" },
+      "Eal": { "breakdown": "First language known or believed to be other than English" },
+      "FirstLanguageEnglish": { "breakdown": "First language known or believed to be English" }
+    }
+  },
+  "measureSets": [
+    {
+      "subtype": "Absence",
+      "description": "LA and England, by phase: every pupil group, plus the all-pupils total for the current year.",
+      "yearsFrom": "PupilAbsence",
+      "pupilGroups": ["Total", "Boys", "Girls", "Disadvantaged", "NotDisadvantaged", "Eal", "FirstLanguageEnglish"],
+      "sources": [
+        {
+          "description": "EES absence by pupil characteristics: every year in one file, LA and England rows.",
+          "scopes": ["England", "LA"],
+          "periods": ["Current"],
+          "publisher": "EES",
+          "file": "6_absence_3term_characteristics",
+          "key": { "England": "geographic_level", "LA": "old_la_code" },
+          "where": { "time_period": "{year}" },
+          "pupilGroups": [{ "Total": { "breakdown": "Total" } }, "characteristics"]
+        },
+        {
+          "scopes": ["England", "LA"],
+          "periods": ["Previous", "Previous2"],
+          "publisher": "EES",
+          "file": "6_absence_3term_characteristics",
+          "key": { "England": "geographic_level", "LA": "old_la_code" },
+          "where": { "time_period": "{year}" },
+          "pupilGroups": "characteristics"
+        }
+      ],
+      "measures": [
+        {
+          "forEach": { "measure": "measures", "phase": "phases" },
+          "measures": [
+            {
+              "name": "Abs_{measure.name}_{phase.name}",
+              "column": "{measure.column}",
+              "unit": "Pct",
+              "where": { "education_phase": "{phase.educationPhase}" },
+              "nameTemplate": "Abs_{measure.name}{_breakdown}_{phase.name}_{scope}_{period}_Pct"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subtype": "Absence",
+      "description": "LA and England all-pupils totals, by phase, for the earlier years.",
+      "yearsFrom": "PupilAbsence",
+      "periods": ["Previous", "Previous2"],
+      "pupilGroups": ["Total"],
+      "sources": [
+        {
+          "description": "EES absence for England, regions and LAs: all-pupils figures only.",
+          "scopes": ["England", "LA"],
+          "publisher": "EES",
+          "file": "1_absence_3term_nat_reg_la",
+          "key": { "England": "geographic_level", "LA": "old_la_code" },
+          "where": { "time_period": "{year}" },
+          "pupilGroups": { "Total": {} }
+        }
+      ],
+      "measures": [
+        {
+          "forEach": { "measure": "measures", "phase": "phases" },
+          "measures": [
+            {
+              "name": "Abs_{measure.name}_{phase.name}",
+              "column": "{measure.column}",
+              "unit": "Pct",
+              "where": { "education_phase": "{phase.educationPhase}" },
+              "nameTemplate": "Abs_{measure.name}{_breakdown}_{phase.name}_{scope}_{period}_Pct"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subtype": "Absence",
+      "description": "Schools, by pupil group, from the wide school files (one column per group), plus the current-year total. One set per measure: oa_percent_… (overall) and pa_percent_… (persistent) files.",
+      "forEach": { "measure": "measures" },
+      "yearsFrom": "PupilAbsence",
+      "pupilGroups": ["Total", "Boys", "Girls", "Disadvantaged", "NotDisadvantaged", "Eal", "FirstLanguageEnglish"],
+      "sources": [
+        {
+          "id": "current",
+          "scopes": ["Establishment"],
+          "periods": ["Current"],
+          "publisher": "EES",
+          "file": "{measure.schoolFile}_percent_3term_sch_{year}_ccss",
+          "key": "urn",
+          "where": { "year": "{year}" }
+        },
+        {
+          "id": "earlier",
+          "scopes": ["Establishment"],
+          "periods": ["Previous", "Previous2"],
+          "publisher": "EES",
+          "file": "{measure.schoolFile}_percent_3term_sch_{year}_ccss",
+          "key": "urn",
+          "where": { "year": "{year}" }
+        }
+      ],
+      "measures": [
+        {
+          "name": "Abs_{measure.name}",
+          "unit": "Pct",
+          "nameTemplate": "Abs_{measure.name}{_breakdown}_{scope}_{period}_Pct",
+          "columnBySource": {
+            "current": {
+              "Total": "all_{measure.schoolFile}_percent",
+              "Boys": "boy_{measure.schoolFile}_percent",
+              "Girls": "girl_{measure.schoolFile}_percent",
+              "Disadvantaged": "fsm_{measure.schoolFile}_percent",
+              "NotDisadvantaged": "nonfsm_{measure.schoolFile}_percent",
+              "Eal": "othlang_{measure.schoolFile}_percent",
+              "FirstLanguageEnglish": "englang_{measure.schoolFile}_percent"
+            },
+            "earlier": {
+              "Boys": "boy_{measure.schoolFile}_percent",
+              "Girls": "girl_{measure.schoolFile}_percent",
+              "Disadvantaged": "fsm_{measure.schoolFile}_percent",
+              "NotDisadvantaged": "nonfsm_{measure.schoolFile}_percent",
+              "Eal": "othlang_{measure.schoolFile}_percent",
+              "FirstLanguageEnglish": "englang_{measure.schoolFile}_percent"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "subtype": "Absence",
+      "description": "School all-pupils totals for the earlier years.",
+      "yearsFrom": "PupilAbsence",
+      "periods": ["Previous", "Previous2"],
+      "pupilGroups": ["Total"],
+      "sources": [
+        {
+          "description": "EES absence for schools: all-pupils figures only.",
+          "scopes": ["Establishment"],
+          "publisher": "EES",
+          "file": "1a_absence_3term_school",
+          "key": "school_urn",
+          "where": { "time_period": "{year}" },
+          "pupilGroups": { "Total": {} }
+        }
+      ],
+      "measures": [
+        {
+          "forEach": { "measure": "measures" },
+          "measures": [
+            {
+              "name": "Abs_{measure.name}",
+              "column": "{measure.column}",
+              "unit": "Pct",
+              "nameTemplate": "Abs_{measure.name}{_breakdown}_{scope}_{period}_Pct"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

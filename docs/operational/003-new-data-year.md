@@ -4,7 +4,7 @@
 
 How to move a dataset (KS4 performance, KS4 destinations, KS2 performance, pupil absence or workforce) on to a newly published academic year. Each dataset holds three years (Current, Previous, Previous2), so a new year drops the oldest.
 
-The data map is code (`Data/SAPSec.Data.Common/Catalogue/Definitions`), so a new year is a small, reviewable change. Automated checks stop the change if the new files don't contain what the catalogue expects.
+The data map is defined in JSON (`SAPData/DataMap/Definitions`, see its README), so a new year is a small, reviewable change. Automated checks stop the change if the new files don't contain what the catalogue expects.
 
 ---
 
@@ -34,11 +34,11 @@ In `Data/SAPSec.Data/DataYears.cs`, add one to the dataset's year, e.g. `PupilAb
 
 ### 3. Point the catalogue at the new files
 
-Open the dataset's definition (e.g. `PupilAbsence.cs`). Most files are one of three kinds:
+Open the dataset's definition (e.g. `SAPData/DataMap/Definitions/pupil-absence.json`). Most files are one of three kinds:
 
-- **built from the year**, e.g. `$"{suffix}_percent_3term_sch_{year.Code}_ccss"`: nothing to change
+- **built from the year**, e.g. `"{measure.schoolFile}_percent_3term_sch_{year}_ccss"`: nothing to change
 - **one file with every year**, e.g. `6_absence_3term_characteristics`: nothing to change if DfE updates the same file; otherwise change the file name
-- **a file per year with an irregular name**, e.g. `202425_performance_tables_schools_final`: add the new year's file and move the older ones down (Current → Previous → Previous2)
+- **a file per year with an irregular name**, e.g. `202425_performance_tables_schools_final`: in each year's source, set `file` to the new names, moving the older ones down (Current → Previous → Previous2). Check each year's `pupilGroups` labels too: DfE sometimes renames them.
 
 To see every file the catalogue now needs, and which are missing locally:
 
@@ -93,8 +93,9 @@ Nothing to do: the pipeline loads any source file it hasn't loaded before (or th
 Include:
 
 - `DataYears.cs`
-- the catalogue definition
+- the dataset's JSON definition
 - `source-profiles.json`
+- `datamap.generated.json`
 
 ---
 

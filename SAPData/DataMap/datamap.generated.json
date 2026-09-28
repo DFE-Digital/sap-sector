@@ -1,8 +1,7 @@
 {
   "generatedBy": "dotnet run --project SAPData -- export-map",
-  "howToEdit": "change or add lines, then run: dotnet run --project SAPData -- import-map. Definitions: Data/SAPSec.Data.Common/Catalogue/Definitions",
+  "editIn": "SAPData/DataMap/Definitions (this file is generated; changes here are lost)",
   "filters": "a row is read when every filter column matches; a list of values means any of them",
-  "codeVersion": "984f4ffe77492ea4",
   "count": 2762,
   "mappings": [
     {"property":"CloseDate","dataset":"Email","scope":"Establishment","publisher":"GIAS","file":"school-email-addresses-24-08-2026","keyColumn":"URN","valueColumn":"CloseDate","dataType":"string","filters":{}},

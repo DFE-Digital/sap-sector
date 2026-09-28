@@ -11,8 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Mapping changes imported from SAPData/DataMap/datamap.generated.json (import-map). -->
-    <EmbeddedResource Include="Catalogue\datamap.overrides.json" LogicalName="datamap.overrides.json" />
+    <InternalsVisibleTo Include="SAPSec.Data.Common.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The data map definitions, edited by developers and data engineers alike. -->
+    <EmbeddedResource Include="..\..\SAPData\DataMap\Definitions\*.json" LogicalName="DataMap/Definitions/%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

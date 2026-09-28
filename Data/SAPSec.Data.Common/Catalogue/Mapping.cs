@@ -6,8 +6,8 @@ using SAPData.Models;
 namespace SAPSec.Data.Common.Catalogue;
 
 /// <summary>
-/// One property's mapping, as written in the mapping list (datamap.generated.json) and the overrides file:
-/// which file, which row (key column and filters) and which column holds the value.
+/// One property's mapping, as written in the mapping list (datamap.generated.json): which file, which row (key column
+/// and filters) and which column holds the value.
 /// </summary>
 public sealed record Mapping
 {
@@ -26,18 +26,7 @@ public sealed record Mapping
     /// <summary>Column → values. A row is read when every column matches one of its values.</summary>
     public Dictionary<string, string[]> Filters { get; init; } = new(StringComparer.Ordinal);
 
-    /// <summary>Set in the mapping list when this mapping comes from the overrides file rather than the definitions.</summary>
-    public bool? Overridden { get; init; }
-
-    /// <summary>Identifies a property: property names are unique within a dataset and scope.</summary>
-    [JsonIgnore]
-    public string Key => KeyOf(Dataset, Scope, Property);
-
-    internal static string KeyOf(string dataset, string scope, string property) => $"{dataset}/{scope}/{property}";
-
-    internal static string KeyOf(DataMapRow r) => KeyOf(r.Type, r.Range, r.PropertyName);
-
-    internal static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -71,55 +60,6 @@ public sealed record Mapping
             DataType = r.DataType,
             Filters = filters,
         };
-    }
-
-    /// <summary>
-    /// The data map row for this mapping. <paramref name="replacing"/> is the row it overrides, if any, whose
-    /// description is kept.
-    /// </summary>
-    public DataMapRow ToRow(DataMapRow? replacing = null)
-    {
-        foreach (var (name, value) in new[] { ("property", Property), ("dataset", Dataset), ("scope", Scope), ("file", File),
-                     ("keyColumn", KeyColumn), ("valueColumn", ValueColumn), ("dataType", DataType) })
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new CatalogueException($"{Key}: '{name}' must not be empty.");
-        }
-
-        if (Filters.Count > MeasureSet.MaxFilters)
-            throw new CatalogueException($"{Key}: has {Filters.Count} filters; the data map supports at most {MeasureSet.MaxFilters}.");
-
-        var row = new DataMapRow
-        {
-            Range = Scope,
-            Ref = Property,
-            PropertyName = Property,
-            PropertyDescription = replacing?.PropertyDescription ?? Property,
-            Source = Publisher ?? "",
-            Type = Dataset,
-            Subtype = Subtype ?? "",
-            Year = Year ?? "",
-            YearDesc = Period ?? "",
-            FileName = File,
-            Field = ValueColumn,
-            DataType = DataType,
-            RecordFilterBy = KeyColumn,
-        };
-
-        var index = 1;
-        foreach (var (column, values) in Filters)
-        {
-            try
-            {
-                MeasureSet.SetFilter(row, index++, new Filter(column, values ?? []));
-            }
-            catch (CatalogueException e)
-            {
-                throw new CatalogueException($"{Key}: {e.Message}");
-            }
-        }
-
-        return row;
     }
 
     private static string? NullIfBlank(string? value) => string.IsNullOrWhiteSpace(value) ? null : value;

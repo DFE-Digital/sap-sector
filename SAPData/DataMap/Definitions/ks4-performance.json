@@ -1,0 +1,293 @@
+{
+  "$schema": "./dataset.schema.json",
+  "dataset": "KS4_Performance",
+  "description": "KS4 performance: headline measures, subject achievement bands and subject grade entries. To roll to a new year, bump Ks4Performance in DataYears.cs and point each source at the new files.",
+  "lists": {
+    "subjects": [
+      { "code": "Bio", "name": "Biology", "discountCode": "RH3", "grades": "singleGrades" },
+      { "code": "Chem", "name": "Chemistry", "discountCode": "RD1", "grades": "singleGrades" },
+      { "code": "CombSci", "name": "Combined Science", "discountCode": "RA1E", "grades": "doubleGrades" },
+      { "code": "EngLang", "name": "English Language", "discountCode": "FK2B", "grades": "singleGrades" },
+      { "code": "EngLit", "name": "English Literature", "discountCode": "FC4", "grades": "singleGrades" },
+      { "code": "Maths", "name": "Mathematics", "discountCode": "RB1", "grades": "singleGrades" },
+      { "code": "Physics", "name": "Physics", "discountCode": "RC1", "grades": "singleGrades" }
+    ],
+    "gradeBands": [
+      { "code": "49", "grade": "9 to 4" },
+      { "code": "59", "grade": "9 to 5" },
+      { "code": "79", "grade": "9 to 7" }
+    ],
+    "numberAndPercent": [
+      { "unit": "Num", "column": "number_achieving" },
+      { "unit": "Pct", "column": "percentage_achieving" }
+    ],
+    "singleGrades": ["4", "5", "6", "7", "8", "9"],
+    "doubleGrades": ["43", "44", "54", "55", "65", "66", "76", "77", "87", "88", "98", "99"]
+  },
+  "pupilGroupSets": {
+    "characteristics": {
+      "Total": { "breakdown_topic": "Total" },
+      "Boys": { "breakdown_topic": "Sex", "sex": "Boys" },
+      "Girls": { "breakdown_topic": "Sex", "sex": "Girls" },
+      "Disadvantaged": { "breakdown_topic": "Disadvantage status", "disadvantage_status": "Disadvantaged" },
+      "NotDisadvantaged": { "breakdown_topic": "Disadvantage status", "disadvantage_status": "Not known to be disadvantaged" },
+      "Eal": { "breakdown_topic": "First language", "first_language": "Known or believed to be other than English" },
+      "Mobile": { "breakdown_topic": "Mobility", "mobility": "Mobile" }
+    },
+    "bySex": {
+      "Total": { "sex": "Total" },
+      "Boys": { "sex": "Boys" },
+      "Girls": { "sex": "Girls" }
+    }
+  },
+  "measureSets": [
+    {
+      "subtype": "Performance",
+      "description": "Attainment 8, Progress 8 and English and maths grade 4+/5+.",
+      "yearsFrom": "Ks4Performance",
+      "pupilGroups": ["Total", "Boys", "Girls", "Disadvantaged", "NotDisadvantaged", "Eal", "Mobile", "NonMobile"],
+      "sources": [
+        {
+          "description": "EES pupil characteristics and geography breakdowns: every year in one file, LA and England rows.",
+          "scopes": ["England", "LA"],
+          "publisher": "EES",
+          "file": "202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_revised",
+          "key": { "England": "geographic_level", "LA": "old_la_code" },
+          "where": { "time_period": "{year}" },
+          "pupilGroups": "characteristics"
+        },
+        {
+          "id": "schoolsCurrent",
+          "description": "EES school performance tables. DfE relabelled the EAL and not-disadvantaged groups between years.",
+          "scopes": ["Establishment"],
+          "periods": ["Current"],
+          "publisher": "EES",
+          "file": "202425_performance_tables_schools_final",
+          "key": "school_urn",
+          "where": { "time_period": "{year}" },
+          "pupilGroups": {
+            "Total": { "breakdown": "Total" },
+            "Boys": { "breakdown": "Boys" },
+            "Girls": { "breakdown": "Girls" },
+            "Disadvantaged": { "breakdown": "Disadvantaged" },
+            "NotDisadvantaged": { "breakdown": "Not known to be disadvantaged" },
+            "Eal": { "breakdown": "Known or believed to be other than English" },
+            "NonMobile": { "breakdown": "Non mobile" }
+          }
+        },
+        {
+          "id": "schoolsPrevious",
+          "scopes": ["Establishment"],
+          "periods": ["Previous"],
+          "publisher": "EES",
+          "file": "202324_performance_tables_schools_final",
+          "key": "school_urn",
+          "where": { "time_period": "{year}" },
+          "pupilGroups": {
+            "Total": { "breakdown": "Total" },
+            "Boys": { "breakdown": "Boys" },
+            "Girls": { "breakdown": "Girls" },
+            "Disadvantaged": { "breakdown": "Disadvantaged" },
+            "NotDisadvantaged": { "breakdown": "Disadvantaged all other" },
+            "Eal": { "breakdown": "Other than English" },
+            "NonMobile": { "breakdown": "Non mobile" }
+          }
+        },
+        {
+          "id": "schoolsPrevious2",
+          "description": "Compare School Performance download: one column per pupil group, so each measure names its columns.",
+          "scopes": ["Establishment"],
+          "periods": ["Previous2"],
+          "publisher": "CSCP",
+          "file": "2022-2023_england_ks4final",
+          "key": "URN"
+        }
+      ],
+      "measures": [
+        {
+          "name": "Attainment8",
+          "column": "attainment8_average",
+          "columnBySource": {
+            "schoolsPrevious": "avg_att8",
+            "schoolsPrevious2": {
+              "Total": "ATT8SCR",
+              "Boys": "ATT8SCR_BOYS",
+              "Girls": "ATT8SCR_GIRLS",
+              "Disadvantaged": "ATT8SCR_FSM6CLA1A",
+              "NotDisadvantaged": "ATT8SCR_NFSM6CLA1A",
+              "Eal": "ATT8SCR_EAL",
+              "NonMobile": "ATT8SCR_NMOB"
+            }
+          }
+        },
+        {
+          "name": "EngMaths49",
+          "column": "engmath_94_total",
+          "columnBySource": { "schoolsPrevious": "t_l2basics_94" },
+          "skip": [{ "scope": "Establishment", "period": "Previous2" }]
+        },
+        {
+          "name": "EngMaths49",
+          "column": "engmath_94_percent",
+          "unit": "Pct",
+          "columnBySource": {
+            "schoolsPrevious": "pt_l2basics_94",
+            "schoolsPrevious2": {
+              "Total": "PTL2BASICS_94",
+              "Boys": "PBL2BASICS_94",
+              "Girls": "PGL2BASICS_94",
+              "Disadvantaged": "PTFSM6CLA1ABASICS_94",
+              "Eal": "PTL2BASICSEAL_94"
+            }
+          }
+        },
+        {
+          "name": "EngMaths59",
+          "column": "engmath_95_total",
+          "columnBySource": { "schoolsPrevious": "t_l2basics_95" },
+          "skip": [{ "scope": "Establishment", "period": "Previous2" }]
+        },
+        {
+          "name": "EngMaths59",
+          "column": "engmath_95_percent",
+          "unit": "Pct",
+          "columnBySource": {
+            "schoolsPrevious": "pt_l2basics_95",
+            "schoolsPrevious2": {
+              "Total": "PTL2BASICS_95",
+              "Boys": "PBL2BASICS_95",
+              "Girls": "PGL2BASICS_95",
+              "Disadvantaged": "PTFSM6CLA1ABASICS_95",
+              "Eal": "PTL2BASICSEAL_95"
+            }
+          }
+        },
+        {
+          "name": "Prog8",
+          "column": "progress8_average",
+          "pupilGroups": ["Total"],
+          "scopes": ["Establishment", "LA"],
+          "columnBySource": {
+            "schoolsPrevious": "avg_p8score",
+            "schoolsPrevious2": { "Total": "P8MEA" }
+          }
+        }
+      ]
+    },
+    {
+      "subtype": "SubjectEntries",
+      "description": "Pupils achieving grade 9–4, 9–5 and 9–7 in each subject, as a number and a percentage.",
+      "yearsFrom": "Ks4Performance",
+      "pupilGroups": ["Total", "Sum", "Boys", "Girls"],
+      "sources": [
+        {
+          "description": "Custom subject achievement extract for LAs and England: every year in one file, by sex.",
+          "scopes": ["England", "LA"],
+          "publisher": "EES",
+          "file": "custom_202325_subject_local_authority_pupil_entriesachievements",
+          "key": { "England": "geographic_level", "LA": "old_la_code" },
+          "where": { "time_period": "{year}" },
+          "pupilGroups": "bySex"
+        },
+        {
+          "description": "Custom subject achievement extract for schools: whole-school totals only.",
+          "scopes": ["Establishment"],
+          "periods": ["Current"],
+          "publisher": "EES",
+          "file": "custom_202425_subject_school_pupil_entriesachievements_revised",
+          "key": "school_urn",
+          "where": { "time_period": "{year}" },
+          "pupilGroups": { "Sum": {} }
+        },
+        {
+          "scopes": ["Establishment"],
+          "periods": ["Previous"],
+          "publisher": "EES",
+          "file": "custom_202324_subject_school_pupil_entriesachievements_final",
+          "key": "school_urn",
+          "where": { "time_period": "{year}" },
+          "pupilGroups": { "Sum": {} }
+        },
+        {
+          "scopes": ["Establishment"],
+          "periods": ["Previous2"],
+          "publisher": "EES",
+          "file": "custom_202223_subject_school_pupil_entriesachievements_final",
+          "key": "school_urn",
+          "where": { "time_period": "{year}" },
+          "pupilGroups": { "Sum": {} }
+        }
+      ],
+      "measures": [
+        {
+          "description": "e.g. Bio49 (number) … Physics79 (percentage).",
+          "forEach": { "value": "numberAndPercent", "subject": "subjects", "band": "gradeBands" },
+          "measures": [
+            {
+              "name": "{subject.code}{band.code}",
+              "column": "{value.column}",
+              "unit": "{value.unit}",
+              "where": { "subject": "{subject.name}", "grade": "{band.grade}" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "subtype": "SubjectEntries",
+      "description": "Entries at each grade per subject (Combined Science uses double grades, e.g. 98).",
+      "yearsFrom": "Ks4Performance",
+      "pupilGroups": ["Sum"],
+      "sources": [
+        {
+          "id": "current",
+          "scopes": ["Establishment"],
+          "periods": ["Current"],
+          "publisher": "EES",
+          "file": "202425_subject_school_all_exam_entriesgrades_final",
+          "key": "school_urn",
+          "where": { "time_period": "{year}" },
+          "pupilGroups": { "Sum": {} }
+        },
+        {
+          "id": "previous",
+          "scopes": ["Establishment"],
+          "periods": ["Previous"],
+          "publisher": "EES",
+          "file": "202324_subject_school_all_exam_entriesgrades_final",
+          "key": "school_urn",
+          "where": { "time_period": "{year}" },
+          "pupilGroups": { "Sum": {} }
+        },
+        {
+          "id": "previous2",
+          "description": "Older underlying data identifies subjects by discount code.",
+          "scopes": ["Establishment"],
+          "periods": ["Previous2"],
+          "publisher": "CSCP",
+          "file": "england_ks4underlying_entriesandgrades_2",
+          "key": "Unique Reference Number (URN)",
+          "pupilGroups": { "Sum": {} }
+        }
+      ],
+      "measures": [
+        {
+          "description": "e.g. Bio4 … Bio9, CombSci43 … CombSci99.",
+          "forEach": { "subject": "subjects", "grade": "{subject.grades}" },
+          "measures": [
+            {
+              "name": "{subject.code}{grade}",
+              "column": "number_achieving",
+              "whereBySource": {
+                "current": { "subject": "{subject.name}", "grade": "{grade}" },
+                "previous": { "subject": "{subject.name}", "grade": "{grade}" },
+                "previous2": { "Discount Code": "{subject.discountCode}", "GRADE": "{grade}" }
+              },
+              "columnBySource": { "previous2": "Number of entries at grade" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Data map dataset",
+  "description": "One dataset in the data map: which source files, rows and columns each property reads. See Data/SAPSec.Data.Common/Catalogue/README.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "dataset": { "type": "string", "description": "The dataset name (the DataMap Type), e.g. KS4_Performance. Measure and column sets can set their own." },
+    "description": { "type": "string" },
+    "lists": {
+      "type": "object",
+      "description": "Named lists used by forEach, e.g. subjects or grade bands.",
+      "additionalProperties": { "type": "array" }
+    },
+    "pupilGroupSets": {
+      "type": "object",
+      "description": "Named sets of pupil groups a source can use, so the same filters aren't repeated.",
+      "additionalProperties": { "$ref": "#/definitions/pupilGroupFilters" }
+    },
+    "measureSets": { "type": "array", "items": { "$ref": "#/definitions/measureSet" } },
+    "columnSets": { "type": "array", "items": { "$ref": "#/definitions/columnSet" } }
+  },
+  "definitions": {
+    "scope": { "enum": ["Establishment", "LA", "England"] },
+    "period": { "enum": ["Current", "Previous", "Previous2"] },
+    "pupilGroup": {
+      "enum": ["Total", "Sum", "Boys", "Girls", "Disadvantaged", "NotDisadvantaged", "Eal", "FirstLanguageEnglish", "Mobile", "NonMobile"]
+    },
+    "values": {
+      "description": "One value, or a list meaning any of them.",
+      "oneOf": [{ "type": "string" }, { "type": "array", "items": { "type": "string" }, "minItems": 1 }]
+    },
+    "forEach": {
+      "type": "object",
+      "description": "Repeat for every combination: each variable is a list, the name of one in \"lists\", or a {variable.field} naming one. Use {variable} or {variable.field} in text.",
+      "additionalProperties": { "oneOf": [{ "type": "string" }, { "type": "array" }] }
+    },
+    "pupilGroupFilters": {
+      "type": "object",
+      "description": "Pupil group → the filters that select its rows, e.g. \"Boys\": { \"breakdown\": \"Boys\" }. {} means every row.",
+      "propertyNames": { "$ref": "#/definitions/pupilGroup" },
+      "additionalProperties": { "type": "object", "additionalProperties": { "type": "string" } }
+    },
+    "measureSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subtype", "yearsFrom", "sources", "measures"],
+      "properties": {
+        "dataset": { "type": "string" },
+        "subtype": { "type": "string" },
+        "description": { "type": "string" },
+        "forEach": { "$ref": "#/definitions/forEach" },
+        "yearsFrom": {
+          "enum": ["Ks4Performance", "Ks4Destinations", "Ks2Performance", "PupilAbsence", "Workforce"],
+          "description": "The current year, from Data/SAPSec.Data/DataYears.cs (shared with the website)."
+        },
+        "periods": { "type": "array", "items": { "$ref": "#/definitions/period" }, "description": "Default: Current, Previous and Previous2." },
+        "pupilGroups": { "type": "array", "items": { "$ref": "#/definitions/pupilGroup" }, "description": "Default pupil groups for the measures. Default: Total." },
+        "sources": { "type": "array", "items": { "$ref": "#/definitions/source" }, "minItems": 1 },
+        "measures": { "type": "array", "items": { "$ref": "#/definitions/measureOrLoop" }, "minItems": 1 }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scopes", "publisher", "file", "key"],
+      "properties": {
+        "id": { "type": "string", "description": "Name used by a measure's columnBySource or whereBySource." },
+        "description": { "type": "string" },
+        "scopes": { "type": "array", "items": { "$ref": "#/definitions/scope" }, "minItems": 1 },
+        "periods": { "type": "array", "items": { "$ref": "#/definitions/period" }, "description": "Default: the measure set's periods." },
+        "publisher": { "type": "string", "description": "e.g. EES, CSCP, GIAS." },
+        "file": { "type": "string", "description": "Source file name without .csv. {year} is the period's year code, e.g. 202425." },
+        "key": {
+          "description": "The column identifying the school, LA or England row; or one per scope.",
+          "oneOf": [{ "type": "string" }, { "type": "object", "propertyNames": { "$ref": "#/definitions/scope" }, "additionalProperties": { "type": "string" } }]
+        },
+        "where": {
+          "type": "object",
+          "description": "Filters for every measure read from this source, e.g. \"time_period\": \"{year}\". A value per scope applies only to the scopes named.",
+          "additionalProperties": {
+            "oneOf": [
+              { "$ref": "#/definitions/values" },
+              { "type": "object", "propertyNames": { "$ref": "#/definitions/scope" }, "additionalProperties": { "$ref": "#/definitions/values" } }
+            ]
+          }
+        },
+        "pupilGroups": {
+          "description": "The pupil groups this source provides: a set from pupilGroupSets, filters per group, or a list of both.",
+          "oneOf": [
+            { "type": "string" },
+            { "$ref": "#/definitions/pupilGroupFilters" },
+            { "type": "array", "items": { "oneOf": [{ "type": "string" }, { "$ref": "#/definitions/pupilGroupFilters" }] } }
+          ]
+        }
+      }
+    },
+    "measureOrLoop": {
+      "oneOf": [
+        { "$ref": "#/definitions/measure" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["forEach", "measures"],
+          "properties": {
+            "forEach": { "$ref": "#/definitions/forEach" },
+            "description": { "type": "string" },
+            "measures": { "type": "array", "items": { "$ref": "#/definitions/measureOrLoop" }, "minItems": 1 }
+          }
+        }
+      ]
+    },
+    "measure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "description": "Used in property names: {metric}_{breakdown}_{scope}_{period}_{unit} by default." },
+        "description": { "type": "string" },
+        "column": { "type": "string", "description": "The column holding the value." },
+        "unit": { "enum": ["Num", "Pct"], "description": "Default: Num." },
+        "dataType": { "enum": ["double", "string", "string array"], "description": "Default: double." },
+        "nameTemplate": {
+          "type": "string",
+          "description": "Placeholders: {metric}, {breakdown}, {_breakdown} (\"_\" and the code, or nothing for Total), {scope}, {period}, {unit}."
+        },
+        "pupilGroups": { "type": "array", "items": { "$ref": "#/definitions/pupilGroup" } },
+        "scopes": { "type": "array", "items": { "$ref": "#/definitions/scope" } },
+        "periods": { "type": "array", "items": { "$ref": "#/definitions/period" } },
+        "skip": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["scope", "period"],
+            "properties": { "scope": { "$ref": "#/definitions/scope" }, "period": { "$ref": "#/definitions/period" } }
+          }
+        },
+        "where": { "type": "object", "description": "Filters for this measure only, e.g. \"subject\": \"Biology\".", "additionalProperties": { "$ref": "#/definitions/values" } },
+        "whereBySource": {
+          "type": "object",
+          "description": "Source id → filters for this measure when reading that source.",
+          "additionalProperties": { "type": "object", "additionalProperties": { "$ref": "#/definitions/values" } }
+        },
+        "columnBySource": {
+          "type": "object",
+          "description": "Source id → the column to read there instead, or one column per pupil group (wide files).",
+          "additionalProperties": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "object", "propertyNames": { "$ref": "#/definitions/pupilGroup" }, "additionalProperties": { "type": "string" } }
+            ]
+          }
+        }
+      }
+    },
+    "columnSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dataset", "scope", "publisher", "file", "key", "columns"],
+      "description": "Columns copied as they are from one file (e.g. contact details, similar schools).",
+      "properties": {
+        "dataset": { "type": "string" },
+        "description": { "type": "string" },
+        "scope": { "type": "string" },
+        "publisher": { "type": "string" },
+        "file": { "type": "string" },
+        "key": { "type": "string" },
+        "columns": { "type": "object", "description": "Property → column.", "additionalProperties": { "type": "string" } }
+      }
+    }
+  }
+}

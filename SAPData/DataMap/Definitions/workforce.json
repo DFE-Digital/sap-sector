@@ -1,0 +1,26 @@
+{
+  "$schema": "./dataset.schema.json",
+  "dataset": "Workforce",
+  "description": "School workforce: pupil to qualified teacher ratio and pupil numbers, current year only. To roll to a new year, bump Workforce in DataYears.cs and point the source at the new file.",
+  "measureSets": [
+    {
+      "subtype": "Workforce",
+      "yearsFrom": "Workforce",
+      "periods": ["Current"],
+      "sources": [
+        {
+          "scopes": ["Establishment"],
+          "publisher": "EES",
+          "file": "workforce_ptrs_2010_2025_sch",
+          "key": "school_urn",
+          "where": { "time_period": "{year}" },
+          "pupilGroups": { "Total": {} }
+        }
+      ],
+      "measures": [
+        { "name": "Workforce_PupTeaRatio", "column": "pupil_to_qual_teacher_ratio", "nameTemplate": "{metric}_{scope}_{period}_{unit}" },
+        { "name": "Workforce_TotPupils", "column": "pupils_fte", "nameTemplate": "{metric}_{scope}_{period}_{unit}" }
+      ]
+    }
+  ]
+}

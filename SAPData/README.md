@@ -123,9 +123,9 @@ Typical local workflow:
 
 ## Data map catalogue and validation
 
-The data map is defined in code under `Data/SAPSec.Data.Common/Catalogue/Definitions` (every dataset is listed in
-`CatalogueDefinitions`). Each definition declares its source files, years, breakdowns and measures once, and
-expands to the rows the SQL generators read. To roll a dataset to a new year, bump its year in
+The data map is defined in JSON under `DataMap/Definitions` (every dataset is listed in `catalogue.json`; see its
+README). Each definition declares its source files, years, pupil groups and measures once, and expands to the rows
+the SQL generators read. Developers and data engineers edit the same files; no C# is needed. To roll a dataset to a new year, bump its year in
 `Data/SAPSec.Data/DataYears.cs` and point its sources at the new files (see `docs/operational/003-new-data-year.md`).
 
 Before any SQL is generated, the catalogue is validated and the run stops if it finds:
@@ -144,9 +144,8 @@ dotnet run --project SAPData -- profile-sources
 Commit the updated `source-profiles.json` with the catalogue change.
 
 Every property's file, key column, value column and filters are listed in `DataMap/datamap.generated.json`, one per
-line. Mappings can also be changed there and imported with `dotnet run --project SAPData -- import-map` (see
-`Data/SAPSec.Data.Common/Catalogue/README.md`). After changing the catalogue, regenerate it (a test fails if it is out
-of date):
+line, generated from the definitions so pull requests show exactly which mappings changed. After changing a
+definition, regenerate it (a test fails if it is out of date):
 
 ```
 dotnet run --project SAPData -- export-map

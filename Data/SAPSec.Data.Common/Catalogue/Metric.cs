@@ -126,7 +126,8 @@ public sealed class Metric
     }
 
     /// <summary>
-    /// Overrides the property name template. Placeholders: {metric}, {breakdown}, {scope}, {period}, {unit}.
+    /// Overrides the property name template. Placeholders: {metric}, {breakdown}, {scope}, {period}, {unit}, and
+    /// {_breakdown}: "_" and the breakdown code, or nothing for Total (e.g. Abs_Tot_Boy_… but Abs_Tot_…).
     /// </summary>
     public Metric Named(string template)
     {
@@ -157,6 +158,7 @@ public sealed class Metric
     internal string PropertyName(Breakdown breakdown, Scope scope, Period period) =>
         _name?.Invoke(breakdown, scope, period) ?? NameTemplate
             .Replace("{metric}", Name)
+            .Replace("{_breakdown}", breakdown == Catalogue.Breakdowns.Total ? "" : $"_{breakdown.Code}")
             .Replace("{breakdown}", breakdown.Code)
             .Replace("{scope}", scope.NameCode())
             .Replace("{period}", period.ToString())
