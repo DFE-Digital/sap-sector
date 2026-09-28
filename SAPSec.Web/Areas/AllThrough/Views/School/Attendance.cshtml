@@ -1,14 +1,14 @@
-@using SAPSec.Web.Areas.Shared.ViewModels
+@using SAPSec.Web.Areas.AllThrough.ViewModels.School
 @using SAPSec.Web.Constants
 
-@model SchoolInfoViewModel
+@model AllThroughAttendancePageViewModel
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = "Attendance measures";
 }
 
 <div class="app-school-page">
-    <span class="govuk-caption-xl">@Model.Name</span>
+    <span class="govuk-caption-xl">@Model.School.Name</span>
     <h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
     <p class="govuk-body">
@@ -23,16 +23,34 @@
     </ul>
 
     <p class="govuk-body">
-        Find out <a href="@Routes.AllThroughSchool(Model.Urn).WhatIsASimilarSchool" class="govuk-link">how DfE identifies what a similar school is</a>.
+        Find out <a href="@Routes.AllThroughSchool(Model.School.Urn).WhatIsASimilarSchool" class="govuk-link">how DfE identifies what a similar school is</a>.
     </p>
+    
+    <form action="" method="get">
+        <partial name="_AttendanceInfo" />
 
-    <div class="govuk-inset-text">
-        <p class="govuk-body">
-            To compare this school with similar schools using up-to-date attendance data,
-            use the Monitor your school attendance service.
-        </p>
-        <p class="govuk-body">
-            You can access this service on <a href="https://viewyourdata.education.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer">View your education data (VYED) (opens in new tab)</a>. If you do not have VYED access, <a href="https://viewyourdata.education.gov.uk/Account/Help" class="govuk-link" target="_blank" rel="noopener noreferrer">get help on accessing VYED (opens in new tab)</a>.
-        </p>
-    </div>
+        <section class="app-measure-section" aria-labelledby="primary-attendance-heading">
+            <h2 class="govuk-heading-m" id="primary-attendance-heading" data-testid="primary-attendance-heading">Primary attendance</h2>
+            <partial name="Measures/_Measure" model=@Model.PrimaryAbsence />
+        </section>
+
+        <section class="app-measure-section" aria-labelledby="secondary-attendance-heading">
+            <h2 class="govuk-heading-m" id="secondary-attendance-heading" data-testid="secondary-attendance-heading">Secondary attendance</h2>
+            <partial name="Measures/_Measure" model=@Model.SecondaryAbsence />
+        </section>
+    </form>
 </div>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as MeasureFilters from '/js/measure-filters.js'
+        import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
+
+        MeasureFilters.initAll();
+        ChartFactory.initAll();
+        ContentToggle.initAll();
+    </script>
+}
