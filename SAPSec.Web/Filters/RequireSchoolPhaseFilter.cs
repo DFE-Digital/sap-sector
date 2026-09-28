@@ -127,6 +127,14 @@ public sealed class RequireSchoolPhaseFilter(
             return new NotFoundResult();
         }
 
+        if (string.Equals(
+                canonicalPath,
+                context.HttpContext.Request.PathBase + context.HttpContext.Request.Path,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            return new NotFoundResult();
+        }
+
         return new RedirectResult(canonicalPath + context.HttpContext.Request.QueryString, permanent: false);
     }
 }
