@@ -1,3 +1,4 @@
+using SAPData.Models;
 using SAPSec.Data.Common.Catalogue;
 using SAPSec.Data.Common.Catalogue.Definitions;
 using SAPSec.Data.Common.Catalogue.Validation;
@@ -10,7 +11,7 @@ internal partial class Program
     // Returns true when args name a command, which has then run instead of the pipeline.
     private static bool RunDeveloperCommand(string[] args, string dataMapDir, string rawInputDir, string sourceProfilesPath)
     {
-        var command = Array.FindIndex(args, a => a is "profile-sources" or "catalogue-summary" or "explain" or "export-map");
+        var command = Array.FindIndex(args, a => a is "profile-sources" or "catalogue-summary" or "explain" or "export-map" or "import-map");
         if (command < 0)
             return false;
 
@@ -26,20 +27,105 @@ internal partial class Program
                 ExplainProperty(args.ElementAtOrDefault(command + 1) ?? "");
                 return true;
             case "export-map":
-                WriteDataMapExport(Path.Combine(dataMapDir, "datamap.generated.json"));
+                WriteMappingList(MappingListPath(dataMapDir), force: args.Contains("--force"));
+                return true;
+            case "import-map":
+                ImportMappingList(MappingListPath(dataMapDir), OverridesPath(dataMapDir), sourceProfilesPath);
                 return true;
             default:
                 return false;
         }
     }
 
-    // Every property's file, key column, value column and filters, one per line, for anyone who needs to look up a
-    // mapping without reading the definitions. A test fails if the committed file is out of date.
-    private static void WriteDataMapExport(string path)
+    private static string MappingListPath(string dataMapDir) => Path.Combine(dataMapDir, "datamap.generated.json");
+
+    private static string OverridesPath(string dataMapDir) =>
+        Path.Combine(Directory.GetParent(dataMapDir)!.Parent!.FullName, "Data", "SAPSec.Data.Common", "Catalogue", MappingOverrides.FileName);
+
+    // The mapping list: every property's file, key column, value column and filters, one per line. A test fails if the
+    // committed list is out of date. Won't overwrite edits that haven't been imported yet, unless --force.
+    private static void WriteMappingList(string path, bool force)
     {
-        var rows = CatalogueDefinitions.Rows();
-        File.WriteAllText(path, DataMapExport.ToJson(rows));
-        Console.WriteLine($"Wrote {rows.Count} mappings to {path}");
+        var codeRows = CatalogueDefinitions.CodeRows();
+        var json = DataMapExport.ToJson(codeRows, MappingOverrides.Embedded());
+
+        if (!force && File.Exists(path) && HasUnimportedEdits(File.ReadAllText(path), json, codeRows))
+        {
+            Console.Error.WriteLine($"{path} has edits that haven't been imported. Run: {DataMapExport.ImportCommand}");
+            Console.Error.WriteLine("(or add --force to discard them).");
+            Environment.ExitCode = 1;
+            return;
+        }
+
+        File.WriteAllText(path, json);
+        Console.WriteLine($"Wrote the mapping list to {path}");
+    }
+
+    // A list generated from the current definitions that no longer matches what they generate has been edited by hand.
+    private static bool HasUnimportedEdits(string current, string expected, IReadOnlyList<DataMapRow> codeRows)
+    {
+        if (current.ReplaceLineEndings("\n") == expected)
+            return false;
+
+        try
+        {
+            return DataMapExport.Parse(current).CodeVersion == DataMapExport.CodeVersion(codeRows);
+        }
+        catch (CatalogueException)
+        {
+            return true;
+        }
+    }
+
+    // Turns edits to the mapping list into overrides, after checking them with the validation rules and the source
+    // file snapshot. Nothing is written if anything fails.
+    private static void ImportMappingList(string listPath, string overridesPath, string sourceProfilesPath)
+    {
+        var codeRows = CatalogueDefinitions.CodeRows();
+        MappingOverrides overrides;
+        try
+        {
+            var (version, mappings) = DataMapExport.Parse(File.ReadAllText(listPath));
+            if (version != DataMapExport.CodeVersion(codeRows))
+            {
+                throw new CatalogueException(
+                    "The definitions have changed since this list was generated, so importing it could undo those changes. " +
+                    $"Keep a copy of your edits, run {DataMapExport.Command} --force, and make them again.");
+            }
+
+            overrides = MappingOverrides.FromEditedList(codeRows, mappings);
+        }
+        catch (CatalogueException e)
+        {
+            Console.Error.WriteLine(e.Message);
+            Environment.ExitCode = 1;
+            return;
+        }
+
+        var profiles = File.Exists(sourceProfilesPath) ? SourceProfiles.Load(sourceProfilesPath) : null;
+        var issues = CatalogueValidator.Validate(overrides.ApplyTo(codeRows), profiles);
+        if (issues.Count > 0)
+        {
+            foreach (var issue in issues)
+                Console.Error.WriteLine(issue);
+
+            Console.Error.WriteLine($"Nothing imported: {issues.Count} issue(s). If you added a source file, profile it first: " +
+                                    "dotnet run --project SAPData -- profile-sources");
+            Environment.ExitCode = 1;
+            return;
+        }
+
+        var codeKeys = codeRows.Where(r => !string.IsNullOrWhiteSpace(r.PropertyName))
+            .Select(r => Mapping.FromRow(r).Key)
+            .ToHashSet(StringComparer.Ordinal);
+        var changed = overrides.Mappings.Count(m => codeKeys.Contains(m.Key));
+
+        File.WriteAllText(overridesPath, overrides.ToJson());
+        File.WriteAllText(listPath, DataMapExport.ToJson(codeRows, overrides));
+
+        Console.WriteLine($"Imported {overrides.Mappings.Count} override(s): {changed} changed, {overrides.Mappings.Count - changed} added.");
+        Console.WriteLine($"Written to {overridesPath}; the mapping list marks them \"overridden\": true.");
+        Console.WriteLine("Next: run the tests and raise a pull request with both files.");
     }
 
     // Snapshot of the source files' columns and filter values, committed so catalogue tests can check fields and
@@ -115,6 +201,8 @@ internal partial class Program
             Console.WriteLine($"  File:        {r.FileName} ({r.Source})");
             Console.WriteLine($"  Key column:  {r.RecordFilterBy}");
             Console.WriteLine($"  Value from:  {r.Field}");
+            if (MappingOverrides.Embedded().Keys.Contains(Mapping.FromRow(r).Key))
+                Console.WriteLine($"  Overridden:  yes, in {MappingOverrides.FileName} (imported from the mapping list)");
 
             var filters = DataMapFilters.Of(r)
                 .Select(f => f.Values.Length == 1

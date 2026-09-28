@@ -11,6 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Mapping changes imported from SAPData/DataMap/datamap.generated.json (import-map). -->
+    <EmbeddedResource Include="Catalogue\datamap.overrides.json" LogicalName="datamap.overrides.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SAPSec.Data\SAPSec.Data.csproj" />
   </ItemGroup>
 

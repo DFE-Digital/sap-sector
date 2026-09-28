@@ -93,18 +93,42 @@ private static Source PerformanceTables(string file, AcademicYear year, string e
 
 [SAPData/DataMap/datamap.generated.json](../../../SAPData/DataMap/datamap.generated.json) lists every property, one per
 line: its file, key column, value column and filters. Use it to look up a mapping without reading C#, or to search
-(for example every property that reads a file or filters on a label). It is generated, never edited:
-
-```
-dotnet run --project SAPData -- export-map
-```
+(for example every property that reads a file or filters on a label).
 
 ```json
 {"property":"Attainment8_EAL_Est_Current_Num","dataset":"KS4_Performance","subtype":"Performance","scope":"Establishment","period":"Current","year":"2024-2025","publisher":"EES","file":"202425_performance_tables_schools_final","keyColumn":"school_urn","valueColumn":"attainment8_average","dataType":"double","filters":{"breakdown":["Known or believed to be other than English"],"time_period":["202425"]}}
 ```
 
-A test fails if the committed file doesn't match the definitions, so it is always current, and a pull request that
-changes a mapping shows the changed lines in this file for reviewers who don't read C#.
+A test fails if the committed list doesn't match the data map, so it is always current, and a pull request that
+changes a mapping shows the changed lines for reviewers who don't read C#.
+
+### Changing mappings in the list
+
+A data engineer can change the data map without writing C#:
+
+1. In `datamap.generated.json`, change a line (file, key column, value column, data type or filters) or add one.
+2. Run `dotnet run --project SAPData -- import-map`. It checks every change with the validation rules and the source
+   file snapshot, and imports nothing if any check fails, for example a filter value that isn't in the file. A new
+   source file needs `profile-sources` first.
+3. Only the differences from the definitions are saved, one line each, to
+   [datamap.overrides.json](datamap.overrides.json). The pipeline uses the definitions plus these overrides, and the
+   list marks them `"overridden": true`. `explain` shows them too.
+4. Run the tests and raise a pull request with both files.
+
+Safety checks:
+
+- Lines can't be removed or renamed in the list (the website may read them); do that in the definitions.
+- `import-map` refuses a list generated before the definitions last changed, so an old list can't undo newer changes.
+  Keep a copy of your edits, run `export-map --force`, and make them again.
+- `export-map` refuses to overwrite edits that haven't been imported yet (add `--force` to discard them).
+- Changing a line back to the definitions' mapping removes its override.
+
+Overrides are a quick, reviewed way to change mappings. When a developer next works on a dataset, move its overrides
+into the definitions: once the code matches, run `import-map` again and they disappear. A new property appears in its
+view straight away; the website shows it once a developer adds it to a page.
+
+After changing the definitions, regenerate the list with `dotnet run --project SAPData -- export-map`. Keep its
+format as generated (one mapping per line): reformatting it in an editor makes the test fail until it is regenerated.
 
 ## Checking a property
 

@@ -18,5 +18,9 @@ public static class CatalogueDefinitions
         .. SimilarSchools.Definitions(),
     ];
 
-    public static IReadOnlyList<DataMapRow> Rows() => DataMapCatalogue.Expand(Definitions());
+    /// <summary>The data map the pipeline uses: the definitions plus any overrides imported from the mapping list.</summary>
+    public static IReadOnlyList<DataMapRow> Rows() => MappingOverrides.Embedded().ApplyTo(CodeRows());
+
+    /// <summary>The definitions' rows only, without overrides.</summary>
+    public static IReadOnlyList<DataMapRow> CodeRows() => DataMapCatalogue.Expand(Definitions());
 }

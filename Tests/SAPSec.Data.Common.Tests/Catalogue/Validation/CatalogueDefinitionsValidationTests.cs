@@ -22,7 +22,7 @@ public class CatalogueDefinitionsValidationTests
             .Split('\n');
 
         committed.Should().Equal(
-            DataMapExport.ToJson(CatalogueDefinitions.Rows()).Split('\n'),
+            DataMapExport.ToJson(CatalogueDefinitions.CodeRows(), MappingOverrides.Embedded()).Split('\n'),
             $"datamap.generated.json must match the definitions; regenerate it with: {DataMapExport.Command}");
     }
 
