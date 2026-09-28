@@ -8,9 +8,9 @@ namespace SAPData;
 internal partial class Program
 {
     // Returns true when args name a command, which has then run instead of the pipeline.
-    private static bool RunDeveloperCommand(string[] args, string rawInputDir, string sourceProfilesPath)
+    private static bool RunDeveloperCommand(string[] args, string dataMapDir, string rawInputDir, string sourceProfilesPath)
     {
-        var command = Array.FindIndex(args, a => a is "profile-sources" or "catalogue-summary" or "explain");
+        var command = Array.FindIndex(args, a => a is "profile-sources" or "catalogue-summary" or "explain" or "export-map");
         if (command < 0)
             return false;
 
@@ -25,9 +25,21 @@ internal partial class Program
             case "explain":
                 ExplainProperty(args.ElementAtOrDefault(command + 1) ?? "");
                 return true;
+            case "export-map":
+                WriteDataMapExport(Path.Combine(dataMapDir, "datamap.generated.json"));
+                return true;
             default:
                 return false;
         }
+    }
+
+    // Every property's file, key column, value column and filters, one per line, for anyone who needs to look up a
+    // mapping without reading the definitions. A test fails if the committed file is out of date.
+    private static void WriteDataMapExport(string path)
+    {
+        var rows = CatalogueDefinitions.Rows();
+        File.WriteAllText(path, DataMapExport.ToJson(rows));
+        Console.WriteLine($"Wrote {rows.Count} mappings to {path}");
     }
 
     // Snapshot of the source files' columns and filter values, committed so catalogue tests can check fields and

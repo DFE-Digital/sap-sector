@@ -143,6 +143,13 @@ dotnet run --project SAPData -- profile-sources
 
 Commit the updated `source-profiles.json` with the catalogue change.
 
+Every property's file, key column, value column and filters are listed in `DataMap/datamap.generated.json`, one per
+line. After changing the catalogue, regenerate it (a test fails if it is out of date):
+
+```
+dotnet run --project SAPData -- export-map
+```
+
 ### Checking the downloaded files
 
 Every pipeline run also checks the files it has just downloaded, before any SQL runs (and before the maintenance

@@ -15,6 +15,18 @@ public class CatalogueDefinitionsValidationTests
         SourceProfiles.Load(Repository.PathTo("SAPData", "DataMap", "source-profiles.json"));
 
     [Fact]
+    public void Generated_mapping_file_is_up_to_date()
+    {
+        var committed = File.ReadAllText(Repository.PathTo("SAPData", "DataMap", "datamap.generated.json"))
+            .ReplaceLineEndings("\n")
+            .Split('\n');
+
+        committed.Should().Equal(
+            DataMapExport.ToJson(CatalogueDefinitions.Rows()).Split('\n'),
+            $"datamap.generated.json must match the definitions; regenerate it with: {DataMapExport.Command}");
+    }
+
+    [Fact]
     public void Every_definition_is_valid_against_its_source_files()
     {
         CatalogueValidator.Validate(CatalogueDefinitions.Rows(), Profiles)

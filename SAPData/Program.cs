@@ -43,7 +43,7 @@ internal partial class Program
             string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");
             string sourceProfilesPath = Path.Combine(dataMapDir, "source-profiles.json");
 
-            if (RunDeveloperCommand(args, rawInputDir, sourceProfilesPath))
+            if (RunDeveloperCommand(args, dataMapDir, rawInputDir, sourceProfilesPath))
                 return;
 
             Directory.CreateDirectory(cleanedDir);

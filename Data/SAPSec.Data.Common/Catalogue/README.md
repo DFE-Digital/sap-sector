@@ -89,6 +89,23 @@ private static Source PerformanceTables(string file, AcademicYear year, string e
     .Field(schoolsPrevious, "avg_att8"))      // the 2023-24 file names the column differently
 ```
 
+## The mapping list
+
+[SAPData/DataMap/datamap.generated.json](../../../SAPData/DataMap/datamap.generated.json) lists every property, one per
+line: its file, key column, value column and filters. Use it to look up a mapping without reading C#, or to search
+(for example every property that reads a file or filters on a label). It is generated, never edited:
+
+```
+dotnet run --project SAPData -- export-map
+```
+
+```json
+{"property":"Attainment8_EAL_Est_Current_Num","dataset":"KS4_Performance","subtype":"Performance","scope":"Establishment","period":"Current","year":"2024-2025","publisher":"EES","file":"202425_performance_tables_schools_final","keyColumn":"school_urn","valueColumn":"attainment8_average","dataType":"double","filters":{"breakdown":["Known or believed to be other than English"],"time_period":["202425"]}}
+```
+
+A test fails if the committed file doesn't match the definitions, so it is always current, and a pull request that
+changes a mapping shows the changed lines in this file for reviewers who don't read C#.
+
 ## Checking a property
 
 To see exactly where one property comes from, without reading the definitions:

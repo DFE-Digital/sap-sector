@@ -295,7 +295,8 @@
             <table>
                 <thead><tr><th>Question</th><th>Where</th></tr></thead>
                 <tbody>
-                    <tr><td>Which file and column does a figure come from?</td><td>The dataset’s file in <code>Data/SAPSec.Data.Common/Catalogue/Definitions</code>, or run <code>dotnet run --project SAPData -- explain &lt;PropertyName&gt;</code></td></tr>
+                    <tr><td>Which file, column and filters does a figure use?</td><td><code>SAPData/DataMap/datamap.generated.json</code>: every property on one line, generated from the definitions and kept current by a test. Or run <code>dotnet run --project SAPData -- explain &lt;PropertyName&gt;</code></td></tr>
+                    <tr><td>Where is a mapping changed?</td><td>The dataset’s file in <code>Data/SAPSec.Data.Common/Catalogue/Definitions</code>; then run <code>export-map</code> so the pull request shows the changed mappings</td></tr>
                     <tr><td>Which rows are read (filters)?</td><td>The same definition: <code>Source.Where</code>, <code>Source.Provides</code> and <code>Metric.Where</code> (below)</td></tr>
                     <tr><td>Which years are shown?</td><td><code>Data/SAPSec.Data/DataYears.cs</code>, shared with the website</td></tr>
                     <tr><td>What is checked, and how?</td><td><code>Catalogue/Validation/Rules</code>, one class per rule</td></tr>

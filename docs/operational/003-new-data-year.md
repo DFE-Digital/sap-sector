@@ -56,13 +56,19 @@ dotnet run --project SAPData -- profile-sources
 
 This updates `SAPData/DataMap/source-profiles.json`: each source file's columns and the values of the columns the catalogue filters on.
 
+Then regenerate the mapping list, so the pull request shows every changed mapping line by line:
+
+```
+dotnet run --project SAPData -- export-map
+```
+
 ### 5. Run the tests
 
 ```
 dotnet test Tests/SAPSec.Data.Common.Tests
 ```
 
-`Every_definition_is_valid_against_its_source_files` reports anything the new files don't support, for example:
+`Generated_mapping_file_is_up_to_date` fails if you forgot `export-map`. `Every_definition_is_valid_against_its_source_files` reports anything the new files don't support, for example:
 
 - `filter time_period = '202526' matches no rows in 6_absence_3term_characteristics`: the file doesn't have the new year yet
 - `filter breakdown = 'Other than English' matches no rows in …`: DfE renamed a breakdown (this happened between 2023-24 and 2024-25; give each year its own label)
