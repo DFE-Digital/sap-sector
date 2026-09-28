@@ -24,7 +24,6 @@ public sealed class MeasureSet : IDataMapDefinition
     private readonly Dictionary<(Scope Scope, Period Period), Source> _sources = [];
     private readonly List<Scope> _scopes = [];
     private readonly List<Metric> _metrics = [];
-    private readonly List<DataMapRow> _rawRows = [];
     private IReadOnlyList<Breakdown> _breakdowns = [Catalogue.Breakdowns.Total];
 
     public MeasureSet(string type, string subtype)
@@ -80,16 +79,6 @@ public sealed class MeasureSet : IDataMapDefinition
     public MeasureSet Metric(string name, string field, Func<Metric, Metric>? configure = null) =>
         Metric(configure?.Invoke(new Metric(name, field)) ?? new Metric(name, field));
 
-    /// <summary>
-    /// Escape hatch for mappings the builder doesn't model (e.g. GIAS attributes with normalised lookups).
-    /// The row is emitted as-is after the expanded metrics.
-    /// </summary>
-    public MeasureSet Row(DataMapRow row)
-    {
-        _rawRows.Add(row);
-        return this;
-    }
-
     public IReadOnlyList<DataMapRow> ToDataMapRows()
     {
         var rows = new List<DataMapRow>();
@@ -122,7 +111,6 @@ public sealed class MeasureSet : IDataMapDefinition
             }
         }
 
-        rows.AddRange(_rawRows);
         DataMapCatalogue.EnsureUniquePropertyNames(rows);
         return rows;
     }

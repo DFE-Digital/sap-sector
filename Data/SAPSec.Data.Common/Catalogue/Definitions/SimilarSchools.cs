@@ -15,8 +15,6 @@ public static class SimilarSchools
 
     private const string Release = "2026_07_03";
 
-    public static IReadOnlyList<string> Types { get; } = [PrimaryGroups, SecondaryGroups, PrimaryValues, SecondaryValues];
-
     public static IReadOnlyList<IDataMapDefinition> Definitions() =>
     [
         Groups(PrimaryGroups, $"{Release}_neighbours_list_primary"),

@@ -1,5 +1,6 @@
 using SAPData.Models;
 using SAPSec.Data.Common.Catalogue.Validation;
+using SAPSec.Data.Common.Catalogue.Validation.Rules;
 
 namespace SAPSec.Data.Common.Tests.Catalogue.Validation;
 
@@ -56,13 +57,11 @@ public class CatalogueValidatorTests
     }
 
     [Fact]
-    public void Ignored_and_unnamed_rows_are_skipped()
+    public void Unnamed_rows_are_skipped()
     {
-        var ignored = Row(yearDesc: "Previous");
-        ignored.IgnoreMapping = "Y";
         var unnamed = Row(property: "", yearDesc: "Previous");
 
-        CatalogueValidator.Validate([ignored, unnamed]).Should().BeEmpty();
+        CatalogueValidator.Validate([unnamed]).Should().BeEmpty();
     }
 
     [Fact]
@@ -139,4 +138,22 @@ public class CatalogueValidatorTests
     [Fact]
     public void Matches_source_columns_after_normalisation() =>
         CatalogueValidator.Validate([Row(field: "Other Value", key: "School URN")], Profiles()).Should().BeEmpty();
+
+    [Fact]
+    public void Runs_only_the_rules_given()
+    {
+        // A wrong year and an unknown filter value, but only the filter value rule runs.
+        var row = Row("M_Tot_Est_Previous2_Num", filterValue: "Unknown");
+
+        var issues = CatalogueValidator.Validate([row], Profiles(), [new FilterValuesExist()]);
+
+        issues.Should().ContainSingle().Which.Rule.Should().Be(CatalogueValidator.UnknownValue);
+    }
+
+    [Fact]
+    public void Every_rule_has_a_unique_name_and_a_description()
+    {
+        CatalogueValidator.Rules.Select(r => r.Name).Should().OnlyHaveUniqueItems();
+        CatalogueValidator.Rules.Should().OnlyContain(r => !string.IsNullOrWhiteSpace(r.Description));
+    }
 }

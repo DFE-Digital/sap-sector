@@ -22,13 +22,6 @@ public class CatalogueDefinitionsValidationTests
             .Should().BeEmpty();
     }
 
-    [Fact]
-    public void Types_lists_every_type_the_definitions_produce()
-    {
-        CatalogueDefinitions.Rows().Select(r => r.Type).Distinct()
-            .Should().BeEquivalentTo(CatalogueDefinitions.Types);
-    }
-
     [Theory]
     [InlineData(Ks4Performance.Type, DataYears.Ks4Performance)]
     [InlineData(Ks4Destinations.Type, DataYears.Ks4Destinations)]

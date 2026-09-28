@@ -230,22 +230,6 @@ public class MeasureSetTests
     }
 
     [Fact]
-    public void Appends_raw_rows_after_expanded_metrics()
-    {
-        var raw = new DataMapRow { Range = "Establishment", Type = "All establishment data", PropertyName = "TrustsId" };
-
-        var rows = new MeasureSet("T", "S")
-            .Year(Period.Current, new AcademicYear(2024))
-            .Source(Scope.Establishment, Period.Current, SchoolSource())
-            .Metric("M", "field", m => m.For(Breakdowns.Total))
-            .Row(raw)
-            .ToDataMapRows();
-
-        rows.Should().HaveCount(2);
-        rows[1].Should().BeSameAs(raw);
-    }
-
-    [Fact]
     public void Throws_when_a_metric_has_no_source_for_a_scope_and_period()
     {
         var set = new MeasureSet("KS4_Performance", "Performance")
