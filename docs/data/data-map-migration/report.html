@@ -151,6 +151,27 @@
   .tag.open { color: var(--visible); }
   .sub { color: var(--muted); font-size: 14px; }
 
+  /* Structure section */
+  .page, section { grid-template-columns: minmax(0, 1fr); }
+  pre {
+    margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 14px 16px; font-family: var(--mono); font-size: 13px; line-height: 1.6; overflow-x: auto;
+  }
+  pre .cm { color: var(--muted); }
+  pre .hl { background: var(--accent-soft); border-radius: 3px; padding: 0 2px; }
+  .flow { display: grid; gap: 6px; }
+  .flow-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 700px) { .flow-row { grid-template-columns: minmax(0, 1fr); } }
+  .flow-box {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 12px 16px; display: grid; gap: 2px; align-content: start;
+  }
+  .flow-box.main { border-left: 3px solid var(--accent); }
+  .flow-k { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+  .flow-box span:last-child { font-size: 14px; color: var(--muted); }
+  .flow-arrow { text-align: center; color: var(--muted); font-size: 18px; line-height: 1; }
+  h3.sub-head { margin-top: 8px; }
+
   footer { border-top: 1px solid var(--rule); padding-top: 20px; color: var(--muted); font-size: 13px; display: grid; gap: 6px; }
 </style>
 
@@ -161,10 +182,10 @@
         <h1>Data map migration: errors fixed, platform improvements and follow-ups</h1>
         <p class="lede">The Excel data map (<code>datamap.csv</code>, 4,948 rows) has been replaced by code, and the pipeline now reloads only what changed. Along the way we found and fixed four KS4 mapping errors and several pipeline problems, including the daily establishment file not being reloaded. One change is visible on the website: around 3,650 schools now show a 2023 to 2024 grade 7+ figure for English language, English literature and Maths that was previously blank. Everything else the website shows is unchanged.</p>
         <div class="meta">
-            <span><b>Pull request</b> #372 (13 commits)</span>
+            <span><b>Pull request</b> #372</span>
             <span><b>Branch</b> <span class="mono">spike-data-map-restructure</span></span>
             <span><b>Status</b> In review; pipeline run in CI, review app 372 front-end testing</span>
-            <span><b>Updated</b> 24 September 2026</span>
+            <span><b>Updated</b> 28 September 2026</span>
         </div>
     </header>
 
@@ -246,6 +267,102 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </section>
+
+    <section aria-labelledby="structure">
+        <div class="section-head">
+            <h2 id="structure">How it works now</h2>
+            <p class="sub">Where each part of the data map lives in the code, and how to change it.</p>
+        </div>
+
+        <div class="flow" role="img" aria-label="Definitions are expanded into one row per property, which is checked by the validation rules and the source file check, then built into views for the website.">
+            <div class="flow-box main"><span class="flow-k">1 · Define</span><strong><code>Definitions/*.cs</code>, one file per dataset</strong><span>Which files, years, pupil groups, measures and filters. Replaces the spreadsheet.</span></div>
+            <div class="flow-arrow" aria-hidden="true">↓</div>
+            <div class="flow-box"><span class="flow-k">2 · Expand</span><strong>One row per property</strong><span>File, key column, value column and filters: the same shape as a spreadsheet row, built by <code>MeasureSet</code> and <code>ColumnSet</code>.</span></div>
+            <div class="flow-arrow" aria-hidden="true">↓</div>
+            <div class="flow-row">
+                <div class="flow-box"><span class="flow-k">3 · Check the map</span><strong><code>Validation/Rules</code></strong><span>7 rules, one class each. Run on every pull request and pipeline run.</span></div>
+                <div class="flow-box"><span class="flow-k">3 · Check the files</span><strong><code>SourceFileCheck</code></strong><span>The files just downloaded, before anything is loaded.</span></div>
+                <div class="flow-box"><span class="flow-k">3 · Build</span><strong><code>GenerateViews.Views</code></strong><span>One line per view the website reads.</span></div>
+            </div>
+            <div class="flow-arrow" aria-hidden="true">↓</div>
+            <div class="flow-box"><span class="flow-k">4 · Serve</span><strong>Database views → website</strong><span>Only what changed is reloaded or rebuilt.</span></div>
+        </div>
+
+        <h3 class="sub-head">Where to find things</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Question</th><th>Where</th></tr></thead>
+                <tbody>
+                    <tr><td>Which file and column does a figure come from?</td><td>The dataset’s file in <code>Data/SAPSec.Data.Common/Catalogue/Definitions</code>, or run <code>dotnet run --project SAPData -- explain &lt;PropertyName&gt;</code></td></tr>
+                    <tr><td>Which rows are read (filters)?</td><td>The same definition: <code>Source.Where</code>, <code>Source.Provides</code> and <code>Metric.Where</code> (below)</td></tr>
+                    <tr><td>Which years are shown?</td><td><code>Data/SAPSec.Data/DataYears.cs</code>, shared with the website</td></tr>
+                    <tr><td>What is checked, and how?</td><td><code>Catalogue/Validation/Rules</code>, one class per rule</td></tr>
+                    <tr><td>Which views are built?</td><td><code>SAPData/GenerateViews.cs</code>, the <code>Views</code> list</td></tr>
+                    <tr><td>School details (GIAS)?</td><td><code>GenerateViews.GenerateEstablishmentDimensionView</code>; its columns are checked against each day’s file too</td></tr>
+                    <tr><td>A guide for developers</td><td><code>Data/SAPSec.Data.Common/Catalogue/README.md</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 class="sub-head">Filters: three places, from general to specific</h3>
+        <p>A DfE file usually has several rows per school, for example one per pupil group and year. Filters pick the one row a figure needs. All three kinds are combined, and each is written once instead of on hundreds of spreadsheet rows.</p>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Where</th><th>Applies to</th><th>Example</th></tr></thead>
+                <tbody>
+                    <tr><td><code>Source.Where</code></td><td>every figure from that file</td><td><code>.Where("time_period", "202425")</code></td></tr>
+                    <tr><td><code>Source.Provides</code></td><td>one pupil group in that file</td><td><code>.Provides(Breakdowns.Eal, ("breakdown", "Known or believed to be other than English"))</code></td></tr>
+                    <tr><td><code>Metric.Where</code></td><td>one measure</td><td><code>.Where("subject", "Biology")</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+<pre><span class="cm">$ dotnet run --project SAPData -- explain Attainment8_EAL_Est_Current_Num</span>
+Attainment8_EAL_Est_Current_Num
+  Dataset:     KS4_Performance (Performance), Establishment
+  Year:        Current 2024-2025
+  File:        202425_performance_tables_schools_final (EES)
+  Key column:  school_urn
+  Value from:  attainment8_average
+  Rows where:  <span class="hl">breakdown = 'Known or believed to be other than English'</span>   <span class="cm">← Source.Provides</span>
+          and  <span class="hl">time_period = '202425'</span>                                      <span class="cm">← Source.Where</span></pre>
+
+        <h3 class="sub-head">Validation rules</h3>
+        <p>Each rule is its own class, based on a real error. To add a rule, write a class and add it to the list in <code>CatalogueValidator.Rules</code>; to change one, edit only its class.</p>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Rule (class)</th><th>Checks that</th><th>Catches</th></tr></thead>
+                <tbody>
+                    <tr><td><code>period-in-name</code><br><span class="sub">NameMatchesYear</span></td><td>a property named “…_Previous2_…” reads that year</td><td><code>Prog8_Avg_LA_Previous2_Num</code> reading the current year (found in the spreadsheet)</td></tr>
+                    <tr><td><code>time-period-filter</code><br><span class="sub">TimePeriodMatchesYear</span></td><td>a year filter matches the property’s year</td><td>a figure labelled 2023 to 2024 reading another year’s data</td></tr>
+                    <tr><td><code>duplicate-mapping</code><br><span class="sub">NoDuplicateMappings</span></td><td>no two properties read exactly the same data</td><td>English and maths 5+ for mobile pupils showing the 4+ figure (found in the spreadsheet)</td></tr>
+                    <tr><td><code>key-column</code><br><span class="sub">OneKeyColumnPerFile</span></td><td>a file is matched to schools in one way within a view</td><td>rows keyed by the wrong column</td></tr>
+                    <tr><td><code>unknown-file</code><br><span class="sub">FileExists</span></td><td>every file the map reads exists</td><td>a file missing or renamed in a new release</td></tr>
+                    <tr><td><code>unknown-column</code><br><span class="sub">ColumnsExist</span></td><td>value, key and filter columns are in the file</td><td>a renamed DfE column (tested: the run stops before loading)</td></tr>
+                    <tr><td><code>unknown-value</code><br><span class="sub">FilterValuesExist</span></td><td>every filter value occurs in the file</td><td>grade 7/8/9 filters in a file with grade bands; the renamed EAL label (<a href="renamed-labels-demo.html">walk-through</a>)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 class="sub-head">Common changes</h3>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>To add or change</th><th>Edit</th></tr></thead>
+                <tbody>
+                    <tr><td>A measure</td><td>one <code>.Metric(...)</code> line in the dataset’s definition</td></tr>
+                    <tr><td>A pupil group, or a label DfE renamed</td><td>one <code>.Provides(...)</code> line on that file’s source</td></tr>
+                    <tr><td>A new data year</td><td><code>DataYears.cs</code> and the file names; see the new-data-year runbook</td></tr>
+                    <tr><td>A dataset</td><td>a new file in <code>Definitions</code>, listed in <code>CatalogueDefinitions</code></td></tr>
+                    <tr><td>A view</td><td>one line in <code>GenerateViews.Views</code></td></tr>
+                    <tr><td>A check</td><td>a new class in <code>Validation/Rules</code>, added to <code>CatalogueValidator.Rules</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="callout">
+            <p><strong>Design.</strong> Each part has one job: a definition says <em>what</em> to read, a rule checks <em>one</em> thing, a view line says <em>where</em> a view’s data comes from. New measures, rules and views are added alongside the existing ones rather than written into shared code, and the validator runs any class that follows the rule interface, so each rule can be tested on its own.</p>
+            <p><strong>Proof.</strong> The restructure changed no output: the SQL generated before and after was compared in three pipeline modes (55 scripts each). Every table and view script is identical; the JSON export scripts differ only in spacing.</p>
         </div>
     </section>
 
