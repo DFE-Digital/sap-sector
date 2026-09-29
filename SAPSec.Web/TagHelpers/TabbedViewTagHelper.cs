@@ -43,22 +43,6 @@ public class TabbedViewTagHelper : TagHelper
         """);
         }
 
-        //use Name to create an aria-describedby with the id being htmlprefix-tab.id
-        //this doesnt apply to the table or top performer
-        //Attainment 8 current year bar chart
-        //on first load
-        //this changes to
-        //Attainment 8 yeay by year line chart
-        //There's also the Table and TPs
-        //Table
-        //TP
-
-        //maybe use aria-describeby with two ids
-        //aria-describedby="htmlprefix-tab.id htmlprefix-tab.id"
-
-        //<span id="htmlprefix-tab.id">{Name}</span>
-
-        //<span id="htmlprefix-tab.id"> year bar chart</span>
 
         output.Content.AppendHtml(
         """
