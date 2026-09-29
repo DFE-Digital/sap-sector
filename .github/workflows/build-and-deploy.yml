@@ -392,7 +392,7 @@ jobs:
         run: |
           set -euo pipefail
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          APP_NAME="get-school-improvement-insights-pr-${PR_NUMBER}"
+          APP_NAME="compare-connect-similar-schools-pr-${PR_NUMBER}"
           : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
 
           CURRENT_DB_SQL="$(mktemp)"
@@ -438,7 +438,7 @@ jobs:
         run: |
           set -euo pipefail
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          APP_NAME="get-school-improvement-insights-pr-${PR_NUMBER}"
+          APP_NAME="compare-connect-similar-schools-pr-${PR_NUMBER}"
           BACKUP_FILE="seed.sql.gz"
           : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
 
@@ -584,8 +584,8 @@ jobs:
           namespace="$(jq -r '.namespace' "terraform/application/config/${{ matrix.environment }}.tfvars.json")"
           maintenance_image="${MAINTENANCE_DOCKER_REPOSITORY}:${MAINTENANCE_IMAGE_TAG}"
           kubectl -n "${namespace}" apply -f maintenance_page/manifests/
-          kubectl -n "${namespace}" set image deployment/get-school-improvement-insights-maintenance maintenance-page="${maintenance_image}"
-          kubectl -n "${namespace}" rollout status deployment/get-school-improvement-insights-maintenance --timeout=180s
+          kubectl -n "${namespace}" set image deployment/compare-connect-similar-schools-maintenance maintenance-page="${maintenance_image}"
+          kubectl -n "${namespace}" rollout status deployment/compare-connect-similar-schools-maintenance --timeout=180s
 
   manual_deploy:
     name: Manual deploy
@@ -690,8 +690,8 @@ jobs:
           namespace="$(jq -r '.namespace' "terraform/application/config/${{ inputs.environment }}.tfvars.json")"
           maintenance_image="${MAINTENANCE_DOCKER_REPOSITORY}:${MAINTENANCE_IMAGE_TAG}"
           kubectl -n "${namespace}" apply -f maintenance_page/manifests/
-          kubectl -n "${namespace}" set image deployment/get-school-improvement-insights-maintenance maintenance-page="${maintenance_image}"
-          kubectl -n "${namespace}" rollout status deployment/get-school-improvement-insights-maintenance --timeout=180s
+          kubectl -n "${namespace}" set image deployment/compare-connect-similar-schools-maintenance maintenance-page="${maintenance_image}"
+          kubectl -n "${namespace}" rollout status deployment/compare-connect-similar-schools-maintenance --timeout=180s
 
       - name: Checkout (needed for workspace consistency)
         if: ${{ inputs.environment == 'review' && steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
@@ -822,7 +822,7 @@ jobs:
         run: |
           set -euo pipefail
           PR_NUMBER="${{ inputs.pull-request-number }}"
-          APP_NAME="get-school-improvement-insights-pr-${PR_NUMBER}"
+          APP_NAME="compare-connect-similar-schools-pr-${PR_NUMBER}"
           : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
 
           CURRENT_DB_SQL="$(mktemp)"
@@ -868,7 +868,7 @@ jobs:
         run: |
           set -euo pipefail
           PR_NUMBER="${{ inputs.pull-request-number }}"
-          APP_NAME="get-school-improvement-insights-pr-${PR_NUMBER}"
+          APP_NAME="compare-connect-similar-schools-pr-${PR_NUMBER}"
           BACKUP_FILE="seed.sql.gz"
           : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
 
