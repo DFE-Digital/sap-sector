@@ -607,7 +607,7 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
     }
 
     [Fact]
-    public async Task Destinations_TableView_ValuesRoundTo1DecimalPlace1()
+    public async Task Destinations_TableView_ValuesRoundTo1DecimalPlace()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")),
