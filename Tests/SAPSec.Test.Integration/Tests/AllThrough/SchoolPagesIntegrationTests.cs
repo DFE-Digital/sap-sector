@@ -49,7 +49,7 @@ public class SchoolPagesIntegrationTests(
     }
 
     [Fact]
-    public async Task OverviewPage_WithSecondarySimilarSchools_ShowsSecondaryPhasePrototypeContent()
+    public async Task OverviewPage_WithSecondarySimilarSchools_ShowsAllThroughContent()
     {
         SetupAllThroughSchool();
         Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
@@ -59,14 +59,13 @@ public class SchoolPagesIntegrationTests(
         page.QuerySelector("h1.govuk-heading-xl")!.TextContent.Trim().Should().Be("Test School 1");
         page.QuerySelector(".app-overview__address")!.TextContent.Trim().Should().Be("1 Test Street, Test Town, TT1 1TT");
         page.QuerySelector(".app-overview__lead")!.TextContent.Trim()
-            .Should().Be("We've identified 50 similar secondary phase schools (including all-throughs) to help you:");
+            .Should().Be("For all-through schools or cross-phase middle schools, we identify:");
 
         page.QuerySelectorAll(".app-overview__list").First().QuerySelectorAll("li")
             .Select(x => x.TextContent.Trim())
             .Should().Equal(
-                "compare performance data",
-                "find improvement opportunities",
-                "connect with school leaders and share insights");
+                "50 primary schools, including all-throughs, similar to the school\u2019s primary phase",
+                "50 secondary schools, including all-throughs, similar to the school\u2019s secondary phase");
 
         var link = page.QuerySelector(".app-overview a");
         link.Should().NotBeNull();
@@ -130,9 +129,16 @@ public class SchoolPagesIntegrationTests(
 
         page.QuerySelector("h1.govuk-heading-xl")!.TextContent.Trim().Should().Be("Test School 1");
         page.QuerySelector(".app-overview__address")!.TextContent.Trim().Should().Be("1 Test Street, Test Town, TT1 1TT");
-        page.QuerySelector(".app-overview h2.govuk-heading-m")!.TextContent.Trim().Should().Be("There are no similar schools available for this school");
+        page.QuerySelectorAll(".app-overview h2.govuk-heading-m")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal(
+                "This school cannot be compared with similar schools",
+                "Compare data from previous academic years",
+                "If you expected to see similar schools");
         page.QuerySelector(".app-overview__lead").Should().BeNull();
-        page.QuerySelectorAll(".app-overview a").Should().BeEmpty();
+        var supportLink = page.QuerySelector(".app-overview a[href='mailto:schoolinsights.support@education.gov.uk']");
+        supportLink.Should().NotBeNull();
+        supportLink!.TextContent.Trim().Should().Be("schoolinsights.support@education.gov.uk");
     }
 
     [Fact]
@@ -212,16 +218,15 @@ public class SchoolPagesIntegrationTests(
         link.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).WhatIsASimilarSchool);
         link.GetAttribute("target").Should().BeNull();
 
-        var tabs = page.QuerySelectorAll(".app-phase-tabs__tab").ToArray();
+        var tabs = page.QuerySelectorAll(".app-phase-tabs .govuk-service-navigation__link").ToArray();
         tabs.Select(x => x.TextContent.Trim()).Should().Equal("Primary", "Secondary");
-        tabs.Select(x => x.GetAttribute("role")).Should().Equal("tab", "tab");
 
         tabs[0].GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
-        tabs[0].GetAttribute("aria-selected").Should().Be("true");
-        tabs[0].ParentElement!.ClassList.Should().Contain("app-phase-tabs__list-item--selected");
+        tabs[0].GetAttribute("aria-current").Should().Be("page");
+        tabs[0].ParentElement!.ClassList.Should().Contain("govuk-service-navigation__item--active");
 
         tabs[1].GetAttribute("href").Should().Be($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
-        tabs[1].GetAttribute("aria-selected").Should().Be("false");
+        tabs[1].GetAttribute("aria-current").Should().BeNull();
     }
 
     [Fact]
@@ -287,10 +292,10 @@ public class SchoolPagesIntegrationTests(
 
         var page = await Fixture.RequestPageAsync($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
 
-        var tabs = page.QuerySelectorAll(".app-phase-tabs__tab").ToArray();
-        tabs[0].GetAttribute("aria-selected").Should().Be("false");
-        tabs[1].GetAttribute("aria-selected").Should().Be("true");
-        tabs[1].ParentElement!.ClassList.Should().Contain("app-phase-tabs__list-item--selected");
+        var tabs = page.QuerySelectorAll(".app-phase-tabs .govuk-service-navigation__link").ToArray();
+        tabs[0].GetAttribute("aria-current").Should().BeNull();
+        tabs[1].GetAttribute("aria-current").Should().Be("page");
+        tabs[1].ParentElement!.ClassList.Should().Contain("govuk-service-navigation__item--active");
     }
 
     [Fact]
