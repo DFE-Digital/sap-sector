@@ -1,4 +1,6 @@
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
+using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Repositories;
 
@@ -49,6 +51,11 @@ internal class SecondarySimilarSchoolsDataProvider(
                     return null;
                 }
 
+                if (!IsSecondaryComparisonEstablishment(establishment))
+                {
+                    return null;
+                }
+
                 return new SimilarSchoolSortItem<EstablishmentPerformance>(
                     SimilarSchool.FromData(establishment, absences.GetValueOrDefault(group.NeighbourURN)?.EstablishmentAbsence),
                     performances.GetValueOrDefault(group.NeighbourURN)?.EstablishmentPerformance);
@@ -61,6 +68,41 @@ internal class SecondarySimilarSchoolsDataProvider(
         return new SecondarySimilarSchoolsSourceData(
             currentSimilarSchool,
             similarSchools);
+    }
+
+    private static bool IsSecondaryComparisonEstablishment(Establishment establishment)
+    {
+        if (PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName) ||
+            PhaseOfEducationValues.IsAllThrough(establishment.PhaseOfEducationName))
+        {
+            return true;
+        }
+
+        if (PhaseOfEducationValues.IsPrimary(establishment.PhaseOfEducationName))
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(establishment.PhaseOfEducationName))
+        {
+            return true;
+        }
+
+        var phaseOfEducationId = establishment.PhaseOfEducationId?.Trim();
+        if (string.IsNullOrWhiteSpace(phaseOfEducationId))
+        {
+            return true;
+        }
+
+        return phaseOfEducationId switch
+        {
+            PhaseOfEducationValues.SecondaryId or
+            PhaseOfEducationValues.MiddleDeemedSecondaryId or
+            PhaseOfEducationValues.AllThroughId => true,
+            PhaseOfEducationValues.PrimaryId or
+            PhaseOfEducationValues.MiddleDeemedPrimaryId => false,
+            _ => true
+        };
     }
 }
 

@@ -15,7 +15,9 @@ using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Components;
 using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Secondary.Controllers;
@@ -31,6 +33,7 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
+        IRequestSchoolAccessor requestSchoolAccessor,
         IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getSchoolKs4CoreSubjectsUseCase,
         IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
@@ -39,6 +42,8 @@ public class SchoolController(
         IFeatureFlagService featureFlagService)
     : Controller
 {
+    private const string SharedKs4CoreSubjectsView = "~/Areas/Shared/Views/School/Ks4CoreSubjects.cshtml";
+
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
@@ -108,9 +113,11 @@ public class SchoolController(
 
         await PopulateViewData(response.School);
 
-        var model = new ViewModels.School.Ks4CoreSubjectsPageViewModel
+        var model = new Ks4CoreSubjectsPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            WhatIsASimilarSchoolUrl = Routes.SecondarySchool(urn).WhatIsASimilarSchool,
+            SimilarSchoolDefinitionLinkText = "how DfE defines what a similar school is",
             Measures = [
                 MeasureViewModel.FromSecondaryMeasure(response.EnglishLanguage, response.School, similarSchoolsResponse.HasSimilarSchools),
                 MeasureViewModel.FromSecondaryMeasure(response.EnglishLiterature, response.School, similarSchoolsResponse.HasSimilarSchools ),
@@ -122,7 +129,7 @@ public class SchoolController(
             ]
         };
 
-        return View(model);
+        return View(SharedKs4CoreSubjectsView, model);
     }
 
     [HttpGet]
@@ -164,6 +171,11 @@ public class SchoolController(
             ControllerContext.ActionDescriptor.ActionName,
             similarSchoolsResponse.HasSimilarSchools,
             await IsRiseResourcesEnabledAsync());
+
+        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);
     }
 
     private async Task PopulateViewData(SchoolDetails currentSchool)
@@ -177,6 +189,10 @@ public class SchoolController(
             ControllerContext.ActionDescriptor.ActionName,
             similarSchoolsResponse.HasSimilarSchools,
             await IsRiseResourcesEnabledAsync());
+
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = currentSchool.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Predecessors);
     }
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>

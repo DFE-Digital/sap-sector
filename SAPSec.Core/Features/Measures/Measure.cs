@@ -79,7 +79,8 @@ public enum MeasureDataType
     ScaledScore,
     GradePercentage,
     OverallAbsencePercentage,
-    PersistentAbsencePercentage
+    PersistentAbsencePercentage,
+    DestinationsPercentage
 }
 
 public record MeasureAvailableFilter(

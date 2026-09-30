@@ -11,12 +11,13 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
-using SAPSec.Web.Areas.Primary.ViewModels.School;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Components;
 using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
@@ -32,6 +33,7 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
+        IRequestSchoolAccessor requestSchoolAccessor,
         IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
         IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
         IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
@@ -39,6 +41,8 @@ public class SchoolController(
         IFeatureFlagService featureFlagService)
     : Controller
 {
+    private const string SharedKs2PerformanceMeasuresView = "~/Areas/Shared/Views/School/Ks2PerformanceMeasures.cshtml";
+
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
@@ -71,6 +75,8 @@ public class SchoolController(
         var model = new Ks2PerformanceMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            WhatIsASimilarSchoolUrl = Routes.PrimarySchool(urn).WhatIsASimilarSchool,
+            SimilarSchoolDefinitionLinkText = "how DfE defines what a similar school is",
             MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School, similarSchoolsResponse.HasSimilarSchools),
             AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardRwm, response.School, similarSchoolsResponse.HasSimilarSchools),
             AverageScaledScoreReading = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreReading, response.School, similarSchoolsResponse.HasSimilarSchools),
@@ -79,7 +85,7 @@ public class SchoolController(
             AchievedHigherStandardGps = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardGps, response.School, similarSchoolsResponse.HasSimilarSchools)
         };
 
-        return View(model);
+        return View(SharedKs2PerformanceMeasuresView, model);
     }
 
     [HttpGet]
@@ -148,6 +154,11 @@ public class SchoolController(
             ControllerContext.ActionDescriptor.ActionName,
             similarSchoolsResponse.HasSimilarSchools,
             includeRise);
+
+        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);
     }
 
     private async Task PopulateViewData(SchoolDetails currentSchool)
@@ -165,6 +176,10 @@ public class SchoolController(
             ControllerContext.ActionDescriptor.ActionName,
             similarSchoolsResponse.HasSimilarSchools,
             includeRise);
+
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = currentSchool.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Predecessors);
     }
 
     private async Task<FindPrimarySimilarSchoolsResponse> GetSimilarSchoolsAsync(string urn)

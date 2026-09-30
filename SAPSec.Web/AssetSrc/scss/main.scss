@@ -488,7 +488,35 @@
   margin-bottom: 0;
 }
 
+.app-all-through-similar-schools {
+  max-width: 960px;
+}
+
+.app-phase-tabs {
+  margin-top: govuk-spacing(7);
+  margin-bottom: govuk-spacing(6);
+  border-bottom: 1px solid govuk-colour("blue");
+  background-color: transparent !important;
+}
+
+.app-phase-tabs .govuk-service-navigation__container {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.app-phase-tabs .govuk-service-navigation__item--active .govuk-service-navigation__link {
+  font-weight: 700;
+  color: govuk-colour("black");
+  text-decoration: none;
+}
+
 @media (max-width: 40.0625em) {
+  .app-phase-tabs {
+    margin-top: govuk-spacing(8);
+    margin-bottom: govuk-spacing(6);
+  }
+
   .app-primary-overview__header {
     margin-bottom: 40px;
   }
@@ -1133,6 +1161,20 @@
   .app-school-results-count, #mapCount {
     font-size: 14px !important;
   }
+}
+
+// MoJ design pattern: "Inset text (highlighted)"
+// https://design-patterns.service.justice.gov.uk/components/inset-text-highlighted/
+.guidance-panel {
+  border-left-color: govuk-colour("blue");
+  background-color: #eaf4f9;
+}
+
+// The closed/predecessor school banner is always the first element in the main content area,
+// which already has its own top padding (govuk-main-wrapper). Without this, the banner's own
+// govuk-inset-text top margin stacks on top of that padding, pushing it too far down the page.
+.app-closed-school-banner {
+  margin-top: 0;
 }
 
 .rise-resources-contents-list {

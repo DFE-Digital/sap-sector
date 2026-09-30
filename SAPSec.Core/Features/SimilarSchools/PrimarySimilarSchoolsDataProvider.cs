@@ -1,4 +1,6 @@
 using SAPSec.Core.Features.SimilarSchools.Sorting;
+using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.KS2.Performance;
 using SAPSec.Data.Repositories;
 
@@ -49,6 +51,11 @@ internal class PrimarySimilarSchoolsDataProvider(
                     return null;
                 }
 
+                if (!IsPrimaryComparisonEstablishment(establishment))
+                {
+                    return null;
+                }
+
                 return new SimilarSchoolSortItem<EstablishmentPerformance>(
                     SimilarSchool.FromData(establishment, absences.GetValueOrDefault(group.NeighbourURN)?.EstablishmentAbsence),
                     performances.GetValueOrDefault(group.NeighbourURN)?.EstablishmentPerformance);
@@ -61,6 +68,33 @@ internal class PrimarySimilarSchoolsDataProvider(
         return new PrimarySimilarSchoolsSourceData(
             currentSimilarSchool,
             similarSchools);
+    }
+
+    private static bool IsPrimaryComparisonEstablishment(Establishment establishment)
+    {
+        if (PhaseOfEducationValues.IsPrimaryOrAllThrough(establishment.PhaseOfEducationName))
+        {
+            return true;
+        }
+
+        if (PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName))
+        {
+            return false;
+        }
+
+        var phaseOfEducationId = establishment.PhaseOfEducationId?.Trim();
+        if (string.IsNullOrWhiteSpace(phaseOfEducationId))
+        {
+            return true;
+        }
+
+        return phaseOfEducationId switch
+        {
+            PhaseOfEducationValues.PrimaryId or
+            PhaseOfEducationValues.MiddleDeemedPrimaryId or
+            PhaseOfEducationValues.AllThroughId => true,
+            _ => false
+        };
     }
 }
 

@@ -12,6 +12,9 @@ public class SchoolDetails
     // Identifiers
     public required string Urn { get; init; }
     public required string Name { get; init; }
+    public required bool ShowClosedSchoolBanner { get; init; }
+    public required IReadOnlyList<SuccessorSchool> Successors { get; init; }
+    public required IReadOnlyList<SuccessorSchool> Predecessors { get; init; }
     public required DataWithAvailability<string> DfENumber { get; init; }
     public required DataWithAvailability<string> Ukprn { get; init; }
 
