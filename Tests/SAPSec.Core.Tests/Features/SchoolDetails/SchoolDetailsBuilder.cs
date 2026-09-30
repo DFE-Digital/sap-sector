@@ -1,5 +1,5 @@
 ﻿using SAPSec.Core.Features.Availability;
-using SAPSec.Core.Model;
+using SAPSec.Core.Features.SchoolDetails;
 using SD = SAPSec.Core.Features.SchoolDetails;
 
 namespace SAPSec.Core.Tests.Features.SchoolDetails;

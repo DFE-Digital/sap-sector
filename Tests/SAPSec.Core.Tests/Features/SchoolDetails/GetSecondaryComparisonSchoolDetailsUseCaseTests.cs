@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Moq;
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.Comparison;
 using SAPSec.Test.Common.Builders;

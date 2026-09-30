@@ -1,6 +1,5 @@
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
-using SAPSec.Core.Model;
 using SAPSec.Web.ViewModels.Components;
 
 namespace SAPSec.Web.Areas.Shared.ViewModels;

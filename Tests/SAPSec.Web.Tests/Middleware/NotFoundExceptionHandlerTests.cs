@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core;
+using SAPSec.Core.Exceptions;
 using SAPSec.Web.Middleware;
 
-namespace SAPSec.Web.Tests.Middleware;
+namespace SAPSec.Web.Tests.Deprecated.Middleware;
 
 public class NotFoundExceptionHandlerTests
 {

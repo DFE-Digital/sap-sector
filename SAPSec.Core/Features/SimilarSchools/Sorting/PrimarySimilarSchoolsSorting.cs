@@ -1,5 +1,5 @@
 using SAPSec.Core.Features.Availability;
-using SAPSec.Core.Features.Sorting;
+using SAPSec.Core.Sorting;
 using SAPSec.Data.Dto.KS2.Performance;
 
 namespace SAPSec.Core.Features.SimilarSchools.Sorting;

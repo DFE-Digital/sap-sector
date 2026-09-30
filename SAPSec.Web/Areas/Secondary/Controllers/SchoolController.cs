@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
@@ -9,7 +9,6 @@ using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
@@ -151,7 +150,7 @@ public class SchoolController(
     }
 
     [HttpGet]
-    [RequireFeatureFlag(FeatureFlags.EnableRiseResources)]
+    [RequireFeatureFlag(Flags.EnableRiseResources)]
     [Route("rise-resources")]
     public async Task<IActionResult> RiseResources(string urn)
     {
@@ -197,7 +196,7 @@ public class SchoolController(
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>
         featureFlagService is not null
-        && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+        && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 
     private async Task<FindSecondarySimilarSchoolsResponse> GetSimilarSchoolsAsync(string urn)
     {

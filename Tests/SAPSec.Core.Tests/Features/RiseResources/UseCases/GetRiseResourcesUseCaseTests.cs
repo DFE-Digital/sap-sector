@@ -1,3 +1,4 @@
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Data.Dto.RiseResources;

@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Filters;
 using AllThroughComparisonController = SAPSec.Web.Areas.AllThrough.Controllers.ComparisonController;
@@ -72,7 +72,7 @@ public class SchoolRouteAuthorizationTests
 
         filter.Should().NotBeNull();
         filter!.Arguments.Should().NotBeNull();
-        filter.Arguments![0].Should().Be(FeatureFlags.EnableAllThroughSchools);
+        filter.Arguments![0].Should().Be(Flags.EnableAllThroughSchools);
     }
 
     [Theory]

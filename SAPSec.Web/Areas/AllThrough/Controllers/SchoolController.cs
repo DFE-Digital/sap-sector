@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.AllThrough.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels;
@@ -24,7 +23,7 @@ namespace SAPSec.Web.Areas.AllThrough.Controllers;
 [Area("AllThrough")]
 [Route("school/all-through/{urn}")]
 [Authorize]
-[RequireFeatureFlag(FeatureFlags.EnableAllThroughSchools)]
+[RequireFeatureFlag(Flags.EnableAllThroughSchools)]
 [RequireSchoolPhase(ExpectedSchoolPhase.AllThrough)]
 public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
@@ -149,7 +148,7 @@ public class SchoolController(
     }
 
     [HttpGet]
-    [RequireFeatureFlag(FeatureFlags.EnableRiseResources)]
+    [RequireFeatureFlag(Flags.EnableRiseResources)]
     [Route("rise-resources")]
     public Task<IActionResult> RiseResources(string urn) =>
         HeadingPage(urn, PageTitles.RiseResources);
@@ -201,5 +200,5 @@ public class SchoolController(
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>
         featureFlagService is not null
-        && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+        && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 }

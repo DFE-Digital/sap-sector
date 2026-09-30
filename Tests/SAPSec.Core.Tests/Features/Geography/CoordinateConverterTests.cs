@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Geography;
 
 namespace SAPSec.Core.Tests.Features.Geography;
 

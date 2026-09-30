@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.Filtering;
+using SAPSec.Core.Filtering;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures;

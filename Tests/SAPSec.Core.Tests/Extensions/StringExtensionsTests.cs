@@ -1,4 +1,4 @@
-using SAPSec.Core.Extensions;
+using SAPSec.Core.Text;
 
 namespace SAPSec.Core.Tests.Extensions;
 
