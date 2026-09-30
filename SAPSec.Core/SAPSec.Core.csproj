@@ -38,9 +38,4 @@
     <ProjectReference Include="..\Data\SAPSec.Data\SAPSec.Data.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-    <Folder Include="Interfaces\Services\" />
-  </ItemGroup>
-
 </Project>
