@@ -1,7 +1,7 @@
 using SAPSec.Core;
-using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Pagination;
 using SAPSec.Core.Sorting;
 using SAPSec.Web.Helpers;
 using System.Net;
