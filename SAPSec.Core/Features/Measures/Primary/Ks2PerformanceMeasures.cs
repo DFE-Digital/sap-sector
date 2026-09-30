@@ -1,6 +1,6 @@
 using SAPSec.Core.Collections;
-using SAPSec.Core.Extensions;
 using SAPSec.Core.Filtering;
+using SAPSec.Core.Text;
 using SAPSec.Data.Repositories;
 using static SAPSec.Core.Features.Measures.Measures.Primary;
 
