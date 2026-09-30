@@ -13,7 +13,7 @@
 
 @model SchoolDetailsPageViewModel
 @{
-    Layout = "_Layout";
+    Layout = "~/Areas/Shared/Views/Comparison/_Layout.cshtml";
     ViewData[ViewDataKeys.Title] = $"School details compared to {Model.ComparatorSchool.Name}";
 
     var inv = CultureInfo.InvariantCulture;

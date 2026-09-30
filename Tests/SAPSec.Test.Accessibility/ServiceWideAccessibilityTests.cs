@@ -30,6 +30,9 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, IT
         new(Routes.PrimarySchool("101206").Comparison("101230").Attendance),
         new(Routes.PrimarySchool("101206").Comparison("101230").SchoolDetails),
 
+        new(Routes.AllThroughSchool("100171").Overview),
+        new(Routes.AllThroughSchool("100171").KS2),
+        new(Routes.AllThroughSchool("100171").ViewSimilarSchools),
         new(Routes.AllThroughSchool("100171").SchoolDetails),
 
         new(Routes.SecondarySchool("100182").Overview),

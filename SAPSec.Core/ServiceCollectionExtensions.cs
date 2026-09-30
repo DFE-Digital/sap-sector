@@ -57,6 +57,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<
             IUseCase<GetPrimaryComparisonSimilarityCharacteristicsRequest, GetPrimaryComparisonSimilarityCharacteristicsResponse>,
             GetPrimaryComparisonSimilarityCharacteristicsUseCase>();
+        services.AddSingleton<
+            IUseCase<GetAllThroughSimilarSchoolPhasesRequest, GetAllThroughSimilarSchoolPhasesResponse>,
+            GetAllThroughSimilarSchoolPhasesUseCase>();
 
         // Measures
 
