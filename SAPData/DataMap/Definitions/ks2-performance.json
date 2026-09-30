@@ -1,0 +1,111 @@
+{
+  "$schema": "./dataset.schema.json",
+  "dataset": "KS2_Performance",
+  "description": "KS2 performance: reading, writing and maths, grammar, punctuation and spelling, scaled scores and science. Property names: {measure}_[{subject}_]{group}_Cohort_{scope}_{period}_Num. To roll to a new year, bump Ks2Performance in DataYears.cs and point the sources at the new files.",
+  "lists": {
+    "expectedAndHigher": [
+      { "name": "RwmExpected", "column": "expected_standard_pupil_percent" },
+      { "name": "RwmHigher", "column": "higher_standard_pupil_percent" }
+    ],
+    "rwmSubjects": [
+      { "namePart": "", "subject": "Reading, writing and maths" },
+      { "namePart": "Reading_", "subject": "Reading" },
+      { "namePart": "Writing_", "subject": "Writing" },
+      { "namePart": "Maths_", "subject": "Maths" }
+    ]
+  },
+  "measureSets": [
+    {
+      "subtype": "Performance",
+      "yearsFrom": "Ks2Performance",
+      "pupilGroups": ["Total", "Boys", "Girls", "Disadvantaged", "NotDisadvantaged", "Eal", "FirstLanguageEnglish", "NonMobile"],
+      "sources": [
+        {
+          "description": "EES KS2 regional, LA and pupil characteristics: every year in one file. Each pupil group leaves the other characteristics at Total.",
+          "scopes": ["England", "LA"],
+          "publisher": "EES",
+          "file": "ks2_regional_local_authority_and_pupil_characteristics_2019_to_2025_revised",
+          "key": { "England": "geographic_level", "LA": "old_la_code" },
+          "where": {
+            "geographic_level": { "England": "National", "LA": "Local authority" },
+            "fsm_status": "Total",
+            "ethnicity_minor": "Total",
+            "sen_provision": "Total",
+            "time_period": "{year}"
+          },
+          "pupilGroups": {
+            "Total": { "sex": "Total", "disadvantage_status": "Total", "first_language": "Total" },
+            "Boys": { "sex": "Boys", "disadvantage_status": "Total", "first_language": "Total" },
+            "Girls": { "sex": "Girls", "disadvantage_status": "Total", "first_language": "Total" },
+            "Disadvantaged": { "sex": "Total", "disadvantage_status": "Disadvantaged", "first_language": "Total" },
+            "NotDisadvantaged": { "sex": "Total", "disadvantage_status": "Not known to be disadvantaged", "first_language": "Total" },
+            "Eal": { "sex": "Total", "disadvantage_status": "Total", "first_language": "Known or believed to be other than English" },
+            "FirstLanguageEnglish": { "sex": "Total", "disadvantage_status": "Total", "first_language": "Known or believed to be English" }
+          }
+        },
+        {
+          "description": "EES KS2 school attainment: one row per school, subject and pupil group.",
+          "scopes": ["Establishment"],
+          "publisher": "EES",
+          "file": "ks2_school_attainment_data",
+          "key": "school_urn",
+          "where": { "time_period": "{year}" },
+          "pupilGroups": {
+            "Total": { "breakdown": "Total" },
+            "Boys": { "breakdown": "Boys" },
+            "Girls": { "breakdown": "Girls" },
+            "Disadvantaged": { "breakdown": "Disadvantaged" },
+            "NotDisadvantaged": { "breakdown": "Not known to be disadvantaged" },
+            "Eal": { "breakdown": "Known or believed to be other than English" },
+            "NonMobile": { "breakdown": "Non mobile" }
+          }
+        }
+      ],
+      "measures": [
+        {
+          "description": "Reading, writing and maths combined, then each subject on its own (e.g. RwmExpected_Reading_Tot_Cohort_…).",
+          "forEach": { "measure": "expectedAndHigher", "rwm": "rwmSubjects" },
+          "measures": [
+            {
+              "name": "{measure.name}",
+              "column": "{measure.column}",
+              "where": { "subject": "{rwm.subject}" },
+              "nameTemplate": "{metric}_{rwm.namePart}{breakdown}_Cohort_{scope}_{period}_{unit}"
+            }
+          ]
+        },
+        {
+          "name": "ReadingScaledScore",
+          "column": "average_scaled_score",
+          "where": { "subject": "Reading" },
+          "nameTemplate": "{metric}_{breakdown}_Cohort_{scope}_{period}_{unit}"
+        },
+        {
+          "name": "MathsScaledScore",
+          "column": "average_scaled_score",
+          "where": { "subject": "Maths" },
+          "nameTemplate": "{metric}_{breakdown}_Cohort_{scope}_{period}_{unit}"
+        },
+        {
+          "name": "GpsExpected",
+          "column": "expected_standard_pupil_percent",
+          "where": { "subject": "Grammar, punctuation and spelling" },
+          "nameTemplate": "{metric}_{breakdown}_Cohort_{scope}_{period}_{unit}"
+        },
+        {
+          "name": "GpsHigher",
+          "column": "higher_standard_pupil_percent",
+          "where": { "subject": "Grammar, punctuation and spelling" },
+          "nameTemplate": "{metric}_{breakdown}_Cohort_{scope}_{period}_{unit}"
+        },
+        {
+          "name": "ScienceExpected",
+          "column": "expected_standard_pupil_percent",
+          "where": { "subject": "Science" },
+          "scopes": ["England", "LA"],
+          "nameTemplate": "{metric}_{breakdown}_Cohort_{scope}_{period}_{unit}"
+        }
+      ]
+    }
+  ]
+}

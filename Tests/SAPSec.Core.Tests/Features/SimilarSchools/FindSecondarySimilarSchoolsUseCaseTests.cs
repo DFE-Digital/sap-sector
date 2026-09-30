@@ -1,6 +1,7 @@
 ﻿using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools;
@@ -3049,12 +3050,12 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100007" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "50.00" },
-            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "50.01" },
-            new() { Id = "100005", Abs_Tot_Est_Current_Pct = "51.00" },
-            new() { Id = "100006", Abs_Tot_Est_Current_Pct = "51.01" },
-            new() { Id = "100007", Abs_Tot_Est_Current_Pct = "52" }
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = 50.00m },
+            new() { Id = "100004", Abs_Tot_Est_Current_Pct = 50.01m },
+            new() { Id = "100005", Abs_Tot_Est_Current_Pct = 51.00m },
+            new() { Id = "100006", Abs_Tot_Est_Current_Pct = 51.01m },
+            new() { Id = "100007", Abs_Tot_Est_Current_Pct = 52m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3104,13 +3105,13 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100008" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "0.5" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "50.00" },
-            new() { Id = "100005", Abs_Tot_Est_Current_Pct = "50.01" },
-            new() { Id = "100006", Abs_Tot_Est_Current_Pct = "51.00" },
-            new() { Id = "100007", Abs_Tot_Est_Current_Pct = "51.01" },
-            new() { Id = "100008", Abs_Tot_Est_Current_Pct = "52" }
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 0.5m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100004", Abs_Tot_Est_Current_Pct = 50.00m },
+            new() { Id = "100005", Abs_Tot_Est_Current_Pct = 50.01m },
+            new() { Id = "100006", Abs_Tot_Est_Current_Pct = 51.00m },
+            new() { Id = "100007", Abs_Tot_Est_Current_Pct = 51.01m },
+            new() { Id = "100008", Abs_Tot_Est_Current_Pct = 52m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3143,9 +3144,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "" },
-            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "XXX" },
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = null },
+            new() { Id = "100004", Abs_Tot_Est_Current_Pct = null },
             new() { Id = "100005" }
         );
         _similarSchoolsRepo.SetupGroups(
@@ -3176,9 +3177,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "" },
-            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "XXX" },
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = null },
+            new() { Id = "100004", Abs_Tot_Est_Current_Pct = null },
             new() { Id = "100005" }
         );
         _similarSchoolsRepo.SetupGroups(
@@ -3207,9 +3208,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Tot_Est_Current_Pct = "48.0" },
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Tot_Est_Current_Pct = 48.0m },
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3249,9 +3250,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Tot_Est_Current_Pct = "48.0" },
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Tot_Est_Current_Pct = 48.0m },
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3291,9 +3292,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Tot_Est_Current_Pct = currentSchoolValue },
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Tot_Est_Current_Pct = MeasureValue.Parse(currentSchoolValue) },
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3343,12 +3344,12 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100007" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "50.00" },
-            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = "50.01" },
-            new() { Id = "100005", Abs_Persistent_Est_Current_Pct = "51.00" },
-            new() { Id = "100006", Abs_Persistent_Est_Current_Pct = "51.01" },
-            new() { Id = "100007", Abs_Persistent_Est_Current_Pct = "52" }
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = 50.00m },
+            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = 50.01m },
+            new() { Id = "100005", Abs_Persistent_Est_Current_Pct = 51.00m },
+            new() { Id = "100006", Abs_Persistent_Est_Current_Pct = 51.01m },
+            new() { Id = "100007", Abs_Persistent_Est_Current_Pct = 52m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3398,13 +3399,13 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100008" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "0.5" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = "50.00" },
-            new() { Id = "100005", Abs_Persistent_Est_Current_Pct = "50.01" },
-            new() { Id = "100006", Abs_Persistent_Est_Current_Pct = "51.00" },
-            new() { Id = "100007", Abs_Persistent_Est_Current_Pct = "51.01" },
-            new() { Id = "100008", Abs_Persistent_Est_Current_Pct = "52" }
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 0.5m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = 50.00m },
+            new() { Id = "100005", Abs_Persistent_Est_Current_Pct = 50.01m },
+            new() { Id = "100006", Abs_Persistent_Est_Current_Pct = 51.00m },
+            new() { Id = "100007", Abs_Persistent_Est_Current_Pct = 51.01m },
+            new() { Id = "100008", Abs_Persistent_Est_Current_Pct = 52m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3437,9 +3438,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "" },
-            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = "XXX" },
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = null },
+            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = null },
             new() { Id = "100005" }
         );
         _similarSchoolsRepo.SetupGroups(
@@ -3470,9 +3471,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "" },
-            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = "XXX" },
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = null },
+            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = null },
             new() { Id = "100005" }
         );
         _similarSchoolsRepo.SetupGroups(
@@ -3501,9 +3502,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = "48.0" },
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = 48.0m },
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3543,9 +3544,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = "48.0" },
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = 48.0m },
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3585,9 +3586,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100003" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = currentSchoolValue },
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "50" }
+            new() { Id = "100001", Abs_Persistent_Est_Current_Pct = MeasureValue.Parse(currentSchoolValue) },
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = 49.99m },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3622,10 +3623,10 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = "10" },
-            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = "z" },
-            new() { Id = "100004", Attainment8_Tot_Est_Current_Num = "30" },
-            new() { Id = "100005", Attainment8_Tot_Est_Current_Num = "20" }
+            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = 10m },
+            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = null },
+            new() { Id = "100004", Attainment8_Tot_Est_Current_Num = 30m },
+            new() { Id = "100005", Attainment8_Tot_Est_Current_Num = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3666,9 +3667,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100004", EstablishmentName = "Maple School" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = "50" },
-            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = "50" },
-            new() { Id = "100004", Attainment8_Tot_Est_Current_Num = "50" }
+            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = 50m },
+            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = 50m },
+            new() { Id = "100004", Attainment8_Tot_Est_Current_Num = 50m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3693,8 +3694,8 @@ public class FindSecondarySimilarSchoolsUseCaseTests
         // Both round to 30.0 for display, but are not exactly equal underneath -
         // the tie-break should still be based on what the user sees.
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = "30.04" },
-            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = "29.96" }
+            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = 30.04m },
+            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = 29.96m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3718,10 +3719,10 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = "10" },
-            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = "z" },
-            new() { Id = "100004", Attainment8_Tot_Est_Current_Num = "30" },
-            new() { Id = "100005", Attainment8_Tot_Est_Current_Num = "20" }
+            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = 10m },
+            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = null },
+            new() { Id = "100004", Attainment8_Tot_Est_Current_Num = 30m },
+            new() { Id = "100005", Attainment8_Tot_Est_Current_Num = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3765,10 +3766,10 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = "10" },
-            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = "z" },
-            new() { Id = "100004", Attainment8_Tot_Est_Current_Num = "30" },
-            new() { Id = "100005", Attainment8_Tot_Est_Current_Num = "20" }
+            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = 10m },
+            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = null },
+            new() { Id = "100004", Attainment8_Tot_Est_Current_Num = 30m },
+            new() { Id = "100005", Attainment8_Tot_Est_Current_Num = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3812,10 +3813,10 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", EngMaths59_Tot_Est_Current_Pct = "10" },
-            new() { Id = "100003", EngMaths59_Tot_Est_Current_Pct = "z" },
-            new() { Id = "100004", EngMaths59_Tot_Est_Current_Pct = "30" },
-            new() { Id = "100005", EngMaths59_Tot_Est_Current_Pct = "20" }
+            new() { Id = "100002", EngMaths59_Tot_Est_Current_Pct = 10m },
+            new() { Id = "100003", EngMaths59_Tot_Est_Current_Pct = null },
+            new() { Id = "100004", EngMaths59_Tot_Est_Current_Pct = 30m },
+            new() { Id = "100005", EngMaths59_Tot_Est_Current_Pct = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3859,10 +3860,10 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", EngLang59_Sum_Est_Current_Pct = "10" },
-            new() { Id = "100003", EngLang59_Sum_Est_Current_Pct = "z" },
-            new() { Id = "100004", EngLang59_Sum_Est_Current_Pct = "30" },
-            new() { Id = "100005", EngLang59_Sum_Est_Current_Pct = "20" }
+            new() { Id = "100002", EngLang59_Sum_Est_Current_Pct = 10m },
+            new() { Id = "100003", EngLang59_Sum_Est_Current_Pct = null },
+            new() { Id = "100004", EngLang59_Sum_Est_Current_Pct = 30m },
+            new() { Id = "100005", EngLang59_Sum_Est_Current_Pct = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3906,10 +3907,10 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", EngLit59_Sum_Est_Current_Pct = "10" },
-            new() { Id = "100003", EngLit59_Sum_Est_Current_Pct = "z" },
-            new() { Id = "100004", EngLit59_Sum_Est_Current_Pct = "30" },
-            new() { Id = "100005", EngLit59_Sum_Est_Current_Pct = "20" }
+            new() { Id = "100002", EngLit59_Sum_Est_Current_Pct = 10m },
+            new() { Id = "100003", EngLit59_Sum_Est_Current_Pct = null },
+            new() { Id = "100004", EngLit59_Sum_Est_Current_Pct = 30m },
+            new() { Id = "100005", EngLit59_Sum_Est_Current_Pct = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3953,10 +3954,10 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", Maths59_Sum_Est_Current_Pct = "10" },
-            new() { Id = "100003", Maths59_Sum_Est_Current_Pct = "z" },
-            new() { Id = "100004", Maths59_Sum_Est_Current_Pct = "30" },
-            new() { Id = "100005", Maths59_Sum_Est_Current_Pct = "20" }
+            new() { Id = "100002", Maths59_Sum_Est_Current_Pct = 10m },
+            new() { Id = "100003", Maths59_Sum_Est_Current_Pct = null },
+            new() { Id = "100004", Maths59_Sum_Est_Current_Pct = 30m },
+            new() { Id = "100005", Maths59_Sum_Est_Current_Pct = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -4000,10 +4001,10 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", CombSci59_Sum_Est_Current_Pct = "10" },
-            new() { Id = "100003", CombSci59_Sum_Est_Current_Pct = "z" },
-            new() { Id = "100004", CombSci59_Sum_Est_Current_Pct = "30" },
-            new() { Id = "100005", CombSci59_Sum_Est_Current_Pct = "20" }
+            new() { Id = "100002", CombSci59_Sum_Est_Current_Pct = 10m },
+            new() { Id = "100003", CombSci59_Sum_Est_Current_Pct = null },
+            new() { Id = "100004", CombSci59_Sum_Est_Current_Pct = 30m },
+            new() { Id = "100005", CombSci59_Sum_Est_Current_Pct = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -4047,10 +4048,10 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", Bio59_Sum_Est_Current_Pct = "10" },
-            new() { Id = "100003", Bio59_Sum_Est_Current_Pct = "z" },
-            new() { Id = "100004", Bio59_Sum_Est_Current_Pct = "30" },
-            new() { Id = "100005", Bio59_Sum_Est_Current_Pct = "20" }
+            new() { Id = "100002", Bio59_Sum_Est_Current_Pct = 10m },
+            new() { Id = "100003", Bio59_Sum_Est_Current_Pct = null },
+            new() { Id = "100004", Bio59_Sum_Est_Current_Pct = 30m },
+            new() { Id = "100005", Bio59_Sum_Est_Current_Pct = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -4094,10 +4095,10 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", Chem59_Sum_Est_Current_Pct = "10" },
-            new() { Id = "100003", Chem59_Sum_Est_Current_Pct = "z" },
-            new() { Id = "100004", Chem59_Sum_Est_Current_Pct = "30" },
-            new() { Id = "100005", Chem59_Sum_Est_Current_Pct = "20" }
+            new() { Id = "100002", Chem59_Sum_Est_Current_Pct = 10m },
+            new() { Id = "100003", Chem59_Sum_Est_Current_Pct = null },
+            new() { Id = "100004", Chem59_Sum_Est_Current_Pct = 30m },
+            new() { Id = "100005", Chem59_Sum_Est_Current_Pct = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -4141,10 +4142,10 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100005" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-            new() { Id = "100002", Physics59_Sum_Est_Current_Pct = "10" },
-            new() { Id = "100003", Physics59_Sum_Est_Current_Pct = "z" },
-            new() { Id = "100004", Physics59_Sum_Est_Current_Pct = "30" },
-            new() { Id = "100005", Physics59_Sum_Est_Current_Pct = "20" }
+            new() { Id = "100002", Physics59_Sum_Est_Current_Pct = 10m },
+            new() { Id = "100003", Physics59_Sum_Est_Current_Pct = null },
+            new() { Id = "100004", Physics59_Sum_Est_Current_Pct = 30m },
+            new() { Id = "100005", Physics59_Sum_Est_Current_Pct = 20m }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -4356,14 +4357,14 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100009" }
        );
         _performanceRepo.SetupEstablishmentPerformance(
-           new() { Id = "100002", EngMaths59_Tot_Est_Current_Pct = "10", Attainment8_Tot_Est_Current_Num = "z" },
-           new() { Id = "100003", EngMaths59_Tot_Est_Current_Pct = "z", Attainment8_Tot_Est_Current_Num = "z" },
-           new() { Id = "100004", EngMaths59_Tot_Est_Current_Pct = "30", Attainment8_Tot_Est_Current_Num = "z" },
-           new() { Id = "100005", EngMaths59_Tot_Est_Current_Pct = "20", Attainment8_Tot_Est_Current_Num = "z" },
-           new() { Id = "100006", EngMaths59_Tot_Est_Current_Pct = "z", Attainment8_Tot_Est_Current_Num = "10" },
-           new() { Id = "100007", EngMaths59_Tot_Est_Current_Pct = "z", Attainment8_Tot_Est_Current_Num = "z" },
-           new() { Id = "100008", EngMaths59_Tot_Est_Current_Pct = "z", Attainment8_Tot_Est_Current_Num = "30" },
-           new() { Id = "100009", EngMaths59_Tot_Est_Current_Pct = "z", Attainment8_Tot_Est_Current_Num = "20" }
+           new() { Id = "100002", EngMaths59_Tot_Est_Current_Pct = 10m, Attainment8_Tot_Est_Current_Num = null },
+           new() { Id = "100003", EngMaths59_Tot_Est_Current_Pct = null, Attainment8_Tot_Est_Current_Num = null },
+           new() { Id = "100004", EngMaths59_Tot_Est_Current_Pct = 30m, Attainment8_Tot_Est_Current_Num = null },
+           new() { Id = "100005", EngMaths59_Tot_Est_Current_Pct = 20m, Attainment8_Tot_Est_Current_Num = null },
+           new() { Id = "100006", EngMaths59_Tot_Est_Current_Pct = null, Attainment8_Tot_Est_Current_Num = 10m },
+           new() { Id = "100007", EngMaths59_Tot_Est_Current_Pct = null, Attainment8_Tot_Est_Current_Num = null },
+           new() { Id = "100008", EngMaths59_Tot_Est_Current_Pct = null, Attainment8_Tot_Est_Current_Num = 30m },
+           new() { Id = "100009", EngMaths59_Tot_Est_Current_Pct = null, Attainment8_Tot_Est_Current_Num = 20m }
        );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -4411,14 +4412,14 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             new() { URN = "100009", UrbanRuralId = "UF1" }
         );
         _performanceRepo.SetupEstablishmentPerformance(
-           new() { Id = "100002", EngMaths59_Tot_Est_Current_Pct = "10", Attainment8_Tot_Est_Current_Num = "z" },
-           new() { Id = "100003", EngMaths59_Tot_Est_Current_Pct = "z", Attainment8_Tot_Est_Current_Num = "z" },
-           new() { Id = "100004", EngMaths59_Tot_Est_Current_Pct = "30", Attainment8_Tot_Est_Current_Num = "z" },
-           new() { Id = "100005", EngMaths59_Tot_Est_Current_Pct = "20", Attainment8_Tot_Est_Current_Num = "z" },
-           new() { Id = "100006", EngMaths59_Tot_Est_Current_Pct = "z", Attainment8_Tot_Est_Current_Num = "10" },
-           new() { Id = "100007", EngMaths59_Tot_Est_Current_Pct = "z", Attainment8_Tot_Est_Current_Num = "z" },
-           new() { Id = "100008", EngMaths59_Tot_Est_Current_Pct = "z", Attainment8_Tot_Est_Current_Num = "30" },
-           new() { Id = "100009", EngMaths59_Tot_Est_Current_Pct = "z", Attainment8_Tot_Est_Current_Num = "20" }
+           new() { Id = "100002", EngMaths59_Tot_Est_Current_Pct = 10m, Attainment8_Tot_Est_Current_Num = null },
+           new() { Id = "100003", EngMaths59_Tot_Est_Current_Pct = null, Attainment8_Tot_Est_Current_Num = null },
+           new() { Id = "100004", EngMaths59_Tot_Est_Current_Pct = 30m, Attainment8_Tot_Est_Current_Num = null },
+           new() { Id = "100005", EngMaths59_Tot_Est_Current_Pct = 20m, Attainment8_Tot_Est_Current_Num = null },
+           new() { Id = "100006", EngMaths59_Tot_Est_Current_Pct = null, Attainment8_Tot_Est_Current_Num = 10m },
+           new() { Id = "100007", EngMaths59_Tot_Est_Current_Pct = null, Attainment8_Tot_Est_Current_Num = null },
+           new() { Id = "100008", EngMaths59_Tot_Est_Current_Pct = null, Attainment8_Tot_Est_Current_Num = 30m },
+           new() { Id = "100009", EngMaths59_Tot_Est_Current_Pct = null, Attainment8_Tot_Est_Current_Num = 20m }
        );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },

@@ -10,4 +10,17 @@
     <PackageReference Include="CsvHelper" Version="33.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="SAPSec.Data.Common.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The data map definitions, edited by developers and data engineers alike. -->
+    <EmbeddedResource Include="..\..\SAPData\DataMap\Definitions\*.json" LogicalName="DataMap/Definitions/%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SAPSec.Data\SAPSec.Data.csproj" />
+  </ItemGroup>
+
 </Project>

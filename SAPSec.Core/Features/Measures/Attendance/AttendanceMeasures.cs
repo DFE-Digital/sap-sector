@@ -1,6 +1,7 @@
-using SAPSec.Core.Collections;
+﻿using SAPSec.Core.Collections;
 using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Filtering;
+using SAPSec.Data;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures.Attendance;
@@ -19,7 +20,7 @@ internal static class AttendanceMeasures
             return Measure.ForSchoolAttendance(
                 Measures.Absence.Key,
                 Measures.Absence.Name,
-                2024,
+                DataYears.PupilAbsence,
                 measureDataType,
                 availableFilters,
                 currentSchool,
@@ -37,7 +38,7 @@ internal static class AttendanceMeasures
             return Measure.ForSchoolComparison(
                 Measures.Absence.Key,
                 Measures.Absence.Name,
-                2024,
+                DataYears.PupilAbsence,
                 measureDataType,
                 availableFilters,
                 currentSchool,
@@ -89,9 +90,9 @@ internal static class AttendanceMeasures
         }
 
         private static (
-            Func<AbsenceData?, string?> Current,
-            Func<AbsenceData?, string?> Previous,
-            Func<AbsenceData?, string?> Previous2) ResolveEstablishmentAccessors(string type, string characteristic)
+            Func<AbsenceData?, decimal?> Current,
+            Func<AbsenceData?, decimal?> Previous,
+            Func<AbsenceData?, decimal?> Previous2) ResolveEstablishmentAccessors(string type, string characteristic)
         {
             return type switch
             {
@@ -161,12 +162,12 @@ internal static class AttendanceMeasures
         }
 
         private static (
-            Func<AbsenceData?, string?> LACurrent,
-            Func<AbsenceData?, string?> LAPrevious,
-            Func<AbsenceData?, string?> LAPrevious2,
-            Func<AbsenceData?, string?> EnglandCurrent,
-            Func<AbsenceData?, string?> EnglandPrevious,
-            Func<AbsenceData?, string?> EnglandPrevious2) ResolveLocalAuthorityAndEnglandAccessors(MeasurePhase phase, string type, string characteristic)
+            Func<AbsenceData?, decimal?> LACurrent,
+            Func<AbsenceData?, decimal?> LAPrevious,
+            Func<AbsenceData?, decimal?> LAPrevious2,
+            Func<AbsenceData?, decimal?> EnglandCurrent,
+            Func<AbsenceData?, decimal?> EnglandPrevious,
+            Func<AbsenceData?, decimal?> EnglandPrevious2) ResolveLocalAuthorityAndEnglandAccessors(MeasurePhase phase, string type, string characteristic)
         {
             return type switch
             {

@@ -1,6 +1,7 @@
-using SAPSec.Core.Collections;
+﻿using SAPSec.Core.Collections;
 using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Filtering;
+using SAPSec.Data;
 using SAPSec.Data.Repositories;
 using static SAPSec.Core.Features.Measures.Measures.Secondary;
 
@@ -17,7 +18,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchool(
                 Ks4EnglishLanguage.Key,
                 Ks4EnglishLanguage.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -32,7 +33,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchoolComparison(
                 Ks4EnglishLanguage.Key,
                 Ks4EnglishLanguage.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -104,7 +105,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchool(
                 Ks4EnglishLiterature.Key,
                 Ks4EnglishLiterature.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -119,7 +120,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchoolComparison(
                 Ks4EnglishLiterature.Key,
                 Ks4EnglishLiterature.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -191,7 +192,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchool(
                 Ks4Biology.Key,
                 Ks4Biology.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -206,7 +207,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchoolComparison(
                 Ks4Biology.Key,
                 Ks4Biology.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -278,7 +279,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchool(
                 Ks4Chemistry.Key,
                 Ks4Chemistry.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -293,7 +294,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchoolComparison(
                 Ks4Chemistry.Key,
                 Ks4Chemistry.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -365,7 +366,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchool(
                 Ks4Physics.Key,
                 Ks4Physics.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -380,7 +381,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchoolComparison(
                 Ks4Physics.Key,
                 Ks4Physics.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -452,7 +453,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchool(
                 Ks4Maths.Key,
                 Ks4Maths.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -467,7 +468,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchoolComparison(
                 Ks4Maths.Key,
                 Ks4Maths.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -539,7 +540,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchool(
                 Ks4CombinedScience.Key,
                 Ks4CombinedScience.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -554,7 +555,7 @@ internal static class Ks4CoreSubjects
             return Measure.ForSchoolComparison(
                 Ks4CombinedScience.Key,
                 Ks4CombinedScience.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,

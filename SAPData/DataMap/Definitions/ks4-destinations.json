@@ -1,0 +1,85 @@
+{
+  "$schema": "./dataset.schema.json",
+  "dataset": "KS4_Destinations",
+  "description": "KS4 destinations: pupils in sustained education, employment or apprenticeships after KS4. Years are the cohort's KS4 year (the file's time_period), which is what the website labels them as. To roll to a new year, bump Ks4Destinations in DataYears.cs and point the sources at the new release.",
+  "lists": {
+    "destinationTypes": [
+      { "name": "AllDest", "group": "Overall destination", "description": "Sustained education, employment & apprenticeships" },
+      { "name": "Education", "group": "Headline destinations", "description": "Sustained education destination" },
+      { "name": "Employment", "group": "Headline destinations", "description": "Sustained employment destination" },
+      { "name": "Apprentice", "group": "Headline destinations", "description": "Sustained apprenticeships" }
+    ]
+  },
+  "pupilGroupSets": {
+    "destinations": {
+      "Total": { "sex": "Total", "disadvantage_status": "Total", "breakdown_topic": "Total", "breakdown": "Total" },
+      "Boys": { "sex": "Male", "disadvantage_status": "Total", "breakdown_topic": "Total", "breakdown": "Total" },
+      "Girls": { "sex": "Female", "disadvantage_status": "Total", "breakdown_topic": "Total", "breakdown": "Total" },
+      "Disadvantaged": { "sex": "Total", "disadvantage_status": "Disadvantaged", "breakdown_topic": "Total", "breakdown": "Total" },
+      "NotDisadvantaged": { "sex": "Total", "disadvantage_status": "Not known to be disadvantaged", "breakdown_topic": "Total", "breakdown": "Total" }
+    }
+  },
+  "measureSets": [
+    {
+      "subtype": "Destinations",
+      "yearsFrom": "Ks4Destinations",
+      "pupilGroups": ["Total", "Boys", "Girls", "Disadvantaged", "NotDisadvantaged", "Eal"],
+      "sources": [
+        {
+          "description": "EES KS4 destination measures: one file with every year and level. Each pupil group leaves the other characteristics at Total.",
+          "scopes": ["England"],
+          "publisher": "EES",
+          "file": "ees_ks4_202223_api",
+          "key": "geographic_level",
+          "where": {
+            "establishment_type_group": "Total state-funded mainstream and special",
+            "ethnicity_major": "Total",
+            "time_period": "{year}"
+          },
+          "pupilGroups": [
+            "destinations",
+            { "Eal": { "sex": "Total", "disadvantage_status": "Total", "breakdown_topic": "First language", "breakdown": "Known or believed to be other than English" } }
+          ]
+        },
+        {
+          "scopes": ["Establishment"],
+          "publisher": "EES",
+          "file": "ees_ks4_202223_api",
+          "key": "school_urn",
+          "where": { "ethnicity_major": "Total", "time_period": "{year}" },
+          "pupilGroups": "destinations"
+        },
+        {
+          "scopes": ["LA"],
+          "publisher": "EES",
+          "file": "ees_ks4_202223_api",
+          "key": "old_la_code",
+          "where": {
+            "establishment_type_group": "State-funded mainstream and special",
+            "ethnicity_major": "Total",
+            "time_period": "{year}"
+          },
+          "pupilGroups": "destinations"
+        }
+      ],
+      "measures": [
+        {
+          "forEach": { "type": "destinationTypes" },
+          "measures": [
+            {
+              "name": "{type.name}",
+              "column": "pupil_count",
+              "where": { "destination_group": "{type.group}", "destination_description": "{type.description}" }
+            },
+            {
+              "name": "{type.name}",
+              "column": "pupil_percent",
+              "unit": "Pct",
+              "where": { "destination_group": "{type.group}", "destination_description": "{type.description}" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,7 @@
-using SAPSec.Core.Collections;
+﻿using SAPSec.Core.Collections;
 using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Filtering;
+using SAPSec.Data;
 using SAPSec.Data.Repositories;
 using static SAPSec.Core.Features.Measures.Measures.Secondary;
 
@@ -17,7 +18,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchool(
                 Ks4Attainment8.Key,
                 Ks4Attainment8.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.Score,
                 availableFilters,
                 currentSchool,
@@ -32,7 +33,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchoolComparison(
                 Ks4Attainment8.Key,
                 Ks4Attainment8.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.Score,
                 availableFilters,
                 currentSchool,
@@ -68,7 +69,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchool(
                 Ks4EnglishMaths.Key,
                 Ks4EnglishMaths.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -83,7 +84,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchoolComparison(
                 Ks4EnglishMaths.Key,
                 Ks4EnglishMaths.Name,
-                2024,
+                DataYears.Ks4Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -144,7 +145,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchool(
                 Ks4Destinations.Key,
                 Ks4Destinations.Name,
-                2022,
+                DataYears.Ks4Destinations,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -159,7 +160,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchoolComparison(
                 Ks4Destinations.Key,
                 Ks4Destinations.Name,
-                2022,
+                DataYears.Ks4Destinations,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,

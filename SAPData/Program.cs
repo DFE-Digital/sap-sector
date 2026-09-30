@@ -1,14 +1,11 @@
-using CsvHelper;
 using Microsoft.Extensions.Configuration;
 using Sentry;
-using SAPData.Models;
 using SAPSec.Data.Common;
-using System.Globalization;
-using System.Text;
+using SAPSec.Data.Common.Catalogue.Definitions;
 
 namespace SAPData;
 
-internal class Program
+internal partial class Program
 {
     static void Main(string[] args)
     {
@@ -34,7 +31,6 @@ internal class Program
             string dataMapDir = Path.Combine(baseDir, "DataMap");
             string rawInputDir = Path.Combine(dataMapDir, "SourceFiles");
             string cleanedDir = Path.Combine(dataMapDir, "CleanedFiles");
-            string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
             string sqlDir = Path.Combine(baseDir, "Sql");
             string rawTablesToRebuildPath = ResolveRawTablesToRebuildPath(baseDir, configuration);
             string runAllSqlFile = Path.Combine(sqlDir, "run_all.sql");
@@ -45,6 +41,10 @@ internal class Program
             string generatedJsonDir = Path.Combine(jsonDir, "Generated");
             string primaryJsonDir = Path.Combine(jsonDir, "PrimarySchools");
             string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");
+            string sourceProfilesPath = Path.Combine(dataMapDir, "source-profiles.json");
+
+            if (RunDeveloperCommand(args, dataMapDir, rawInputDir, sourceProfilesPath))
+                return;
 
             Directory.CreateDirectory(cleanedDir);
             Directory.CreateDirectory(sqlDir);
@@ -53,42 +53,48 @@ internal class Program
             Directory.CreateDirectory(primaryJsonDir);
 
             // -------------------------------------------------
-            // 1. Load DataMap
+            // 1. Load and check the data map (SAPSec.Data.Common/Catalogue/Definitions)
             // -------------------------------------------------
-            List<DataMapRow> dataMaps;
-            using (var reader = new StreamReader(dataMapCsv))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
-                csv.Context.RegisterClassMap<DataMapMapping>();
-                dataMaps = csv.GetRecords<DataMapRow>().ToList();
-            }
+            var dataMaps = CatalogueDefinitions.Rows().ToList();
+            ValidateCatalogue(dataMaps);
 
             Console.WriteLine($"Loaded {dataMaps.Count} DataMap rows");
 
             var rebuildAllRawTables = ShouldRebuildAllRawTables(configuration);
+            var incremental = IsIncremental(configuration);
             var logicalKeysToRebuild = rebuildAllRawTables
                 ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 : LoadLogicalKeysToRebuild(rawTablesToRebuildPath);
+
+            // Incremental: the database reloads and rebuilds only what changed, so the SQL covers everything.
+            // Listed raw tables are still forced to reload.
+            var generateAllSql = rebuildAllRawTables || incremental;
+
             WriteCleanupSql(
                 Path.Combine(sqlDir, "00_cleanup.sql"),
-                logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName),
-                rebuildAllRawTables);
+                incremental ? [] : logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName),
+                rebuildAllRawTables,
+                incremental);
 
             // -------------------------------------------------
-            // 2. Generate raw tables + cleaned files + mapping
+            // 2. Raw tables (01_, 02_): clean each downloaded file and load it as is, then check the files
+            //    against the data map before anything is loaded
             // -------------------------------------------------
-            new GenerateRawTables(
+            var rawTables = new GenerateRawTables(
                 rawInputDir,
                 cleanedDir,
                 sqlDir,
                 tableMappingPath,
                 sqlFiles,
                 logicalKeysToRebuild,
-                rebuildAllRawTables
-            ).Run();
+                rebuildAllRawTables,
+                incremental);
+            rawTables.Run();
+
+            CheckSourceFiles(dataMaps, rawTables, configuration);
 
             // -------------------------------------------------
-            // 3. Generate views
+            // 3. Views the website reads (03_, 04_) and their JSON exports (60_, 61_)
             // -------------------------------------------------
             new GenerateViews(
                 dataMaps,
@@ -98,11 +104,11 @@ internal class Program
                 generatedJsonDir,
                 sqlFiles,
                 logicalKeysToRebuild,
-                rebuildAllRawTables
+                generateAllSql
             ).Run();
 
             // -------------------------------------------------
-            // 10. Generate indexes
+            // 4. Indexes (10_)
             // -------------------------------------------------
             new GenerateIndexes(
                 sqlDir,
@@ -110,7 +116,7 @@ internal class Program
             ).Run();
 
             // -------------------------------------------------
-            // 50. Generate similar schools views
+            // 5. Similar schools views (50_) and their JSON exports (70_)
             // -------------------------------------------------
             new GenerateSimilarSchoolsViews(
                 dataMaps,
@@ -119,32 +125,21 @@ internal class Program
                 generatedJsonDir,
                 sqlFiles,
                 logicalKeysToRebuild,
-                rebuildAllRawTables
+                generateAllSql
             ).Run();
 
             // -------------------------------------------------
-            // 60. Generate similar schools indexes
+            // 6. Similar schools indexes (60_)
             // -------------------------------------------------
             new GenerateSimilarSchoolsIndexes(
                 sqlDir,
                 sqlFiles
             ).Run();
 
-            var runAllSql = new StringBuilder();
-            runAllSql.AppendLine(@"-- ================================================================");
-            runAllSql.AppendLine(@"-- run_all.sql");
-            runAllSql.AppendLine(@"-- ================================================================");
-            runAllSql.AppendLine(@"");
-            runAllSql.AppendLine(@"\set ON_ERROR_STOP on");
-            runAllSql.AppendLine(@"");
-            runAllSql.AppendLine(@"\ir 00_cleanup.sql");
-
-            foreach (var line in sqlFiles.Order())
-            {
-                runAllSql.AppendLine(@$"\ir {line}");
-            }
-
-            File.WriteAllText(runAllSqlFile, runAllSql.ToString());
+            // -------------------------------------------------
+            // 7. run_all.sql: every script, in order
+            // -------------------------------------------------
+            WriteRunAllSql(runAllSqlFile, sqlDir, sqlFiles, incremental);
 
             Console.WriteLine("Run Complete.");
 
@@ -163,6 +158,16 @@ internal class Program
             }
             throw;
         }
+    }
+
+    private static bool IsIncremental(IConfiguration configuration)
+    {
+        var mode = configuration["RawTableRebuildMode"] ?? Environment.GetEnvironmentVariable("RAW_TABLE_REBUILD_MODE");
+        var incremental = !string.Equals(mode?.Trim(), "list", StringComparison.OrdinalIgnoreCase);
+        Console.WriteLine(incremental
+            ? "Raw table rebuild mode: incremental (reload what changed)."
+            : "Raw table rebuild mode: list (reload only the listed tables).");
+        return incremental;
     }
 
     private static IDisposable? InitialiseSentry(IConfiguration configuration)
@@ -243,113 +248,4 @@ internal class Program
         return keys;
     }
 
-    private static void WriteCleanupSql(string path, IEnumerable<string> tableNamesToRebuild, bool rebuildAllRawTables)
-    {
-        var tablesToRebuild = tableNamesToRebuild
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        var sql = new StringBuilder();
-        sql.AppendLine("-- ================================================================");
-        sql.AppendLine("-- 00_cleanup.sql");
-        sql.AppendLine("-- Auto-generated by SAPData/Program.cs");
-        sql.AppendLine("-- Drops only explicitly listed raw tables before regeneration.");
-        sql.AppendLine("-- Recreates helper functions used by generated views.");
-        sql.AppendLine("-- ================================================================");
-        sql.AppendLine();
-        sql.AppendLine(@"\echo 'Cleaning up listed raw tables and regenerating helper functions...'");
-        sql.AppendLine();
-        sql.AppendLine("DO $$");
-        sql.AppendLine("DECLARE");
-        sql.AppendLine("  v_schema text := current_schema();");
-        sql.AppendLine("  r record;");
-        if (tablesToRebuild.Count > 0)
-        {
-            sql.AppendLine($"  tables_to_rebuild text[] := ARRAY[{string.Join(", ", tablesToRebuild.Select(name => $"'{name}'"))}];");
-        }
-        else
-        {
-            sql.AppendLine("  tables_to_rebuild text[] := ARRAY[]::text[];");
-        }
-        sql.AppendLine("BEGIN");
-        sql.AppendLine("  EXECUTE format('SET search_path TO %I', v_schema);");
-        sql.AppendLine();
-        sql.AppendLine("  -- Drop only listed raw tables");
-        sql.AppendLine("  FOR r IN");
-        sql.AppendLine("    SELECT schemaname, tablename");
-        sql.AppendLine("    FROM pg_tables");
-        sql.AppendLine("    WHERE schemaname = v_schema");
-        if (rebuildAllRawTables)
-        {
-            sql.AppendLine("      AND tablename LIKE 't\\_%' ESCAPE '\\'");
-        }
-        else
-        {
-            sql.AppendLine("      AND tablename = ANY(tables_to_rebuild)");
-        }
-        sql.AppendLine("  LOOP");
-        sql.AppendLine("    EXECUTE format('DROP TABLE IF EXISTS %I.%I CASCADE', r.schemaname, r.tablename);");
-        sql.AppendLine("  END LOOP;");
-        sql.AppendLine("END $$;");
-        sql.AppendLine();
-        sql.AppendLine("-- =========================");
-        sql.AppendLine("-- Cleaning helpers");
-        sql.AppendLine("-- =========================");
-        sql.AppendLine();
-        sql.AppendLine("CREATE OR REPLACE FUNCTION clean_int(value TEXT)");
-        sql.AppendLine("RETURNS INT");
-        sql.AppendLine("LANGUAGE plpgsql");
-        sql.AppendLine("IMMUTABLE");
-        sql.AppendLine("AS $$");
-        sql.AppendLine("BEGIN");
-        sql.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN");
-        sql.AppendLine("        RETURN NULL;");
-        sql.AppendLine("    END IF;");
-        sql.AppendLine();
-        sql.AppendLine("    RETURN value::INT;");
-        sql.AppendLine();
-        sql.AppendLine("EXCEPTION WHEN others THEN");
-        sql.AppendLine("    RETURN NULL;");
-        sql.AppendLine("END;");
-        sql.AppendLine("$$;");
-        sql.AppendLine();
-        sql.AppendLine("CREATE OR REPLACE FUNCTION clean_numeric(value TEXT)");
-        sql.AppendLine("RETURNS NUMERIC");
-        sql.AppendLine("LANGUAGE plpgsql");
-        sql.AppendLine("IMMUTABLE");
-        sql.AppendLine("AS $$");
-        sql.AppendLine("BEGIN");
-        sql.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN");
-        sql.AppendLine("        RETURN NULL;");
-        sql.AppendLine("    END IF;");
-        sql.AppendLine();
-        sql.AppendLine("    RETURN value::NUMERIC;");
-        sql.AppendLine();
-        sql.AppendLine("EXCEPTION WHEN others THEN");
-        sql.AppendLine("    RETURN NULL;");
-        sql.AppendLine("END;");
-        sql.AppendLine("$$;");
-        sql.AppendLine();
-        sql.AppendLine("CREATE OR REPLACE FUNCTION clean_date(value TEXT)");
-        sql.AppendLine("RETURNS DATE");
-        sql.AppendLine("LANGUAGE plpgsql");
-        sql.AppendLine("IMMUTABLE");
-        sql.AppendLine("AS $$");
-        sql.AppendLine("BEGIN");
-        sql.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'na', 'n/a', 'N/A', '.', '-', '--') THEN");
-        sql.AppendLine("        RETURN NULL;");
-        sql.AppendLine("    END IF;");
-        sql.AppendLine();
-        sql.AppendLine("    RETURN value::DATE;");
-        sql.AppendLine();
-        sql.AppendLine("EXCEPTION WHEN others THEN");
-        sql.AppendLine("    RETURN NULL;");
-        sql.AppendLine("END;");
-        sql.AppendLine("$$;");
-        sql.AppendLine();
-        sql.AppendLine(@"\echo 'Cleanup complete.'");
-
-        File.WriteAllText(path, sql.ToString(), new UTF8Encoding(false));
-    }
 }

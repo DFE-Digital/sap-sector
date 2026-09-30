@@ -13,6 +13,6 @@ public class EstablishmentWorkforce
     public string LAName { get; set; } = string.Empty;
     public string RegionId { get; set; } = string.Empty;
     public string RegionName { get; set; } = string.Empty;
-    public string Workforce_PupTeaRatio_Est_Current_Num { get; set; } = string.Empty;
-    public string Workforce_TotPupils_Est_Current_Num { get; set; } = string.Empty;
+    public decimal? Workforce_PupTeaRatio_Est_Current_Num { get; set; } = null;
+    public decimal? Workforce_TotPupils_Est_Current_Num { get; set; } = null;
 }

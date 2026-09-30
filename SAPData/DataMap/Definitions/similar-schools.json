@@ -1,0 +1,62 @@
+{
+  "$schema": "./dataset.schema.json",
+  "description": "Similar schools: each school's neighbours (groups) and the values used to match them, for primary and secondary. Read by SAPData.GenerateSimilarSchoolsViews, which copies the columns as they are. To refresh, point the four files at the new release.",
+  "columnSets": [
+    {
+      "dataset": "PrimaryGroups",
+      "scope": "SimilarSchools",
+      "publisher": "Similar Schools",
+      "file": "2026_07_03_neighbours_list_primary",
+      "key": "urn",
+      "columns": { "URN": "urn", "NeighbourURN": "neighbour_urn", "Dist": "dist", "Rank": "rank" }
+    },
+    {
+      "dataset": "SecondaryGroups",
+      "scope": "SimilarSchools",
+      "publisher": "Similar Schools",
+      "file": "2026_07_03_neighbours_list_secondary",
+      "key": "urn",
+      "columns": { "URN": "urn", "NeighbourURN": "neighbour_urn", "Dist": "dist", "Rank": "rank" }
+    },
+    {
+      "dataset": "PrimaryValues",
+      "scope": "SimilarSchools",
+      "publisher": "Similar Schools",
+      "file": "2026_07_03_matched_primary_schools_data",
+      "key": "urn",
+      "columns": {
+        "URN": "urn",
+        "Ks1PriorRwmAverage": "ks1_prior_rwm_avg",
+        "PPPerc": "percent_fsm_ever",
+        "Polar4QuintilePupils": "polar4quintile_pupils",
+        "PStability": "p_stability",
+        "PercentSchSupport": "percent_sch_support",
+        "PercentEAL": "percent_eal",
+        "IdaciPupils": "idaci_pupils",
+        "PercentageStatementOrEhp": "percent_statement_or_ehp",
+        "NumberOfPupils": "nor",
+        "ReadMatAverage": "ks2_outcome_read_mat_avg"
+      }
+    },
+    {
+      "dataset": "SecondaryValues",
+      "scope": "SimilarSchools",
+      "publisher": "Similar Schools",
+      "file": "2026_07_03_matched_secondary_schools_data",
+      "key": "urn",
+      "columns": {
+        "URN": "urn",
+        "KS2MRP": "ks2_prior_rm_avg",
+        "PPPerc": "percent_fsm_ever",
+        "PercentEAL": "percent_eal",
+        "Polar4QuintilePupils": "polar4quintile_pupils",
+        "PStability": "p_stability",
+        "IdaciPupils": "idaci_pupils",
+        "PercentSchSupport": "percent_sch_support",
+        "NumberOfPupils": "nor",
+        "PercentageStatementOrEHP": "percent_statement_or_ehp",
+        "Att8Scr": "ks4_outcome_a8"
+      }
+    }
+  ]
+}

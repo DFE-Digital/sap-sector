@@ -88,12 +88,12 @@ public record MeasureAvailableFilter(
     IReadOnlyCollection<FilterOption> Options);
 
 internal record MeasureFieldSelector<T>(
-    Func<T?, string?> SchoolCurrent,
-    Func<T?, string?> SchoolPrevious,
-    Func<T?, string?> SchoolPrevious2,
-    Func<T?, string?> LocalAuthorityCurrent,
-    Func<T?, string?> LocalAuthorityPrevious,
-    Func<T?, string?> LocalAuthorityPrevious2,
-    Func<T?, string?> EnglandCurrent,
-    Func<T?, string?> EnglandPrevious,
-    Func<T?, string?> EnglandPrevious2);
+    Func<T?, decimal?> SchoolCurrent,
+    Func<T?, decimal?> SchoolPrevious,
+    Func<T?, decimal?> SchoolPrevious2,
+    Func<T?, decimal?> LocalAuthorityCurrent,
+    Func<T?, decimal?> LocalAuthorityPrevious,
+    Func<T?, decimal?> LocalAuthorityPrevious2,
+    Func<T?, decimal?> EnglandCurrent,
+    Func<T?, decimal?> EnglandPrevious,
+    Func<T?, decimal?> EnglandPrevious2);
