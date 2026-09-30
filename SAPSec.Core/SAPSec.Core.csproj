@@ -40,7 +40,7 @@
 
   <ItemGroup>
     <Folder Include="Extensions\" />
-    <Folder Include="Services\Helper\" />
+    <Folder Include="Interfaces\Services\" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Model;
+﻿namespace SAPSec.Core.CustomEvents;
 
 public class ClickData
 {
