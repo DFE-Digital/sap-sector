@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Core.Features.Geography;
+namespace SAPSec.Core.Geography;
 
 public record BNGCoordinates(int Easting, int Northing)
 {
