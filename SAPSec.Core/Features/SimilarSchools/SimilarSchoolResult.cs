@@ -1,7 +1,7 @@
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SchoolInfo;
-using SAPSec.Core.Features.Sorting;
+using SAPSec.Core.Sorting;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 

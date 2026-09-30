@@ -3,7 +3,7 @@ using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
-using SAPSec.Core.Features.Sorting;
+using SAPSec.Core.Sorting;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
