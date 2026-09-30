@@ -10,7 +10,7 @@ module "domains" {
   host_name           = each.value.origin_hostname
   cached_paths        = try(each.value.cached_paths, [])
   redirect_rules      = try(each.value.redirect_rules, [])
-  rate_limit          = each.value.fwpolicy ? try(var.rate_limit, null) : null
+  rate_limit_max      = each.value.fwpolicy ? try(var.rate_limit_max, null) : null
   allow_aks           = each.value.fwpolicy ? var.allow_aks : null
   block_ip            = each.value.fwpolicy ? var.block_ip : null
   dont_block_nonprod  = each.value.fwpolicy ? false : true
