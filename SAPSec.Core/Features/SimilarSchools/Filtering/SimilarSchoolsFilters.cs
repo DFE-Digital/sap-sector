@@ -1,5 +1,4 @@
 ﻿using SAPSec.Core.Collections;
-using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;

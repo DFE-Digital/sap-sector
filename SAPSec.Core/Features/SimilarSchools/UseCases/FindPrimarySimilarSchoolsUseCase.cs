@@ -1,4 +1,4 @@
-using SAPSec.Core.Extensions;
+using SAPSec.Core.Collections;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Geography;
