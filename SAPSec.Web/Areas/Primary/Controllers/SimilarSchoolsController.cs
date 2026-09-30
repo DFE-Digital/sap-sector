@@ -9,7 +9,9 @@ using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Components;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
 
@@ -19,6 +21,7 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
 public class SimilarSchoolsController(
         IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findSimilarSchoolsUseCase,
+        IRequestSchoolAccessor requestSchoolAccessor,
         IFeatureFlagService featureFlagService)
     : Controller
 {
@@ -72,5 +75,10 @@ public class SimilarSchoolsController(
             ControllerContext.ActionDescriptor.ActionName,
             hasSimilarSchools,
             includeRise);
+
+        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);
     }
 }

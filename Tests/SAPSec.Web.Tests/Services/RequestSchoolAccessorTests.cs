@@ -81,6 +81,9 @@ public class RequestSchoolAccessorTests
         {
             Name = "Test School",
             Urn = urn,
+            ShowClosedSchoolBanner = false,
+            Successors = [],
+            Predecessors = [],
             DfENumber = DataWithAvailability.Available("123/4567"),
             Ukprn = DataWithAvailability.Available("10012345"),
             Address = DataWithAvailability.Available("1 Test Street"),

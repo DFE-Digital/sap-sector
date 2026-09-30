@@ -8,16 +8,19 @@ public class JsonEstablishmentRepository : IEstablishmentRepository
 {
     private readonly IJsonFile<Establishment> _establishmentFile;
     private readonly IJsonFile<EstablishmentEmail> _establishmentEmailFile;
+    private readonly IJsonFile<EstablishmentLinks> _establishmentLinksFile;
 
     private ILogger<JsonEstablishmentRepository> _logger;
 
     public JsonEstablishmentRepository(
         IJsonFile<Establishment> establishmentFile,
         IJsonFile<EstablishmentEmail> establishmentEmailFile,
+        IJsonFile<EstablishmentLinks> establishmentLinksFile,
         ILogger<JsonEstablishmentRepository> logger)
     {
         _establishmentFile = establishmentFile;
         _establishmentEmailFile = establishmentEmailFile;
+        _establishmentLinksFile = establishmentLinksFile;
         _logger = logger;
     }
 
@@ -55,5 +58,12 @@ public class JsonEstablishmentRepository : IEstablishmentRepository
         var establishmentEmails = await _establishmentEmailFile.ReadAllAsync();
 
         return establishmentEmails.FirstOrDefault(x => x.URN == urn);
+    }
+
+    public async Task<IReadOnlyCollection<EstablishmentLinks>> GetEstablishmentLinksAsync(string urn)
+    {
+        var establishmentLinks = await _establishmentLinksFile.ReadAllAsync();
+
+        return establishmentLinks.Where(x => x.urn == urn).ToList().AsReadOnly();
     }
 }

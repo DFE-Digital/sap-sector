@@ -2,6 +2,7 @@
 @using SAPSec.Web.Constants;
 @using SAPSec.Web.Helpers
 @using SAPSec.Web.ViewModels
+@using SAPSec.Web.ViewModels.Components
 
 @{
     var navigation = ViewData[ViewDataKeys.SchoolNavigation] as SchoolSideNavigationViewModel;
@@ -13,6 +14,10 @@
 
     ViewData[ViewDataKeys.SkipLinkTargetId] = "page-content";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var showClosedSchoolBanner = ViewData[ViewDataKeys.ShowClosedSchoolBanner] as bool? ?? false;
+    var closedSchoolSuccessors = ViewData[ViewDataKeys.ClosedSchoolSuccessors] as IReadOnlyList<SuccessorLinkViewModel> ?? [];
+    var schoolPredecessors = ViewData[ViewDataKeys.SchoolPredecessors] as IReadOnlyList<SuccessorLinkViewModel> ?? [];
 }
 
 @section Breadcrumbs {
@@ -23,6 +28,11 @@
             </li>
         </ol>
     </nav>
+}
+
+@if (showClosedSchoolBanner || closedSchoolSuccessors.Any() || schoolPredecessors.Any())
+{
+    @await Component.InvokeAsync("ClosedSchoolBanner", new { variant = ClosedSchoolBannerVariant.ThisSchool, successors = closedSchoolSuccessors, predecessors = schoolPredecessors })
 }
 
 <div class="govuk-grid-row">
