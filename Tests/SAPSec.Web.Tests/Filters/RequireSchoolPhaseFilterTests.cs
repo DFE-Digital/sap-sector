@@ -8,12 +8,11 @@ using Moq;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
-using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
 
-namespace SAPSec.Web.Tests.Filters;
+namespace SAPSec.Web.Tests.Deprecated.Filters;
 
 public class RequireSchoolPhaseFilterTests
 {
