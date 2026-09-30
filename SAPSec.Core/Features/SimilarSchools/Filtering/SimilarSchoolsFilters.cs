@@ -1,5 +1,6 @@
 ﻿using SAPSec.Core.Collections;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Validation;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
