@@ -1,3 +1,4 @@
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.Geography;
 using SAPSec.Data.Repositories;
 

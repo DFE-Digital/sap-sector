@@ -1,3 +1,4 @@
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Data.Dto;

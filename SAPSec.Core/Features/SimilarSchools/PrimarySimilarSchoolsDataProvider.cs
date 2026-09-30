@@ -1,5 +1,6 @@
-using SAPSec.Core.Features.SimilarSchools.Sorting;
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.KS2.Performance;
 using SAPSec.Data.Repositories;
