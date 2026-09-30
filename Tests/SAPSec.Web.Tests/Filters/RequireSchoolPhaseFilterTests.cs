@@ -5,10 +5,9 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Moq;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
@@ -24,10 +23,10 @@ public class RequireSchoolPhaseFilterTests
     public RequireSchoolPhaseFilterTests()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(true);
     }
 
@@ -114,7 +113,7 @@ public class RequireSchoolPhaseFilterTests
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(false);
 
         var result = await ExecuteFilterAsync(
@@ -135,7 +134,7 @@ public class RequireSchoolPhaseFilterTests
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(false);
 
         var result = await ExecuteFilterAsync(
@@ -156,10 +155,10 @@ public class RequireSchoolPhaseFilterTests
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(false);
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(true);
 
         var result = await ExecuteFilterAsync(
@@ -181,7 +180,7 @@ public class RequireSchoolPhaseFilterTests
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(true);
 
         var result = await ExecuteFilterAsync(
@@ -202,7 +201,7 @@ public class RequireSchoolPhaseFilterTests
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(false);
 
         var result = await ExecuteFilterAsync(

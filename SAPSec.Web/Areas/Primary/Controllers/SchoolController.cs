@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
@@ -9,7 +9,6 @@ using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
@@ -127,7 +126,7 @@ public class SchoolController(
     }
 
     [HttpGet]
-    [RequireFeatureFlag(FeatureFlags.EnableRiseResources)]
+    [RequireFeatureFlag(Flags.EnableRiseResources)]
     [Route("rise-resources")]
     public async Task<IActionResult> RiseResources(string urn)
     {
@@ -146,7 +145,7 @@ public class SchoolController(
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
 
         var includeRise = featureFlagService is not null
-            && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+            && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,
@@ -168,7 +167,7 @@ public class SchoolController(
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
 
         var includeRise = featureFlagService is not null
-            && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+            && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,

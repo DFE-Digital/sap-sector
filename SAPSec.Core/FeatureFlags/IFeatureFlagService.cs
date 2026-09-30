@@ -1,4 +1,4 @@
-namespace SAPSec.Core.Interfaces.Services;
+namespace SAPSec.Core.FeatureFlags;
 
 public interface IFeatureFlagService
 {

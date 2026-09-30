@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.Common.FeatureFlags;

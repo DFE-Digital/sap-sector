@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using FluentAssertions;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.FluentAssertions;
@@ -20,8 +20,8 @@ public class SchoolPagesIntegrationTests(
 
     public override Task DisposeAsync()
     {
-        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnableAllThroughSchools);
-        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnableRiseResources);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnableAllThroughSchools);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnableRiseResources);
 
         return base.DisposeAsync();
     }
@@ -179,7 +179,7 @@ public class SchoolPagesIntegrationTests(
     public async Task OverviewPage_WhenAllThroughFeatureFlagDisabled_ReturnsNotFound()
     {
         SetupAllThroughSchool();
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableAllThroughSchools, false);
+        Fixture.FeatureFlagService.Override(Flags.EnableAllThroughSchools, false);
 
         await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Overview, HttpStatusCode.NotFound);
     }
@@ -740,8 +740,8 @@ public class SchoolPagesIntegrationTests(
 
     private void SetupAllThroughSchool()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableAllThroughSchools, true);
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableAllThroughSchools, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
 
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28").WithAddress("1 Test Street", "", "", "Test Town", "TT1 1TT")),
@@ -750,8 +750,8 @@ public class SchoolPagesIntegrationTests(
 
     private void SetupAllThroughSchoolWithPrimarySimilarSchools(int count = 50)
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableAllThroughSchools, true);
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableAllThroughSchools, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
 
         var neighbourUrns = Enumerable.Range(2, count)
             .Select(i => $"100{i:000}")
@@ -777,8 +777,8 @@ public class SchoolPagesIntegrationTests(
 
     private void SetupAllThroughSchoolWithSecondarySimilarSchools(int count = 50)
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableAllThroughSchools, true);
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableAllThroughSchools, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
 
         var neighbourUrns = Enumerable.Range(2, count)
             .Select(i => $"200{i:000}")
