@@ -14,7 +14,9 @@ using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Components;
 using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.AllThrough.Controllers;
@@ -27,6 +29,7 @@ namespace SAPSec.Web.Areas.AllThrough.Controllers;
 public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
+        IRequestSchoolAccessor requestSchoolAccessor,
         IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
         IUseCase<GetAllThroughSimilarSchoolPhasesRequest, GetAllThroughSimilarSchoolPhasesResponse> getAllThroughSimilarSchoolPhasesUseCase,
@@ -164,12 +167,21 @@ public class SchoolController(
     {
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
         ViewData[ViewDataKeys.SchoolNavigation] = await CreateNavigation(currentSchool.Urn);
+
+        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);
     }
 
     private async Task PopulateViewData(SchoolDetails currentSchool)
     {
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
         ViewData[ViewDataKeys.SchoolNavigation] = await CreateNavigation(currentSchool.Urn);
+
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = currentSchool.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Predecessors);
     }
 
     private async Task<SchoolSideNavigationViewModel> CreateNavigation(string urn) =>

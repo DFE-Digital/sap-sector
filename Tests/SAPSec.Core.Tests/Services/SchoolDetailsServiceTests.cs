@@ -25,6 +25,8 @@ public class SchoolDetailsServiceTests
 
         _sut = new SchoolDetailsService(
             _establishmentRepository,
+            new SchoolClosureEligibilityService(_establishmentRepository, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
+            new SchoolPredecessorRelationshipService(_establishmentRepository, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
             _loggerMock.Object);
     }
 

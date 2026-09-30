@@ -105,5 +105,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<ISchoolSearchService, SchoolSearchService>();
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
+        services.AddSingleton<ISchoolClosureEligibilityService, SchoolClosureEligibilityService>();
+        services.AddSingleton<ISchoolPredecessorRelationshipService, SchoolPredecessorRelationshipService>();
     }
 }

@@ -1,6 +1,7 @@
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Model;
+using SAPSec.Web.ViewModels.Components;
 
 namespace SAPSec.Web.Areas.Shared.ViewModels;
 
@@ -9,6 +10,9 @@ public class SchoolDetailsViewModel
     // Identifiers
     public required string Urn { get; init; }
     public required string Name { get; init; }
+    public required bool ShowClosedSchoolBanner { get; init; }
+    public required IReadOnlyList<SuccessorLinkViewModel> Successors { get; init; }
+    public required IReadOnlyList<SuccessorLinkViewModel> Predecessors { get; init; }
     public required DataWithAvailability<string> DfENumber { get; init; }
     public required DataWithAvailability<string> Ukprn { get; init; }
 
@@ -80,6 +84,9 @@ public class SchoolDetailsViewModel
         {
             Urn = schoolDetails.Urn,
             Name = schoolDetails.Name,
+            ShowClosedSchoolBanner = schoolDetails.ShowClosedSchoolBanner,
+            Successors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors),
+            Predecessors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors),
             DfENumber = schoolDetails.DfENumber,
             Ukprn = schoolDetails.Ukprn,
             Address = schoolDetails.Address,
