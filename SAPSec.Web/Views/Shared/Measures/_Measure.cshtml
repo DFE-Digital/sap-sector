@@ -5,7 +5,7 @@
 <partial name="Measures/_Filters" model=@Model.MeasureInfo />
 
 <div id="@Model.MeasureInfo.HtmlPrefix">
-    <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix" year="@Model.MeasureInfo.Year">
+    <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
         <tab-content id="charts" name="Charts">
             <content-toggle>
                 <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)" active="true">
