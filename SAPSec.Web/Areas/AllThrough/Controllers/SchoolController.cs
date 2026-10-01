@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
+using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
@@ -32,6 +33,7 @@ public class SchoolController(
         IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
         IUseCase<GetAllThroughSimilarSchoolPhasesRequest, GetAllThroughSimilarSchoolPhasesResponse> getAllThroughSimilarSchoolPhasesUseCase,
+        IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
         IFeatureFlagService featureFlagService)
     : Controller
 {
@@ -150,8 +152,13 @@ public class SchoolController(
     [HttpGet]
     [RequireFeatureFlag(Flags.EnableRiseResources)]
     [Route("rise-resources")]
-    public Task<IActionResult> RiseResources(string urn) =>
-        HeadingPage(urn, PageTitles.RiseResources);
+    public async Task<IActionResult> RiseResources(string urn)
+    {
+        var response = await getRiseResourcesUseCase.Execute(new(urn));
+        await PopulateViewData(response.School);
+
+        return View(RiseResourcesPageViewModel.FromResponse(response));
+    }
 
     private async Task<IActionResult> HeadingPage(string urn, string title)
     {
