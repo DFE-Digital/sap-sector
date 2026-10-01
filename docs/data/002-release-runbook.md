@@ -11,6 +11,7 @@
 8. (update data pipeline to remove unneeded data - check with public team)
 
 ## Pre-release
+1. Edit workflows to skip enabling/disabling maintenance page on prod (identify + list)
 1. Enable maintenance page on prod
 2. Upload dummy data files to test blob storage
 3. Run data pipeline against test DB
@@ -29,5 +30,6 @@
 6. Upload backup file to prod (location)
 7. Restore backup file (workflow, filename)
 8. Disable maintenance page on prod
-9. Rename existing data files in prod blob storage
-10. Upload released data files to prod blob storage
+9. Edit workflows to reinstate enabling/disabling maintenance page on prod
+10. Rename existing data files in prod blob storage
+11. Upload released data files to prod blob storage
