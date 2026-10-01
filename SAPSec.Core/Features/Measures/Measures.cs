@@ -294,6 +294,33 @@ public static class Measures
                         ];
                     }
                 }
+
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks4EnglishMaths.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
             }
         }
 

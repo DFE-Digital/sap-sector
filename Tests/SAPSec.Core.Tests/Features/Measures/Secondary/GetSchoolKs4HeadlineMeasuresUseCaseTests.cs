@@ -2,6 +2,7 @@
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
 using static SAPSec.Core.Features.Measures.Measures.Secondary;
@@ -971,6 +972,146 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
     }
 
     [Fact]
+    public async Task EnglishMaths_ShouldContainPupilCharacteristicFilterWithAllPupilsSelectedByDefault()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Secondary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var filter = response.EnglishMaths.Filters
+            .Single(f => f.Key == Ks4EnglishMaths.Filters.PupilCharacteristic.Key);
+
+        filter.Name.Should().Be("Pupil characteristic");
+        filter.Options.Select(o => o.Name).Should().Equal(
+            "All pupils",
+            "Boys",
+            "Girls",
+            "Disadvantaged pupils",
+            "Non-disadvantaged pupils",
+            "English as an additional language",
+            "Non-mobile pupils");
+        filter.Options.Single(o => o.Selected).Key.Should().Be(Ks4EnglishMaths.Filters.PupilCharacteristic.Values.AllPupils);
+    }
+
+    [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade4AndAbove, Ks4EnglishMaths.Filters.PupilCharacteristic.Values.Boys, new[] { 44.0, 43.0, 42.0 }, new[] { 34.0, 33.0, 32.0 }, new[] { 54.0, 53.0, 52.0 }, new[] { 64.0, 63.0, 62.0 })]
+    [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade5AndAbove, Ks4EnglishMaths.Filters.PupilCharacteristic.Values.Girls, new[] { 55.0, 54.0, 53.0 }, new[] { 45.0, 44.0, 43.0 }, new[] { 65.0, 64.0, 63.0 }, new[] { 75.0, 74.0, 73.0 })]
+    [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade4AndAbove, Ks4EnglishMaths.Filters.PupilCharacteristic.Values.Disadvantaged, new[] { 46.0, 45.0, 44.0 }, new[] { 36.0, 35.0, 34.0 }, new[] { 56.0, 55.0, 54.0 }, new[] { 66.0, 65.0, 64.0 })]
+    [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade4AndAbove, Ks4EnglishMaths.Filters.PupilCharacteristic.Values.Eal, new[] { 48.0, 47.0, 46.0 }, new[] { 38.0, 37.0, 36.0 }, new[] { 58.0, 57.0, 56.0 }, new[] { 68.0, 67.0, 66.0 })]
+    [Theory]
+    public async Task EnglishMaths_FilterBy_PupilCharacteristic_ContainsYearByYearValuesForSelectedCharacteristic(
+        string grade,
+        string characteristic,
+        double[] currentSchool,
+        double[] similarSchools,
+        double[] la,
+        double[] england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            EnglishMathsCharacteristicsEstablishment("100001"),
+            EnglishMathsCharacteristicsEstablishment("100002", offset: -10),
+            EnglishMathsCharacteristicsEstablishment("100003", offset: -10));
+
+        _performanceRepo.SetupLAPerformance(
+            EnglishMathsCharacteristicsLA("001"));
+
+        _performanceRepo.SetupEnglandPerformance(
+            EnglishMathsCharacteristicsEngland());
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4EnglishMaths.Filters.Grade.Key] = grade,
+            [Ks4EnglishMaths.Filters.PupilCharacteristic.Key] = characteristic
+        }));
+
+        response.EnglishMaths.Series.Should().Equal([
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]),
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, (decimal?)similarSchools[0], (decimal?)similarSchools[1], (decimal?)similarSchools[2]),
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2])
+        ]);
+    }
+
+    [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade4AndAbove)]
+    [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade5AndAbove)]
+    [Theory]
+    public async Task EnglishMaths_FilterBy_NonMobile_ContainsSchoolValuesAndNullLocalAuthorityAndEnglandValues(string grade)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            EnglishMathsCharacteristicsEstablishment("100001"),
+            EnglishMathsCharacteristicsEstablishment("100002", offset: -10),
+            EnglishMathsCharacteristicsEstablishment("100003", offset: -10));
+
+        _performanceRepo.SetupLAPerformance(
+            EnglishMathsCharacteristicsLA("001"));
+
+        _performanceRepo.SetupEnglandPerformance(
+            EnglishMathsCharacteristicsEngland());
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4EnglishMaths.Filters.Grade.Key] = grade,
+            [Ks4EnglishMaths.Filters.PupilCharacteristic.Key] = Ks4EnglishMaths.Filters.PupilCharacteristic.Values.NonMobile
+        }));
+
+        var expectedCurrentSchool = grade == Ks4EnglishMaths.Filters.Grade.Values.Grade5AndAbove
+            ? new MeasureSeries(MeasureSeriesType.CurrentSchool, 59, 58, null)
+            : new MeasureSeries(MeasureSeriesType.CurrentSchool, 49, 48, null);
+        var expectedSimilarSchools = grade == Ks4EnglishMaths.Filters.Grade.Values.Grade5AndAbove
+            ? new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, 49, 48, null)
+            : new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, 39, 38, null);
+
+        response.EnglishMaths.Series.Should().Equal(
+            expectedCurrentSchool,
+            expectedSimilarSchools,
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task EnglishMaths_FilterBy_PupilCharacteristic_TopPerformersRanksBySelectedCharacteristic()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary()),
+            Build.Establishment("100004", "Test School 4", x => x.Secondary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003", "100004"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            new EstablishmentPerformance { Id = "100001", EngMaths49_Boy_Est_Current_Pct = "50" },
+            new EstablishmentPerformance { Id = "100002", EngMaths49_Boy_Est_Current_Pct = "80" },
+            new EstablishmentPerformance { Id = "100003", EngMaths49_Boy_Est_Current_Pct = "70" },
+            new EstablishmentPerformance { Id = "100004", EngMaths49_Boy_Est_Current_Pct = "90" });
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4EnglishMaths.Filters.PupilCharacteristic.Key] = Ks4EnglishMaths.Filters.PupilCharacteristic.Values.Boys
+        }));
+
+        response.EnglishMaths.TopPerformers.Should().NotBeNullOrEmpty();
+        response.EnglishMaths.TopPerformers!.Select(tp => tp.Urn).Should().Equal("100004", "100002", "100003");
+    }
+
+    [Fact]
     public async Task Destinations_ShouldContainExpectedMeasureSeries()
     {
         _establishmentRepo.SetupEstablishments(
@@ -1513,6 +1654,116 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
         topPerformers.Should().NotBeNullOrEmpty();
         topPerformers.Select(tp => tp.Urn).Should().Equal(expected);
     }
+
+    private static EstablishmentPerformance EnglishMathsCharacteristicsEstablishment(string urn, int offset = 0) =>
+        new()
+        {
+            Id = urn,
+            EngMaths49_Boy_Est_Current_Pct = $"{44 + offset}",
+            EngMaths49_Boy_Est_Previous_Pct = $"{43 + offset}",
+            EngMaths49_Boy_Est_Previous2_Pct = $"{42 + offset}",
+            EngMaths49_Grl_Est_Current_Pct = $"{45 + offset}",
+            EngMaths49_Grl_Est_Previous_Pct = $"{44 + offset}",
+            EngMaths49_Grl_Est_Previous2_Pct = $"{43 + offset}",
+            EngMaths49_Dis_Est_Current_Pct = $"{46 + offset}",
+            EngMaths49_Dis_Est_Previous_Pct = $"{45 + offset}",
+            EngMaths49_Dis_Est_Previous2_Pct = $"{44 + offset}",
+            EngMaths49_NDi_Est_Current_Pct = $"{47 + offset}",
+            EngMaths49_NDi_Est_Previous_Pct = $"{46 + offset}",
+            EngMaths49_EAL_Est_Current_Pct = $"{48 + offset}",
+            EngMaths49_EAL_Est_Previous_Pct = $"{47 + offset}",
+            EngMaths49_EAL_Est_Previous2_Pct = $"{46 + offset}",
+            EngMaths49_NMo_Est_Current_Pct = $"{49 + offset}",
+            EngMaths49_NMo_Est_Previous_Pct = $"{48 + offset}",
+            EngMaths59_Boy_Est_Current_Pct = $"{54 + offset}",
+            EngMaths59_Boy_Est_Previous_Pct = $"{53 + offset}",
+            EngMaths59_Boy_Est_Previous2_Pct = $"{52 + offset}",
+            EngMaths59_Grl_Est_Current_Pct = $"{55 + offset}",
+            EngMaths59_Grl_Est_Previous_Pct = $"{54 + offset}",
+            EngMaths59_Grl_Est_Previous2_Pct = $"{53 + offset}",
+            EngMaths59_Dis_Est_Current_Pct = $"{56 + offset}",
+            EngMaths59_Dis_Est_Previous_Pct = $"{55 + offset}",
+            EngMaths59_Dis_Est_Previous2_Pct = $"{54 + offset}",
+            EngMaths59_NDi_Est_Current_Pct = $"{57 + offset}",
+            EngMaths59_NDi_Est_Previous_Pct = $"{56 + offset}",
+            EngMaths59_EAL_Est_Current_Pct = $"{58 + offset}",
+            EngMaths59_EAL_Est_Previous_Pct = $"{57 + offset}",
+            EngMaths59_EAL_Est_Previous2_Pct = $"{56 + offset}",
+            EngMaths59_NMo_Est_Current_Pct = $"{59 + offset}",
+            EngMaths59_NMo_Est_Previous_Pct = $"{58 + offset}",
+        };
+
+    private static LAPerformance EnglishMathsCharacteristicsLA(string la) =>
+        new()
+        {
+            Id = la,
+            EngMaths49_Boy_LA_Current_Pct = "54",
+            EngMaths49_Boy_LA_Previous_Pct = "53",
+            EngMaths49_Boy_LA_Previous2_Pct = "52",
+            EngMaths49_Grl_LA_Current_Pct = "55",
+            EngMaths49_Grl_LA_Previous_Pct = "54",
+            EngMaths49_Grl_LA_Previous2_Pct = "53",
+            EngMaths49_Dis_LA_Current_Pct = "56",
+            EngMaths49_Dis_LA_Previous_Pct = "55",
+            EngMaths49_Dis_LA_Previous2_Pct = "54",
+            EngMaths49_NDi_LA_Current_Pct = "57",
+            EngMaths49_NDi_LA_Previous_Pct = "56",
+            EngMaths49_NDi_LA_Previous2_Pct = "55",
+            EngMaths49_EAL_LA_Current_Pct = "58",
+            EngMaths49_EAL_LA_Previous_Pct = "57",
+            EngMaths49_EAL_LA_Previous2_Pct = "56",
+            EngMaths59_Boy_LA_Current_Pct = "64",
+            EngMaths59_Boy_LA_Previous_Pct = "63",
+            EngMaths59_Boy_LA_Previous2_Pct = "62",
+            EngMaths59_Grl_LA_Current_Pct = "65",
+            EngMaths59_Grl_LA_Previous_Pct = "64",
+            EngMaths59_Grl_LA_Previous2_Pct = "63",
+            EngMaths59_Dis_LA_Current_Pct = "66",
+            EngMaths59_Dis_LA_Previous_Pct = "65",
+            EngMaths59_Dis_LA_Previous2_Pct = "64",
+            EngMaths59_NDi_LA_Current_Pct = "67",
+            EngMaths59_NDi_LA_Previous_Pct = "66",
+            EngMaths59_NDi_LA_Previous2_Pct = "65",
+            EngMaths59_EAL_LA_Current_Pct = "68",
+            EngMaths59_EAL_LA_Previous_Pct = "67",
+            EngMaths59_EAL_LA_Previous2_Pct = "66",
+        };
+
+    private static EnglandPerformance EnglishMathsCharacteristicsEngland() =>
+        new()
+        {
+            Id = "National",
+            EngMaths49_Boy_Eng_Current_Pct = "64",
+            EngMaths49_Boy_Eng_Previous_Pct = "63",
+            EngMaths49_Boy_Eng_Previous2_Pct = "62",
+            EngMaths49_Grl_Eng_Current_Pct = "65",
+            EngMaths49_Grl_Eng_Previous_Pct = "64",
+            EngMaths49_Grl_Eng_Previous2_Pct = "63",
+            EngMaths49_Dis_Eng_Current_Pct = "66",
+            EngMaths49_Dis_Eng_Previous_Pct = "65",
+            EngMaths49_Dis_Eng_Previous2_Pct = "64",
+            EngMaths49_NDi_Eng_Current_Pct = "67",
+            EngMaths49_NDi_Eng_Previous_Pct = "66",
+            EngMaths49_NDi_Eng_Previous2_Pct = "65",
+            EngMaths49_EAL_Eng_Current_Pct = "68",
+            EngMaths49_EAL_Eng_Previous_Pct = "67",
+            EngMaths49_EAL_Eng_Previous2_Pct = "66",
+            EngMaths59_Boy_Eng_Current_Pct = "74",
+            EngMaths59_Boy_Eng_Previous_Pct = "73",
+            EngMaths59_Boy_Eng_Previous2_Pct = "72",
+            EngMaths59_Grl_Eng_Current_Pct = "75",
+            EngMaths59_Grl_Eng_Previous_Pct = "74",
+            EngMaths59_Grl_Eng_Previous2_Pct = "73",
+            EngMaths59_Dis_Eng_Current_Pct = "76",
+            EngMaths59_Dis_Eng_Previous_Pct = "75",
+            EngMaths59_Dis_Eng_Previous2_Pct = "74",
+            EngMaths59_NDi_Eng_Current_Pct = "77",
+            EngMaths59_NDi_Eng_Previous_Pct = "76",
+            EngMaths59_NDi_Eng_Previous2_Pct = "75",
+            EngMaths59_EAL_Eng_Current_Pct = "78",
+            EngMaths59_EAL_Eng_Previous_Pct = "77",
+            EngMaths59_EAL_Eng_Previous2_Pct = "76",
+        };
 
     private GetSchoolKs4HeadlineMeasuresRequest Request(string urn, Dictionary<string, string>? filterBy = null) =>
             new(urn, filterBy ?? []);
