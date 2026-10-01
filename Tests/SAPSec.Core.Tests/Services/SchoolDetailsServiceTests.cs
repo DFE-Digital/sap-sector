@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
-using SAPSec.Core.Model;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
 
@@ -25,6 +25,8 @@ public class SchoolDetailsServiceTests
 
         _sut = new SchoolDetailsService(
             _establishmentRepository,
+            new SchoolClosureEligibilityService(_establishmentRepository, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
+            new SchoolPredecessorRelationshipService(_establishmentRepository, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
             _loggerMock.Object);
     }
 
@@ -57,6 +59,21 @@ public class SchoolDetailsServiceTests
         // Assert
         result.Urn.Should().Be("123456");
         result.Ukprn.Value.Should().Be("10012345");
+    }
+
+    [Fact]
+    public async Task GetByUrn_ValidUrn_MapsTypeOfEstablishmentCode()
+    {
+        // Arrange
+        _establishmentRepository
+            .SetupEstablishments(Build.Establishment("123456", "Test Academy", x => x
+                .WithTypeOfEstablishment("49", "Online provider")));
+
+        // Act
+        var result = await _sut.GetByUrnAsync("123456");
+
+        // Assert
+        result.TypeOfEstablishmentCode.Value.Should().Be("49");
     }
 
     [Fact]

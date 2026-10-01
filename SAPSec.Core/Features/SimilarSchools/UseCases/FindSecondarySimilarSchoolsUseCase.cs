@@ -1,10 +1,11 @@
-using SAPSec.Core.Extensions;
-using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Pagination;
+using SAPSec.Core.Collections;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
-using SAPSec.Core.Features.Sorting;
+using SAPSec.Core.Geography;
+using SAPSec.Core.Pagination;
+using SAPSec.Core.Sorting;
 using SAPSec.Core.UseCases;
+using SAPSec.Core.Validation;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -28,6 +29,8 @@ public class FindSecondarySimilarSchoolsUseCase(
 
         var data = await dataProvider.GetData(request.CurrentSchoolUrn);
         var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(data.CurrentSimilarSchool);
+
+        var hasSimilarSchools = data.SimilarSchools.Count > 0;
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
         var filters = new SimilarSchoolsFilters(filterBy, data.CurrentSimilarSchool);
@@ -58,6 +61,7 @@ public class FindSecondarySimilarSchoolsUseCase(
         var resultsPage = new PagedCollection<SimilarSchoolResult>(allResults, page, request.ResultsPerPage);
 
         return new(
+            hasSimilarSchools,
             currentSchoolInfo,
             sorting.GetPossibleOptions(sortBy).ToList().AsReadOnly(),
             filters.AsAvailableFilters(data.SimilarSchools, i => i.SimilarSchool),
@@ -76,6 +80,7 @@ public record FindSecondarySimilarSchoolsRequest(
     int ResultsPerPage = 10);
 
 public record FindSecondarySimilarSchoolsResponse(
+    bool HasSimilarSchools,
     SchoolInfo.SchoolInfo CurrentSchool,
     IReadOnlyCollection<SortOption> SortOptions,
     IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,

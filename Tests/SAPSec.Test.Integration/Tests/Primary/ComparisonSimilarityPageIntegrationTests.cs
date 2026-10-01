@@ -1,6 +1,6 @@
 using AngleSharp.Html.Dom;
 using FluentAssertions;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
@@ -17,7 +17,7 @@ public class ComparisonSimilarityPageIntegrationTests(
 {
     public override Task DisposeAsync()
     {
-        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnablePrimarySchools);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnablePrimarySchools);
 
         return base.DisposeAsync();
     }

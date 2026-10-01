@@ -73,8 +73,8 @@ public class EstablishmentExtensionsTests
     [Theory]
     [InlineData("1", true)]
     [InlineData("3", true)]
-    [InlineData("2", false)]
-    [InlineData("4", false)]
+    [InlineData("2", true)] // Closed with no known close date is treated as within the eligibility window
+    [InlineData("4", false)] // Proposed to open is unrelated to closure eligibility and always excluded
     public void CanSearch_UsesStatusId(string statusId, bool expected)
     {
         var result = new Establishment { PhaseOfEducationId = "4", EstablishmentStatusId = statusId }
@@ -84,13 +84,14 @@ public class EstablishmentExtensionsTests
     }
 
     [Theory]
-    [InlineData(true, "2")]
-    [InlineData(true, "4")]
-    [InlineData(false, "2")]
-    [InlineData(false, "4")]
-    public void CanSearch_WithSecondaryPhaseNameAndExcludedStatusId_ReturnsFalse(
+    [InlineData(true, "2", true)] // Closed, no known close date -> still eligible
+    [InlineData(true, "4", false)] // Proposed to open -> always excluded
+    [InlineData(false, "2", true)]
+    [InlineData(false, "4", false)]
+    public void CanSearch_WithSecondaryPhaseNameAndStatusId(
         bool primarySchoolsEnabled,
-        string statusId)
+        string statusId,
+        bool expected)
     {
         var result = new Establishment
         {
@@ -98,13 +99,13 @@ public class EstablishmentExtensionsTests
             EstablishmentStatusId = statusId
         }.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled: true);
 
-        result.Should().BeFalse();
+        result.Should().Be(expected);
     }
 
     [Theory]
     [InlineData("Open", true)]
     [InlineData("Open, but proposed to close", true)]
-    [InlineData("Closed", false)]
+    [InlineData("Closed", true)] // No known close date -> still eligible
     [InlineData("Proposed to open", false)]
     public void CanSearch_FallsBackToStatusName(string statusName, bool expected)
     {
@@ -112,6 +113,36 @@ public class EstablishmentExtensionsTests
             .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
 
         result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void CanSearch_ClosedSchoolWithinEligibilityWindow_ReturnsTrue()
+    {
+        var recentCloseDate = DateTime.UtcNow.AddYears(-1).ToString("dd-MM-yyyy");
+
+        var result = new Establishment
+        {
+            PhaseOfEducationId = "4",
+            EstablishmentStatusId = "2",
+            CloseDate = recentCloseDate
+        }.CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CanSearch_ClosedSchoolBeyondEligibilityWindow_ReturnsFalse()
+    {
+        var longAgoCloseDate = DateTime.UtcNow.AddYears(-5).ToString("dd-MM-yyyy");
+
+        var result = new Establishment
+        {
+            PhaseOfEducationId = "4",
+            EstablishmentStatusId = "2",
+            CloseDate = longAgoCloseDate
+        }.CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+
+        result.Should().BeFalse();
     }
 
     [Theory]

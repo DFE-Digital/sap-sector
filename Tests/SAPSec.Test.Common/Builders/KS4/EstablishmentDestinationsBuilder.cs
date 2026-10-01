@@ -10,6 +10,9 @@ public class EstablishmentDestinationsBuilder(string urn)
     string Education_Tot_Est_Current_Pct = string.Empty;
     string Education_Tot_Est_Previous_Pct = string.Empty;
     string Education_Tot_Est_Previous2_Pct = string.Empty;
+    string Apprentice_Tot_Est_Current_Pct = string.Empty;
+    string Apprentice_Tot_Est_Previous_Pct = string.Empty;
+    string Apprentice_Tot_Est_Previous2_Pct = string.Empty;
     string Employment_Tot_Est_Current_Pct = string.Empty;
     string Employment_Tot_Est_Previous_Pct = string.Empty;
     string Employment_Tot_Est_Previous2_Pct = string.Empty;
@@ -28,6 +31,15 @@ public class EstablishmentDestinationsBuilder(string urn)
         Education_Tot_Est_Current_Pct = current;
         Education_Tot_Est_Previous_Pct = prev;
         Education_Tot_Est_Previous2_Pct = prev2;
+
+        return this;
+    }
+
+    public EstablishmentDestinationsBuilder WithApprenticeships(string current, string prev, string prev2)
+    {
+        Apprentice_Tot_Est_Current_Pct = current;
+        Apprentice_Tot_Est_Previous_Pct = prev;
+        Apprentice_Tot_Est_Previous2_Pct = prev2;
 
         return this;
     }
@@ -51,6 +63,9 @@ public class EstablishmentDestinationsBuilder(string urn)
             Education_Tot_Est_Current_Pct = Education_Tot_Est_Current_Pct,
             Education_Tot_Est_Previous_Pct = Education_Tot_Est_Previous_Pct,
             Education_Tot_Est_Previous2_Pct = Education_Tot_Est_Previous2_Pct,
+            Apprentice_Tot_Est_Current_Pct = Apprentice_Tot_Est_Current_Pct,
+            Apprentice_Tot_Est_Previous_Pct = Apprentice_Tot_Est_Previous_Pct,
+            Apprentice_Tot_Est_Previous2_Pct = Apprentice_Tot_Est_Previous2_Pct,
             Employment_Tot_Est_Current_Pct = Employment_Tot_Est_Current_Pct,
             Employment_Tot_Est_Previous_Pct = Employment_Tot_Est_Previous_Pct,
             Employment_Tot_Est_Previous2_Pct = Employment_Tot_Est_Previous2_Pct,

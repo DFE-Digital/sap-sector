@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolDetails;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.Services;
 
@@ -27,6 +26,13 @@ public sealed class RequireSchoolPhaseFilter(
             var school = await requestSchoolAccessor.GetAsync(context.HttpContext, urn);
             if (!MatchesExpectedPhase(school, expectedPhase))
             {
+                if (school.IsAllThroughSchool()
+                    && !await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools))
+                {
+                    context.Result = new NotFoundResult();
+                    return;
+                }
+
                 context.Result = TryBuildRedirectResult(context, school);
                 return;
             }
@@ -57,13 +63,35 @@ public sealed class RequireSchoolPhaseFilter(
     private static bool MatchesExpectedPhase(SchoolDetails school, ExpectedSchoolPhase expectedPhase)
         => expectedPhase switch
         {
-            ExpectedSchoolPhase.Primary => school.IsPrimarySchool() || school.IsAllThroughSchool(),
+            ExpectedSchoolPhase.Primary => school.IsPrimarySchool() && !school.IsAllThroughSchool(),
             ExpectedSchoolPhase.Secondary => school.IsSecondarySchool(),
+            ExpectedSchoolPhase.AllThrough => school.IsAllThroughSchool(),
+            ExpectedSchoolPhase.PrimaryComparisonParticipant => school.IsPrimarySchool() || school.IsAllThroughSchool(),
+            ExpectedSchoolPhase.SecondaryComparisonParticipant => school.IsSecondarySchool() || school.IsAllThroughSchool(),
             _ => false
         };
 
     private async Task<bool> IsFeatureEnabledForSchoolAsync(SchoolDetails school, ExpectedSchoolPhase expectedPhase)
     {
+        if (expectedPhase == ExpectedSchoolPhase.AllThrough)
+        {
+            return await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools);
+        }
+
+        if (expectedPhase == ExpectedSchoolPhase.PrimaryComparisonParticipant)
+        {
+            return school.IsAllThroughSchool()
+                ? await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools)
+                : await featureFlagService.IsEnabledAsync(Flags.EnablePrimarySchools);
+        }
+
+        if (expectedPhase == ExpectedSchoolPhase.SecondaryComparisonParticipant)
+        {
+            return school.IsAllThroughSchool()
+                ? await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools)
+                : true;
+        }
+
         if (expectedPhase != ExpectedSchoolPhase.Primary)
         {
             return true;
@@ -71,12 +99,12 @@ public sealed class RequireSchoolPhaseFilter(
 
         if (school.IsAllThroughSchool())
         {
-            return await featureFlagService.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools);
+            return await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools);
         }
 
         if (school.IsPrimarySchool())
         {
-            return await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
+            return await featureFlagService.IsEnabledAsync(Flags.EnablePrimarySchools);
         }
 
         return true;
@@ -94,6 +122,14 @@ public sealed class RequireSchoolPhaseFilter(
                 school,
                 context.HttpContext.Request.PathBase,
                 out var canonicalPath))
+        {
+            return new NotFoundResult();
+        }
+
+        if (string.Equals(
+                canonicalPath,
+                context.HttpContext.Request.PathBase + context.HttpContext.Request.Path,
+                StringComparison.OrdinalIgnoreCase))
         {
             return new NotFoundResult();
         }

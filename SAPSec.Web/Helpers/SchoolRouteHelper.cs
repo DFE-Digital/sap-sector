@@ -16,6 +16,7 @@ public static class SchoolRouteHelper
 
         var relativePath = school switch
         {
+            _ when school.IsAllThroughSchool() => GetAllThroughPath(requestPath, school.Urn),
             _ when school.IsPrimarySchool() => GetPrimaryPath(requestPath, school.Urn),
             _ when school.IsSecondarySchool() => GetSecondaryPath(requestPath, school.Urn),
             _ => null
@@ -34,10 +35,18 @@ public static class SchoolRouteHelper
     private static string GetPrimaryPath(PathString requestPath, string urn)
         => (requestPath.Value ?? string.Empty)
             .Replace($"/school/{urn}", Routes.PrimarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase)
+            .Replace(Routes.AllThroughSchool(urn).Overview, Routes.PrimarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase)
             .Replace(Routes.SecondarySchool(urn).Overview, Routes.PrimarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase);
 
     private static string GetSecondaryPath(PathString requestPath, string urn)
         => (requestPath.Value ?? string.Empty)
             .Replace($"/school/{urn}", Routes.SecondarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase)
+            .Replace(Routes.AllThroughSchool(urn).Overview, Routes.SecondarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase)
             .Replace(Routes.PrimarySchool(urn).Overview, Routes.SecondarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase);
+
+    private static string GetAllThroughPath(PathString requestPath, string urn)
+        => (requestPath.Value ?? string.Empty)
+            .Replace($"/school/{urn}", Routes.AllThroughSchool(urn).Overview, StringComparison.OrdinalIgnoreCase)
+            .Replace(Routes.PrimarySchool(urn).Overview, Routes.AllThroughSchool(urn).Overview, StringComparison.OrdinalIgnoreCase)
+            .Replace(Routes.SecondarySchool(urn).Overview, Routes.AllThroughSchool(urn).Overview, StringComparison.OrdinalIgnoreCase);
 }

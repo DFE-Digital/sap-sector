@@ -55,6 +55,19 @@ public class SchoolSearchControllerTests
         Northing = 433200,
     };
 
+    private static Establishment FakeAllThroughEstablishment = new()
+    {
+        URN = "111111",
+        UKPRN = "12",
+        LAId = "102",
+        EstablishmentNumber = "3",
+        EstablishmentName = "Fake All-through Establishment",
+        PhaseOfEducationName = "All-through",
+        LAName = "Leeds",
+        Easting = 430300,
+        Northing = 433300,
+    };
+
     public SchoolSearchControllerTests()
     {
         _mockLogger = new Mock<ILogger<SchoolSearchController>>();
@@ -687,13 +700,7 @@ public class SchoolSearchControllerTests
     {
         var query = "School";
 
-        var allThroughSchool = SchoolSearchResult.FromNameAndEstablishment("All-through School", new Establishment
-        {
-            URN = "111111",
-            EstablishmentName = "All-through School",
-            PhaseOfEducationName = "All-through",
-            LAName = "Leeds"
-        });
+        var allThroughSchool = SchoolSearchResult.FromNameAndEstablishment("All-through School", FakeAllThroughEstablishment);
         var secondarySchool = SchoolSearchResult.FromNameAndEstablishment("Secondary School", new Establishment
         {
             URN = "222222",
@@ -710,7 +717,8 @@ public class SchoolSearchControllerTests
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         var model = viewResult.Model.Should().BeOfType<SchoolSearchResultsViewModel>().Subject;
         model.Results.Should().HaveCount(2);
-        model.Results.Select(x => x.SchoolName).Should().Contain(["All-through School", "Secondary School"]);
+        model.Results.Select(x => x.SchoolName).Should().Contain(["Fake All-through Establishment", "Secondary School"]);
+        model.Results.Single(x => x.SchoolName == "Fake All-through Establishment").SchoolUrl.Should().Be(Routes.AllThroughSchool("111111").Overview);
     }
 
     [Fact]

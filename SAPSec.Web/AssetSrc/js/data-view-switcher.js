@@ -144,7 +144,18 @@
             return "";
         }
 
-        return baseUrl.replace(/\/+$/, "") + "/" + encodeURIComponent(urn);
+        try {
+            var parsedUrl = new URL(baseUrl, window.location.origin);
+
+            if (parsedUrl.origin !== window.location.origin) {
+                return "";
+            }
+
+            parsedUrl.pathname = parsedUrl.pathname.replace(/\/+$/, "") + "/" + encodeURIComponent(urn);
+            return parsedUrl.toString();
+        } catch (error) {
+            return "";
+        }
     }
 
     function updateTopPerformers(tableBody, rows, baseUrl) {
@@ -167,14 +178,15 @@
             name.scope = "row";
             name.className = "govuk-table__header";
 
-            if (row.isCurrentSchool) {
-                name.textContent = row.name;
-            } else {
+            var href = row.isCurrentSchool ? "" : buildTopPerformerHref(baseUrl, row.urn);
+            if (href) {
                 var link = document.createElement("a");
                 link.className = "govuk-link";
-                link.href = buildTopPerformerHref(baseUrl, row.urn);
+                link.href = href;
                 link.textContent = row.name;
                 name.appendChild(link);
+            } else {
+                name.textContent = row.name;
             }
 
             var value = document.createElement("td");
