@@ -52,9 +52,10 @@ function initialiseToggle(toggle, activeIndex) {
         var activeName = activePanel.getAttribute("data-content-toggle-name") || "";
         var nextName = nextPanel.getAttribute("data-content-toggle-name") || "";
 
-        button.setAttribute("aria-description", index === 0
+        button.setAttribute("aria-label", index === 0
             ? "Show year by year line chart"
             : `Show ${nextName} bar charts`);
+
 
         panels.forEach(function (panel, panelIndex) {
             panel.classList.toggle("app-content-toggle__panel--active", panelIndex === index);
