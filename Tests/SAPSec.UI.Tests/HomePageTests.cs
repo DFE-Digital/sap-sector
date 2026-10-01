@@ -31,7 +31,7 @@ public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fi
 
         var title = await Page.TitleAsync();
 
-        title.Should().Contain("Get school improvement insights");
+        title.Should().Contain("Compare and connect with similar schools");
     }
 
     [Fact]

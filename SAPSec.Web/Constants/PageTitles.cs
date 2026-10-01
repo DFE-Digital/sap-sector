@@ -6,7 +6,7 @@ public static class PageTitles
     public const string TermsAndConditions = "Terms and conditions";
     public const string Cookies = "Cookies";
     public const string PrivacyPolicy = "Privacy Policy";
-    public const string ServiceHome = "Get school improvement insights";
+    public const string ServiceHome = "Compare and connect with similar schools";
     public const string ErrorNotFound = "Page not found";
     public const string ErrorProblem = "Sorry, there is a problem with the service";
     public const string ErrorAccessDenied = "Access denied";
