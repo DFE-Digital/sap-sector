@@ -38,7 +38,7 @@ public class SchoolSearchService(
         var allThroughSchoolsEnabled = await _featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
 
-        return school.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled)
+        return school.IsSearchable(primarySchoolsEnabled, allThroughSchoolsEnabled)
             ? school
             : null;
     }
@@ -69,7 +69,7 @@ public class SchoolSearchService(
                 continue;
             }
 
-            if (!r.School.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled))
+            if (!r.School.IsSearchable(primarySchoolsEnabled, allThroughSchoolsEnabled))
             {
                 continue;
             }

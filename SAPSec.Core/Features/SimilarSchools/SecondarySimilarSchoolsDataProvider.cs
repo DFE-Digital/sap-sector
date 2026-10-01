@@ -1,7 +1,6 @@
 using SAPSec.Core.Exceptions;
-using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
-using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Repositories;
 
@@ -52,7 +51,7 @@ internal class SecondarySimilarSchoolsDataProvider(
                     return null;
                 }
 
-                if (!IsSecondaryComparisonEstablishment(establishment))
+                if ((EducationStageHelper.FromEstablishment(establishment) | EducationStage.Secondary) == EducationStage.None)
                 {
                     return null;
                 }
@@ -71,40 +70,40 @@ internal class SecondarySimilarSchoolsDataProvider(
             similarSchools);
     }
 
-    private static bool IsSecondaryComparisonEstablishment(Establishment establishment)
-    {
-        if (PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName) ||
-            PhaseOfEducationValues.IsAllThrough(establishment.PhaseOfEducationName))
-        {
-            return true;
-        }
+    //private static bool IsSecondaryComparisonEstablishment(Establishment establishment)
+    //{
+    //    if (PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName) ||
+    //        PhaseOfEducationValues.IsAllThrough(establishment.PhaseOfEducationName))
+    //    {
+    //        return true;
+    //    }
 
-        if (PhaseOfEducationValues.IsPrimary(establishment.PhaseOfEducationName))
-        {
-            return false;
-        }
+    //    if (PhaseOfEducationValues.IsPrimary(establishment.PhaseOfEducationName))
+    //    {
+    //        return false;
+    //    }
 
-        if (!string.IsNullOrWhiteSpace(establishment.PhaseOfEducationName))
-        {
-            return true;
-        }
+    //    if (!string.IsNullOrWhiteSpace(establishment.PhaseOfEducationName))
+    //    {
+    //        return true;
+    //    }
 
-        var phaseOfEducationId = establishment.PhaseOfEducationId?.Trim();
-        if (string.IsNullOrWhiteSpace(phaseOfEducationId))
-        {
-            return true;
-        }
+    //    var phaseOfEducationId = establishment.PhaseOfEducationId?.Trim();
+    //    if (string.IsNullOrWhiteSpace(phaseOfEducationId))
+    //    {
+    //        return true;
+    //    }
 
-        return phaseOfEducationId switch
-        {
-            PhaseOfEducationValues.SecondaryId or
-            PhaseOfEducationValues.MiddleDeemedSecondaryId or
-            PhaseOfEducationValues.AllThroughId => true,
-            PhaseOfEducationValues.PrimaryId or
-            PhaseOfEducationValues.MiddleDeemedPrimaryId => false,
-            _ => true
-        };
-    }
+    //    return phaseOfEducationId switch
+    //    {
+    //        PhaseOfEducationValues.SecondaryId or
+    //        PhaseOfEducationValues.MiddleDeemedSecondaryId or
+    //        PhaseOfEducationValues.AllThroughId => true,
+    //        PhaseOfEducationValues.PrimaryId or
+    //        PhaseOfEducationValues.MiddleDeemedPrimaryId => false,
+    //        _ => true
+    //    };
+    //}
 }
 
 internal record SecondarySimilarSchoolsSourceData(

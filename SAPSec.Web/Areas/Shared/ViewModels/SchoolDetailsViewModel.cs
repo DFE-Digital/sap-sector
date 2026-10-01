@@ -1,5 +1,6 @@
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Web.ViewModels.Components;
 
 namespace SAPSec.Web.Areas.Shared.ViewModels;
@@ -16,9 +17,8 @@ public class SchoolDetailsViewModel
     public required DataWithAvailability<string> Ukprn { get; init; }
 
     // Location
-    public required DataWithAvailability<string> Address { get; init; }
-    public required DataWithAvailability<string> LocalAuthorityName { get; init; }
-    public required DataWithAvailability<string> LocalAuthorityCode { get; init; }
+    public required string? Address { get; init; }
+    public required LocalAuthority? LocalAuthority { get; init; }
     public required DataWithAvailability<string> Region { get; init; }
     public required DataWithAvailability<string> UrbanRuralDescription { get; init; }
 
@@ -27,8 +27,8 @@ public class SchoolDetailsViewModel
     public required DataWithAvailability<int> AgeRangeHigh { get; init; }
     public required DataWithAvailability<string> GenderOfEntry { get; init; }
     public required DataWithAvailability<string> PhaseOfEducation { get; init; }
-    public required bool IsPrimarySchool { get; init; }
-    public required bool IsAllThroughSchool { get; init; }
+    //public required bool IsPrimarySchool { get; init; }
+    //public required bool IsAllThroughSchool { get; init; }
     public required DataWithAvailability<string> SchoolType { get; init; }
     public required DataWithAvailability<string> TypeOfEstablishmentCode { get; init; }
     public required DataWithAvailability<string> AdmissionsPolicy { get; init; }
@@ -88,17 +88,16 @@ public class SchoolDetailsViewModel
             Predecessors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors),
             DfENumber = schoolDetails.DfENumber,
             Ukprn = schoolDetails.Ukprn,
-            Address = schoolDetails.Address,
-            LocalAuthorityName = schoolDetails.LocalAuthorityName,
-            LocalAuthorityCode = schoolDetails.LocalAuthorityCode,
+            Address = schoolDetails.Address?.ToString(),
+            LocalAuthority = schoolDetails.LocalAuthority,
             Region = schoolDetails.Region,
             UrbanRuralDescription = schoolDetails.UrbanRuralDescription,
             AgeRangeLow = schoolDetails.AgeRangeLow,
             AgeRangeHigh = schoolDetails.AgeRangeHigh,
             GenderOfEntry = schoolDetails.GenderOfEntry,
             PhaseOfEducation = schoolDetails.PhaseOfEducation,
-            IsPrimarySchool = schoolDetails.IsPrimarySchool(),
-            IsAllThroughSchool = schoolDetails.IsAllThroughSchool(),
+            //IsPrimarySchool = schoolDetails.IsPrimarySchool(),
+            //IsAllThroughSchool = schoolDetails.IsAllThroughSchool(),
             SchoolType = schoolDetails.SchoolType,
             TypeOfEstablishmentCode = schoolDetails.TypeOfEstablishmentCode,
             AdmissionsPolicy = schoolDetails.AdmissionsPolicy,
