@@ -6,7 +6,6 @@
     Layout = "~/Areas/Shared/Views/School/_Layout.cshtml";
     ViewData[ViewDataKeys.Title] = "View similar schools";
     ViewData[ViewDataKeys.PageTitle] = $"{Model.TotalResults} similar schools - {ViewData[ViewDataKeys.Title]}";
-    var hasVisibleResults = Model.SimilarSchools.Any();
 }
 
 <link rel="stylesheet" href="~/css/leaflet.css"/>
@@ -107,6 +106,7 @@
             }
     </div>
 </div>
+<partial name="_SimilarSchoolsContent" model="Model" />
 
 @section Scripts {
     <script src="~/js/similar-schools-filter.js"></script>

@@ -1,14 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Constants;
+using SAPSec.Core.Exceptions;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Components;
 
 namespace SAPSec.Web.Areas.Secondary.Controllers;
 
@@ -18,6 +20,7 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SimilarSchoolsController(
         IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse> findSimilarSchoolsUseCase,
+        IRequestSchoolAccessor requestSchoolAccessor,
         IFeatureFlagService featureFlagService) : Controller
 {
     [HttpGet]
@@ -35,7 +38,12 @@ public class SimilarSchoolsController(
             sortBy,
             page));
 
-        await PopulateViewData(response.CurrentSchool);
+        if (!response.HasSimilarSchools)
+        {
+            throw new NotFoundException($"School {urn} does not have any similar schools.");
+        }
+
+        await PopulateViewData(response.CurrentSchool, response.HasSimilarSchools);
 
         var viewModel = SimilarSchoolsPageViewModel.Build(
             "secondary",
@@ -54,15 +62,21 @@ public class SimilarSchoolsController(
         return View(viewModel);
     }
 
-    private async Task PopulateViewData(SchoolInfo currentSchool)
+    private async Task PopulateViewData(SchoolInfo currentSchool, bool hasSimilarSchools = true)
     {
         var includeRise = featureFlagService is not null
-            && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+            && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
+            hasSimilarSchools,
             includeRise);
+
+        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);
     }
 }

@@ -1,6 +1,6 @@
 using AngleSharp.Html.Dom;
 using FluentAssertions;
-using SAPSec.Core.Services.Helper;
+using SAPSec.Core.Text;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.FluentAssertions;

@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Interfaces.Services;
+﻿using SAPSec.Core.FeatureFlags;
 
 namespace SAPSec.Test.Common.FeatureFlags;
 

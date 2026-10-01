@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
-using SAPSec.Core;
+using SAPSec.Core.Exceptions;
 
 namespace SAPSec.Web.Middleware;
 

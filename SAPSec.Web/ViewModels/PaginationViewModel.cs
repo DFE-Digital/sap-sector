@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Pagination;
 
 namespace SAPSec.Web.ViewModels;
 public class PaginationViewModel

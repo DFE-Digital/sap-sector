@@ -1,6 +1,6 @@
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
-using SAPSec.Core.Model;
+using SAPSec.Web.ViewModels.Components;
 
 namespace SAPSec.Web.Areas.Shared.ViewModels;
 
@@ -9,6 +9,9 @@ public class SchoolDetailsViewModel
     // Identifiers
     public required string Urn { get; init; }
     public required string Name { get; init; }
+    public required bool ShowClosedSchoolBanner { get; init; }
+    public required IReadOnlyList<SuccessorLinkViewModel> Successors { get; init; }
+    public required IReadOnlyList<SuccessorLinkViewModel> Predecessors { get; init; }
     public required DataWithAvailability<string> DfENumber { get; init; }
     public required DataWithAvailability<string> Ukprn { get; init; }
 
@@ -25,7 +28,9 @@ public class SchoolDetailsViewModel
     public required DataWithAvailability<string> GenderOfEntry { get; init; }
     public required DataWithAvailability<string> PhaseOfEducation { get; init; }
     public required bool IsPrimarySchool { get; init; }
+    public required bool IsAllThroughSchool { get; init; }
     public required DataWithAvailability<string> SchoolType { get; init; }
+    public required DataWithAvailability<string> TypeOfEstablishmentCode { get; init; }
     public required DataWithAvailability<string> AdmissionsPolicy { get; init; }
     public required DataWithAvailability<string> ReligiousCharacter { get; init; }
 
@@ -46,11 +51,41 @@ public class SchoolDetailsViewModel
     public required DataWithAvailability<string> Telephone { get; init; }
     public required DataWithAvailability<string> Email { get; init; }
 
+    public bool HasAcademyTrust =>
+        AcademyTrustName.IsAvailable
+        && AcademyTrustId.IsAvailable;
+
+    public bool ShouldDisplayAcademyTrust =>
+        HasAcademyTrust
+        && (!IsAllThroughSchool
+            || (GovernanceStructure.IsAvailable
+                && GovernanceStructure.Value is GovernanceType.MultiAcademyTrust or GovernanceType.SingleAcademyTrust));
+
+    public string OfstedReportUrl
+    {
+        get
+        {
+            var providerId = IsAllThroughSchool
+                ? GetAllThroughOfstedProviderId()
+                : IsPrimarySchool ? "21" : "23";
+
+            return $"https://reports.ofsted.gov.uk/provider/{providerId}/{Urn}";
+        }
+    }
+
+    private string GetAllThroughOfstedProviderId() =>
+        TypeOfEstablishmentCode.IsAvailable && TypeOfEstablishmentCode.Value == "49"
+            ? "100003"
+            : "28";
+
     public static SchoolDetailsViewModel FromSchoolDetails(SchoolDetails schoolDetails) =>
         new()
         {
             Urn = schoolDetails.Urn,
             Name = schoolDetails.Name,
+            ShowClosedSchoolBanner = schoolDetails.ShowClosedSchoolBanner,
+            Successors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors),
+            Predecessors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors),
             DfENumber = schoolDetails.DfENumber,
             Ukprn = schoolDetails.Ukprn,
             Address = schoolDetails.Address,
@@ -63,7 +98,9 @@ public class SchoolDetailsViewModel
             GenderOfEntry = schoolDetails.GenderOfEntry,
             PhaseOfEducation = schoolDetails.PhaseOfEducation,
             IsPrimarySchool = schoolDetails.IsPrimarySchool(),
+            IsAllThroughSchool = schoolDetails.IsAllThroughSchool(),
             SchoolType = schoolDetails.SchoolType,
+            TypeOfEstablishmentCode = schoolDetails.TypeOfEstablishmentCode,
             AdmissionsPolicy = schoolDetails.AdmissionsPolicy,
             ReligiousCharacter = schoolDetails.ReligiousCharacter,
             GovernanceStructure = schoolDetails.GovernanceStructure,

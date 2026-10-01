@@ -4,12 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Authentication;
-using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using System.Security.Claims;
 
-namespace SAPSec.Web.Tests.Controllers;
+namespace SAPSec.Web.Tests.Deprecated.Controllers;
 
 public class UserControllerTests
 {
@@ -85,5 +84,33 @@ public class UserControllerTests
 
         var redirect = result.Should().BeOfType<RedirectResult>().Subject;
         redirect.Url.Should().Be(Routes.SecondarySchool("654321").Overview);
+    }
+
+    [Fact]
+    public async Task Index_WhenCurrentOrganisationIsAllThrough_RedirectsToAllThroughSchoolRoute()
+    {
+        var user = new User
+        {
+            Sub = "user-123",
+            Organisations = [new Organisation { Id = "org-3", Urn = "111111" }]
+        };
+        var organisation = new Organisation
+        {
+            Id = "org-3",
+            Name = "All-through School",
+            Category = new Category { Name = "Establishment" },
+            Urn = "111111",
+            PhaseOfEducation = new PhaseOfEducation { Name = "All-through" }
+        };
+
+        _userService.Setup(x => x.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
+            .ReturnsAsync(user);
+        _userService.Setup(x => x.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
+            .ReturnsAsync(organisation);
+
+        var result = await _controller.Index();
+
+        var redirect = result.Should().BeOfType<RedirectResult>().Subject;
+        redirect.Url.Should().Be(Routes.AllThroughSchool("111111").Overview);
     }
 }

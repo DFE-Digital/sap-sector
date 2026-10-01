@@ -1,21 +1,21 @@
-﻿@using SAPSec.Core.Model
-@using SAPSec.Web.Areas.Shared.ViewModels
+﻿
+@using SAPSec.Web.Areas.Shared.ViewModels.School
 @using SAPSec.Web.Constants;
-@using SAPSec.Web.Helpers
-@using SAPSec.Web.ViewModels
 
-@model SchoolInfoViewModel
+@model SchoolOverviewPageViewModel
 @{
     Layout = "_Layout.cshtml";
-    ViewData[ViewDataKeys.Title] = Model.Name;
+    ViewData[ViewDataKeys.Title] = Model.School.Name;
 } 
 
 <div class="app-overview">
     <header class="app-overview__header">
         <h1 class="govuk-heading-xl app-overview__title">@ViewData[ViewDataKeys.Title]</h1>
-        <p class="govuk-body-l app-overview__address">@Model.Address</p>
+        <p class="govuk-body-l app-overview__address">@Model.School.Address</p>
     </header>
 
+@if (Model.HasSimilarSchools)
+{
     <section class="app-overview__section">
         <p class="govuk-body app-overview__lead">
             We've identified <strong>50</strong> similar primary phase schools (including all-throughs) to help you:
@@ -31,7 +31,7 @@
             match every characteristic but they will be similar across a large number of them.
         </p>
         <p class="govuk-body">
-            Find out more about <a href="@Routes.PrimarySchool(Model.Urn).WhatIsASimilarSchool" class="govuk-link">how the DfE defines what a similar school is</a>.
+            Find out more about <a href="@Routes.PrimarySchool(Model.School.Urn).WhatIsASimilarSchool" class="govuk-link">how the DfE defines what a similar school is</a>.
         </p>
     </section>
 
@@ -55,4 +55,8 @@
             finding the right match, use their contact details to connect with them.
         </p>
     </section>
+} else
+{
+    <partial name="~/Areas/Shared/Views/SimilarSchools/_NoSimilarSchools.cshtml" />
+}
 </div>

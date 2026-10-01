@@ -1,5 +1,4 @@
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.CustomEvents;
 
 namespace SAPSec.Web.Services;
 

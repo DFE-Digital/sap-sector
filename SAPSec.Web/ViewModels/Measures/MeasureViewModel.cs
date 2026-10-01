@@ -22,12 +22,13 @@ public record MeasureViewModel(
     private static readonly string[] ComparisonCurrentYearColors = ["#ca357c", "#2a1950", "#2a1950"];
     private static readonly string[] ComparisonYearByYearColors = ["#ca357c", "#2a1950", "#4b9b7d"];
 
-    public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo)
+    public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.PrimarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
             SchoolCurrentYearColors,
-            SchoolYearByYearColors);
+            SchoolYearByYearColors,
+            hasSimilarSchools);
 
     public static MeasureViewModel FromPrimaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
@@ -36,12 +37,37 @@ public record MeasureViewModel(
             ComparisonCurrentYearColors,
             ComparisonYearByYearColors);
 
-    public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo)
+    public static MeasureViewModel FromAllThroughPrimaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
+        => FromMeasure(measure, schoolInfo, similarSchool,
+            urn => Routes.AllThroughSchool(urn).ViewSimilarSchools,
+            (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).PrimaryComparison(similarSchoolUrn).Similarity,
+            ComparisonCurrentYearColors,
+            ComparisonYearByYearColors,
+            englandSchoolsAverageLabel: "Primary schools in England average");
+
+    public static MeasureViewModel FromAllThroughPrimaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools)
+        => FromMeasure(measure, schoolInfo, null,
+            urn => Routes.AllThroughSchool(urn).ViewSimilarSchools,
+            (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).PrimaryComparison(similarSchoolUrn).Similarity,
+            SchoolCurrentYearColors,
+            SchoolYearByYearColors,
+            hasSimilarSchools);
+
+    public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
             SchoolCurrentYearColors,
-            SchoolYearByYearColors);
+            SchoolYearByYearColors,
+            hasSimilarSchools);
+
+    public static MeasureViewModel FromAllThroughSecondaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools)
+        => FromMeasure(measure, schoolInfo, null,
+            urn => $"{Routes.AllThroughSchool(urn).ViewSimilarSchools}?phase=secondary",
+            (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).SecondaryComparison(similarSchoolUrn).Similarity,
+            SchoolCurrentYearColors,
+            SchoolYearByYearColors,
+            hasSimilarSchools);
 
     public static MeasureViewModel FromSecondaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
@@ -50,6 +76,14 @@ public record MeasureViewModel(
             ComparisonCurrentYearColors,
             ComparisonYearByYearColors);
 
+    public static MeasureViewModel FromAllThroughSecondaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
+        => FromMeasure(measure, schoolInfo, similarSchool,
+            urn => $"{Routes.AllThroughSchool(urn).ViewSimilarSchools}?phase=secondary",
+            (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).SecondaryComparison(similarSchoolUrn).Similarity,
+            ComparisonCurrentYearColors,
+            ComparisonYearByYearColors,
+            englandSchoolsAverageLabel: "Secondary schools in England average");
+
     private static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,
@@ -57,7 +91,9 @@ public record MeasureViewModel(
         Func<string, string> viewSimilarSchoolsUrl,
         Func<string, string, string> similarSchoolComparisonUrl,
         string[] currentYearChartColors,
-        string[] yearByYearChartColors)
+        string[] yearByYearChartColors,
+        bool hasSimilarSchools = true,
+        string englandSchoolsAverageLabel = "Schools in England average")
     {
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
@@ -65,7 +101,7 @@ public record MeasureViewModel(
             measure.Year,
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
-            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool)),
+            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool, englandSchoolsAverageLabel)),
             measure.Series.Select(s => ResolveSeriesPointStyle(s.SeriesType)));
 
         decimal? MapCurrentYear(MeasureSeries series) =>
@@ -93,7 +129,7 @@ public record MeasureViewModel(
 
         TopPerformersViewModel? topPerformers = null;
 
-        if (measure.TopPerformers is not null)
+        if (measure.TopPerformers is not null && hasSimilarSchools)
         {
             TopPerformerViewModel MapTopPerformer(TopPerformer t) => new TopPerformerViewModel(
                 t.Rank,
@@ -117,7 +153,11 @@ public record MeasureViewModel(
             topPerformers);
     }
 
-    private static string ResolveSeriesLabel(MeasureSeriesType seriesType, SchoolInfo currentSchool, SchoolInfo? similarSchool = null) =>
+    private static string ResolveSeriesLabel(
+        MeasureSeriesType seriesType,
+        SchoolInfo currentSchool,
+        SchoolInfo? similarSchool = null,
+        string englandSchoolsAverageLabel = "Schools in England average") =>
        seriesType switch
        {
            MeasureSeriesType.CurrentSchool => currentSchool.Name,
@@ -125,7 +165,7 @@ public record MeasureViewModel(
                throw new InvalidOperationException($"Similar school required to resolve label for Measure Series Type: {Enum.GetName(seriesType)}"),
            MeasureSeriesType.SimilarSchoolsAverage => "Similar schools average",
            MeasureSeriesType.LASchoolsAverage => "Local authority schools average",
-           MeasureSeriesType.EnglandSchoolsAverage => "Schools in England average",
+           MeasureSeriesType.EnglandSchoolsAverage => englandSchoolsAverageLabel,
            _ => throw new InvalidOperationException($"No label found for Measure Series Type: {Enum.GetName(seriesType)}")
        };
 

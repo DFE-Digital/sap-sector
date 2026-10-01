@@ -313,12 +313,14 @@ public static class Measures
                     {
                         public const string AllDestinations = "all";
                         public const string Education = "ed";
+                        public const string Apprenticeships = "app";
                         public const string Employment = "emp";
 
                         public static readonly FilterValueDefinition[] AllValues = [
                             new(AllDestinations, "All destinations"),
                             new(Education, "Education"),
-                            new(Employment, "Employment and apprenticeships")
+                            new(Apprenticeships, "Apprenticeships"),
+                            new(Employment, "Employment")
                         ];
                     }
                 }
