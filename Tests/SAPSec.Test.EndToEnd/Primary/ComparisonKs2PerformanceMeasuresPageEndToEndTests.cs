@@ -36,7 +36,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     {
         await base.InitializeAsync();
         await NavigateTo(Routes.FindASchool());
-        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(CurrentSchoolUrn);
+        await Page.GetByLabel("Compare and connect with similar schools", new() { Exact = true }).FillAsync(CurrentSchoolUrn);
         await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Overview);
         await Page.GetByRole(AriaRole.Link, new() { Name = "View similar schools", Exact = true }).ClickAsync();

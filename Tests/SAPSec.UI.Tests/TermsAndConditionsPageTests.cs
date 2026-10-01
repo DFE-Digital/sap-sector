@@ -79,8 +79,8 @@ public class TermsAndConditionsPageTests(WebApplicationSetupFixture fixture) : B
     {
         await Page.GotoAsync(TermsAndConditionsPath);
 
-        // Verify "Get school improvement insights" is used consistently (as in CSHTML)
-        var serviceReference = Page.Locator("text=/Get school improvement insights/");
+        // Verify "Compare and connect with similar schools" is used consistently (as in CSHTML)
+        var serviceReference = Page.Locator("text=/Compare and connect with similar schools/");
         var count = await serviceReference.CountAsync();
 
         count.Should().BeGreaterThan(0);
@@ -104,7 +104,7 @@ public class TermsAndConditionsPageTests(WebApplicationSetupFixture fixture) : B
             "You must not attempt to gain unauthorised access",
             "You must not attack our site through a denial-of-service attack",
             "Each of these acts is a criminal offense",
-            "The Get school improvements insights service and content are provided 'as is' and 'as available'",
+            "The Compare and connect with similar schools service and content are provided 'as is' and 'as available'",
             "without warranty of any kind whether express or implied",
             "In no event will we be liable for any loss or damage including, without limitation, indirect or consequential loss or damage",
             "These terms and conditions shall be governed by and construed in accordance with the laws of England and Wales",
@@ -160,10 +160,10 @@ public class TermsAndConditionsPageTests(WebApplicationSetupFixture fixture) : B
         await Page.GotoAsync(TermsAndConditionsPath);
 
         // Verify the service name used in CSHTML matches the constant
-        var serviceReference = Page.Locator("text=/Get school improvement insights/");
+        var serviceReference = Page.Locator("text=/Compare and connect with similar schools/");
         var foundText = await serviceReference.First.TextContentAsync();
 
-        foundText.Should().Contain("Get school improvement insights");
+        foundText.Should().Contain("Compare and connect with similar schools");
     }
 
     #endregion
