@@ -25,7 +25,7 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
     {
         await base.InitializeAsync();
         await NavigateTo(Routes.FindASchool());
-        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(Urn);
+        await Page.GetByLabel("Compare and connect with similar schools", new() { Exact = true }).FillAsync(Urn);
         await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.Overview);
         await Page.GetByText("KS4 headline measures", new() { Exact = true }).ClickAsync();
