@@ -20,6 +20,8 @@ public class SchoolPagesAccessibilityTests(AccessibilityTestsFixture fixture) : 
         Routes.AllThroughSchool("100171").Overview,
         Routes.AllThroughSchool("100171").KS2,
         Routes.AllThroughSchool("100171").ViewSimilarSchools,
+        Routes.AllThroughSchool("100171").KS4HeadlineMeasures,
+        Routes.AllThroughSchool("100171").KS4CoreSubjects,
         Routes.SecondarySchool("100182").Overview,
         Routes.SecondarySchool("100182").KS4HeadlineMeasures,
         Routes.SecondarySchool("100182").KS4CoreSubjects,
