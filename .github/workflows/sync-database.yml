@@ -1,0 +1,447 @@
+name: Sync DB backup between environments
+
+on:
+  workflow_dispatch:
+    inputs:
+      source-environment:
+        description: Source environment to backup
+        required: true
+        default: test
+        type: choice
+        options:
+        - test
+        - production
+      target-environment:
+        description: Target environment to restore
+        required: true
+        default: production
+        type: choice
+        options:
+        - test
+        - production
+      exclude-tables:
+        description: Tables to exclude from backup (space-separated list, optional)
+        required: false
+        type: string
+        default: ""
+      confirm-production:
+        description: Must be set to true if restoring production
+        required: true
+        default: 'false'
+        type: choice
+        options:
+        - 'false'
+        - 'true'
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  SERVICE_NAME: get-school-improvement-insights
+  SERVICE_SHORT: sapsec
+  TF_VARS_PATH: terraform/application/config
+  POSTGRES_VERSION: 16
+
+jobs:
+  backup:
+    name: Backup database
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.source-environment }}
+    env:
+      DEPLOY_ENV: ${{ inputs.source-environment }}
+    outputs:
+      backup_file: ${{ steps.vars.outputs.backup_file }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+
+    - name: Setup postgres client
+      uses: DFE-Digital/github-actions/install-postgres-client@master
+      with:
+        version: ${{ env.POSTGRES_VERSION }}
+
+    - name: Install kubectl
+      uses: DFE-Digital/github-actions/set-kubectl@master
+
+    - uses: DFE-Digital/github-actions/set-kubelogin-environment@master
+      with:
+        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Configure environment
+      id: vars
+      shell: bash
+      env:
+        EXCLUDE_TABLES_INPUT: ${{ inputs.exclude-tables }}
+      run: |
+        set -euo pipefail
+
+        source "global_config/${DEPLOY_ENV}.sh"
+        tf_vars_file="${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json"
+
+        echo "CLUSTER=$(jq -r '.cluster' "${tf_vars_file}")" >> "$GITHUB_ENV"
+        echo "NAMESPACE=$(jq -r '.namespace' "${tf_vars_file}")" >> "$GITHUB_ENV"
+
+        today="$(TZ=Europe/London date +%F)"
+        backup_file="${SERVICE_SHORT}_${{ inputs.source-environment }}_${{ inputs.target-environment }}_${today}_${GITHUB_RUN_NUMBER}.dump"
+
+        echo "BACKUP_FILE=${backup_file}" >> "$GITHUB_ENV"
+        echo "backup_file=${backup_file}" >> "$GITHUB_OUTPUT"
+        echo "EXCLUDE_TABLES=${EXCLUDE_TABLES_INPUT}" >> "$GITHUB_ENV"
+
+    - name: Configure cluster connection
+      shell: bash
+      env:
+        AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
+        AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
+      run: |
+        set -euo pipefail
+        : "${AKS_RESOURCE_GROUP:?AKS_RESOURCE_GROUP is not set}"
+        : "${AKS_CLUSTER_NAME:?AKS_CLUSTER_NAME is not set}"
+
+        echo "CLUSTER_RG=${AKS_RESOURCE_GROUP}" >> "$GITHUB_ENV"
+        echo "CLUSTER_NAME=${AKS_CLUSTER_NAME}" >> "$GITHUB_ENV"
+
+    - name: Configure AKS access
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        az aks get-credentials \
+          --overwrite-existing \
+          --resource-group "$CLUSTER_RG" \
+          --name "$CLUSTER_NAME"
+
+        kubelogin convert-kubeconfig -l "$AAD_LOGIN_METHOD"
+
+        curl -fsSL \
+          https://raw.githubusercontent.com/DFE-Digital/teacher-services-cloud/main/scripts/konduit.sh \
+          -o konduit.sh
+
+        chmod +x konduit.sh
+
+    - name: Create backup with retry
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        if [[ -n "${NAMESPACE:-}" ]]; then
+          NAMESPACE_ARG="-n ${NAMESPACE}"
+        fi
+
+        EXCLUDE_OPTS=""
+        for table in ${EXCLUDE_TABLES}; do
+          [[ -z "$table" ]] && continue
+          EXCLUDE_OPTS="${EXCLUDE_OPTS} --exclude-table=${table}"
+        done
+
+        LOG_FILE="pg_dump.log"
+        MAX_ATTEMPTS=5
+
+        run_backup() {
+          local attempt=1
+          local delay=10
+
+          while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
+            echo "Backup attempt ${attempt}/${MAX_ATTEMPTS}"
+
+            set +e
+            ./konduit.sh \
+              ${NAMESPACE_ARG:-} \
+              -t 28800 \
+              -x "${SERVICE_NAME}-${DEPLOY_ENV}" \
+              -- pg_dump \
+                --format=custom \
+                --verbose \
+                --clean \
+                --if-exists \
+                --no-owner \
+                --no-acl \
+                ${EXCLUDE_OPTS} \
+                -f "${BACKUP_FILE}" \
+              2>&1 | tee "$LOG_FILE"
+
+            exit_code=${PIPESTATUS[0]}
+            set -e
+
+            if [ "$exit_code" -eq 0 ]; then
+              echo "Backup succeeded"
+              return 0
+            fi
+
+            if grep -Eqi "SSL error: unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|EOF detected|connection reset" "$LOG_FILE"; then
+              echo "Transient connection drop detected during backup. Retrying in ${delay}s."
+              sleep "$delay"
+              delay=$((delay * 2))
+              if [ "$delay" -gt 120 ]; then delay=120; fi
+              attempt=$((attempt + 1))
+            else
+              echo "Non-transient error during backup"
+              exit "$exit_code"
+            fi
+          done
+
+          echo "Backup failed after ${MAX_ATTEMPTS} attempts"
+          exit 1
+        }
+
+        run_backup
+
+    - name: Upload backup artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: postgres-backup
+        path: ${{ env.BACKUP_FILE }}
+        retention-days: 1
+
+    - name: Backup summary
+      if: success()
+      shell: bash
+      run: |
+        now="$(TZ=Europe/London date +"%F %R")"
+        {
+          echo "## Backup successful"
+          echo ""
+          echo "- Source: ${{ inputs.source-environment }}"
+          echo "- Target: ${{ inputs.target-environment }}"
+          echo "- File: ${BACKUP_FILE}"
+          echo "- At: ${now}"
+        } >> "$GITHUB_STEP_SUMMARY"
+
+  enable-maintenance:
+    name: Enable maintenance mode
+    if: ${{ inputs.target-environment != 'production' || (inputs.target-environment == 'production' && inputs.confirm-production == 'true') }}
+    uses: ./.github/workflows/toggle-maintenance-page.yml
+    needs: backup
+    with:
+      environment: ${{ inputs.target-environment }}
+      action: enable
+    secrets: inherit
+
+  restore:
+    name: Restore database
+    if: ${{ inputs.target-environment != 'production' || (inputs.target-environment == 'production' && inputs.confirm-production == 'true') }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target-environment }}
+    concurrency: deploy_${{ inputs.target-environment }}
+    needs:
+    - enable-maintenance
+    - backup
+    outputs:
+      db_usable: ${{ steps.dbcheck.outputs.db_usable }}
+
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout
+
+    - uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+
+    - name: Setup postgres client
+      uses: DFE-Digital/github-actions/install-postgres-client@master
+      with:
+        version: ${{ env.POSTGRES_VERSION }}
+
+    - name: Install kubectl
+      uses: DFE-Digital/github-actions/set-kubectl@master
+
+    - uses: DFE-Digital/github-actions/set-kubelogin-environment@master
+      with:
+        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Configure environment
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        source "global_config/${{ inputs.target-environment }}.sh"
+        tf_vars_file="${TF_VARS_PATH}/${{ inputs.target-environment }}.tfvars.json"
+
+        echo "CLUSTER=$(jq -r '.cluster' "${tf_vars_file}")" >> "$GITHUB_ENV"
+        echo "NAMESPACE=$(jq -r '.namespace' "${tf_vars_file}")" >> "$GITHUB_ENV"
+
+    - name: Configure cluster connection
+      shell: bash
+      env:
+        AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
+        AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
+      run: |
+        set -euo pipefail
+        : "${AKS_RESOURCE_GROUP:?AKS_RESOURCE_GROUP is not set}"
+        : "${AKS_CLUSTER_NAME:?AKS_CLUSTER_NAME is not set}"
+
+        echo "CLUSTER_RG=${AKS_RESOURCE_GROUP}" >> "$GITHUB_ENV"
+        echo "CLUSTER_NAME=${AKS_CLUSTER_NAME}" >> "$GITHUB_ENV"
+
+    - name: Configure AKS access
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        az aks get-credentials \
+          --overwrite-existing \
+          --resource-group "$CLUSTER_RG" \
+          --name "$CLUSTER_NAME"
+
+        kubelogin convert-kubeconfig -l "$AAD_LOGIN_METHOD"
+
+        curl -fsSL \
+          https://raw.githubusercontent.com/DFE-Digital/teacher-services-cloud/main/scripts/konduit.sh \
+          -o konduit.sh
+
+        chmod +x konduit.sh
+
+    - name: Download backup artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: postgres-backup
+        path: .
+
+    - name: Restore backup with retry
+      id: restore_run
+      shell: bash
+      continue-on-error: true
+      run: |
+        set -euo pipefail
+
+        BACKUP_FILE="${{ needs.backup.outputs.backup_file }}"
+
+        if [[ -n "${NAMESPACE:-}" ]]; then
+          NAMESPACE_ARG="-n ${NAMESPACE}"
+        fi
+
+        export PGOPTIONS='-c tcp_keepalives_idle=60 -c tcp_keepalives_interval=30 -c tcp_keepalives_count=10'
+
+        LOG_FILE="pg_restore.log"
+        MAX_ATTEMPTS=5
+
+        run_restore() {
+          local attempt=1
+          local delay=10
+
+          while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
+            echo "Restore attempt ${attempt}/${MAX_ATTEMPTS}"
+
+            set +e
+            ./konduit.sh \
+              ${NAMESPACE_ARG:-} \
+              -t 28800 \
+              -x "${SERVICE_NAME}-${{ inputs.target-environment }}" \
+              -- pg_restore \
+                --verbose \
+                --clean \
+                --if-exists \
+                --no-owner \
+                --no-acl \
+                --single-transaction \
+                --exit-on-error \
+                "${BACKUP_FILE}" \
+              2>&1 | tee "$LOG_FILE"
+
+            exit_code=${PIPESTATUS[0]}
+            set -e
+
+            if [ "$exit_code" -eq 0 ]; then
+              echo "Restore succeeded"
+              return 0
+            fi
+
+            if grep -Eqi "SSL error: unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|EOF detected|connection reset" "$LOG_FILE"; then
+              echo "Transient connection drop detected during restore. Retrying in ${delay}s."
+              sleep "$delay"
+              delay=$((delay * 2))
+              if [ "$delay" -gt 120 ]; then delay=120; fi
+              attempt=$((attempt + 1))
+            else
+              echo "Non-transient error during restore"
+              return "$exit_code"
+            fi
+          done
+
+          echo "Restore failed after ${MAX_ATTEMPTS} attempts"
+          return 1
+        }
+
+        run_restore
+
+    - name: Check database usability
+      id: dbcheck
+      if: always()
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        if [[ -n "${NAMESPACE:-}" ]]; then
+          NAMESPACE_ARG="-n ${NAMESPACE}"
+        fi
+
+        set +e
+        ./konduit.sh \
+          ${NAMESPACE_ARG:-} \
+          -t 300 \
+          -x "${SERVICE_NAME}-${{ inputs.target-environment }}" \
+          -- psql \
+            --set=ON_ERROR_STOP=1 \
+            --command="select 1;" \
+        >/tmp/dbcheck.log 2>&1
+        exit_code=$?
+        set -e
+
+        if [ "$exit_code" -eq 0 ]; then
+          echo "db_usable=true" >> "$GITHUB_OUTPUT"
+        else
+          cat /tmp/dbcheck.log
+          echo "db_usable=false" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Restore summary
+      if: always()
+      shell: bash
+      run: |
+        now="$(TZ=Europe/London date +"%F %R")"
+        {
+          if [[ "${{ steps.restore_run.outcome }}" == "success" ]]; then
+            echo "## Restore successful"
+          else
+            echo "## Restore failed"
+          fi
+          echo ""
+          echo "- Source: ${{ inputs.source-environment }}"
+          echo "- Target: ${{ inputs.target-environment }}"
+          echo "- Backup file restored: ${{ needs.backup.outputs.backup_file }}"
+          echo "- DB usable: ${{ steps.dbcheck.outputs.db_usable }}"
+          echo "- At: ${now}"
+        } >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Fail restore job when restore step failed
+      if: always()
+      shell: bash
+      run: |
+        if [[ "${{ steps.restore_run.outcome }}" != "success" ]]; then
+          echo "Restore failed. Marking job as failed after DB usability check and summary."
+          exit 1
+        fi
+
+  disable-maintenance:
+    name: Disable maintenance mode
+    if: ${{ always() && needs.restore.outputs.db_usable == 'true' }}
+    uses: ./.github/workflows/toggle-maintenance-page.yml
+    needs: restore
+    with:
+      environment: ${{ inputs.target-environment }}
+      action: disable
+    secrets: inherit
