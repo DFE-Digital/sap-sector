@@ -25,6 +25,9 @@ public class EstablishmentDestinations
     public string AllDest_Dis_Est_Previous_Pct { get; set; } = string.Empty;
     public string AllDest_Dis_Est_Previous2_Num { get; set; } = string.Empty;
     public string AllDest_Dis_Est_Previous2_Pct { get; set; } = string.Empty;
+    public string AllDest_EAL_Est_Current_Pct { get; set; } = string.Empty;
+    public string AllDest_EAL_Est_Previous_Pct { get; set; } = string.Empty;
+    public string AllDest_EAL_Est_Previous2_Pct { get; set; } = string.Empty;
     public string AllDest_Grl_Est_Current_Num { get; set; } = string.Empty;
     public string AllDest_Grl_Est_Current_Pct { get; set; } = string.Empty;
     public string AllDest_Grl_Est_Previous_Num { get; set; } = string.Empty;
@@ -55,6 +58,9 @@ public class EstablishmentDestinations
     public string Apprentice_Dis_Est_Previous_Pct { get; set; } = string.Empty;
     public string Apprentice_Dis_Est_Previous2_Num { get; set; } = string.Empty;
     public string Apprentice_Dis_Est_Previous2_Pct { get; set; } = string.Empty;
+    public string Apprentice_EAL_Est_Current_Pct { get; set; } = string.Empty;
+    public string Apprentice_EAL_Est_Previous_Pct { get; set; } = string.Empty;
+    public string Apprentice_EAL_Est_Previous2_Pct { get; set; } = string.Empty;
     public string Apprentice_Grl_Est_Current_Num { get; set; } = string.Empty;
     public string Apprentice_Grl_Est_Current_Pct { get; set; } = string.Empty;
     public string Apprentice_Grl_Est_Previous_Num { get; set; } = string.Empty;
@@ -85,6 +91,9 @@ public class EstablishmentDestinations
     public string Education_Dis_Est_Previous_Pct { get; set; } = string.Empty;
     public string Education_Dis_Est_Previous2_Num { get; set; } = string.Empty;
     public string Education_Dis_Est_Previous2_Pct { get; set; } = string.Empty;
+    public string Education_EAL_Est_Current_Pct { get; set; } = string.Empty;
+    public string Education_EAL_Est_Previous_Pct { get; set; } = string.Empty;
+    public string Education_EAL_Est_Previous2_Pct { get; set; } = string.Empty;
     public string Education_Grl_Est_Current_Num { get; set; } = string.Empty;
     public string Education_Grl_Est_Current_Pct { get; set; } = string.Empty;
     public string Education_Grl_Est_Previous_Num { get; set; } = string.Empty;
@@ -115,6 +124,9 @@ public class EstablishmentDestinations
     public string Employment_Dis_Est_Previous_Pct { get; set; } = string.Empty;
     public string Employment_Dis_Est_Previous2_Num { get; set; } = string.Empty;
     public string Employment_Dis_Est_Previous2_Pct { get; set; } = string.Empty;
+    public string Employment_EAL_Est_Current_Pct { get; set; } = string.Empty;
+    public string Employment_EAL_Est_Previous_Pct { get; set; } = string.Empty;
+    public string Employment_EAL_Est_Previous2_Pct { get; set; } = string.Empty;
     public string Employment_Grl_Est_Current_Num { get; set; } = string.Empty;
     public string Employment_Grl_Est_Current_Pct { get; set; } = string.Empty;
     public string Employment_Grl_Est_Previous_Num { get; set; } = string.Empty;

@@ -2,6 +2,7 @@
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Data.Dto.KS4.Destinations;
 using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
@@ -260,6 +261,108 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
     }
 
     [Fact]
+    public async Task Attainment8_ShouldContainPupilCharacteristicFilterWithAllPupilsSelectedByDefault()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Secondary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var filter = response.Attainment8.Filters
+            .Single(f => f.Key == Ks4Attainment8.Filters.PupilCharacteristic.Key);
+
+        filter.Name.Should().Be("Pupil characteristic");
+        filter.Options.Select(o => o.Name).Should().Equal(
+            "All pupils",
+            "Boys",
+            "Girls",
+            "Disadvantaged pupils",
+            "Non-disadvantaged pupils",
+            "English as an additional language",
+            "Non-mobile pupils");
+        filter.Options.Single(o => o.Selected).Key.Should().Be(Ks4Attainment8.Filters.PupilCharacteristic.Values.AllPupils);
+    }
+
+    [InlineData(Ks4Attainment8.Filters.PupilCharacteristic.Values.Boys, new[] { 44.0, 43.0, 42.0 }, new[] { 34.0, 33.0, 32.0 }, new[] { 54.0, 53.0, 52.0 }, new[] { 64.0, 63.0, 62.0 })]
+    [InlineData(Ks4Attainment8.Filters.PupilCharacteristic.Values.Girls, new[] { 45.0, 44.0, 43.0 }, new[] { 35.0, 34.0, 33.0 }, new[] { 55.0, 54.0, 53.0 }, new[] { 65.0, 64.0, 63.0 })]
+    [InlineData(Ks4Attainment8.Filters.PupilCharacteristic.Values.Disadvantaged, new[] { 46.0, 45.0, 44.0 }, new[] { 36.0, 35.0, 34.0 }, new[] { 56.0, 55.0, 54.0 }, new[] { 66.0, 65.0, 64.0 })]
+    [InlineData(Ks4Attainment8.Filters.PupilCharacteristic.Values.NonDisadvantaged, new[] { 47.0, 46.0, 45.0 }, new[] { 37.0, 36.0, 35.0 }, new[] { 57.0, 56.0, 55.0 }, new[] { 67.0, 66.0, 65.0 })]
+    [InlineData(Ks4Attainment8.Filters.PupilCharacteristic.Values.Eal, new[] { 48.0, 47.0, 46.0 }, new[] { 38.0, 37.0, 36.0 }, new[] { 58.0, 57.0, 56.0 }, new[] { 68.0, 67.0, 66.0 })]
+    [Theory]
+    public async Task Attainment8_FilterBy_PupilCharacteristic_ContainsYearByYearValuesForSelectedCharacteristic(
+        string characteristic,
+        double[] currentSchool,
+        double[] similarSchools,
+        double[] la,
+        double[] england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Attainment8CharacteristicsEstablishment("100001"),
+            Attainment8CharacteristicsEstablishment("100002", offset: -10),
+            Attainment8CharacteristicsEstablishment("100003", offset: -10));
+
+        _performanceRepo.SetupLAPerformance(
+            Attainment8CharacteristicsLA("001"));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Attainment8CharacteristicsEngland());
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4Attainment8.Filters.PupilCharacteristic.Key] = characteristic
+        }));
+
+        response.Attainment8.Series.Should().Equal([
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]),
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, (decimal?)similarSchools[0], (decimal?)similarSchools[1], (decimal?)similarSchools[2]),
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2])
+        ]);
+    }
+
+    [Fact]
+    public async Task Attainment8_FilterBy_NonMobile_ContainsSchoolValuesAndNullLocalAuthorityAndEnglandValues()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Attainment8CharacteristicsEstablishment("100001"),
+            Attainment8CharacteristicsEstablishment("100002", offset: -10),
+            Attainment8CharacteristicsEstablishment("100003", offset: -10));
+
+        _performanceRepo.SetupLAPerformance(
+            Attainment8CharacteristicsLA("001"));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Attainment8CharacteristicsEngland());
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4Attainment8.Filters.PupilCharacteristic.Key] = Ks4Attainment8.Filters.PupilCharacteristic.Values.NonMobile
+        }));
+
+        response.Attainment8.Series.Should().Equal(
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, 49, 48, 47),
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, 39, 38, 37),
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
     public async Task Attainment8_SimilarSchoolsAverage_WhenNoSimilarSchoolsForCurrentSchool_ContainsNullValues()
     {
         _establishmentRepo.SetupEstablishments(
@@ -457,6 +560,33 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
             new TopPerformer(2, "100002", "Test School 2", 104.2m, IsCurrentSchool: false),
             new TopPerformer(3, "100003", "Test School 3", 104.2m, IsCurrentSchool: false)
         ]);
+    }
+
+    [Fact]
+    public async Task Attainment8_FilterBy_PupilCharacteristic_TopPerformersRanksBySelectedCharacteristic()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary()),
+            Build.Establishment("100004", "Test School 4", x => x.Secondary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003", "100004"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            new EstablishmentPerformance { Id = "100001", Attainment8_Boy_Est_Current_Num = "50" },
+            new EstablishmentPerformance { Id = "100002", Attainment8_Boy_Est_Current_Num = "80" },
+            new EstablishmentPerformance { Id = "100003", Attainment8_Boy_Est_Current_Num = "70" },
+            new EstablishmentPerformance { Id = "100004", Attainment8_Boy_Est_Current_Num = "90" });
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4Attainment8.Filters.PupilCharacteristic.Key] = Ks4Attainment8.Filters.PupilCharacteristic.Values.Boys
+        }));
+
+        response.Attainment8.TopPerformers.Should().NotBeNullOrEmpty();
+        response.Attainment8.TopPerformers!.Select(tp => tp.Urn).Should().Equal("100004", "100002", "100003");
     }
 
     [Fact]
@@ -1481,6 +1611,103 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
         ]);
     }
 
+    [Fact]
+    public async Task Destinations_ShouldContainPupilCharacteristicFilterWithAllPupilsSelectedByDefault()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Secondary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var filter = response.Destinations.Filters
+            .Single(f => f.Key == Ks4Destinations.Filters.PupilCharacteristic.Key);
+
+        filter.Name.Should().Be("Pupil characteristic");
+        filter.Options.Select(o => o.Name).Should().Equal(
+            "All pupils",
+            "Boys",
+            "Girls",
+            "Disadvantaged pupils",
+            "Non-disadvantaged pupils",
+            "English as an additional language");
+        filter.Options.Single(o => o.Selected).Key.Should().Be(Ks4Destinations.Filters.PupilCharacteristic.Values.AllPupils);
+    }
+
+    [InlineData(Ks4Destinations.Filters.Destination.Values.AllDestinations, Ks4Destinations.Filters.PupilCharacteristic.Values.Boys, new[] { 44.0, 43.0, 42.0 }, new[] { 34.0, 33.0, 32.0 }, new[] { 54.0, 53.0, 52.0 }, new[] { 64.0, 63.0, 62.0 })]
+    [InlineData(Ks4Destinations.Filters.Destination.Values.Education, Ks4Destinations.Filters.PupilCharacteristic.Values.Girls, new[] { 145.0, 144.0, 143.0 }, new[] { 135.0, 134.0, 133.0 }, new[] { 155.0, 154.0, 153.0 }, new[] { 165.0, 164.0, 163.0 })]
+    [InlineData(Ks4Destinations.Filters.Destination.Values.Apprenticeships, Ks4Destinations.Filters.PupilCharacteristic.Values.Disadvantaged, new[] { 246.0, 245.0, 244.0 }, new[] { 236.0, 235.0, 234.0 }, new[] { 256.0, 255.0, 254.0 }, new[] { 266.0, 265.0, 264.0 })]
+    [InlineData(Ks4Destinations.Filters.Destination.Values.Employment, Ks4Destinations.Filters.PupilCharacteristic.Values.NonDisadvantaged, new[] { 347.0, 346.0, 345.0 }, new[] { 337.0, 336.0, 335.0 }, new[] { 357.0, 356.0, 355.0 }, new[] { 367.0, 366.0, 365.0 })]
+    [InlineData(Ks4Destinations.Filters.Destination.Values.AllDestinations, Ks4Destinations.Filters.PupilCharacteristic.Values.Eal, new[] { 48.0, 47.0, 46.0 }, new[] { 38.0, 37.0, 36.0 }, new[] { 58.0, 57.0, 56.0 }, new[] { 68.0, 67.0, 66.0 })]
+    [Theory]
+    public async Task Destinations_FilterBy_PupilCharacteristic_ContainsYearByYearValuesForSelectedCharacteristic(
+        string destination,
+        string characteristic,
+        double[] currentSchool,
+        double[] similarSchools,
+        double[] la,
+        double[] england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
+
+        _destinationsRepo.SetupEstablishmentDestinations(
+            DestinationsCharacteristicsEstablishment("100001"),
+            DestinationsCharacteristicsEstablishment("100002", offset: -10),
+            DestinationsCharacteristicsEstablishment("100003", offset: -10));
+
+        _destinationsRepo.SetupLADestinations(
+            DestinationsCharacteristicsLA("001"));
+
+        _destinationsRepo.SetupEnglandDestinations(
+            DestinationsCharacteristicsEngland());
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4Destinations.Filters.Destination.Key] = destination,
+            [Ks4Destinations.Filters.PupilCharacteristic.Key] = characteristic
+        }));
+
+        response.Destinations.Series.Should().Equal([
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]),
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, (decimal?)similarSchools[0], (decimal?)similarSchools[1], (decimal?)similarSchools[2]),
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2])
+        ]);
+    }
+
+    [Fact]
+    public async Task Destinations_FilterBy_PupilCharacteristic_TopPerformersRanksBySelectedCharacteristicAndDestination()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary()),
+            Build.Establishment("100004", "Test School 4", x => x.Secondary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003", "100004"]));
+
+        _destinationsRepo.SetupEstablishmentDestinations(
+            new EstablishmentDestinations { Id = "100001", Education_Boy_Est_Current_Pct = "50" },
+            new EstablishmentDestinations { Id = "100002", Education_Boy_Est_Current_Pct = "80" },
+            new EstablishmentDestinations { Id = "100003", Education_Boy_Est_Current_Pct = "70" },
+            new EstablishmentDestinations { Id = "100004", Education_Boy_Est_Current_Pct = "90" });
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4Destinations.Filters.Destination.Key] = Ks4Destinations.Filters.Destination.Values.Education,
+            [Ks4Destinations.Filters.PupilCharacteristic.Key] = Ks4Destinations.Filters.PupilCharacteristic.Values.Boys
+        }));
+
+        response.Destinations.TopPerformers.Should().NotBeNullOrEmpty();
+        response.Destinations.TopPerformers!.Select(tp => tp.Urn).Should().Equal("100004", "100002", "100003");
+    }
+
     [InlineData(Ks4Destinations.Filters.Destination.Values.Education)]
     [InlineData(Ks4Destinations.Filters.Destination.Values.Apprenticeships)]
     [InlineData(Ks4Destinations.Filters.Destination.Values.Employment)]
@@ -1654,6 +1881,189 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
         topPerformers.Should().NotBeNullOrEmpty();
         topPerformers.Select(tp => tp.Urn).Should().Equal(expected);
     }
+
+    private static EstablishmentDestinations DestinationsCharacteristicsEstablishment(string urn, int offset = 0) =>
+        new()
+        {
+            Id = urn,
+            AllDest_Boy_Est_Current_Pct = $"{44 + offset}",
+            AllDest_Boy_Est_Previous_Pct = $"{43 + offset}",
+            AllDest_Boy_Est_Previous2_Pct = $"{42 + offset}",
+            AllDest_Grl_Est_Current_Pct = $"{45 + offset}",
+            AllDest_Grl_Est_Previous_Pct = $"{44 + offset}",
+            AllDest_Grl_Est_Previous2_Pct = $"{43 + offset}",
+            AllDest_Dis_Est_Current_Pct = $"{46 + offset}",
+            AllDest_Dis_Est_Previous_Pct = $"{45 + offset}",
+            AllDest_Dis_Est_Previous2_Pct = $"{44 + offset}",
+            AllDest_NDi_Est_Current_Pct = $"{47 + offset}",
+            AllDest_NDi_Est_Previous_Pct = $"{46 + offset}",
+            AllDest_NDi_Est_Previous2_Pct = $"{45 + offset}",
+            AllDest_EAL_Est_Current_Pct = $"{48 + offset}",
+            AllDest_EAL_Est_Previous_Pct = $"{47 + offset}",
+            AllDest_EAL_Est_Previous2_Pct = $"{46 + offset}",
+            Education_Boy_Est_Current_Pct = $"{144 + offset}",
+            Education_Boy_Est_Previous_Pct = $"{143 + offset}",
+            Education_Boy_Est_Previous2_Pct = $"{142 + offset}",
+            Education_Grl_Est_Current_Pct = $"{145 + offset}",
+            Education_Grl_Est_Previous_Pct = $"{144 + offset}",
+            Education_Grl_Est_Previous2_Pct = $"{143 + offset}",
+            Education_Dis_Est_Current_Pct = $"{146 + offset}",
+            Education_Dis_Est_Previous_Pct = $"{145 + offset}",
+            Education_Dis_Est_Previous2_Pct = $"{144 + offset}",
+            Education_NDi_Est_Current_Pct = $"{147 + offset}",
+            Education_NDi_Est_Previous_Pct = $"{146 + offset}",
+            Education_NDi_Est_Previous2_Pct = $"{145 + offset}",
+            Education_EAL_Est_Current_Pct = $"{148 + offset}",
+            Education_EAL_Est_Previous_Pct = $"{147 + offset}",
+            Education_EAL_Est_Previous2_Pct = $"{146 + offset}",
+            Apprentice_Boy_Est_Current_Pct = $"{244 + offset}",
+            Apprentice_Boy_Est_Previous_Pct = $"{243 + offset}",
+            Apprentice_Boy_Est_Previous2_Pct = $"{242 + offset}",
+            Apprentice_Grl_Est_Current_Pct = $"{245 + offset}",
+            Apprentice_Grl_Est_Previous_Pct = $"{244 + offset}",
+            Apprentice_Grl_Est_Previous2_Pct = $"{243 + offset}",
+            Apprentice_Dis_Est_Current_Pct = $"{246 + offset}",
+            Apprentice_Dis_Est_Previous_Pct = $"{245 + offset}",
+            Apprentice_Dis_Est_Previous2_Pct = $"{244 + offset}",
+            Apprentice_NDi_Est_Current_Pct = $"{247 + offset}",
+            Apprentice_NDi_Est_Previous_Pct = $"{246 + offset}",
+            Apprentice_NDi_Est_Previous2_Pct = $"{245 + offset}",
+            Apprentice_EAL_Est_Current_Pct = $"{248 + offset}",
+            Apprentice_EAL_Est_Previous_Pct = $"{247 + offset}",
+            Apprentice_EAL_Est_Previous2_Pct = $"{246 + offset}",
+            Employment_Boy_Est_Current_Pct = $"{344 + offset}",
+            Employment_Boy_Est_Previous_Pct = $"{343 + offset}",
+            Employment_Boy_Est_Previous2_Pct = $"{342 + offset}",
+            Employment_Grl_Est_Current_Pct = $"{345 + offset}",
+            Employment_Grl_Est_Previous_Pct = $"{344 + offset}",
+            Employment_Grl_Est_Previous2_Pct = $"{343 + offset}",
+            Employment_Dis_Est_Current_Pct = $"{346 + offset}",
+            Employment_Dis_Est_Previous_Pct = $"{345 + offset}",
+            Employment_Dis_Est_Previous2_Pct = $"{344 + offset}",
+            Employment_NDi_Est_Current_Pct = $"{347 + offset}",
+            Employment_NDi_Est_Previous_Pct = $"{346 + offset}",
+            Employment_NDi_Est_Previous2_Pct = $"{345 + offset}",
+            Employment_EAL_Est_Current_Pct = $"{348 + offset}",
+            Employment_EAL_Est_Previous_Pct = $"{347 + offset}",
+            Employment_EAL_Est_Previous2_Pct = $"{346 + offset}",
+        };
+
+    private static LADestinations DestinationsCharacteristicsLA(string la) =>
+        new()
+        {
+            Id = la,
+            AllDest_Boy_LA_Current_Pct = "54",
+            AllDest_Boy_LA_Previous_Pct = "53",
+            AllDest_Boy_LA_Previous2_Pct = "52",
+            AllDest_Grl_LA_Current_Pct = "55",
+            AllDest_Grl_LA_Previous_Pct = "54",
+            AllDest_Grl_LA_Previous2_Pct = "53",
+            AllDest_Dis_LA_Current_Pct = "56",
+            AllDest_Dis_LA_Previous_Pct = "55",
+            AllDest_Dis_LA_Previous2_Pct = "54",
+            AllDest_NDi_LA_Current_Pct = "57",
+            AllDest_NDi_LA_Previous_Pct = "56",
+            AllDest_NDi_LA_Previous2_Pct = "55",
+            AllDest_EAL_LA_Current_Pct = "58",
+            AllDest_EAL_LA_Previous_Pct = "57",
+            AllDest_EAL_LA_Previous2_Pct = "56",
+            Education_Grl_LA_Current_Pct = "155",
+            Education_Grl_LA_Previous_Pct = "154",
+            Education_Grl_LA_Previous2_Pct = "153",
+            Apprentice_Dis_LA_Current_Pct = "256",
+            Apprentice_Dis_LA_Previous_Pct = "255",
+            Apprentice_Dis_LA_Previous2_Pct = "254",
+            Employment_NDi_LA_Current_Pct = "357",
+            Employment_NDi_LA_Previous_Pct = "356",
+            Employment_NDi_LA_Previous2_Pct = "355",
+        };
+
+    private static EnglandDestinations DestinationsCharacteristicsEngland() =>
+        new()
+        {
+            Id = "National",
+            AllDest_Boy_Eng_Current_Pct = "64",
+            AllDest_Boy_Eng_Previous_Pct = "63",
+            AllDest_Boy_Eng_Previous2_Pct = "62",
+            AllDest_EAL_Eng_Current_Pct = "68",
+            AllDest_EAL_Eng_Previous_Pct = "67",
+            AllDest_EAL_Eng_Previous2_Pct = "66",
+            Education_Grl_Eng_Current_Pct = "165",
+            Education_Grl_Eng_Previous_Pct = "164",
+            Education_Grl_Eng_Previous2_Pct = "163",
+            Apprentice_Dis_Eng_Current_Pct = "266",
+            Apprentice_Dis_Eng_Previous_Pct = "265",
+            Apprentice_Dis_Eng_Previous2_Pct = "264",
+            Employment_NDi_Eng_Current_Pct = "367",
+            Employment_NDi_Eng_Previous_Pct = "366",
+            Employment_NDi_Eng_Previous2_Pct = "365",
+        };
+
+    private static EstablishmentPerformance Attainment8CharacteristicsEstablishment(string urn, int offset = 0) =>
+        new()
+        {
+            Id = urn,
+            Attainment8_Boy_Est_Current_Num = $"{44 + offset}",
+            Attainment8_Boy_Est_Previous_Num = $"{43 + offset}",
+            Attainment8_Boy_Est_Previous2_Num = $"{42 + offset}",
+            Attainment8_Grl_Est_Current_Num = $"{45 + offset}",
+            Attainment8_Grl_Est_Previous_Num = $"{44 + offset}",
+            Attainment8_Grl_Est_Previous2_Num = $"{43 + offset}",
+            Attainment8_Dis_Est_Current_Num = $"{46 + offset}",
+            Attainment8_Dis_Est_Previous_Num = $"{45 + offset}",
+            Attainment8_Dis_Est_Previous2_Num = $"{44 + offset}",
+            Attainment8_NDi_Est_Current_Num = $"{47 + offset}",
+            Attainment8_NDi_Est_Previous_Num = $"{46 + offset}",
+            Attainment8_NDi_Est_Previous2_Num = $"{45 + offset}",
+            Attainment8_EAL_Est_Current_Num = $"{48 + offset}",
+            Attainment8_EAL_Est_Previous_Num = $"{47 + offset}",
+            Attainment8_EAL_Est_Previous2_Num = $"{46 + offset}",
+            Attainment8_NMo_Est_Current_Num = $"{49 + offset}",
+            Attainment8_NMo_Est_Previous_Num = $"{48 + offset}",
+            Attainment8_NMo_Est_Previous2_Num = $"{47 + offset}",
+        };
+
+    private static LAPerformance Attainment8CharacteristicsLA(string la) =>
+        new()
+        {
+            Id = la,
+            Attainment8_Boy_LA_Current_Num = "54",
+            Attainment8_Boy_LA_Previous_Num = "53",
+            Attainment8_Boy_LA_Previous2_Num = "52",
+            Attainment8_Grl_LA_Current_Num = "55",
+            Attainment8_Grl_LA_Previous_Num = "54",
+            Attainment8_Grl_LA_Previous2_Num = "53",
+            Attainment8_Dis_LA_Current_Num = "56",
+            Attainment8_Dis_LA_Previous_Num = "55",
+            Attainment8_Dis_LA_Previous2_Num = "54",
+            Attainment8_NDi_LA_Current_Num = "57",
+            Attainment8_NDi_LA_Previous_Num = "56",
+            Attainment8_NDi_LA_Previous2_Num = "55",
+            Attainment8_EAL_LA_Current_Num = "58",
+            Attainment8_EAL_LA_Previous_Num = "57",
+            Attainment8_EAL_LA_Previous2_Num = "56",
+        };
+
+    private static EnglandPerformance Attainment8CharacteristicsEngland() =>
+        new()
+        {
+            Id = "National",
+            Attainment8_Boy_Eng_Current_Num = "64",
+            Attainment8_Boy_Eng_Previous_Num = "63",
+            Attainment8_Boy_Eng_Previous2_Num = "62",
+            Attainment8_Grl_Eng_Current_Num = "65",
+            Attainment8_Grl_Eng_Previous_Num = "64",
+            Attainment8_Grl_Eng_Previous2_Num = "63",
+            Attainment8_Dis_Eng_Current_Num = "66",
+            Attainment8_Dis_Eng_Previous_Num = "65",
+            Attainment8_Dis_Eng_Previous2_Num = "64",
+            Attainment8_NDi_Eng_Current_Num = "67",
+            Attainment8_NDi_Eng_Previous_Num = "66",
+            Attainment8_NDi_Eng_Previous2_Num = "65",
+            Attainment8_EAL_Eng_Current_Num = "68",
+            Attainment8_EAL_Eng_Previous_Num = "67",
+            Attainment8_EAL_Eng_Previous2_Num = "66",
+        };
 
     private static EstablishmentPerformance EnglishMathsCharacteristicsEstablishment(string urn, int offset = 0) =>
         new()

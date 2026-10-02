@@ -5,6 +5,7 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
 using static SAPSec.Core.Features.Measures.Measures.Secondary;
+using KS4Performance = SAPSec.Data.Dto.KS4.Performance;
 
 namespace SAPSec.Core.Tests.Features.Measures.Secondary;
 
@@ -3813,6 +3814,146 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
         topPerformers.Select(tp => tp.Urn).Should().Equal(expected);
     }
 
-    private GetSchoolKs4CoreSubjectsMeasuresRequest Request(string urn, Dictionary<string, string>? filterBy = null) =>
-            new(urn, filterBy ?? []);
+    [Fact]
+    public async Task EnglishLanguage_WhenPupilCharacteristicFilterEnabled_ContainsExpectedFilterOptions()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Secondary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var characteristicFilter = response.EnglishLanguage.Filters
+            .Single(f => f.Key == Ks4EnglishLanguage.Filters.PupilCharacteristic.Key);
+
+        characteristicFilter.Name.Should().Be("Pupil characteristic");
+        characteristicFilter.Options.Select(o => o.Name).Should().Equal([
+            "All pupils",
+            "Boys",
+            "Girls",
+            "Disadvantaged pupils",
+            "Non-disadvantaged pupils",
+            "English as an additional language",
+            "Non-mobile pupils"
+        ]);
+        characteristicFilter.Options.Single(o => o.Selected).Key.Should()
+            .Be(Ks4EnglishLanguage.Filters.PupilCharacteristic.Values.AllPupils);
+    }
+
+    [Fact]
+    public async Task EnglishLanguage_WhenPupilCharacteristicFilterDisabled_DoesNotContainFilter()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Secondary()));
+
+        var response = await _sut.Execute(Request("100001", includePupilCharacteristicFilter: false));
+
+        response.EnglishLanguage.Filters
+            .Should().NotContain(f => f.Key == Ks4EnglishLanguage.Filters.PupilCharacteristic.Key);
+    }
+
+    [Theory]
+    [InlineData(Ks4EnglishLanguage.Filters.Grade.Values.Grade4AndAbove, new[] { 41.0, 40.0, 39.0 }, new[] { 43.0, 42.0, 41.0 }, new[] { 44.0, 43.0, 42.0 }, new[] { 45.0, 44.0, 43.0 })]
+    [InlineData(Ks4EnglishLanguage.Filters.Grade.Values.Grade5AndAbove, new[] { 51.0, 50.0, 49.0 }, new[] { 53.0, 52.0, 51.0 }, new[] { 54.0, 53.0, 52.0 }, new[] { 55.0, 54.0, 53.0 })]
+    [InlineData(Ks4EnglishLanguage.Filters.Grade.Values.Grade7AndAbove, new[] { 71.0, 70.0, 69.0 }, new[] { 73.0, 72.0, 71.0 }, new[] { 74.0, 73.0, 72.0 }, new[] { 75.0, 74.0, 73.0 })]
+    public async Task EnglishLanguage_FilterBy_PupilCharacteristicAndGrade_ContainsYearByYearValuesForSelectedCharacteristic(
+        string grade,
+        double[] currentSchool,
+        double[] similarSchools,
+        double[] la,
+        double[] england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            new KS4Performance.EstablishmentPerformance
+            {
+                Id = "100001",
+                EngLang49_Dis_Est_Current_Pct = "41", EngLang49_Dis_Est_Previous_Pct = "40", EngLang49_Dis_Est_Previous2_Pct = "39",
+                EngLang59_Dis_Est_Current_Pct = "51", EngLang59_Dis_Est_Previous_Pct = "50", EngLang59_Dis_Est_Previous2_Pct = "49",
+                EngLang79_Dis_Est_Current_Pct = "71", EngLang79_Dis_Est_Previous_Pct = "70", EngLang79_Dis_Est_Previous2_Pct = "69",
+            },
+            new KS4Performance.EstablishmentPerformance
+            {
+                Id = "100002",
+                EngLang49_Dis_Est_Current_Pct = "42", EngLang49_Dis_Est_Previous_Pct = "41", EngLang49_Dis_Est_Previous2_Pct = "40",
+                EngLang59_Dis_Est_Current_Pct = "52", EngLang59_Dis_Est_Previous_Pct = "51", EngLang59_Dis_Est_Previous2_Pct = "50",
+                EngLang79_Dis_Est_Current_Pct = "72", EngLang79_Dis_Est_Previous_Pct = "71", EngLang79_Dis_Est_Previous2_Pct = "70",
+            },
+            new KS4Performance.EstablishmentPerformance
+            {
+                Id = "100003",
+                EngLang49_Dis_Est_Current_Pct = "44", EngLang49_Dis_Est_Previous_Pct = "43", EngLang49_Dis_Est_Previous2_Pct = "42",
+                EngLang59_Dis_Est_Current_Pct = "54", EngLang59_Dis_Est_Previous_Pct = "53", EngLang59_Dis_Est_Previous2_Pct = "52",
+                EngLang79_Dis_Est_Current_Pct = "74", EngLang79_Dis_Est_Previous_Pct = "73", EngLang79_Dis_Est_Previous2_Pct = "72",
+            });
+
+        _performanceRepo.SetupLAPerformance(
+            new KS4Performance.LAPerformance
+            {
+                Id = "001",
+                EngLang49_Dis_LA_Current_Pct = "44", EngLang49_Dis_LA_Previous_Pct = "43", EngLang49_Dis_LA_Previous2_Pct = "42",
+                EngLang59_Dis_LA_Current_Pct = "54", EngLang59_Dis_LA_Previous_Pct = "53", EngLang59_Dis_LA_Previous2_Pct = "52",
+                EngLang79_Dis_LA_Current_Pct = "74", EngLang79_Dis_LA_Previous_Pct = "73", EngLang79_Dis_LA_Previous2_Pct = "72",
+            });
+
+        _performanceRepo.SetupEnglandPerformance(
+            new KS4Performance.EnglandPerformance
+            {
+                Id = "National",
+                EngLang49_Dis_Eng_Current_Pct = "45", EngLang49_Dis_Eng_Previous_Pct = "44", EngLang49_Dis_Eng_Previous2_Pct = "43",
+                EngLang59_Dis_Eng_Current_Pct = "55", EngLang59_Dis_Eng_Previous_Pct = "54", EngLang59_Dis_Eng_Previous2_Pct = "53",
+                EngLang79_Dis_Eng_Current_Pct = "75", EngLang79_Dis_Eng_Previous_Pct = "74", EngLang79_Dis_Eng_Previous2_Pct = "73",
+            });
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4EnglishLanguage.Filters.Grade.Key] = grade,
+            [Ks4EnglishLanguage.Filters.PupilCharacteristic.Key] = Ks4EnglishLanguage.Filters.PupilCharacteristic.Values.Disadvantaged
+        }));
+
+        response.EnglishLanguage.Series.Should().Equal([
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]),
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, (decimal?)similarSchools[0], (decimal?)similarSchools[1], (decimal?)similarSchools[2]),
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2])
+        ]);
+    }
+
+    [Fact]
+    public async Task EnglishLanguage_FilterBy_NonMobile_ContainsNullValuesForLocalAuthorityAndEngland()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            new KS4Performance.EstablishmentPerformance { Id = "100001", EngLang49_NMo_Est_Current_Pct = "40", EngLang49_NMo_Est_Previous_Pct = "39", EngLang49_NMo_Est_Previous2_Pct = "38" },
+            new KS4Performance.EstablishmentPerformance { Id = "100002", EngLang49_NMo_Est_Current_Pct = "42", EngLang49_NMo_Est_Previous_Pct = "41", EngLang49_NMo_Est_Previous2_Pct = "40" },
+            new KS4Performance.EstablishmentPerformance { Id = "100003", EngLang49_NMo_Est_Current_Pct = "44", EngLang49_NMo_Est_Previous_Pct = "43", EngLang49_NMo_Est_Previous2_Pct = "42" });
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4EnglishLanguage.Filters.PupilCharacteristic.Key] = Ks4EnglishLanguage.Filters.PupilCharacteristic.Values.NonMobile
+        }));
+
+        response.EnglishLanguage.Series.Should().Equal([
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, 40, 39, 38),
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, 43, 42, 41),
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null)
+        ]);
+    }
+
+    private GetSchoolKs4CoreSubjectsMeasuresRequest Request(string urn, Dictionary<string, string>? filterBy = null, bool includePupilCharacteristicFilter = true) =>
+            new(urn, filterBy ?? [], includePupilCharacteristicFilter);
 }

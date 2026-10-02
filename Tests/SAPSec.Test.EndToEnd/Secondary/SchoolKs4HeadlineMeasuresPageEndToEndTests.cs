@@ -57,6 +57,39 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
     }
 
     [Fact]
+    public async Task Attainment8_ChangePupilCharacteristicFilter()
+    {
+        var section = await GetSection(Attainment8HeaderText);
+        var filter = section.GetByRole(AriaRole.Combobox, new() { Name = "Pupil characteristic" });
+
+        await Expect(filter).ToHaveValueAsync("tot");
+        (await filter.Locator("option").AllTextContentsAsync()).Should().Equal(
+            "All pupils",
+            "Boys",
+            "Girls",
+            "Disadvantaged pupils",
+            "Non-disadvantaged pupils",
+            "English as an additional language",
+            "Non-mobile pupils");
+
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+
+        var table = section.GetByRole(AriaRole.Table);
+        await Expect(table).ToBeVisibleAsync();
+
+        var originalValues = await table.GetCells().AllTrimmedTextContentsAsync();
+
+        await filter.SelectOptionAsync("Boys");
+        await table.WaitForDomToStopChanging();
+
+        await Expect(filter).ToHaveValueAsync("boy");
+        await Expect(table).ToBeVisibleAsync();
+
+        var filteredValues = await table.GetCells().AllTrimmedTextContentsAsync();
+        filteredValues.Should().NotEqual(originalValues);
+    }
+
+    [Fact]
     public async Task Attainment8_ViewTopPerfomers()
     {
         var section = await GetSection(Attainment8HeaderText);
@@ -226,6 +259,38 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
         }
 
         subjectValues.Should().AllBeDifferent();
+    }
+
+    [Fact]
+    public async Task Destinations_ChangePupilCharacteristicFilter()
+    {
+        var section = await GetSection(DestinationsHeaderText);
+        var filter = section.GetByRole(AriaRole.Combobox, new() { Name = "Pupil characteristic" });
+
+        await Expect(filter).ToHaveValueAsync("tot");
+        (await filter.Locator("option").AllTextContentsAsync()).Should().Equal(
+            "All pupils",
+            "Boys",
+            "Girls",
+            "Disadvantaged pupils",
+            "Non-disadvantaged pupils",
+            "English as an additional language");
+
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+
+        var table = section.GetByRole(AriaRole.Table);
+        await Expect(table).ToBeVisibleAsync();
+
+        var originalValues = await table.GetCells().AllTrimmedTextContentsAsync();
+
+        await filter.SelectOptionAsync("Boys");
+        await table.WaitForDomToStopChanging();
+
+        await Expect(filter).ToHaveValueAsync("boy");
+        await Expect(table).ToBeVisibleAsync();
+
+        var filteredValues = await table.GetCells().AllTrimmedTextContentsAsync();
+        filteredValues.Should().NotEqual(originalValues);
     }
 
     private async Task<ILocator> GetSection(string headerText)
