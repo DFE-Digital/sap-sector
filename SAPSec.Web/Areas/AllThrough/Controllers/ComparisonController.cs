@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
@@ -20,7 +20,7 @@ namespace SAPSec.Web.Areas.AllThrough.Controllers;
 [Area("AllThrough")]
 [Route("school/all-through/{urn}/view-similar-schools")]
 [Authorize]
-[RequireFeatureFlag(FeatureFlags.EnableAllThroughSchools)]
+[RequireFeatureFlag(Flags.EnableAllThroughSchools)]
 [RequireSchoolPhase(ExpectedSchoolPhase.AllThrough, "urn")]
 public class ComparisonController(
     IUseCase<GetPrimaryComparisonSimilarityCharacteristicsRequest, GetPrimaryComparisonSimilarityCharacteristicsResponse> getPrimarySimilarityCharacteristicsUseCase,

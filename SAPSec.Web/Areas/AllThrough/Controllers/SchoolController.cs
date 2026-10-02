@@ -1,20 +1,21 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.AllThrough.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Components;
 using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.AllThrough.Controllers;
@@ -22,15 +23,16 @@ namespace SAPSec.Web.Areas.AllThrough.Controllers;
 [Area("AllThrough")]
 [Route("school/all-through/{urn}")]
 [Authorize]
-[RequireFeatureFlag(FeatureFlags.EnableAllThroughSchools)]
+[RequireFeatureFlag(Flags.EnableAllThroughSchools)]
 [RequireSchoolPhase(ExpectedSchoolPhase.AllThrough)]
 public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
+        IRequestSchoolAccessor requestSchoolAccessor,
         IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
-        IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getKs4HeadlineMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
         IUseCase<GetAllThroughSimilarSchoolPhasesRequest, GetAllThroughSimilarSchoolPhasesResponse> getAllThroughSimilarSchoolPhasesUseCase,
+        IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getKs4HeadlineMeasuresUseCase,
         IFeatureFlagService featureFlagService)
     : Controller
 {
@@ -163,7 +165,7 @@ public class SchoolController(
     }
 
     [HttpGet]
-    [RequireFeatureFlag(FeatureFlags.EnableRiseResources)]
+    [RequireFeatureFlag(Flags.EnableRiseResources)]
     [Route("rise-resources")]
     public Task<IActionResult> RiseResources(string urn) =>
         HeadingPage(urn, PageTitles.RiseResources);
@@ -181,12 +183,21 @@ public class SchoolController(
     {
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
         ViewData[ViewDataKeys.SchoolNavigation] = await CreateNavigation(currentSchool.Urn);
+
+        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);
     }
 
     private async Task PopulateViewData(SchoolDetails currentSchool)
     {
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
         ViewData[ViewDataKeys.SchoolNavigation] = await CreateNavigation(currentSchool.Urn);
+
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = currentSchool.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Predecessors);
     }
 
     private async Task<SchoolSideNavigationViewModel> CreateNavigation(string urn) =>
@@ -206,5 +217,5 @@ public class SchoolController(
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>
         featureFlagService is not null
-        && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+        && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 }

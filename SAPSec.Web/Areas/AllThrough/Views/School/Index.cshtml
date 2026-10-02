@@ -10,7 +10,7 @@
 <div class="app-overview">
     <header class="app-overview__header">
         <h1 class="govuk-heading-xl app-overview__title">@ViewData[ViewDataKeys.Title]</h1>
-        <p class="govuk-body-l app-overview__address">@Model.School.Address</p>
+        <p class="govuk-body app-overview__address">@Model.School.Address</p>
     </header>
 
     @if (Model.HasSimilarSchools)
@@ -20,14 +20,8 @@
                 For all-through schools or cross-phase middle schools, we identify:
             </p>
             <ul class="govuk-list govuk-list--bullet app-overview__list">
-                @if (Model.HasPrimarySimilarSchools)
-                {
-                    <li><strong>50</strong> primary schools, including all-throughs, similar to the school&rsquo;s primary phase</li>
-                }
-                @if (Model.HasSecondarySimilarSchools)
-                {
-                    <li><strong>50</strong> secondary schools, including all-throughs, similar to the school&rsquo;s secondary phase</li>
-                }
+                <li><strong>50</strong> primary schools, including all-throughs, similar to the school&rsquo;s primary phase</li>
+                <li><strong>50</strong> secondary schools, including all-throughs, similar to the school&rsquo;s secondary phase</li>
             </ul>
 
             <p class="govuk-body">Use this data to:</p>
@@ -38,7 +32,7 @@
             </ul>
 
             <p class="govuk-body">
-                We use 9 characteristics to find schools similar to yours. Similar schools will not
+                We use 9 characteristics to find similar schools. Similar schools will not
                 match every characteristic but they will be similar across a large number of them.
             </p>
             <p class="govuk-body">
@@ -78,20 +72,6 @@
     }
     else
     {
-        <section class="app-overview__section">
-            <h2 class="govuk-heading-m app-overview__section-heading">There are no similar schools available for this school</h2>
-            <p class="govuk-body">
-                DfE has not identified similar schools for this all-through school's primary or secondary phase.
-            </p>
-            <p class="govuk-body">
-                You can still use this service to view this school's performance data and compare it with:
-            </p>
-            <ul class="govuk-list govuk-list--bullet app-overview__list">
-                <li>the local authority primary average</li>
-                <li>the local authority secondary average</li>
-                <li>the national primary average</li>
-                <li>the national secondary average</li>
-            </ul>
-        </section>
+        <partial name="~/Areas/Shared/Views/SimilarSchools/_NoSimilarSchools.cshtml" />
     }
 </div>

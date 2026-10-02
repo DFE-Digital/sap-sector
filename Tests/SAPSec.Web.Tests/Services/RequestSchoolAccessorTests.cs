@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
-using SAPSec.Core.Model;
 using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Tests.Services;
@@ -81,6 +80,9 @@ public class RequestSchoolAccessorTests
         {
             Name = "Test School",
             Urn = urn,
+            ShowClosedSchoolBanner = false,
+            Successors = [],
+            Predecessors = [],
             DfENumber = DataWithAvailability.Available("123/4567"),
             Ukprn = DataWithAvailability.Available("10012345"),
             Address = DataWithAvailability.Available("1 Test Street"),

@@ -1,6 +1,6 @@
 ﻿using AngleSharp.Html.Dom;
 using FluentAssertions;
-using SAPSec.Core.Services.Helper;
+using SAPSec.Core.Text;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.FluentAssertions;
@@ -424,11 +424,11 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4DestinationsRepository.SetupEstablishmentDestinations(
-            Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "81", prev: "80", prev2: "79")),
-            Build.Ks4Destinations.Establishment("100002", x => x.WithAllDest(current: "71", prev: "70", prev2: "69")));
+            Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "81.1", prev: "80.5", prev2: "79.8")),
+            Build.Ks4Destinations.Establishment("100002", x => x.WithAllDest(current: "71.1", prev: "70.5", prev2: "69.8")));
 
         Fixture.Ks4DestinationsRepository.SetupEnglandDestinations(
-            Build.Ks4Destinations.England(x => x.WithAllDest(current: "101", prev: "100", prev2: "99")));
+            Build.Ks4Destinations.England(x => x.WithAllDest(current: "99.4", prev: "100.0", prev2: "99.2")));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
@@ -436,9 +436,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2020 to 2021", "2021 to 2022", "2022 to 2023"],
-            ["Test School 1", "79.0%", "80.0%", "81.0%"],
-            ["Test School 2", "69.0%", "70.0%", "71.0%"],
-            ["Schools in England average", "99.0%", "100.0%", "101.0%"]);
+            ["Test School 1", "79.8%", "80.5%", "81.1%"],
+            ["Test School 2", "71.1%", "70.5%", "69.8%"],
+            ["Schools in England average", "99.2%", "100.0%", "99.4%"]);
     }
 
     [Fact]
@@ -452,11 +452,11 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4DestinationsRepository.SetupEstablishmentDestinations(
-            Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "80.99", prev: "80.3", prev2: "78.9")),
+            Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "80.9", prev: "80.3", prev2: "78.9")),
             Build.Ks4Destinations.Establishment("100002", x => x.WithAllDest(current: "70.6", prev: "70.3", prev2: "69.1")));
 
         Fixture.Ks4DestinationsRepository.SetupEnglandDestinations(
-            Build.Ks4Destinations.England(x => x.WithAllDest(current: "101.31", prev: "99.52", prev2: "99.49")));
+            Build.Ks4Destinations.England(x => x.WithAllDest(current: "96.3", prev: "99.5", prev2: "99.9")));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
@@ -464,9 +464,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2020 to 2021", "2021 to 2022", "2022 to 2023"],
-            ["Test School 1", "78.9%", "80.3%", "81.0%"],
+            ["Test School 1", "78.9%", "80.3%", "80.9%"],
             ["Test School 2", "69.1%", "70.3%", "70.6%"],
-            ["Schools in England average", "99.5%", "99.5%", "101.3%"]);
+            ["Schools in England average", "99.9%", "99.5%", "96.3%"]);
     }
 
     [Fact]
@@ -537,9 +537,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         filter.ChildTrimmedTextContent().Should().Equal(["All destinations", "Education", "Apprenticeships", "Employment"]);
     }
 
-    [InlineData("Education", new[] { "70.0%", "71.0%", "72.0%" }, new[] { "69.0%", "70.0%", "71.0%" }, new[] { "72.0%", "73.0%", "74.0%" })]
-    [InlineData("Apprenticeships", new[] { "50.0%", "51.0%", "52.0%" }, new[] { "49.0%", "50.0%", "51.0%" }, new[] { "52.0%", "53.0%", "54.0%" })]
-    [InlineData("Employment", new[] { "60.0%", "61.0%", "62.0%" }, new[] { "59.0%", "60.0%", "61.0%" }, new[] { "62.0%", "63.0%", "64.0%" })]
+    [InlineData("Education", new[] { "70.2%", "71.3%", "72.1%" }, new[] { "69.4%", "70.5%", "71.6%" }, new[] { "72.7%", "73.8%", "74.9%" })]
+    [InlineData("Apprenticeships", new[] { "50.1%", "51.2%", "52.3%" }, new[] { "49.4%", "50.5%", "51.6%" }, new[] { "52.7%", "53.8%", "54.9%" })]
+    [InlineData("Employment", new[] { "60.1%", "61.2%", "62.3%" }, new[] { "59.4%", "60.5%", "61.6%" }, new[] { "62.7%", "63.8%", "64.9%" })]
     [Theory]
     public async Task Destinations_DestinationFilter_UpdatesTableViewWithSubjectValues(string filterOption, string[] currentSchool, string[] similarSchools, string[] england)
     {
@@ -552,19 +552,19 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
 
         Fixture.Ks4DestinationsRepository.SetupEstablishmentDestinations(
             Build.Ks4Destinations.Establishment("100001", x => x
-                .WithEducation(current: "72", prev: "71", prev2: "70")
-                .WithApprenticeships(current: "52", prev: "51", prev2: "50")
-                .WithEmployment(current: "62", prev: "61", prev2: "60")),
+                .WithEducation(current: "70.2", prev: "71.3", prev2: "72.1")
+                .WithApprenticeships(current: "50.1", prev: "51.2", prev2: "52.3")
+                .WithEmployment(current: "60.1", prev: "61.2", prev2: "62.3")),
             Build.Ks4Destinations.Establishment("100002", x => x
-                .WithEducation(current: "71", prev: "70", prev2: "69")
-                .WithApprenticeships(current: "51", prev: "50", prev2: "49")
-                .WithEmployment(current: "61", prev: "60", prev2: "59")));
+                .WithEducation(current: "69.4", prev: "70.5", prev2: "71.6")
+                .WithApprenticeships(current: "49.4", prev: "50.5", prev2: "51.6")
+                .WithEmployment(current: "59.4", prev: "60.5", prev2: "61.6")));
 
         Fixture.Ks4DestinationsRepository.SetupEnglandDestinations(
             Build.Ks4Destinations.England(x => x
-                .WithEducation(current: "74", prev: "73", prev2: "72")
-                .WithApprenticeships(current: "54", prev: "53", prev2: "52")
-                .WithEmployment(current: "64", prev: "63", prev2: "62")));
+                .WithEducation(current: "72.7", prev: "73.8", prev2: "74.9")
+                .WithApprenticeships(current: "52.7", prev: "53.8", prev2: "54.9")
+                .WithEmployment(current: "62.7", prev: "63.8", prev2: "64.9")));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 

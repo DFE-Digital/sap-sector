@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core;
-using SAPSec.Core.Constants;
+using SAPSec.Core.Exceptions;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Components;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
 
@@ -19,6 +20,7 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
 public class SimilarSchoolsController(
         IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findSimilarSchoolsUseCase,
+        IRequestSchoolAccessor requestSchoolAccessor,
         IFeatureFlagService featureFlagService)
     : Controller
 {
@@ -64,7 +66,7 @@ public class SimilarSchoolsController(
     private async Task PopulateViewData(SchoolInfo currentSchool, bool hasSimilarSchools = true)
     {
         var includeRise = featureFlagService is not null
-            && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+            && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,
@@ -72,5 +74,10 @@ public class SimilarSchoolsController(
             ControllerContext.ActionDescriptor.ActionName,
             hasSimilarSchools,
             includeRise);
+
+        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);
     }
 }

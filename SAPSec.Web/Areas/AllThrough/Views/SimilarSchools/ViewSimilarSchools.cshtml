@@ -60,28 +60,30 @@
         Find out <a href="@Model.WhatIsASimilarSchoolUrl" class="govuk-link">how DfE identifies what a similar school is</a>.
     </p>
 
-    <nav class="app-phase-tabs" aria-label="Similar school phase">
-        <ul class="app-phase-tabs__list" role="tablist">
-            <li class="app-phase-tabs__list-item @(Model.IsPrimarySelected ? "app-phase-tabs__list-item--selected" : string.Empty)" role="presentation">
-                <a class="app-phase-tabs__tab"
-                   href="@Model.PrimaryTabUrl"
-                   id="tab_primary"
-                   role="tab"
-                   aria-selected="@(Model.IsPrimarySelected ? "true" : "false")">
-                    Primary
-                </a>
-            </li>
-            <li class="app-phase-tabs__list-item @(!Model.IsPrimarySelected ? "app-phase-tabs__list-item--selected" : string.Empty)" role="presentation">
-                <a class="app-phase-tabs__tab"
-                   href="@Model.SecondaryTabUrl"
-                   id="tab_secondary"
-                   role="tab"
-                   aria-selected="@(!Model.IsPrimarySelected ? "true" : "false")">
-                    Secondary
-                </a>
-            </li>
-        </ul>
-    </nav>
+    <div class="govuk-service-navigation app-phase-tabs">
+        <div class="govuk-service-navigation__container">
+            <nav aria-label="Similar school phase" class="govuk-service-navigation__wrapper">
+                <ul class="govuk-service-navigation__list">
+                    <li class="govuk-service-navigation__item @(Model.IsPrimarySelected ? "govuk-service-navigation__item--active" : string.Empty)">
+                        <a class="govuk-service-navigation__link"
+                           href="@Model.PrimaryTabUrl"
+                           id="tab_primary"
+                           aria-current="@(Model.IsPrimarySelected ? "page" : null)">
+                            Primary
+                        </a>
+                    </li>
+                    <li class="govuk-service-navigation__item @(!Model.IsPrimarySelected ? "govuk-service-navigation__item--active" : string.Empty)">
+                        <a class="govuk-service-navigation__link"
+                           href="@Model.SecondaryTabUrl"
+                           id="tab_secondary"
+                           aria-current="@(!Model.IsPrimarySelected ? "page" : null)">
+                            Secondary
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>
 
 @if (selectedSimilarSchools is not null)

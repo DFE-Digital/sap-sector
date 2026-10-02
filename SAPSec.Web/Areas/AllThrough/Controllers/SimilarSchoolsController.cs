@@ -1,25 +1,23 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Constants;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.AllThrough.Services;
 using SAPSec.Web.Areas.AllThrough.ViewModels;
-using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.ViewModels;
+using SAPSec.Core.FeatureFlags;
 
 namespace SAPSec.Web.Areas.AllThrough.Controllers;
 
 [Area("AllThrough")]
 [Route("school/all-through/{urn}")]
 [Authorize]
-[RequireFeatureFlag(FeatureFlags.EnableAllThroughSchools)]
+[RequireFeatureFlag(Flags.EnableAllThroughSchools)]
 [RequireSchoolPhase(ExpectedSchoolPhase.AllThrough)]
 public class SimilarSchoolsController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
@@ -126,7 +124,7 @@ public class SimilarSchoolsController(
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>
         featureFlagService is not null
-        && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+        && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 
     private static string BuildSelectedPhaseViewSimilarSchoolsUrl(
         string urn,

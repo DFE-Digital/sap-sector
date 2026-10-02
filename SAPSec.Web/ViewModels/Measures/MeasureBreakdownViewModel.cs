@@ -10,20 +10,24 @@ public abstract record MeasureBreakdownViewModel(
        MeasureInfo.DataType switch
        {
            MeasureDataType.Score or MeasureDataType.ScaledScore => DisplayValue(value),
-           MeasureDataType.DestinationPercentage => DisplayPercent(value, 1),
+           MeasureDataType.DestinationsPercentage => DisplayPercent(value, 1),
            MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => DisplayPercent(value, 2),
-           _ => DisplayPercent(value, 0)
-       };
+           _ => DisplayWholePercent(value)
+       };           
 
     private static string DisplayValue(decimal? value) =>
         value.HasValue
             ? value.Value.ToString("0.0", CultureInfo.InvariantCulture)
             : "No available data";
 
-    public static string DisplayPercent(decimal? value, int decimalPlaces = 2) =>
+    public static string DisplayWholePercent(decimal? value, int decimalPlaces = 2) =>
         value.HasValue
-            ? Math.Round(value.Value, decimalPlaces, MidpointRounding.AwayFromZero)
-                .ToString(decimalPlaces == 0 ? "0" : $"0.{new string('0', decimalPlaces)}", CultureInfo.InvariantCulture) + "%"
+            ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture) + "%"
+            : "No available data";
+
+    public static string DisplayPercent(decimal? value, int decimalPlaces) =>
+        value.HasValue
+            ? value.Value.ToString($"F{decimalPlaces}", CultureInfo.InvariantCulture) + "%"
             : "No available data";
 }
  
