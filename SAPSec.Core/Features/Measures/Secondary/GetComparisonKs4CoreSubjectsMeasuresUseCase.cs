@@ -28,7 +28,8 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
             Ks4CoreSubjects.EnglishLanguage.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
-                filterBy),
+                filterBy,
+                request.IncludePupilCharacteristicFilter),
             Ks4CoreSubjects.EnglishLiterature.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
@@ -60,7 +61,8 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
 public record GetComparisonKs4CoreSubjectsMeasuresRequest(
     string CurrentSchoolUrn,
     string ComparatorSchoolUrn,
-    IDictionary<string, string>? FilterBy = null);
+    IDictionary<string, string>? FilterBy = null,
+    bool IncludePupilCharacteristicFilter = true);
 
 public record GetComparisonKs4CoreSubjectsMeasuresResponse(
     SchoolInfo.SchoolInfo CurrentSchool,

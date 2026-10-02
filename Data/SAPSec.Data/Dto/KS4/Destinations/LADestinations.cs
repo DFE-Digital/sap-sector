@@ -21,6 +21,9 @@ public class LADestinations
     public string AllDest_Dis_LA_Previous_Pct { get; set; } = string.Empty;
     public string AllDest_Dis_LA_Previous2_Num { get; set; } = string.Empty;
     public string AllDest_Dis_LA_Previous2_Pct { get; set; } = string.Empty;
+    public string AllDest_EAL_LA_Current_Pct { get; set; } = string.Empty;
+    public string AllDest_EAL_LA_Previous_Pct { get; set; } = string.Empty;
+    public string AllDest_EAL_LA_Previous2_Pct { get; set; } = string.Empty;
     public string AllDest_Grl_LA_Current_Num { get; set; } = string.Empty;
     public string AllDest_Grl_LA_Current_Pct { get; set; } = string.Empty;
     public string AllDest_Grl_LA_Previous_Num { get; set; } = string.Empty;
@@ -51,6 +54,9 @@ public class LADestinations
     public string Apprentice_Dis_LA_Previous_Pct { get; set; } = string.Empty;
     public string Apprentice_Dis_LA_Previous2_Num { get; set; } = string.Empty;
     public string Apprentice_Dis_LA_Previous2_Pct { get; set; } = string.Empty;
+    public string Apprentice_EAL_LA_Current_Pct { get; set; } = string.Empty;
+    public string Apprentice_EAL_LA_Previous_Pct { get; set; } = string.Empty;
+    public string Apprentice_EAL_LA_Previous2_Pct { get; set; } = string.Empty;
     public string Apprentice_Grl_LA_Current_Num { get; set; } = string.Empty;
     public string Apprentice_Grl_LA_Current_Pct { get; set; } = string.Empty;
     public string Apprentice_Grl_LA_Previous_Num { get; set; } = string.Empty;
@@ -81,6 +87,9 @@ public class LADestinations
     public string Education_Dis_LA_Previous_Pct { get; set; } = string.Empty;
     public string Education_Dis_LA_Previous2_Num { get; set; } = string.Empty;
     public string Education_Dis_LA_Previous2_Pct { get; set; } = string.Empty;
+    public string Education_EAL_LA_Current_Pct { get; set; } = string.Empty;
+    public string Education_EAL_LA_Previous_Pct { get; set; } = string.Empty;
+    public string Education_EAL_LA_Previous2_Pct { get; set; } = string.Empty;
     public string Education_Grl_LA_Current_Num { get; set; } = string.Empty;
     public string Education_Grl_LA_Current_Pct { get; set; } = string.Empty;
     public string Education_Grl_LA_Previous_Num { get; set; } = string.Empty;
@@ -111,6 +120,9 @@ public class LADestinations
     public string Employment_Dis_LA_Previous_Pct { get; set; } = string.Empty;
     public string Employment_Dis_LA_Previous2_Num { get; set; } = string.Empty;
     public string Employment_Dis_LA_Previous2_Pct { get; set; } = string.Empty;
+    public string Employment_EAL_LA_Current_Pct { get; set; } = string.Empty;
+    public string Employment_EAL_LA_Previous_Pct { get; set; } = string.Empty;
+    public string Employment_EAL_LA_Previous2_Pct { get; set; } = string.Empty;
     public string Employment_Grl_LA_Current_Num { get; set; } = string.Empty;
     public string Employment_Grl_LA_Current_Pct { get; set; } = string.Empty;
     public string Employment_Grl_LA_Previous_Num { get; set; } = string.Empty;
