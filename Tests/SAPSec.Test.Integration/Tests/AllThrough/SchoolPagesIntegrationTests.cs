@@ -2,6 +2,8 @@ using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using FluentAssertions;
 using SAPSec.Core.FeatureFlags;
+using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.FluentAssertions;
@@ -731,6 +733,150 @@ public class SchoolPagesIntegrationTests(
         homeBreadcrumb.GetAttribute("href").Should().Be(Routes.FindASchool());
     }
 
+    [Fact]
+    public async Task RiseResourcesPage_WhenEnableRiseResourcesFeatureFlagEnabled_RendersHeaderAndIntro()
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).RiseResources, HttpStatusCode.OK);
+
+        page.QuerySelector(".govuk-caption-xl")!.TrimmedTextContent().Should().Be("Test School 1");
+        page.QuerySelector("h1.govuk-heading-xl")!.TrimmedTextContent().Should().Be(PageTitles.RiseResources);
+        page.ElementWithTestIdShouldExist("rise-resources-intro")
+            .TrimmedTextContent()
+            .Should().Be("Use these resources from RISE to help improve your school’s performance.");
+    }
+
+    [Fact]
+    public async Task RiseResourcesPage_WhenEnableRiseResourcesFeatureFlagDisabled_ReturnsNotFound()
+    {
+        SetupAllThroughSchool();
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, false);
+
+        var response = await Fixture.Client.GetAsync(Routes.AllThroughSchool(Urn).RiseResources);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task RiseResourcesPage_WithNonExistentUrn_ReturnsNotFound()
+    {
+        SetupAllThroughSchool();
+
+        var response = await Fixture.Client.GetAsync(Routes.AllThroughSchool("999999").RiseResources);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task RiseResourcesPage_GroupsByCategoryThenSubCategory_WithContentsLinksDescriptionsAndAlphabeticalResources()
+    {
+        SetupAllThroughSchool();
+        Fixture.RiseResourcesRepository.SetupCategories(
+            Category("Performance and attendance", "About performance and attendance."),
+            Category("Wider school", "About the wider school."));
+        Fixture.RiseResourcesRepository.SetupResources(
+            Entry("Teaching maths fluency", "Wider school", "Curriculum and teaching", "All through"),
+            Entry("GCSE revision guidance", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
+            Entry("Phonics screening support", "Performance and attendance", "Literacy", PhaseOfEducationValues.Primary),
+            Entry("Cross-phase attendance guidance", "Performance and attendance", "Attendance", "All through"),
+            Entry("Pastoral support", "Pupil characteristics", "SEND", "All through"),
+            Entry("Post-16 guidance", "Performance and attendance", "Literacy", "16 plus"));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).RiseResources, HttpStatusCode.OK);
+
+        page.QuerySelectorAll("[data-testid='rise-resources-category']")
+            .Select(el => el.TrimmedTextContent())
+            .Should().Equal("Performance and attendance", "Wider school", "Pupil characteristics");
+
+        page.QuerySelectorAll("[data-testid='rise-resources-category-description']")
+            .Select(el => el.TrimmedTextContent())
+            .Should().Equal("About performance and attendance.", "About the wider school.");
+
+        var subCategoryHeadings = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']");
+        subCategoryHeadings.Select(el => el.TrimmedTextContent())
+            .Should().Equal("Literacy", "Attendance", "Curriculum and teaching", "SEND");
+        subCategoryHeadings[0].GetAttribute("id").Should().Be("literacy");
+        subCategoryHeadings[0].GetAttribute("tabindex").Should().Be("-1");
+
+        var contents = page.ElementWithTestIdShouldExist("rise-resources-contents");
+        contents.ClassList.Should().Contain("rise-resources-contents-list");
+        contents.QuerySelector("h2.rise-resources-contents-list__title")!.TrimmedTextContent().Should().Be("Contents");
+        contents.QuerySelectorAll(".rise-resources-contents-list__list > li").Should().OnlyContain(
+            li => li.ClassList.Contains("rise-resources-contents-list__list-item--dashed"));
+        contents.QuerySelectorAll("[aria-hidden='true']").Should().OnlyContain(
+            dash => dash.ClassList.Contains("rise-resources-contents-list__list-item-dash"));
+        contents.QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
+            .Should().Equal("Literacy", "Attendance", "Curriculum and teaching", "SEND");
+        contents.QuerySelector("a")!.GetAttribute("href").Should().Be("#literacy");
+
+        // Alphabetical within the sub-category; primary-only and secondary-only resources are both
+        // included for an all-through school, since it spans both phases.
+        var literacyList = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")
+            .First(heading => heading.TrimmedTextContent() == "Literacy")
+            .NextElementSibling;
+        literacyList!.QuerySelectorAll("[data-testid='rise-resource-title']")
+            .Select(el => el.TrimmedTextContent())
+            .Should().Equal("GCSE revision guidance", "Phonics screening support");
+
+        // "16 plus"-only resource doesn't apply to primary, secondary, or all-through, so it's excluded.
+        page.QuerySelectorAll("[data-testid='rise-resource-title']")
+            .Select(el => el.TrimmedTextContent())
+            .Should().NotContain("Post-16 guidance");
+
+        var link = literacyList.QuerySelector("a")!;
+        link.GetAttribute("href").Should().Be("https://example.gov.uk/gcse-revision-guidance");
+
+        // Resource links open in the current tab, not a new one.
+        link.GetAttribute("target").Should().BeNull();
+    }
+
+    [Fact]
+    public async Task RiseResourcesPage_OrdersSubCategorySectionsAndContentsBySubCategoryConfiguration()
+    {
+        SetupAllThroughSchool();
+        Fixture.RiseResourcesRepository.SetupCategories(
+            Category("Performance and attendance", "About performance.", "Literacy", "Maths", "Attendance"),
+            Category("Wider school", "About the wider school.", "Curriculum and teaching"));
+        Fixture.RiseResourcesRepository.SetupResources(
+            // Resource-file order is deliberately not the display order.
+            Entry("Maths guide", "Performance and attendance", "Maths", "All through"),
+            Entry("Attendance guide", "Performance and attendance", "Attendance", "All through"),
+            Entry("Literacy guide", "Performance and attendance", "Literacy", "All through"),
+            Entry("Leadership guide", "Wider school", "Leadership and training", "All through"),
+            Entry("Curriculum guide", "Wider school", "Curriculum and teaching", "All through"));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).RiseResources, HttpStatusCode.OK);
+
+        // Listed sub-categories in configured order; "Leadership and training" is unlisted so trails.
+        var expected = new[] { "Literacy", "Maths", "Attendance", "Curriculum and teaching", "Leadership and training" };
+
+        page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")
+            .Select(el => el.TrimmedTextContent())
+            .Should().Equal(expected);
+
+        page.ElementWithTestIdShouldExist("rise-resources-contents")
+            .QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
+            .Should().Equal(expected);
+    }
+
+    [Fact]
+    public async Task RiseResourcesPage_WhenNoResourcesMatchThePhase_ShowsEmptyState()
+    {
+        SetupAllThroughSchool();
+        Fixture.RiseResourcesRepository.SetupResources(
+            Entry("Post-16 guidance", "Performance and attendance", "Literacy", "16 plus"));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).RiseResources, HttpStatusCode.OK);
+
+        page.QuerySelectorAll("[data-testid='rise-resource']").Should().BeEmpty();
+        page.ElementWithTestIdShouldExist("rise-resources-empty");
+    }
+
     public static TheoryData<string, string, string> AllThroughPages => new()
     {
         { Routes.AllThroughSchool(Urn).Overview, "Test School 1", "Overview" },
@@ -831,4 +977,18 @@ public class SchoolPagesIntegrationTests(
 
     private static string NormaliseWhitespace(string value) =>
         string.Join(" ", value.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+
+    private static RiseResourceEntry Entry(string title, string category, string subCategory, params string[] phases) =>
+        new()
+        {
+            ResourceTitle = title,
+            ResourceDescription = $"{title} description",
+            ResourceUrl = $"https://example.gov.uk/{title.Replace(' ', '-').ToLowerInvariant()}",
+            Category = category,
+            SubCategory = subCategory,
+            SchoolPhases = phases
+        };
+
+    private static RiseResourceCategoryEntry Category(string name, string description, params string[] subCategories) =>
+        new() { Category = name, CategoryDescription = description, SubCategories = subCategories };
 }
