@@ -41,6 +41,7 @@ public class SchoolController(
         IFeatureFlagService featureFlagService)
     : Controller
 {
+    private const string SharedKs4HeadlineMeasuresView = "~/Areas/Shared/Views/School/Ks4HeadlineMeasures.cshtml";
     private const string SharedKs4CoreSubjectsView = "~/Areas/Shared/Views/School/Ks4CoreSubjects.cshtml";
 
     [HttpGet]
@@ -90,15 +91,17 @@ public class SchoolController(
 
         await PopulateViewData(response.School);
 
-        var model = new ViewModels.School.Ks4HeadlineMeasuresPageViewModel
+        var model = new Ks4HeadlineMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            WhatIsASimilarSchoolUrl = Routes.SecondarySchool(urn).WhatIsASimilarSchool,
+            SimilarSchoolDefinitionLinkText = "how DfE defines what a similar school is",
             Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School, similarSchoolsResponse.HasSimilarSchools),
             EnglishMaths = MeasureViewModel.FromSecondaryMeasure(response.EnglishMaths, response.School, similarSchoolsResponse.HasSimilarSchools),
             Destinations = MeasureViewModel.FromSecondaryMeasure(response.Destinations, response.School, similarSchoolsResponse.HasSimilarSchools)
         };
 
-        return View(model);
+        return View(SharedKs4HeadlineMeasuresView, model);
     }
 
     [HttpGet]

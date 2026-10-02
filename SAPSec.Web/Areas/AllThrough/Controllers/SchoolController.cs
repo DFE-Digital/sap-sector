@@ -39,6 +39,7 @@ public class SchoolController(
     : Controller
 {
     private const string SharedKs2PerformanceMeasuresView = "~/Areas/Shared/Views/School/Ks2PerformanceMeasures.cshtml";
+    private const string SharedKs4HeadlineMeasuresView = "~/Areas/Shared/Views/School/Ks4HeadlineMeasures.cshtml";
     private const string SharedKs4CoreSubjectsView = "~/Areas/Shared/Views/School/Ks4CoreSubjects.cshtml";
 
     [HttpGet]
@@ -94,12 +95,14 @@ public class SchoolController(
         var model = new Ks4HeadlineMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            WhatIsASimilarSchoolUrl = Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
+            SimilarSchoolDefinitionLinkText = "how DfE identifies what a similar school is",
             Attainment8 = MeasureViewModel.FromAllThroughSecondaryMeasure(response.Attainment8, response.School, hasSimilarSecondarySchools),
             EnglishMaths = MeasureViewModel.FromAllThroughSecondaryMeasure(response.EnglishMaths, response.School, hasSimilarSecondarySchools),
             Destinations = MeasureViewModel.FromAllThroughSecondaryMeasure(response.Destinations, response.School, hasSimilarSecondarySchools)
         };
 
-        return View(model);
+        return View(SharedKs4HeadlineMeasuresView, model);
     }
 
     [HttpGet]

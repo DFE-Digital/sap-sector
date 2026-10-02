@@ -6,7 +6,6 @@ using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
-using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
@@ -67,13 +66,16 @@ public class SchoolPagesIntegrationTests(
 
         lists.First().QuerySelectorAll("li")
             .Select(x => x.TextContent.Trim())
-            .Should().Equal("50 secondary schools, including all-throughs, similar to the school’s secondary phase");
+            .Should().Equal(
+                "50 primary schools, including all-throughs, similar to the school’s primary phase",
+                "50 secondary schools, including all-throughs, similar to the school’s secondary phase");
 
         lists.Skip(1).First().QuerySelectorAll("li")
             .Select(x => x.TextContent.Trim())
             .Should().Equal(
-                "50 primary schools, including all-throughs, similar to the school\u2019s primary phase",
-                "50 secondary schools, including all-throughs, similar to the school\u2019s secondary phase");
+                "compare performance data",
+                "find improvement opportunities",
+                "connect with school leaders and share insights");
 
         var link = page.QuerySelector(".app-overview a");
         link.Should().NotBeNull();
