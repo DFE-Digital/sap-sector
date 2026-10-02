@@ -50,6 +50,7 @@
         var title = document.createElement("h3");
         title.className = "govuk-heading-m app-content-toggle__title";
         title.textContent = primaryLabel;
+        title.id = "chart-title";
 
         var button = document.createElement("button");
         button.type = "button";
