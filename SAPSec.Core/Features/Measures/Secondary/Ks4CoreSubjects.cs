@@ -133,9 +133,9 @@ internal static class Ks4CoreSubjects
 
     public static class EnglishLiterature
     {
-        public static Measure ForSchool(SchoolMeasureData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolMeasureData<Ks4PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchool(SchoolMeasureData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolMeasureData<Ks4PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters, bool includePupilCharacteristicFilter = true)
         {
-            var (availableFilters, fieldSelector) = ResolveFilters(filters);
+            var (availableFilters, fieldSelector) = ResolveFilters(filters, includePupilCharacteristicFilter);
 
             return Measure.ForSchool(
                 Ks4EnglishLiterature.Key,
@@ -148,9 +148,9 @@ internal static class Ks4CoreSubjects
                 fieldSelector);
         }
 
-        public static Measure ForSchoolComparison(SchoolMeasureData<Ks4PerformanceData> currentSchool, SchoolMeasureData<Ks4PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolMeasureData<Ks4PerformanceData> currentSchool, SchoolMeasureData<Ks4PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters, bool includePupilCharacteristicFilter = true)
         {
-            var (availableFilters, fieldSelector) = ResolveFilters(filters);
+            var (availableFilters, fieldSelector) = ResolveFilters(filters, includePupilCharacteristicFilter);
 
             return Measure.ForSchoolComparison(
                 Ks4EnglishLiterature.Key,
@@ -163,13 +163,17 @@ internal static class Ks4CoreSubjects
                 fieldSelector);
         }
 
-        private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<Ks4PerformanceData> FieldSelector) ResolveFilters(CaseInsensitiveDictionary<string> filters)
+        private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<Ks4PerformanceData> FieldSelector) ResolveFilters(CaseInsensitiveDictionary<string> filters, bool includePupilCharacteristicFilter)
         {
             var grade = filters.ContainsKey(Ks4EnglishLiterature.Filters.Grade.Key)
                 ? filters[Ks4EnglishLiterature.Filters.Grade.Key]
                 : Ks4EnglishLiterature.Filters.Grade.Values.Grade4AndAbove;
 
-            IEnumerable<MeasureAvailableFilter> availableFilters = [
+            var characteristic = includePupilCharacteristicFilter && filters.ContainsKey(Ks4EnglishLiterature.Filters.PupilCharacteristic.Key)
+                ? filters[Ks4EnglishLiterature.Filters.PupilCharacteristic.Key]
+                : Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.AllPupils;
+
+            List<MeasureAvailableFilter> availableFilters = [
                 new MeasureAvailableFilter(
                     Ks4EnglishLiterature.Filters.Grade.Key,
                     Ks4EnglishLiterature.Filters.Grade.Name,
@@ -178,43 +182,75 @@ internal static class Ks4CoreSubjects
                     .ToList())
             ];
 
-            MeasureFieldSelector<Ks4PerformanceData> fieldSelector = grade switch
+            if (includePupilCharacteristicFilter)
             {
-                _ when grade.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.Grade.Values.Grade5AndAbove) => new(
-                    x => x?.EstablishmentPerformance?.EngLit59_Sum_Est_Current_Pct,
-                    x => x?.EstablishmentPerformance?.EngLit59_Sum_Est_Previous_Pct,
-                    x => x?.EstablishmentPerformance?.EngLit59_Sum_Est_Previous2_Pct,
-                    x => x?.LocalAuthorityPerformance?.EngLit59_Tot_LA_Current_Pct,
-                    x => x?.LocalAuthorityPerformance?.EngLit59_Tot_LA_Previous_Pct,
-                    x => x?.LocalAuthorityPerformance?.EngLit59_Tot_LA_Previous2_Pct,
-                    x => x?.EnglandPerformance?.EngLit59_Tot_Eng_Current_Pct,
-                    x => x?.EnglandPerformance?.EngLit59_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.EngLit59_Tot_Eng_Previous2_Pct),
+                availableFilters.Add(new MeasureAvailableFilter(
+                    Ks4EnglishLiterature.Filters.PupilCharacteristic.Key,
+                    Ks4EnglishLiterature.Filters.PupilCharacteristic.Name,
+                    Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.AllValues.Select(f =>
+                        new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(characteristic)))
+                    .ToList()));
+            }
 
-                _ when grade.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.Grade.Values.Grade7AndAbove) => new(
-                    x => x?.EstablishmentPerformance?.EngLit79_Sum_Est_Current_Pct,
-                    x => x?.EstablishmentPerformance?.EngLit79_Sum_Est_Previous_Pct,
-                    x => x?.EstablishmentPerformance?.EngLit79_Sum_Est_Previous2_Pct,
-                    x => x?.LocalAuthorityPerformance?.EngLit79_Tot_LA_Current_Pct,
-                    x => x?.LocalAuthorityPerformance?.EngLit79_Tot_LA_Previous_Pct,
-                    x => x?.LocalAuthorityPerformance?.EngLit79_Tot_LA_Previous2_Pct,
-                    x => x?.EnglandPerformance?.EngLit79_Tot_Eng_Current_Pct,
-                    x => x?.EnglandPerformance?.EngLit79_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.EngLit79_Tot_Eng_Previous2_Pct),
+            var gradeCode = ResolveGradeCode(grade);
+            var establishmentCharacteristicCode = ResolveEstablishmentCharacteristicCode(characteristic);
+            var localAuthorityCharacteristicCode = ResolveLocalAuthorityCharacteristicCode(characteristic);
 
-                _ => new(
-                    x => x?.EstablishmentPerformance?.EngLit49_Sum_Est_Current_Pct,
-                    x => x?.EstablishmentPerformance?.EngLit49_Sum_Est_Previous_Pct,
-                    x => x?.EstablishmentPerformance?.EngLit49_Sum_Est_Previous2_Pct,
-                    x => x?.LocalAuthorityPerformance?.EngLit49_Tot_LA_Current_Pct,
-                    x => x?.LocalAuthorityPerformance?.EngLit49_Tot_LA_Previous_Pct,
-                    x => x?.LocalAuthorityPerformance?.EngLit49_Tot_LA_Previous2_Pct,
-                    x => x?.EnglandPerformance?.EngLit49_Tot_Eng_Current_Pct,
-                    x => x?.EnglandPerformance?.EngLit49_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.EngLit49_Tot_Eng_Previous2_Pct)
-            };
+            MeasureFieldSelector<Ks4PerformanceData> fieldSelector = new(
+                x => Read(x?.EstablishmentPerformance, gradeCode, establishmentCharacteristicCode, "Est", "Current"),
+                x => Read(x?.EstablishmentPerformance, gradeCode, establishmentCharacteristicCode, "Est", "Previous"),
+                x => Read(x?.EstablishmentPerformance, gradeCode, establishmentCharacteristicCode, "Est", "Previous2"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.LocalAuthorityPerformance, gradeCode, localAuthorityCharacteristicCode, "LA", "Current"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.LocalAuthorityPerformance, gradeCode, localAuthorityCharacteristicCode, "LA", "Previous"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.LocalAuthorityPerformance, gradeCode, localAuthorityCharacteristicCode, "LA", "Previous2"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.EnglandPerformance, gradeCode, localAuthorityCharacteristicCode, "Eng", "Current"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.EnglandPerformance, gradeCode, localAuthorityCharacteristicCode, "Eng", "Previous"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.EnglandPerformance, gradeCode, localAuthorityCharacteristicCode, "Eng", "Previous2"));
 
             return (availableFilters, fieldSelector);
+        }
+
+        private static string ResolveGradeCode(string grade) =>
+            grade switch
+            {
+                _ when grade.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.Grade.Values.Grade5AndAbove) => "59",
+                _ when grade.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.Grade.Values.Grade7AndAbove) => "79",
+                _ => "49"
+            };
+
+        private static string ResolveEstablishmentCharacteristicCode(string characteristic) =>
+            characteristic switch
+            {
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.Boys) => "Boy",
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.Girls) => "Grl",
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.Disadvantaged) => "Dis",
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.NonDisadvantaged) => "NDi",
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.Eal) => "EAL",
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.NonMobile) => "NMo",
+                _ => "Sum"
+            };
+
+        private static string? ResolveLocalAuthorityCharacteristicCode(string characteristic) =>
+            characteristic switch
+            {
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.Boys) => "Boy",
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.Girls) => "Grl",
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.Disadvantaged) => "Dis",
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.NonDisadvantaged) => "NDi",
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.Eal) => "EAL",
+                _ when characteristic.EqualsCaseInsensitive(Ks4EnglishLiterature.Filters.PupilCharacteristic.Values.NonMobile) => null,
+                _ => "Tot"
+            };
+
+        private static string? Read(object? source, string gradeCode, string characteristicCode, string scope, string year)
+        {
+            if (source is null)
+            {
+                return null;
+            }
+
+            var propertyName = $"EngLit{gradeCode}_{characteristicCode}_{scope}_{year}_Pct";
+            return source.GetType().GetProperty(propertyName)?.GetValue(source) as string;
         }
     }
 
@@ -481,9 +517,9 @@ internal static class Ks4CoreSubjects
 
     public static class Maths
     {
-        public static Measure ForSchool(SchoolMeasureData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolMeasureData<Ks4PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchool(SchoolMeasureData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolMeasureData<Ks4PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters, bool includePupilCharacteristicFilter = true)
         {
-            var (availableFilters, fieldSelector) = ResolveFilters(filters);
+            var (availableFilters, fieldSelector) = ResolveFilters(filters, includePupilCharacteristicFilter);
 
             return Measure.ForSchool(
                 Ks4Maths.Key,
@@ -496,9 +532,9 @@ internal static class Ks4CoreSubjects
                 fieldSelector);
         }
 
-        public static Measure ForSchoolComparison(SchoolMeasureData<Ks4PerformanceData> currentSchool, SchoolMeasureData<Ks4PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolMeasureData<Ks4PerformanceData> currentSchool, SchoolMeasureData<Ks4PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters, bool includePupilCharacteristicFilter = true)
         {
-            var (availableFilters, fieldSelector) = ResolveFilters(filters);
+            var (availableFilters, fieldSelector) = ResolveFilters(filters, includePupilCharacteristicFilter);
 
             return Measure.ForSchoolComparison(
                 Ks4Maths.Key,
@@ -511,13 +547,17 @@ internal static class Ks4CoreSubjects
                 fieldSelector);
         }
 
-        private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<Ks4PerformanceData> FieldSelector) ResolveFilters(CaseInsensitiveDictionary<string> filters)
+        private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<Ks4PerformanceData> FieldSelector) ResolveFilters(CaseInsensitiveDictionary<string> filters, bool includePupilCharacteristicFilter)
         {
             var grade = filters.ContainsKey(Ks4Maths.Filters.Grade.Key)
                 ? filters[Ks4Maths.Filters.Grade.Key]
                 : Ks4Maths.Filters.Grade.Values.Grade4AndAbove;
 
-            IEnumerable<MeasureAvailableFilter> availableFilters = [
+            var characteristic = includePupilCharacteristicFilter && filters.ContainsKey(Ks4Maths.Filters.PupilCharacteristic.Key)
+                ? filters[Ks4Maths.Filters.PupilCharacteristic.Key]
+                : Ks4Maths.Filters.PupilCharacteristic.Values.AllPupils;
+
+            List<MeasureAvailableFilter> availableFilters = [
                 new MeasureAvailableFilter(
                     Ks4Maths.Filters.Grade.Key,
                     Ks4Maths.Filters.Grade.Name,
@@ -526,51 +566,83 @@ internal static class Ks4CoreSubjects
                     .ToList())
             ];
 
-            MeasureFieldSelector<Ks4PerformanceData> fieldSelector = grade switch
+            if (includePupilCharacteristicFilter)
             {
-                _ when grade.EqualsCaseInsensitive(Ks4Maths.Filters.Grade.Values.Grade5AndAbove) => new(
-                    x => x?.EstablishmentPerformance?.Maths59_Sum_Est_Current_Pct,
-                    x => x?.EstablishmentPerformance?.Maths59_Sum_Est_Previous_Pct,
-                    x => x?.EstablishmentPerformance?.Maths59_Sum_Est_Previous2_Pct,
-                    x => x?.LocalAuthorityPerformance?.Maths59_Tot_LA_Current_Pct,
-                    x => x?.LocalAuthorityPerformance?.Maths59_Tot_LA_Previous_Pct,
-                    x => x?.LocalAuthorityPerformance?.Maths59_Tot_LA_Previous2_Pct,
-                    x => x?.EnglandPerformance?.Maths59_Tot_Eng_Current_Pct,
-                    x => x?.EnglandPerformance?.Maths59_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.Maths59_Tot_Eng_Previous2_Pct),
+                availableFilters.Add(new MeasureAvailableFilter(
+                    Ks4Maths.Filters.PupilCharacteristic.Key,
+                    Ks4Maths.Filters.PupilCharacteristic.Name,
+                    Ks4Maths.Filters.PupilCharacteristic.Values.AllValues.Select(f =>
+                        new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(characteristic)))
+                    .ToList()));
+            }
 
-                _ when grade.EqualsCaseInsensitive(Ks4Maths.Filters.Grade.Values.Grade7AndAbove) => new(
-                    x => x?.EstablishmentPerformance?.Maths79_Sum_Est_Current_Pct,
-                    x => x?.EstablishmentPerformance?.Maths79_Sum_Est_Previous_Pct,
-                    x => x?.EstablishmentPerformance?.Maths79_Sum_Est_Previous2_Pct,
-                    x => x?.LocalAuthorityPerformance?.Maths79_Tot_LA_Current_Pct,
-                    x => x?.LocalAuthorityPerformance?.Maths79_Tot_LA_Previous_Pct,
-                    x => x?.LocalAuthorityPerformance?.Maths79_Tot_LA_Previous2_Pct,
-                    x => x?.EnglandPerformance?.Maths79_Tot_Eng_Current_Pct,
-                    x => x?.EnglandPerformance?.Maths79_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.Maths79_Tot_Eng_Previous2_Pct),
+            var gradeCode = ResolveGradeCode(grade);
+            var establishmentCharacteristicCode = ResolveEstablishmentCharacteristicCode(characteristic);
+            var localAuthorityCharacteristicCode = ResolveLocalAuthorityCharacteristicCode(characteristic);
 
-                _ => new(
-                    x => x?.EstablishmentPerformance?.Maths49_Sum_Est_Current_Pct,
-                    x => x?.EstablishmentPerformance?.Maths49_Sum_Est_Previous_Pct,
-                    x => x?.EstablishmentPerformance?.Maths49_Sum_Est_Previous2_Pct,
-                    x => x?.LocalAuthorityPerformance?.Maths49_Tot_LA_Current_Pct,
-                    x => x?.LocalAuthorityPerformance?.Maths49_Tot_LA_Previous_Pct,
-                    x => x?.LocalAuthorityPerformance?.Maths49_Tot_LA_Previous2_Pct,
-                    x => x?.EnglandPerformance?.Maths49_Tot_Eng_Current_Pct,
-                    x => x?.EnglandPerformance?.Maths49_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.Maths49_Tot_Eng_Previous2_Pct)
-            };
+            MeasureFieldSelector<Ks4PerformanceData> fieldSelector = new(
+                x => Read(x?.EstablishmentPerformance, gradeCode, establishmentCharacteristicCode, "Est", "Current"),
+                x => Read(x?.EstablishmentPerformance, gradeCode, establishmentCharacteristicCode, "Est", "Previous"),
+                x => Read(x?.EstablishmentPerformance, gradeCode, establishmentCharacteristicCode, "Est", "Previous2"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.LocalAuthorityPerformance, gradeCode, localAuthorityCharacteristicCode, "LA", "Current"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.LocalAuthorityPerformance, gradeCode, localAuthorityCharacteristicCode, "LA", "Previous"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.LocalAuthorityPerformance, gradeCode, localAuthorityCharacteristicCode, "LA", "Previous2"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.EnglandPerformance, gradeCode, localAuthorityCharacteristicCode, "Eng", "Current"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.EnglandPerformance, gradeCode, localAuthorityCharacteristicCode, "Eng", "Previous"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.EnglandPerformance, gradeCode, localAuthorityCharacteristicCode, "Eng", "Previous2"));
 
             return (availableFilters, fieldSelector);
+        }
+
+        private static string ResolveGradeCode(string grade) =>
+            grade switch
+            {
+                _ when grade.EqualsCaseInsensitive(Ks4Maths.Filters.Grade.Values.Grade5AndAbove) => "59",
+                _ when grade.EqualsCaseInsensitive(Ks4Maths.Filters.Grade.Values.Grade7AndAbove) => "79",
+                _ => "49"
+            };
+
+        private static string ResolveEstablishmentCharacteristicCode(string characteristic) =>
+            characteristic switch
+            {
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.Boys) => "Boy",
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.Girls) => "Grl",
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.Disadvantaged) => "Dis",
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.NonDisadvantaged) => "NDi",
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.Eal) => "EAL",
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.NonMobile) => "NMo",
+                _ => "Sum"
+            };
+
+        private static string? ResolveLocalAuthorityCharacteristicCode(string characteristic) =>
+            characteristic switch
+            {
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.Boys) => "Boy",
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.Girls) => "Grl",
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.Disadvantaged) => "Dis",
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.NonDisadvantaged) => "NDi",
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.Eal) => "EAL",
+                _ when characteristic.EqualsCaseInsensitive(Ks4Maths.Filters.PupilCharacteristic.Values.NonMobile) => null,
+                _ => "Tot"
+            };
+
+        private static string? Read(object? source, string gradeCode, string characteristicCode, string scope, string year)
+        {
+            if (source is null)
+            {
+                return null;
+            }
+
+            var propertyName = $"Maths{gradeCode}_{characteristicCode}_{scope}_{year}_Pct";
+            return source.GetType().GetProperty(propertyName)?.GetValue(source) as string;
         }
     }
 
     public static class CombinedScience
     {
-        public static Measure ForSchool(SchoolMeasureData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolMeasureData<Ks4PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchool(SchoolMeasureData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolMeasureData<Ks4PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters, bool includePupilCharacteristicFilter = true)
         {
-            var (availableFilters, fieldSelector) = ResolveFilters(filters);
+            var (availableFilters, fieldSelector) = ResolveFilters(filters, includePupilCharacteristicFilter);
 
             return Measure.ForSchool(
                 Ks4CombinedScience.Key,
@@ -583,9 +655,9 @@ internal static class Ks4CoreSubjects
                 fieldSelector);
         }
 
-        public static Measure ForSchoolComparison(SchoolMeasureData<Ks4PerformanceData> currentSchool, SchoolMeasureData<Ks4PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolMeasureData<Ks4PerformanceData> currentSchool, SchoolMeasureData<Ks4PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters, bool includePupilCharacteristicFilter = true)
         {
-            var (availableFilters, fieldSelector) = ResolveFilters(filters);
+            var (availableFilters, fieldSelector) = ResolveFilters(filters, includePupilCharacteristicFilter);
 
             return Measure.ForSchoolComparison(
                 Ks4CombinedScience.Key,
@@ -598,13 +670,17 @@ internal static class Ks4CoreSubjects
                 fieldSelector);
         }
 
-        private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<Ks4PerformanceData> FieldSelector) ResolveFilters(CaseInsensitiveDictionary<string> filters)
+        private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<Ks4PerformanceData> FieldSelector) ResolveFilters(CaseInsensitiveDictionary<string> filters, bool includePupilCharacteristicFilter)
         {
             var grade = filters.ContainsKey(Ks4CombinedScience.Filters.Grade.Key)
                 ? filters[Ks4CombinedScience.Filters.Grade.Key]
                 : Ks4CombinedScience.Filters.Grade.Values.Grade44AndAbove;
 
-            IEnumerable<MeasureAvailableFilter> availableFilters = [
+            var characteristic = includePupilCharacteristicFilter && filters.ContainsKey(Ks4CombinedScience.Filters.PupilCharacteristic.Key)
+                ? filters[Ks4CombinedScience.Filters.PupilCharacteristic.Key]
+                : Ks4CombinedScience.Filters.PupilCharacteristic.Values.AllPupils;
+
+            List<MeasureAvailableFilter> availableFilters = [
                 new MeasureAvailableFilter(
                     Ks4CombinedScience.Filters.Grade.Key,
                     Ks4CombinedScience.Filters.Grade.Name,
@@ -613,43 +689,75 @@ internal static class Ks4CoreSubjects
                     .ToList())
             ];
 
-            MeasureFieldSelector<Ks4PerformanceData> fieldSelector = grade switch
+            if (includePupilCharacteristicFilter)
             {
-                _ when grade.EqualsCaseInsensitive(Ks4CombinedScience.Filters.Grade.Values.Grade55AndAbove) => new(
-                    x => x?.EstablishmentPerformance?.CombSci59_Sum_Est_Current_Pct,
-                    x => x?.EstablishmentPerformance?.CombSci59_Sum_Est_Previous_Pct,
-                    x => x?.EstablishmentPerformance?.CombSci59_Sum_Est_Previous2_Pct,
-                    x => x?.LocalAuthorityPerformance?.CombSci59_Tot_LA_Current_Pct,
-                    x => x?.LocalAuthorityPerformance?.CombSci59_Tot_LA_Previous_Pct,
-                    x => x?.LocalAuthorityPerformance?.CombSci59_Tot_LA_Previous2_Pct,
-                    x => x?.EnglandPerformance?.CombSci59_Tot_Eng_Current_Pct,
-                    x => x?.EnglandPerformance?.CombSci59_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.CombSci59_Tot_Eng_Previous2_Pct),
+                availableFilters.Add(new MeasureAvailableFilter(
+                    Ks4CombinedScience.Filters.PupilCharacteristic.Key,
+                    Ks4CombinedScience.Filters.PupilCharacteristic.Name,
+                    Ks4CombinedScience.Filters.PupilCharacteristic.Values.AllValues.Select(f =>
+                        new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(characteristic)))
+                    .ToList()));
+            }
 
-                _ when grade.EqualsCaseInsensitive(Ks4CombinedScience.Filters.Grade.Values.Grade77AndAbove) => new(
-                    x => x?.EstablishmentPerformance?.CombSci79_Sum_Est_Current_Pct,
-                    x => x?.EstablishmentPerformance?.CombSci79_Sum_Est_Previous_Pct,
-                    x => x?.EstablishmentPerformance?.CombSci79_Sum_Est_Previous2_Pct,
-                    x => x?.LocalAuthorityPerformance?.CombSci79_Tot_LA_Current_Pct,
-                    x => x?.LocalAuthorityPerformance?.CombSci79_Tot_LA_Previous_Pct,
-                    x => x?.LocalAuthorityPerformance?.CombSci79_Tot_LA_Previous2_Pct,
-                    x => x?.EnglandPerformance?.CombSci79_Tot_Eng_Current_Pct,
-                    x => x?.EnglandPerformance?.CombSci79_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.CombSci79_Tot_Eng_Previous2_Pct),
+            var gradeCode = ResolveGradeCode(grade);
+            var establishmentCharacteristicCode = ResolveEstablishmentCharacteristicCode(characteristic);
+            var localAuthorityCharacteristicCode = ResolveLocalAuthorityCharacteristicCode(characteristic);
 
-                _ => new(
-                    x => x?.EstablishmentPerformance?.CombSci49_Sum_Est_Current_Pct,
-                    x => x?.EstablishmentPerformance?.CombSci49_Sum_Est_Previous_Pct,
-                    x => x?.EstablishmentPerformance?.CombSci49_Sum_Est_Previous2_Pct,
-                    x => x?.LocalAuthorityPerformance?.CombSci49_Tot_LA_Current_Pct,
-                    x => x?.LocalAuthorityPerformance?.CombSci49_Tot_LA_Previous_Pct,
-                    x => x?.LocalAuthorityPerformance?.CombSci49_Tot_LA_Previous2_Pct,
-                    x => x?.EnglandPerformance?.CombSci49_Tot_Eng_Current_Pct,
-                    x => x?.EnglandPerformance?.CombSci49_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.CombSci49_Tot_Eng_Previous2_Pct)
-            };
+            MeasureFieldSelector<Ks4PerformanceData> fieldSelector = new(
+                x => Read(x?.EstablishmentPerformance, gradeCode, establishmentCharacteristicCode, "Est", "Current"),
+                x => Read(x?.EstablishmentPerformance, gradeCode, establishmentCharacteristicCode, "Est", "Previous"),
+                x => Read(x?.EstablishmentPerformance, gradeCode, establishmentCharacteristicCode, "Est", "Previous2"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.LocalAuthorityPerformance, gradeCode, localAuthorityCharacteristicCode, "LA", "Current"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.LocalAuthorityPerformance, gradeCode, localAuthorityCharacteristicCode, "LA", "Previous"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.LocalAuthorityPerformance, gradeCode, localAuthorityCharacteristicCode, "LA", "Previous2"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.EnglandPerformance, gradeCode, localAuthorityCharacteristicCode, "Eng", "Current"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.EnglandPerformance, gradeCode, localAuthorityCharacteristicCode, "Eng", "Previous"),
+                x => localAuthorityCharacteristicCode is null ? null : Read(x?.EnglandPerformance, gradeCode, localAuthorityCharacteristicCode, "Eng", "Previous2"));
 
             return (availableFilters, fieldSelector);
+        }
+
+        private static string ResolveGradeCode(string grade) =>
+            grade switch
+            {
+                _ when grade.EqualsCaseInsensitive(Ks4CombinedScience.Filters.Grade.Values.Grade55AndAbove) => "59",
+                _ when grade.EqualsCaseInsensitive(Ks4CombinedScience.Filters.Grade.Values.Grade77AndAbove) => "79",
+                _ => "49"
+            };
+
+        private static string ResolveEstablishmentCharacteristicCode(string characteristic) =>
+            characteristic switch
+            {
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.Boys) => "Boy",
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.Girls) => "Grl",
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.Disadvantaged) => "Dis",
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.NonDisadvantaged) => "NDi",
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.Eal) => "EAL",
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.NonMobile) => "NMo",
+                _ => "Sum"
+            };
+
+        private static string? ResolveLocalAuthorityCharacteristicCode(string characteristic) =>
+            characteristic switch
+            {
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.Boys) => "Boy",
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.Girls) => "Grl",
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.Disadvantaged) => "Dis",
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.NonDisadvantaged) => "NDi",
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.Eal) => "EAL",
+                _ when characteristic.EqualsCaseInsensitive(Ks4CombinedScience.Filters.PupilCharacteristic.Values.NonMobile) => null,
+                _ => "Tot"
+            };
+
+        private static string? Read(object? source, string gradeCode, string characteristicCode, string scope, string year)
+        {
+            if (source is null)
+            {
+                return null;
+            }
+
+            var propertyName = $"CombSci{gradeCode}_{characteristicCode}_{scope}_{year}_Pct";
+            return source.GetType().GetProperty(propertyName)?.GetValue(source) as string;
         }
     }
 }

@@ -33,15 +33,18 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
             Ks4CoreSubjects.EnglishLiterature.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
-                filterBy),
+                filterBy,
+                request.IncludePupilCharacteristicFilter),
             Ks4CoreSubjects.Maths.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
-                filterBy),
+                filterBy,
+                request.IncludePupilCharacteristicFilter),
             Ks4CoreSubjects.CombinedScience.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
-                filterBy),
+                filterBy,
+                request.IncludePupilCharacteristicFilter),
             Ks4CoreSubjects.Biology.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
