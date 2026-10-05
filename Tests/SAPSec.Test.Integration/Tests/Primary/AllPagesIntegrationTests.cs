@@ -1,7 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using FluentAssertions;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;
@@ -51,7 +51,7 @@ public class AllPagesIntegrationTests(
 
     public override Task DisposeAsync()
     {
-        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnablePrimarySchools);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnablePrimarySchools);
 
         return base.DisposeAsync();
     }
@@ -60,7 +60,7 @@ public class AllPagesIntegrationTests(
     [MemberData(nameof(AllPages))]
     public async Task AllPages_WhenPrimarySchoolsFeatureFlagDisabled_ReturnNotFound(string path)
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnablePrimarySchools, false);
+        Fixture.FeatureFlagService.Override(Flags.EnablePrimarySchools, false);
 
         await Fixture.RequestPageAsync(path, HttpStatusCode.NotFound);
     }

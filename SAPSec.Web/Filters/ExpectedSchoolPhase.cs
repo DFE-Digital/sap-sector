@@ -4,5 +4,7 @@ public enum ExpectedSchoolPhase
 {
     Primary,
     Secondary,
-    AllThrough
+    AllThrough,
+    PrimaryComparisonParticipant,
+    SecondaryComparisonParticipant
 }

@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using SAPSec.Core.Authentication;
-using SAPSec.Core.Services;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;

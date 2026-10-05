@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.Features.Availability;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;

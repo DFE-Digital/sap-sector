@@ -1,5 +1,5 @@
 using SAPSec.Core.Features.Availability;
-using SAPSec.Core.Features.Filtering;
+using SAPSec.Core.Filtering;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 

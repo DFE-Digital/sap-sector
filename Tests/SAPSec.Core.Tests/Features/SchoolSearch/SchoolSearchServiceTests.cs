@@ -1,7 +1,6 @@
 using Moq;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
@@ -17,10 +16,10 @@ public class SchoolSearchServiceTests
     public SchoolSearchServiceTests()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(false);
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(false);
 
         _sut = new SchoolSearchService(
@@ -91,7 +90,7 @@ public class SchoolSearchServiceTests
             EstablishmentStatusId = "1"
         };
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
@@ -112,7 +111,7 @@ public class SchoolSearchServiceTests
             EstablishmentStatusId = "1"
         };
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
@@ -133,7 +132,7 @@ public class SchoolSearchServiceTests
             EstablishmentStatusId = "1"
         };
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
@@ -168,7 +167,7 @@ public class SchoolSearchServiceTests
             EstablishmentStatusId = "1"
         };
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
@@ -195,7 +194,7 @@ public class SchoolSearchServiceTests
     public async Task SearchByNumberAsync_WithSecondarySchoolAndProposedToOpenStatus_WhenPrimaryFeatureEnabled_ReturnsNull()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
@@ -275,7 +274,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_IncludesAllThroughSchools_WhenAllThroughFeatureEnabled()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -297,7 +296,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_ExcludesAllThroughSchools_WhenPrimaryFeatureEnabledAndAllThroughFeatureDisabled()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -319,10 +318,10 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_IncludesPrimarySecondaryAndAllThroughSchools_WhenBothFeaturesEnabled()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -345,7 +344,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_IncludesPrimarySchools_WhenFeatureEnabledAndStatusExistsOnEstablishment()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -391,7 +390,7 @@ public class SchoolSearchServiceTests
     public async Task SuggestAsync_ExcludesSchools_WithProposedToOpenStatus()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -413,7 +412,7 @@ public class SchoolSearchServiceTests
         var recentCloseDate = DateTime.UtcNow.AddYears(-1).ToString("dd-MM-yyyy");
 
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -443,7 +442,7 @@ public class SchoolSearchServiceTests
         var longAgoCloseDate = DateTime.UtcNow.AddYears(-5).ToString("dd-MM-yyyy");
 
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -491,7 +490,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_IncludesSchools_WithIncludedStatusIds(string statusId)
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -511,7 +510,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_ExcludesSchools_WithProposedToOpenStatusId()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -531,7 +530,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_ExcludesSecondarySchools_WithProposedToOpenStatusId_WhenPrimaryFeatureEnabled()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -614,7 +613,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_ExcludesSchools_WithUnsupportedPhaseIds(string phaseId, string phaseName)
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))

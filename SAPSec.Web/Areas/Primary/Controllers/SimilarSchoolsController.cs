@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core;
-using SAPSec.Core.Constants;
+using SAPSec.Core.Exceptions;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Constants;
@@ -67,7 +66,7 @@ public class SimilarSchoolsController(
     private async Task PopulateViewData(SchoolInfo currentSchool, bool hasSimilarSchools = true)
     {
         var includeRise = featureFlagService is not null
-            && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+            && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,

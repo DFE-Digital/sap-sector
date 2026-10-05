@@ -1,7 +1,12 @@
 using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using FluentAssertions;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
+using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Data.Dto.RiseResources;
+using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
+using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
@@ -17,8 +22,8 @@ public class SchoolPagesIntegrationTests(
 
     public override Task DisposeAsync()
     {
-        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnableAllThroughSchools);
-        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnableRiseResources);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnableAllThroughSchools);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnableRiseResources);
 
         return base.DisposeAsync();
     }
@@ -46,6 +51,99 @@ public class SchoolPagesIntegrationTests(
     }
 
     [Fact]
+    public async Task OverviewPage_WithSecondarySimilarSchools_ShowsAllThroughContent()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Overview);
+
+        page.QuerySelector("h1.govuk-heading-xl")!.TextContent.Trim().Should().Be("Test School 1");
+        page.QuerySelector(".app-overview__address")!.TextContent.Trim().Should().Be("1 Test Street, Test Town, TT1 1TT");
+        page.QuerySelector(".app-overview__lead")!.TextContent.Trim()
+            .Should().Be("For all-through schools or cross-phase middle schools, we identify:");
+
+        page.QuerySelectorAll(".app-overview__list").First().QuerySelectorAll("li")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal(
+                "50 primary schools, including all-throughs, similar to the school\u2019s primary phase",
+                "50 secondary schools, including all-throughs, similar to the school\u2019s secondary phase");
+
+        var link = page.QuerySelector(".app-overview a");
+        link.Should().NotBeNull();
+        link!.TextContent.Trim().Should().Be("how the DfE defines what a similar school is");
+        link.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).WhatIsASimilarSchool);
+
+        page.QuerySelectorAll(".app-overview h2")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal(
+                "Compare school performance",
+                "View similar schools to connect with",
+                "Missing data for multi-phase schools");
+    }
+
+    [Fact]
+    public async Task OverviewPage_WithSecondarySimilarSchools_ShowsSecondaryPhaseNavigation()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Overview);
+
+        AssertNavigation(page, [
+            ("Overview", Routes.AllThroughSchool(Urn).Overview),
+            ("KS2", Routes.AllThroughSchool(Urn).KS2),
+            ("KS4 headline measures", Routes.AllThroughSchool(Urn).KS4HeadlineMeasures),
+            ("KS4 core subjects", Routes.AllThroughSchool(Urn).KS4CoreSubjects),
+            ("Attendance", Routes.AllThroughSchool(Urn).Attendance),
+            ("View similar schools", Routes.AllThroughSchool(Urn).ViewSimilarSchools),
+            ("School details", Routes.AllThroughSchool(Urn).SchoolDetails),
+            ("What is a similar school?", Routes.AllThroughSchool(Urn).WhatIsASimilarSchool),
+            ("RISE resources", Routes.AllThroughSchool(Urn).RiseResources)
+        ]);
+    }
+
+    [Fact]
+    public async Task OverviewPage_WithPrimaryAndSecondarySimilarSchools_ShowsBothPhasePrototypeContent()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(Build.PrimaryGroup(Urn, ["100002"]));
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Overview);
+
+        page.QuerySelector(".app-overview__lead")!.TextContent.Trim()
+            .Should().Be("For all-through schools or cross-phase middle schools, we identify:");
+
+        page.QuerySelectorAll(".app-overview__list").First().QuerySelectorAll("li")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal(
+                "50 primary schools, including all-throughs, similar to the school\u2019s primary phase",
+                "50 secondary schools, including all-throughs, similar to the school\u2019s secondary phase");
+    }
+
+    [Fact]
+    public async Task OverviewPage_WithoutSimilarSchools_ShowsEmptyStateContent()
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Overview);
+
+        page.QuerySelector("h1.govuk-heading-xl")!.TextContent.Trim().Should().Be("Test School 1");
+        page.QuerySelector(".app-overview__address")!.TextContent.Trim().Should().Be("1 Test Street, Test Town, TT1 1TT");
+        page.QuerySelectorAll(".app-overview h2.govuk-heading-m")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal(
+                "This school cannot be compared with similar schools",
+                "Compare data from previous academic years",
+                "If you expected to see similar schools");
+        page.QuerySelector(".app-overview__lead").Should().BeNull();
+        var supportLink = page.QuerySelector(".app-overview a[href='mailto:schoolinsights.support@education.gov.uk']");
+        supportLink.Should().NotBeNull();
+        supportLink!.TextContent.Trim().Should().Be("schoolinsights.support@education.gov.uk");
+    }
+
+    [Fact]
     public async Task OverviewPage_WithoutSimilarSchools_OmitsViewSimilarSchoolsNavigation()
     {
         SetupAllThroughSchool();
@@ -62,6 +160,7 @@ public class SchoolPagesIntegrationTests(
             ("What is a similar school?", Routes.AllThroughSchool(Urn).WhatIsASimilarSchool),
             ("RISE resources", Routes.AllThroughSchool(Urn).RiseResources)
         ]);
+        AssertSelectedNavigationItem(page, "Overview", Routes.AllThroughSchool(Urn).Overview);
     }
 
     [Theory]
@@ -69,6 +168,7 @@ public class SchoolPagesIntegrationTests(
     public async Task AllThroughPages_ShowHeadingAndSelectedNavigation(string path, string expectedHeading, string expectedNavigationText)
     {
         SetupAllThroughSchool();
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(Build.PrimaryGroup(Urn, ["100002"]));
         Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
 
         var page = await Fixture.RequestPageAsync(path);
@@ -81,7 +181,7 @@ public class SchoolPagesIntegrationTests(
     public async Task OverviewPage_WhenAllThroughFeatureFlagDisabled_ReturnsNotFound()
     {
         SetupAllThroughSchool();
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableAllThroughSchools, false);
+        Fixture.FeatureFlagService.Override(Flags.EnableAllThroughSchools, false);
 
         await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Overview, HttpStatusCode.NotFound);
     }
@@ -98,6 +198,160 @@ public class SchoolPagesIntegrationTests(
         button!.GetAttribute("aria-expanded").Should().Be("false");
         button.GetAttribute("data-label-show").Should().Be("Show navigation");
         button.GetAttribute("data-label-hide").Should().Be("Hide navigation");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_ShowsAllThroughStaticContentAndPrimaryTabByDefault()
+    {
+        SetupAllThroughSchoolWithPrimarySimilarSchools();
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+
+        page.QuerySelector(".govuk-caption-xl")!.TextContent.Trim().Should().Be("Test School 1");
+        page.QuerySelector("h1.govuk-heading-xl")!.TextContent.Trim().Should().Be("View similar schools");
+
+        NormaliseWhitespace(page.QuerySelector(".app-all-through-similar-schools p.govuk-body")!.TextContent)
+            .Should().Be("We've identified 50 similar primary phase schools (including all-throughs) and 50 similar secondary phase schools (including all-throughs). Select primary or secondary then choose a school to compare further and connect with for support. You can also refine the results by applying filters.");
+
+        var link = page.QuerySelector(".app-all-through-similar-schools p.govuk-body a");
+        link.Should().NotBeNull();
+        link!.TextContent.Trim().Should().Be("how DfE identifies what a similar school is");
+        link.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).WhatIsASimilarSchool);
+        link.GetAttribute("target").Should().BeNull();
+
+        var tabs = page.QuerySelectorAll(".app-phase-tabs .govuk-service-navigation__link").ToArray();
+        tabs.Select(x => x.TextContent.Trim()).Should().Equal("Primary", "Secondary");
+
+        tabs[0].GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+        tabs[0].GetAttribute("aria-current").Should().Be("page");
+        tabs[0].ParentElement!.ClassList.Should().Contain("govuk-service-navigation__item--active");
+
+        tabs[1].GetAttribute("href").Should().Be($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+        tabs[1].GetAttribute("aria-current").Should().BeNull();
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_PrimaryTab_ShowsPrimarySimilarSchoolsList()
+    {
+        SetupAllThroughSchoolWithPrimarySimilarSchools();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+
+        page.ElementWithTestIdShouldExist("primary-similar-schools-filter");
+        page.QuerySelector(".app-similar-schools-sort label")!.TextContent.Trim().Should().Be("Sort by");
+        page.QuerySelector("#sort-by option[selected]")!.TextContent.Trim()
+            .Should().Be("Meeting expected standard in reading, writing and maths");
+        page.QuerySelector("#similar-schools-results-count")!.TextContent.Trim()
+            .Should().Be("Showing 1-10 of 50 similar schools");
+        page.QuerySelector("#toggleViewLink")!.TextContent.Trim().Should().Contain("View on map");
+
+        var list = page.ElementWithTestIdShouldExist("primary-similar-schools-list");
+        var results = list.QuerySelectorAll(".app-school-result").ToArray();
+        results.Should().HaveCount(10);
+
+        var firstLink = results[0].QuerySelector("a")!;
+        firstLink.TextContent.Trim().Should().Be("Similar School 50");
+        firstLink.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).PrimaryComparison("100051").Similarity);
+        results[0].TextContent.Should().Contain("50 Test Street");
+        results[0].TextContent.Should().Contain("Meeting expected standard in reading, writing and maths: 100%");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_PrimaryTab_ShowsPaginationForPrimarySimilarSchools()
+    {
+        SetupAllThroughSchoolWithPrimarySimilarSchools();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+
+        page.QuerySelectorAll(".govuk-pagination__list .govuk-pagination__link")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal("1", "2", "3", "4", "5");
+
+        page.QuerySelector(".govuk-pagination__next a")!
+            .GetAttribute("href").Should().Be($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?page=2&sortBy=RwmExpected");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_PrimaryTab_EmptyStateDoesNotShowFiltersMapOrSort()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+
+        page.ElementWithTestIdShouldExist("primary-similar-schools-empty-state")
+            .TextContent.Trim().Should().Be("Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.");
+        page.QuerySelector("[data-testid='primary-similar-schools-filter']").Should().BeNull();
+        page.QuerySelector("#sort-by").Should().BeNull();
+        page.QuerySelector("#map").Should().BeNull();
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_WithSecondaryPhase_ShowsSecondaryTabAsActive()
+    {
+        SetupAllThroughSchoolWithSecondarySimilarSchools();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+
+        var tabs = page.QuerySelectorAll(".app-phase-tabs .govuk-service-navigation__link").ToArray();
+        tabs[0].GetAttribute("aria-current").Should().BeNull();
+        tabs[1].GetAttribute("aria-current").Should().Be("page");
+        tabs[1].ParentElement!.ClassList.Should().Contain("govuk-service-navigation__item--active");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_SecondaryTab_ShowsSecondarySimilarSchoolsList()
+    {
+        SetupAllThroughSchoolWithSecondarySimilarSchools();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+
+        page.ElementWithTestIdShouldExist("secondary-similar-schools-filter");
+        page.QuerySelector(".app-similar-schools-sort label")!.TextContent.Trim().Should().Be("Sort by");
+        page.QuerySelector("#sort-by option[selected]")!.TextContent.Trim().Should().Be("Attainment 8");
+        page.QuerySelector("#similar-schools-results-count")!.TextContent.Trim()
+            .Should().Be("Showing 1-10 of 50 similar schools");
+        page.QuerySelector("#toggleViewLink")!.TextContent.Trim().Should().Contain("View on map");
+
+        var list = page.ElementWithTestIdShouldExist("secondary-similar-schools-list");
+        var results = list.QuerySelectorAll(".app-school-result").ToArray();
+        results.Should().HaveCount(10);
+
+        var firstLink = results[0].QuerySelector("a")!;
+        firstLink.TextContent.Trim().Should().Be("Secondary Similar School 50");
+        firstLink.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).SecondaryComparison("200051").Similarity);
+        results[0].TextContent.Should().Contain("50 Secondary Street");
+        results[0].TextContent.Should().Contain("Attainment 8: 100.0");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_SecondaryTab_ShowsPaginationForSecondarySimilarSchools()
+    {
+        SetupAllThroughSchoolWithSecondarySimilarSchools();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+
+        page.QuerySelectorAll(".govuk-pagination__list .govuk-pagination__link")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal("1", "2", "3", "4", "5");
+
+        page.QuerySelector(".govuk-pagination__next a")!
+            .GetAttribute("href").Should().Be($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary&page=2&sortBy=Att8");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_SecondaryTab_EmptyStateDoesNotShowFiltersMapOrSort()
+    {
+        SetupAllThroughSchoolWithPrimarySimilarSchools();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+
+        page.ElementWithTestIdShouldExist("secondary-similar-schools-empty-state")
+            .TextContent.Trim().Should().Be("Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.");
+        page.QuerySelector("[data-testid='secondary-similar-schools-filter']").Should().BeNull();
+        page.QuerySelector("#sort-by").Should().BeNull();
+        page.QuerySelector("#map").Should().BeNull();
     }
 
     [Fact]
@@ -145,6 +399,269 @@ public class SchoolPagesIntegrationTests(
         links[2].GetAttribute("href").Should().Be("https://viewyourdata.education.gov.uk/Account/Help");
         links[2].GetAttribute("target").Should().Be("_blank");
         links[2].GetAttribute("rel").Should().Be("noopener noreferrer");
+    }
+
+    [Fact]
+    public async Task Ks4CoreSubjectsPage_ShowsExpectedStaticContentAndMeasures()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS4CoreSubjects);
+
+        page.QuerySelector(".govuk-caption-xl")!.TextContent.Trim().Should().Be("Test School 1");
+        page.QuerySelector("h1.govuk-heading-xl")!.TextContent.Trim().Should().Be("KS4 core subject GCSE results");
+        page.QuerySelector(".app-school-page p.govuk-body")!.TextContent.Trim().Should().Be("Compare this school's GCSEs in KS4 core subjects with:");
+
+        page.QuerySelectorAll(".app-school-page ul.govuk-list li")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal(
+                "50 similar secondary phase schools (including all-throughs)",
+                "the local authority average",
+                "the national average");
+
+        var similarSchoolInfoLink = page.QuerySelector(".app-school-page p.govuk-body a");
+        similarSchoolInfoLink.Should().NotBeNull();
+        similarSchoolInfoLink!.TextContent.Trim().Should().Be("how DfE identifies what a similar school is");
+        similarSchoolInfoLink.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).WhatIsASimilarSchool);
+
+        page.QuerySelectorAll(".app-measure-section h2")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal(
+                "English language",
+                "English literature",
+                "Maths",
+                "Combined science (double award)",
+                "Biology",
+                "Chemistry",
+                "Physics");
+    }
+
+    [Fact]
+    public async Task Ks4CoreSubjectsPage_WithSecondarySimilarSchools_ShowsTopPerformersTabs()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(Build.SecondaryValues([Urn, "100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS4CoreSubjects);
+
+        page.ElementWithTestIdShouldExist("eng-lang-tabs")
+            .ChildTrimmedTextContent()
+            .Should().BeEquivalentTo("Charts", "Table", "Top performers");
+
+        page.ElementWithTestIdShouldExist("comb-sci-tabs")
+            .ChildTrimmedTextContent()
+            .Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
+    public async Task Ks4CoreSubjectsPage_WithoutSecondarySimilarSchools_HidesTopPerformersTabs()
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS4CoreSubjects);
+
+        page.ElementWithTestIdShouldExist("eng-lang-tabs")
+            .ChildTrimmedTextContent()
+            .Should().BeEquivalentTo("Charts", "Table");
+
+        page.ElementWithTestIdShouldExist("comb-sci-tabs")
+            .ChildTrimmedTextContent()
+            .Should().BeEquivalentTo("Charts", "Table");
+    }
+
+    [Fact]
+    public async Task Ks4CoreSubjectsPage_GradeFilters_HaveExpectedOptions()
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS4CoreSubjects);
+
+        page.ElementWithTestIdShouldExist("eng-lang-grade-filter")
+            .ChildTrimmedTextContent()
+            .Should().Equal(["Grade 4 and above", "Grade 5 and above", "Grade 7 and above"]);
+
+        page.ElementWithTestIdShouldExist("comb-sci-grade-filter")
+            .ChildTrimmedTextContent()
+            .Should().Equal(["Grade 4-4 and above", "Grade 5-5 and above", "Grade 7-7 and above"]);
+    }
+
+    [Fact]
+    public async Task Ks4CoreSubjectsPage_TopPerformers_LinkToSecondaryComparisonAndAllThroughSecondaryTab()
+    {
+        SetupAllThroughSchool();
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28").WithAddress("1 Test Street", "", "", "Test Town", "TT1 1TT")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().AllThrough().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Open().AllThrough().InLA("001")),
+            Build.Establishment("100004", "Test School 4", x => x.Open().AllThrough().InLA("001")),
+            Build.Establishment("100005", "Test School 5", x => x.Open().AllThrough().InLA("001")));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup(Urn, ["100002", "100003", "100004", "100005"]));
+
+        Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks4Performance.Establishment(Urn, x => x.WithEngLang49(current: "18", prev: "75", prev2: "80")),
+            Build.Ks4Performance.Establishment("100002", x => x.WithEngLang49(current: "20", prev: "70", prev2: "50")),
+            Build.Ks4Performance.Establishment("100003", x => x.WithEngLang49(current: "21", prev: "69", prev2: "51")),
+            Build.Ks4Performance.Establishment("100004", x => x.WithEngLang49(current: "22", prev: "68", prev2: "49")),
+            Build.Ks4Performance.Establishment("100005", x => x.WithEngLang49(current: "19", prev: "61", prev2: "67")));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS4CoreSubjects);
+
+        var similarSchoolsLink = page.ElementWithTestIdShouldExist("eng-lang-top-performers-similar-schools-link");
+        similarSchoolsLink.GetAttribute("href").Should().Be($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("eng-lang-top-performers-table");
+        var topPerformersLinks = table.QuerySelectorAll("a")
+            .Select(l => l.GetAttribute("href"));
+
+        topPerformersLinks.Should().BeEquivalentTo([
+            Routes.AllThroughSchool(Urn).SecondaryComparison("100004").Similarity,
+            Routes.AllThroughSchool(Urn).SecondaryComparison("100003").Similarity,
+            Routes.AllThroughSchool(Urn).SecondaryComparison("100002").Similarity
+        ]);
+    }
+
+    [Fact]
+    public async Task Ks2PerformanceMeasuresPage_TopPerformers_LinkToPrimaryComparison()
+    {
+        SetupAllThroughSchool();
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28").WithAddress("1 Test Street", "", "", "Test Town", "TT1 1TT")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().AllThrough().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Open().AllThrough().InLA("001")),
+            Build.Establishment("100004", "Test School 4", x => x.Open().AllThrough().InLA("001")),
+            Build.Establishment("100005", "Test School 5", x => x.Open().AllThrough().InLA("001")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup(Urn, ["100002", "100003", "100004", "100005"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(Urn, x => x.WithRwmExpected(current: "18", prev: "75", prev2: "80")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithRwmExpected(current: "20", prev: "70", prev2: "50")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithRwmExpected(current: "21", prev: "69", prev2: "51")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithRwmExpected(current: "22", prev: "68", prev2: "49")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithRwmExpected(current: "19", prev: "61", prev2: "67")));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS2);
+
+        var similarSchoolsLink = page.ElementWithTestIdShouldExist("expected-rwm-top-performers-similar-schools-link");
+        similarSchoolsLink.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-rwm-top-performers-table");
+        var topPerformersLinks = table.QuerySelectorAll("a")
+            .Select(l => l.GetAttribute("href"));
+
+        topPerformersLinks.Should().BeEquivalentTo([
+            Routes.AllThroughSchool(Urn).PrimaryComparison("100004").Similarity,
+            Routes.AllThroughSchool(Urn).PrimaryComparison("100003").Similarity,
+            Routes.AllThroughSchool(Urn).PrimaryComparison("100002").Similarity
+        ]);
+    }
+
+    [Fact]
+    public async Task PrimaryComparisonPage_AllThroughRoute_PreservesAllThroughNavigation()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup(Urn, ["100002"]))
+            .SetupValues(Build.PrimaryValues([Urn, "100002"]));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).PrimaryComparison("100002").Similarity);
+
+        page.ElementWithTestIdShouldExist<IHtmlAnchorElement>("what-is-a-similar-school-link")
+            .PathName.Should().Be(Routes.AllThroughSchool(Urn).WhatIsASimilarSchool);
+
+        page.QuerySelector(".govuk-back-link")!
+            .GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+
+        page.QuerySelectorAll(".compare-nav a")
+            .Select(l => l.GetAttribute("href"))
+            .Should().Equal(
+                Routes.AllThroughSchool(Urn).PrimaryComparison("100002").Similarity,
+                Routes.AllThroughSchool(Urn).PrimaryComparison("100002").Ks2,
+                Routes.AllThroughSchool(Urn).PrimaryComparison("100002").Attendance,
+                Routes.AllThroughSchool(Urn).PrimaryComparison("100002").SchoolDetails);
+    }
+
+    [Fact]
+    public async Task SecondaryComparisonPage_AllThroughRoute_PreservesAllThroughNavigation()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository
+            .SetupGroups(Build.SecondaryGroup(Urn, ["100002"]))
+            .SetupValues(Build.SecondaryValues([Urn, "100002"]));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).SecondaryComparison("100002").Similarity);
+
+        page.ElementWithTestIdShouldExist<IHtmlAnchorElement>("what-is-a-similar-school-link")
+            .PathName.Should().Be(Routes.AllThroughSchool(Urn).WhatIsASimilarSchool);
+
+        page.QuerySelector(".govuk-back-link")!
+            .GetAttribute("href").Should().Be($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+
+        page.QuerySelectorAll(".compare-nav a")
+            .Select(l => l.GetAttribute("href"))
+            .Should().Equal(
+                Routes.AllThroughSchool(Urn).SecondaryComparison("100002").Similarity,
+                Routes.AllThroughSchool(Urn).SecondaryComparison("100002").KS4HeadlineMeasures,
+                Routes.AllThroughSchool(Urn).SecondaryComparison("100002").KS4CoreSubjects,
+                Routes.AllThroughSchool(Urn).SecondaryComparison("100002").Attendance,
+                Routes.AllThroughSchool(Urn).SecondaryComparison("100002").SchoolDetails);
+    }
+
+    [Fact]
+    public async Task PrimaryComparisonAttendancePage_AllThroughRoute_UsesPrimaryEnglandAverageLabel()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup(Urn, ["100002"]))
+            .SetupValues(Build.PrimaryValues([Urn, "100002"]));
+        Fixture.AbsenceRepository.SetupEstablishmentAbsence(
+            Build.Absence.Establishment(Urn, x => x.WithOverallAbsence(current: "6.91", previous: "6.90", previous2: "6.89")),
+            Build.Absence.Establishment("100002", x => x.WithOverallAbsence(current: "5.12", previous: "5.11", previous2: "5.10")));
+        Fixture.AbsenceRepository.SetupEnglandAbsence(
+            Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "4.83", previous: "4.82", previous2: "4.81")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).PrimaryComparison("100002").Attendance);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "6.89%", "6.90%", "6.91%"],
+            ["Test School 2", "5.10%", "5.11%", "5.12%"],
+            ["Primary schools in England average", "4.81%", "4.82%", "4.83%"]);
+    }
+
+    [Fact]
+    public async Task SecondaryComparisonAttendancePage_AllThroughRoute_UsesSecondaryEnglandAverageLabel()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository
+            .SetupGroups(Build.SecondaryGroup(Urn, ["100002"]))
+            .SetupValues(Build.SecondaryValues([Urn, "100002"]));
+        Fixture.AbsenceRepository.SetupEstablishmentAbsence(
+            Build.Absence.Establishment(Urn, x => x.WithOverallAbsence(current: "6.91", previous: "6.90", previous2: "6.89")),
+            Build.Absence.Establishment("100002", x => x.WithOverallAbsence(current: "5.12", previous: "5.11", previous2: "5.10")));
+        Fixture.AbsenceRepository.SetupEnglandAbsence(
+            Build.Absence.England(x => x.WithOverallAbsenceSecondary(current: "4.83", previous: "4.82", previous2: "4.81")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).SecondaryComparison("100002").Attendance);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "6.89%", "6.90%", "6.91%"],
+            ["Test School 2", "5.10%", "5.11%", "5.12%"],
+            ["Secondary schools in England average", "4.81%", "4.82%", "4.83%"]);
     }
 
     [Fact]
@@ -196,6 +713,164 @@ public class SchoolPagesIntegrationTests(
         homeBreadcrumb.GetAttribute("href").Should().Be(Routes.FindASchool());
     }
 
+    [Fact]
+    public async Task OverviewPage_HomeBreadcrumb_LinksToFindASchool()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(Build.PrimaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Overview);
+
+        var homeBreadcrumb = page.QuerySelector(".govuk-breadcrumbs__link");
+        homeBreadcrumb.Should().NotBeNull();
+        homeBreadcrumb!.TextContent.Trim().Should().Be("Home");
+        homeBreadcrumb.GetAttribute("href").Should().Be(Routes.FindASchool());
+    }
+
+    [Fact]
+    public async Task RiseResourcesPage_WhenEnableRiseResourcesFeatureFlagEnabled_RendersHeaderAndIntro()
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).RiseResources, HttpStatusCode.OK);
+
+        page.QuerySelector(".govuk-caption-xl")!.TrimmedTextContent().Should().Be("Test School 1");
+        page.QuerySelector("h1.govuk-heading-xl")!.TrimmedTextContent().Should().Be(PageTitles.RiseResources);
+        page.ElementWithTestIdShouldExist("rise-resources-intro")
+            .TrimmedTextContent()
+            .Should().Be("Use these resources from RISE to help improve your school’s performance.");
+    }
+
+    [Fact]
+    public async Task RiseResourcesPage_WhenEnableRiseResourcesFeatureFlagDisabled_ReturnsNotFound()
+    {
+        SetupAllThroughSchool();
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, false);
+
+        var response = await Fixture.Client.GetAsync(Routes.AllThroughSchool(Urn).RiseResources);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task RiseResourcesPage_WithNonExistentUrn_ReturnsNotFound()
+    {
+        SetupAllThroughSchool();
+
+        var response = await Fixture.Client.GetAsync(Routes.AllThroughSchool("999999").RiseResources);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task RiseResourcesPage_GroupsByCategoryThenSubCategory_WithContentsLinksDescriptionsAndAlphabeticalResources()
+    {
+        SetupAllThroughSchool();
+        Fixture.RiseResourcesRepository.SetupCategories(
+            Category("Performance and attendance", "About performance and attendance."),
+            Category("Wider school", "About the wider school."));
+        Fixture.RiseResourcesRepository.SetupResources(
+            Entry("Teaching maths fluency", "Wider school", "Curriculum and teaching", "All through"),
+            Entry("GCSE revision guidance", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
+            Entry("Phonics screening support", "Performance and attendance", "Literacy", PhaseOfEducationValues.Primary),
+            Entry("Cross-phase attendance guidance", "Performance and attendance", "Attendance", "All through"),
+            Entry("Pastoral support", "Pupil characteristics", "SEND", "All through"),
+            Entry("Post-16 guidance", "Performance and attendance", "Literacy", "16 plus"));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).RiseResources, HttpStatusCode.OK);
+
+        page.QuerySelectorAll("[data-testid='rise-resources-category']")
+            .Select(el => el.TrimmedTextContent())
+            .Should().Equal("Performance and attendance", "Wider school", "Pupil characteristics");
+
+        page.QuerySelectorAll("[data-testid='rise-resources-category-description']")
+            .Select(el => el.TrimmedTextContent())
+            .Should().Equal("About performance and attendance.", "About the wider school.");
+
+        var subCategoryHeadings = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']");
+        subCategoryHeadings.Select(el => el.TrimmedTextContent())
+            .Should().Equal("Literacy", "Attendance", "Curriculum and teaching", "SEND");
+        subCategoryHeadings[0].GetAttribute("id").Should().Be("literacy");
+        subCategoryHeadings[0].GetAttribute("tabindex").Should().Be("-1");
+
+        var contents = page.ElementWithTestIdShouldExist("rise-resources-contents");
+        contents.ClassList.Should().Contain("rise-resources-contents-list");
+        contents.QuerySelector("h2.rise-resources-contents-list__title")!.TrimmedTextContent().Should().Be("Contents");
+        contents.QuerySelectorAll(".rise-resources-contents-list__list > li").Should().OnlyContain(
+            li => li.ClassList.Contains("rise-resources-contents-list__list-item--dashed"));
+        contents.QuerySelectorAll("[aria-hidden='true']").Should().OnlyContain(
+            dash => dash.ClassList.Contains("rise-resources-contents-list__list-item-dash"));
+        contents.QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
+            .Should().Equal("Literacy", "Attendance", "Curriculum and teaching", "SEND");
+        contents.QuerySelector("a")!.GetAttribute("href").Should().Be("#literacy");
+
+        // Alphabetical within the sub-category; primary-only and secondary-only resources are both
+        // included for an all-through school, since it spans both phases.
+        var literacyList = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")
+            .First(heading => heading.TrimmedTextContent() == "Literacy")
+            .NextElementSibling;
+        literacyList!.QuerySelectorAll("[data-testid='rise-resource-title']")
+            .Select(el => el.TrimmedTextContent())
+            .Should().Equal("GCSE revision guidance", "Phonics screening support");
+
+        // "16 plus"-only resource doesn't apply to primary, secondary, or all-through, so it's excluded.
+        page.QuerySelectorAll("[data-testid='rise-resource-title']")
+            .Select(el => el.TrimmedTextContent())
+            .Should().NotContain("Post-16 guidance");
+
+        var link = literacyList.QuerySelector("a")!;
+        link.GetAttribute("href").Should().Be("https://example.gov.uk/gcse-revision-guidance");
+
+        // Resource links open in the current tab, not a new one.
+        link.GetAttribute("target").Should().BeNull();
+    }
+
+    [Fact]
+    public async Task RiseResourcesPage_OrdersSubCategorySectionsAndContentsBySubCategoryConfiguration()
+    {
+        SetupAllThroughSchool();
+        Fixture.RiseResourcesRepository.SetupCategories(
+            Category("Performance and attendance", "About performance.", "Literacy", "Maths", "Attendance"),
+            Category("Wider school", "About the wider school.", "Curriculum and teaching"));
+        Fixture.RiseResourcesRepository.SetupResources(
+            // Resource-file order is deliberately not the display order.
+            Entry("Maths guide", "Performance and attendance", "Maths", "All through"),
+            Entry("Attendance guide", "Performance and attendance", "Attendance", "All through"),
+            Entry("Literacy guide", "Performance and attendance", "Literacy", "All through"),
+            Entry("Leadership guide", "Wider school", "Leadership and training", "All through"),
+            Entry("Curriculum guide", "Wider school", "Curriculum and teaching", "All through"));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).RiseResources, HttpStatusCode.OK);
+
+        // Listed sub-categories in configured order; "Leadership and training" is unlisted so trails.
+        var expected = new[] { "Literacy", "Maths", "Attendance", "Curriculum and teaching", "Leadership and training" };
+
+        page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")
+            .Select(el => el.TrimmedTextContent())
+            .Should().Equal(expected);
+
+        page.ElementWithTestIdShouldExist("rise-resources-contents")
+            .QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
+            .Should().Equal(expected);
+    }
+
+    [Fact]
+    public async Task RiseResourcesPage_WhenNoResourcesMatchThePhase_ShowsEmptyState()
+    {
+        SetupAllThroughSchool();
+        Fixture.RiseResourcesRepository.SetupResources(
+            Entry("Post-16 guidance", "Performance and attendance", "Literacy", "16 plus"));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).RiseResources, HttpStatusCode.OK);
+
+        page.QuerySelectorAll("[data-testid='rise-resource']").Should().BeEmpty();
+        page.ElementWithTestIdShouldExist("rise-resources-empty");
+    }
+
     public static TheoryData<string, string, string> AllThroughPages => new()
     {
         { Routes.AllThroughSchool(Urn).Overview, "Test School 1", "Overview" },
@@ -211,12 +886,66 @@ public class SchoolPagesIntegrationTests(
 
     private void SetupAllThroughSchool()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableAllThroughSchools, true);
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableAllThroughSchools, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
 
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28")),
+            Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28").WithAddress("1 Test Street", "", "", "Test Town", "TT1 1TT")),
             Build.Establishment("100002", "Test School 2", x => x.Open().AllThrough().InLA("001")));
+    }
+
+    private void SetupAllThroughSchoolWithPrimarySimilarSchools(int count = 50)
+    {
+        Fixture.FeatureFlagService.Override(Flags.EnableAllThroughSchools, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
+
+        var neighbourUrns = Enumerable.Range(2, count)
+            .Select(i => $"100{i:000}")
+            .ToArray();
+
+        var establishments = new[]
+        {
+            Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28").WithAddress("1 Test Street", "", "", "Test Town", "TT1 1TT"))
+        }.Concat(neighbourUrns.Select((urn, index) =>
+            Build.Establishment(urn, $"Similar School {index + 1:00}", x => x
+                .Open()
+                .Primary()
+                .InLA("001")
+                .WithAddress($"{index + 1} Test Street", "", "", "Test Town", "TT1 1TT"))));
+
+        Fixture.EstablishmentRepository.SetupEstablishments(establishments.ToArray());
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(Build.PrimaryGroup(Urn, neighbourUrns));
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(Build.PrimaryValues([Urn, .. neighbourUrns]));
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            neighbourUrns.Select((urn, index) =>
+                Build.Ks2Performance.Establishment(urn, x => x.WithRwmExpected((index + 51).ToString(), "", ""))).ToArray());
+    }
+
+    private void SetupAllThroughSchoolWithSecondarySimilarSchools(int count = 50)
+    {
+        Fixture.FeatureFlagService.Override(Flags.EnableAllThroughSchools, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
+
+        var neighbourUrns = Enumerable.Range(2, count)
+            .Select(i => $"200{i:000}")
+            .ToArray();
+
+        var establishments = new[]
+        {
+            Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28").WithAddress("1 Test Street", "", "", "Test Town", "TT1 1TT"))
+        }.Concat(neighbourUrns.Select((urn, index) =>
+            Build.Establishment(urn, $"Secondary Similar School {index + 1:00}", x => x
+                .Open()
+                .Secondary()
+                .InLA("001")
+                .WithAddress($"{index + 1} Secondary Street", "", "", "Test Town", "TT1 1TT"))));
+
+        Fixture.EstablishmentRepository.SetupEstablishments(establishments.ToArray());
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, neighbourUrns));
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(Build.SecondaryValues([Urn, .. neighbourUrns]));
+        Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
+            neighbourUrns.Select((urn, index) =>
+                Build.Ks4Performance.Establishment(urn, x => x.WithAttainment8((index + 51).ToString(), "", ""))).ToArray());
     }
 
     private static void AssertNavigation(IDocument page, (string Text, string Href)[] expectedItems)
@@ -239,4 +968,21 @@ public class SchoolPagesIntegrationTests(
         link.ClassList.Should().Contain("app-side-navigation__link--selected");
         link.GetAttribute("aria-current").Should().Be("page");
     }
+
+    private static string NormaliseWhitespace(string value) =>
+        string.Join(" ", value.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+
+    private static RiseResourceEntry Entry(string title, string category, string subCategory, params string[] phases) =>
+        new()
+        {
+            ResourceTitle = title,
+            ResourceDescription = $"{title} description",
+            ResourceUrl = $"https://example.gov.uk/{title.Replace(' ', '-').ToLowerInvariant()}",
+            Category = category,
+            SubCategory = subCategory,
+            SchoolPhases = phases
+        };
+
+    private static RiseResourceCategoryEntry Category(string name, string description, params string[] subCategories) =>
+        new() { Category = name, CategoryDescription = description, SubCategories = subCategories };
 }

@@ -1,5 +1,4 @@
 ﻿using SAPSec.Core.Features.Availability;
-using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SchoolDetails;
 

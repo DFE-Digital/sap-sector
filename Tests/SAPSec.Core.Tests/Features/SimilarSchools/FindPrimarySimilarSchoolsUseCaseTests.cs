@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Features.Availability;
+﻿using SAPSec.Core.Exceptions;
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Test.Common.InMemory;
@@ -93,6 +94,30 @@ public class FindPrimarySimilarSchoolsUseCaseTests
                 "100004",
                 "100005",
                 "100006");
+    }
+
+    [Fact]
+    public async Task ResultsExcludeSecondarySchoolsFromPrimarySimilarSchoolsGroup()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001", PhaseOfEducationName = "All-through" },
+            new() { URN = "100002", PhaseOfEducationName = "Primary" },
+            new() { URN = "100003", PhaseOfEducationName = "All-through" },
+            new() { URN = "100004", PhaseOfEducationName = "Secondary" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" }
+        );
+
+        var response = await _sut.Execute(Request("100001"));
+
+        response.AllResults.Select(r => r.URN)
+            .Should().BeEquivalentTo("100002", "100003");
+
+        response.ResultsPage.Select(r => r.URN)
+            .Should().BeEquivalentTo("100002", "100003");
     }
 
     [Fact]
@@ -1070,9 +1095,9 @@ public class FindPrimarySimilarSchoolsUseCaseTests
     // Duplicate filter values are ignored
     [InlineData("poe", new[] { "2", "2", "3", "3" }, new[] { "100003", "100004" })]
     // Empty filter values returns all results
-    [InlineData("poe", new string[0], new[] { "100002", "100003", "100004", "100005" })]
+    [InlineData("poe", new string[0], new[] { "100003", "100004" })]
     // All filter values returns all results
-    [InlineData("poe", new[] { "1", "2", "3", "4" }, new[] { "100002", "100003", "100004", "100005" })]
+    [InlineData("poe", new[] { "1", "2", "3", "4" }, new[] { "100003", "100004" })]
     public async Task FilterBy_PhaseOfEducation(string filterKey, string[] filterValues, string[] expectedUrns)
     {
         _establishmentRepo.SetupEstablishments(

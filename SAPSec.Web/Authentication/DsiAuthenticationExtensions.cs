@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using SAPSec.Core.Authentication;
-using SAPSec.Core.Services;
 using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 using System.Diagnostics.CodeAnalysis;

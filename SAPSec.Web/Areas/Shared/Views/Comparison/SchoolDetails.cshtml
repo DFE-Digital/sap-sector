@@ -1,8 +1,6 @@
 @using System.Globalization
 @using System.Text.Encodings.Web
 @using System.Text.Json
-@using SAPSec.Core.Constants
-@using SAPSec.Core.Extensions
 @using SAPSec.Core.Features.SchoolDetails
 @using SAPSec.Web.Areas.Secondary.ViewModels
 @using SAPSec.Web.Areas.Shared.ViewModels.Comparison
@@ -13,7 +11,7 @@
 
 @model SchoolDetailsPageViewModel
 @{
-    Layout = "_Layout";
+    Layout = "~/Areas/Shared/Views/Comparison/_Layout.cshtml";
     ViewData[ViewDataKeys.Title] = $"School details compared to {Model.ComparatorSchool.Name}";
 
     var inv = CultureInfo.InvariantCulture;

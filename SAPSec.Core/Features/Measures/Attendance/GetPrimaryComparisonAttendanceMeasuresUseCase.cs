@@ -1,4 +1,4 @@
-using SAPSec.Core.Extensions;
+using SAPSec.Core.Collections;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Data.Repositories;

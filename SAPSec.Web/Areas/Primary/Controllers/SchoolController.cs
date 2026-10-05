@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
@@ -9,9 +9,7 @@ using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
-using SAPSec.Web.Areas.Primary.ViewModels.School;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
@@ -42,6 +40,8 @@ public class SchoolController(
         IFeatureFlagService featureFlagService)
     : Controller
 {
+    private const string SharedKs2PerformanceMeasuresView = "~/Areas/Shared/Views/School/Ks2PerformanceMeasures.cshtml";
+
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
@@ -74,6 +74,8 @@ public class SchoolController(
         var model = new Ks2PerformanceMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            WhatIsASimilarSchoolUrl = Routes.PrimarySchool(urn).WhatIsASimilarSchool,
+            SimilarSchoolDefinitionLinkText = "how DfE defines what a similar school is",
             MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School, similarSchoolsResponse.HasSimilarSchools),
             AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardRwm, response.School, similarSchoolsResponse.HasSimilarSchools),
             AverageScaledScoreReading = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreReading, response.School, similarSchoolsResponse.HasSimilarSchools),
@@ -82,7 +84,7 @@ public class SchoolController(
             AchievedHigherStandardGps = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardGps, response.School, similarSchoolsResponse.HasSimilarSchools)
         };
 
-        return View(model);
+        return View(SharedKs2PerformanceMeasuresView, model);
     }
 
     [HttpGet]
@@ -124,7 +126,7 @@ public class SchoolController(
     }
 
     [HttpGet]
-    [RequireFeatureFlag(FeatureFlags.EnableRiseResources)]
+    [RequireFeatureFlag(Flags.EnableRiseResources)]
     [Route("rise-resources")]
     public async Task<IActionResult> RiseResources(string urn)
     {
@@ -143,7 +145,7 @@ public class SchoolController(
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
 
         var includeRise = featureFlagService is not null
-            && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+            && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,
@@ -165,7 +167,7 @@ public class SchoolController(
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
 
         var includeRise = featureFlagService is not null
-            && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+            && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,
