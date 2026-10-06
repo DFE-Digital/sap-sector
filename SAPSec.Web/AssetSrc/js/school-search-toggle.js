@@ -16,6 +16,22 @@
         if (textEl) textEl.textContent = text;
     }
 
+    function getResultsLabel(toggle) {
+        return toggle.dataset.resultsLabel || "schools";
+    }
+
+    function setToggleLabel(toggle, nextView, currentView) {
+        const resultsLabel = getResultsLabel(toggle);
+        toggle.setAttribute("aria-label", `View ${nextView}, currently showing ${currentView} of ${resultsLabel}`);
+    }
+
+    function announceView(toggle, currentView) {
+        const notificationContainer = document.getElementById("notification-container");
+        if (!notificationContainer) return;
+
+        notificationContainer.textContent = `Showing ${currentView} of ${getResultsLabel(toggle)}`;
+    }
+
     function showMap({ persist = true } = {}) {
         const listView = document.getElementById("listView");
         const mapView = document.getElementById("mapView");
@@ -27,6 +43,7 @@
 
         setToggleText(toggle, "View as a list");
         toggle.dataset.view = "map";
+        setToggleLabel(toggle, "as a list", "map");
 
         requestAnimationFrame(() => mountToggle(MAP_SLOT_ID));
         setTimeout(() => mountToggle(MAP_SLOT_ID), 0);
@@ -47,6 +64,7 @@
 
         setToggleText(toggle, "View on map");
         toggle.dataset.view = "list";
+        setToggleLabel(toggle, "on map", "list");
 
         mountToggle(LIST_SLOT_ID);
 
@@ -66,19 +84,16 @@
 
     document.addEventListener("click", function (e) {
         const toggleLink = e.target.closest("#toggleViewLink");
-        const notificationContainer = document.getElementById("notification-container");
         if (toggleLink) {
             e.preventDefault();
             const isList = toggleLink.dataset.view === "list";
             if (isList) {
-                //sends notification to aria-live container
-                notificationContainer.textContent = "Showing map of similar schools";
                 showMap();
+                announceView(toggleLink, "map");
             }
             else {
-                //sends notification to aria-live container
-                notificationContainer.textContent = "Showing list of similar schools";
                 showList();
+                announceView(toggleLink, "list");
             }
             return;
         }

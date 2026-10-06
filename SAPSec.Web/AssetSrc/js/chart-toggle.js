@@ -50,13 +50,12 @@
         var title = document.createElement("h3");
         title.className = "govuk-heading-m app-content-toggle__title";
         title.textContent = primaryLabel;
-        title.id = "chart-title";
 
         var button = document.createElement("button");
         button.type = "button";
         button.className = "govuk-button govuk-button--secondary";
         button.textContent = "Show " + yearlyLabel.toLowerCase();
-        button.setAttribute("aria-pressed", "false");
+        button.setAttribute("aria-label", "Show " + yearlyLabel.toLowerCase() + " line graph");
         button.setAttribute("data-module", "govuk-button");
 
         header.appendChild(title);
@@ -168,7 +167,9 @@
             toggle.button.textContent = showingYearly
                 ? "Show " + primaryLabel.toLowerCase()
                 : "Show " + yearlyLabel.toLowerCase();
-            toggle.button.setAttribute("aria-pressed", showingYearly ? "true" : "false");
+            toggle.button.setAttribute("aria-label", showingYearly
+                ? "Show " + primaryLabel.toLowerCase() + " bar graph"
+                : "Show " + yearlyLabel.toLowerCase() + " line graph");
 
             resizeCharts(showingYearly ? yearlyPanel : averagePanel);
         });

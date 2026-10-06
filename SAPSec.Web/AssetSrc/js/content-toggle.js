@@ -26,6 +26,12 @@ function resizeCharts(container) {
     });
 }
 
+function getToggleLabel(panel) {
+    return panel.getAttribute("data-content-toggle-aria-label")
+        || panel.getAttribute("data-content-toggle-name")
+        || "";
+}
+
 function initialiseToggle(toggle, activeIndex) {
     var title = toggle.querySelector(".app-content-toggle__title");
     var button = toggle.querySelector(".app-content-toggle__header button[type='button']");
@@ -49,13 +55,11 @@ function initialiseToggle(toggle, activeIndex) {
         var nextIndex = (index + 1) % panels.length;
         var activePanel = panels[index];
         var nextPanel = panels[nextIndex];
-        var activeName = activePanel.getAttribute("data-content-toggle-name") || "";
         var nextName = nextPanel.getAttribute("data-content-toggle-name") || "";
+        var activeName = activePanel.getAttribute("data-content-toggle-name") || "";
+        var nextLabel = getToggleLabel(nextPanel);
 
-        button.setAttribute("aria-label", index === 0
-            ? "Show year by year line chart"
-            : `Show ${nextName} bar charts`);
-
+        button.setAttribute("aria-label", "Show " + nextLabel.toLowerCase());
 
         panels.forEach(function (panel, panelIndex) {
             panel.classList.toggle("app-content-toggle__panel--active", panelIndex === index);

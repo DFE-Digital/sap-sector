@@ -37,7 +37,7 @@ public class TabbedViewTagHelper : TagHelper
             output.Content.AppendHtml(
         $"""
                 <li class="govuk-tabs__list-item {selected}">
-                    <a class="govuk-tabs__tab" href="#{HtmlPrefix}-{tab.Id}">{tab.Name}</a>
+                    <a class="govuk-tabs__tab" href="#{HtmlPrefix}-{tab.Id}"{BuildAriaLabel(tab.AriaLabel)}>{tab.Name}</a>
                 </li>
         """);
         }
@@ -63,6 +63,11 @@ public class TabbedViewTagHelper : TagHelper
             """);
         }
     }
+
+    private static string BuildAriaLabel(string? ariaLabel) =>
+        string.IsNullOrWhiteSpace(ariaLabel)
+            ? string.Empty
+            : $" aria-label=\"{WebUtility.HtmlEncode(ariaLabel)}\"";
 }
 
 public class TabbedViewContext
