@@ -3,7 +3,7 @@ using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Features.SchoolInfo;
 
-public record SchoolInfo(string Urn, string Name, LocalAuthority LocalAuthority, Address Address, EducationStage EducationStage)
+public record SchoolInfo(string Urn, string Name, LocalAuthority LocalAuthority, Address Address, PhaseOfEducation PhaseOfEducation, EducationStage EducationStage)
 {
     internal static SchoolInfo FromEstablishment(Establishment establishment) =>
         new SchoolInfo(
@@ -28,6 +28,15 @@ public enum EducationStage
     None = 0,
     Primary = 1,
     Secondary = 2
+}
+
+public enum PhaseOfEducation
+{
+    Primary,
+    Secondary,
+    AllThrough,
+    MiddleDeemedPrimary,
+    MiddleDeemedSecondary
 }
 
 public static class EducationStageHelper

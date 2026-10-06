@@ -51,32 +51,19 @@ public class SchoolDetailsViewModel
     public required DataWithAvailability<string> Telephone { get; init; }
     public required DataWithAvailability<string> Email { get; init; }
 
+    public required string OfstedProviderId { get; init; }
+
     public bool HasAcademyTrust =>
         AcademyTrustName.IsAvailable
         && AcademyTrustId.IsAvailable;
 
     public bool ShouldDisplayAcademyTrust =>
         HasAcademyTrust
-        && (!IsAllThroughSchool
-            || (GovernanceStructure.IsAvailable
-                && GovernanceStructure.Value is GovernanceType.MultiAcademyTrust or GovernanceType.SingleAcademyTrust));
+        && (GovernanceStructure.IsAvailable
+            && GovernanceStructure.Value is GovernanceType.MultiAcademyTrust or GovernanceType.SingleAcademyTrust);
 
-    public string OfstedReportUrl
-    {
-        get
-        {
-            var providerId = IsAllThroughSchool
-                ? GetAllThroughOfstedProviderId()
-                : IsPrimarySchool ? "21" : "23";
-
-            return $"https://reports.ofsted.gov.uk/provider/{providerId}/{Urn}";
-        }
-    }
-
-    private string GetAllThroughOfstedProviderId() =>
-        TypeOfEstablishmentCode.IsAvailable && TypeOfEstablishmentCode.Value == "49"
-            ? "100003"
-            : "28";
+    public string OfstedReportUrl =>
+        $"https://reports.ofsted.gov.uk/provider/{OfstedProviderId}/{Urn}";
 
     public static SchoolDetailsViewModel FromSchoolDetails(SchoolDetails schoolDetails) =>
         new()
@@ -113,5 +100,6 @@ public class SchoolDetailsViewModel
             Website = schoolDetails.Website,
             Telephone = schoolDetails.Telephone,
             Email = schoolDetails.Email,
+            OfstedProviderId = schoolDetails.OfstedProviderId
         };
 }

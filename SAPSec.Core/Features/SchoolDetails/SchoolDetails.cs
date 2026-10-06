@@ -52,4 +52,6 @@ public record SchoolDetails(string Urn, string Name, LocalAuthority LocalAuthori
     public required DataWithAvailability<string> Website { get; init; }
     public required DataWithAvailability<string> Telephone { get; init; }
     public required DataWithAvailability<string> Email { get; init; }
+
+    public required string OfstedProviderId { get; init; }
 }
