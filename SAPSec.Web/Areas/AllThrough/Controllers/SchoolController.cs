@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.FeatureFlags;
+using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.RiseResources;
@@ -34,6 +36,7 @@ public class SchoolController(
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
         IUseCase<GetAllThroughSimilarSchoolPhasesRequest, GetAllThroughSimilarSchoolPhasesResponse> getAllThroughSimilarSchoolPhasesUseCase,
         IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
+        IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
         IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getKs4HeadlineMeasuresUseCase,
         IFeatureFlagService featureFlagService)
     : Controller
@@ -138,10 +141,22 @@ public class SchoolController(
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        var response = await getSchoolInfoUseCase.Execute(new(urn));
-        await PopulateViewData(response.School);
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var primaryResponse = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Primary, urn, filters, ScopeKeysToPhase: true));
+        var secondaryResponse = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Secondary, urn, filters, ScopeKeysToPhase: true));
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+        await PopulateViewData(primaryResponse.School);
+
+        var model = new AllThroughAttendancePageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(primaryResponse.School),
+            WhatIsASimilarSchoolUrl = Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
+            SimilarSchoolDefinitionLinkText = "how DfE identifies what a similar school is",
+            PrimaryAbsence = MeasureViewModel.FromAllThroughPrimaryAttendanceMeasure(primaryResponse.Absence, primaryResponse.School),
+            SecondaryAbsence = MeasureViewModel.FromAllThroughSecondaryAttendanceMeasure(secondaryResponse.Absence, secondaryResponse.School)
+        };
+
+        return View(model);
     }
 
     [HttpGet]

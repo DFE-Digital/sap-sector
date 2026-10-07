@@ -20,7 +20,7 @@ public abstract record MeasureBreakdownViewModel(
             ? value.Value.ToString("0.0", CultureInfo.InvariantCulture)
             : "No available data";
 
-    public static string DisplayWholePercent(decimal? value, int decimalPlaces = 2) =>
+    private static string DisplayWholePercent(decimal? value) =>
         value.HasValue
             ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture) + "%"
             : "No available data";
