@@ -108,4 +108,22 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
 
         return result;
     }
+
+    public async Task<IReadOnlyCollection<EstablishmentLinks>> GetEstablishmentLinksAsync(string urn)
+    {
+        if (string.IsNullOrWhiteSpace(urn))
+            return Array.Empty<EstablishmentLinks>();
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+
+        const string sql = """
+            SELECT *
+            FROM public.v_establishment_links
+            WHERE urn = @urn;
+        """;
+
+        var result = await conn.QueryAsync<EstablishmentLinks>(sql, new { urn });
+
+        return result.ToList();
+    }
 }

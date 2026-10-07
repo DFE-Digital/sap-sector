@@ -42,10 +42,34 @@ public record MeasureViewModel(
             ComparisonCurrentYearColors,
             ComparisonYearByYearColors);
 
+    public static MeasureViewModel FromAllThroughPrimaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
+        => FromMeasure(measure, schoolInfo, similarSchool,
+            urn => Routes.AllThroughSchool(urn).ViewSimilarSchools,
+            (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).PrimaryComparison(similarSchoolUrn).Similarity,
+            ComparisonCurrentYearColors,
+            ComparisonYearByYearColors,
+            englandSchoolsAverageLabel: "Primary schools in England average");
+
+    public static MeasureViewModel FromAllThroughPrimaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools)
+        => FromMeasure(measure, schoolInfo, null,
+            urn => Routes.AllThroughSchool(urn).ViewSimilarSchools,
+            (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).PrimaryComparison(similarSchoolUrn).Similarity,
+            SchoolCurrentYearColors,
+            SchoolYearByYearColors,
+            hasSimilarSchools);
+
     public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
+            SchoolCurrentYearColors,
+            SchoolYearByYearColors,
+            hasSimilarSchools);
+
+    public static MeasureViewModel FromAllThroughSecondaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools)
+        => FromMeasure(measure, schoolInfo, null,
+            urn => $"{Routes.AllThroughSchool(urn).ViewSimilarSchools}?phase=secondary",
+            (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).SecondaryComparison(similarSchoolUrn).Similarity,
             SchoolCurrentYearColors,
             SchoolYearByYearColors,
             hasSimilarSchools);
@@ -57,13 +81,33 @@ public record MeasureViewModel(
             ComparisonCurrentYearColors,
             ComparisonYearByYearColors);
 
-    public static MeasureViewModel FromAllThroughMeasure(MeasurePhase phase, Measure measure, SchoolInfo schoolInfo)
+    public static MeasureViewModel FromAllThroughSecondaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
+        => FromMeasure(measure, schoolInfo, similarSchool,
+            urn => $"{Routes.AllThroughSchool(urn).ViewSimilarSchools}?phase=secondary",
+            (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).SecondaryComparison(similarSchoolUrn).Similarity,
+            ComparisonCurrentYearColors,
+            ComparisonYearByYearColors,
+            englandSchoolsAverageLabel: "Secondary schools in England average");
+
+    // Attendance is a 3-series measure (school, LA average, England average) with no similar schools average
+    // or top performers, so the similar-schools URL delegates are never invoked.
+    public static MeasureViewModel FromAllThroughPrimaryAttendanceMeasure(Measure measure, SchoolInfo schoolInfo)
         => FromMeasure(measure, schoolInfo, null,
-            _ => throw new InvalidOperationException("All-through attendance measures have no top performers"),
-            (_, _) => throw new InvalidOperationException("All-through attendance measures have no top performers"),
+            _ => throw new InvalidOperationException("Attendance measures have no top performers"),
+            (_, _) => throw new InvalidOperationException("Attendance measures have no top performers"),
             AllThroughCurrentYearColors,
             AllThroughYearByYearColors,
-            labelResolver: (seriesType, currentSchool, _) => ResolveAllThroughSeriesLabel(phase, seriesType, currentSchool));
+            laSchoolsAverageLabel: "Local authority primary schools average",
+            englandSchoolsAverageLabel: "Primary schools in England average");
+
+    public static MeasureViewModel FromAllThroughSecondaryAttendanceMeasure(Measure measure, SchoolInfo schoolInfo)
+        => FromMeasure(measure, schoolInfo, null,
+            _ => throw new InvalidOperationException("Attendance measures have no top performers"),
+            (_, _) => throw new InvalidOperationException("Attendance measures have no top performers"),
+            AllThroughCurrentYearColors,
+            AllThroughYearByYearColors,
+            laSchoolsAverageLabel: "Local authority secondary schools average",
+            englandSchoolsAverageLabel: "Secondary schools in England average");
 
     private static MeasureViewModel FromMeasure(
         Measure measure,
@@ -74,17 +118,16 @@ public record MeasureViewModel(
         string[] currentYearChartColors,
         string[] yearByYearChartColors,
         bool hasSimilarSchools = true,
-        Func<MeasureSeriesType, SchoolInfo, SchoolInfo?, string>? labelResolver = null)
+        string laSchoolsAverageLabel = "Local authority schools average",
+        string englandSchoolsAverageLabel = "Schools in England average")
     {
-        labelResolver ??= ResolveSeriesLabel;
-
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
             measure.Name,
             measure.Year,
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
-            measure.Series.Select(s => labelResolver(s.SeriesType, schoolInfo, similarSchool)),
+            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool, laSchoolsAverageLabel, englandSchoolsAverageLabel)),
             measure.Series.Select(s => ResolveSeriesPointStyle(s.SeriesType)));
 
         decimal? MapCurrentYear(MeasureSeries series) =>
@@ -136,30 +179,22 @@ public record MeasureViewModel(
             topPerformers);
     }
 
-    private static string ResolveSeriesLabel(MeasureSeriesType seriesType, SchoolInfo currentSchool, SchoolInfo? similarSchool = null) =>
+    private static string ResolveSeriesLabel(
+        MeasureSeriesType seriesType,
+        SchoolInfo currentSchool,
+        SchoolInfo? similarSchool = null,
+        string laSchoolsAverageLabel = "Local authority schools average",
+        string englandSchoolsAverageLabel = "Schools in England average") =>
        seriesType switch
        {
            MeasureSeriesType.CurrentSchool => currentSchool.Name,
            MeasureSeriesType.ComparatorSchool => similarSchool?.Name ??
                throw new InvalidOperationException($"Similar school required to resolve label for Measure Series Type: {Enum.GetName(seriesType)}"),
            MeasureSeriesType.SimilarSchoolsAverage => "Similar schools average",
-           MeasureSeriesType.LASchoolsAverage => "Local authority schools average",
-           MeasureSeriesType.EnglandSchoolsAverage => "Schools in England average",
+           MeasureSeriesType.LASchoolsAverage => laSchoolsAverageLabel,
+           MeasureSeriesType.EnglandSchoolsAverage => englandSchoolsAverageLabel,
            _ => throw new InvalidOperationException($"No label found for Measure Series Type: {Enum.GetName(seriesType)}")
        };
-
-    private static string ResolveAllThroughSeriesLabel(MeasurePhase phase, MeasureSeriesType seriesType, SchoolInfo currentSchool) =>
-        seriesType switch
-        {
-            MeasureSeriesType.CurrentSchool => currentSchool.Name,
-            MeasureSeriesType.LASchoolsAverage => $"Local authority {PhaseLabel(phase)} schools average",
-            MeasureSeriesType.EnglandSchoolsAverage => $"{CapitalisedPhaseLabel(phase)} schools in England average",
-            _ => throw new InvalidOperationException($"No all-through label found for Measure Series Type: {Enum.GetName(seriesType)}")
-        };
-
-    private static string PhaseLabel(MeasurePhase phase) => phase is MeasurePhase.Primary ? "primary" : "secondary";
-
-    private static string CapitalisedPhaseLabel(MeasurePhase phase) => phase is MeasurePhase.Primary ? "Primary" : "Secondary";
 
     private static string ResolveSeriesPointStyle(MeasureSeriesType seriesType) =>
         seriesType switch

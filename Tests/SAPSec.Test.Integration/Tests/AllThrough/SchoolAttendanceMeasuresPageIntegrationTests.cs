@@ -1,7 +1,7 @@
 using AngleSharp.Html.Dom;
 using FluentAssertions;
-using SAPSec.Core.Constants;
-using SAPSec.Core.Services.Helper;
+using SAPSec.Core.FeatureFlags;
+using SAPSec.Core.Text;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;
@@ -19,9 +19,18 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
 
     public override Task DisposeAsync()
     {
-        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnableAllThroughSchools);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnableAllThroughSchools);
 
         return base.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task Attendance_WhenAllThroughFeatureFlagDisabled_ReturnsNotFound()
+    {
+        SetupAllThroughSchool();
+        Fixture.FeatureFlagService.Override(Flags.EnableAllThroughSchools, false);
+
+        await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Attendance, HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -209,7 +218,7 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
 
     private void SetupAllThroughSchool()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableAllThroughSchools, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableAllThroughSchools, true);
 
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001")));

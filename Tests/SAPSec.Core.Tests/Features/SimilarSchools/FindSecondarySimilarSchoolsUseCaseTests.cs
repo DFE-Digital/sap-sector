@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Features.Availability;
+﻿using SAPSec.Core.Exceptions;
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Test.Common.InMemory;
@@ -93,6 +94,30 @@ public class FindSecondarySimilarSchoolsUseCaseTests
                 "100004",
                 "100005",
                 "100006");
+    }
+
+    [Fact]
+    public async Task ResultsExcludePrimarySchoolsFromSecondarySimilarSchoolsGroup()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001", PhaseOfEducationName = "All-through" },
+            new() { URN = "100002", PhaseOfEducationName = "Secondary" },
+            new() { URN = "100003", PhaseOfEducationName = "All-through" },
+            new() { URN = "100004", PhaseOfEducationName = "Primary" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" }
+        );
+
+        var response = await _sut.Execute(Request("100001"));
+
+        response.AllResults.Select(r => r.URN)
+            .Should().BeEquivalentTo("100002", "100003");
+
+        response.ResultsPage.Select(r => r.URN)
+            .Should().BeEquivalentTo("100002", "100003");
     }
 
     [Fact]
@@ -1065,25 +1090,25 @@ public class FindSecondarySimilarSchoolsUseCaseTests
     }
 
     [Theory]
-    [InlineData("poe", new[] { "2", "3" }, new[] { "100003", "100004" })]
+    [InlineData("poe", new[] { "11", "12" }, new[] { "100003", "100004" })]
     // Filter key is case insensitive
-    [InlineData("POE", new[] { "2", "3" }, new[] { "100003", "100004" })]
+    [InlineData("POE", new[] { "11", "12" }, new[] { "100003", "100004" })]
     // Invalid filter values are ignored
-    [InlineData("poe", new[] { "xxx", "3" }, new[] { "100004" })]
+    [InlineData("poe", new[] { "xxx", "12" }, new[] { "100004" })]
     // Duplicate filter values are ignored
-    [InlineData("poe", new[] { "2", "2", "3", "3" }, new[] { "100003", "100004" })]
+    [InlineData("poe", new[] { "11", "11", "12", "12" }, new[] { "100003", "100004" })]
     // Empty filter values returns all results
     [InlineData("poe", new string[0], new[] { "100002", "100003", "100004", "100005" })]
     // All filter values returns all results
-    [InlineData("poe", new[] { "1", "2", "3", "4" }, new[] { "100002", "100003", "100004", "100005" })]
+    [InlineData("poe", new[] { "10", "11", "12", "13" }, new[] { "100002", "100003", "100004", "100005" })]
     public async Task FilterBy_PhaseOfEducation(string filterKey, string[] filterValues, string[] expectedUrns)
     {
         _establishmentRepo.SetupEstablishments(
             new() { URN = "100001" },
-            new() { URN = "100002", PhaseOfEducationId = "1" },
-            new() { URN = "100003", PhaseOfEducationId = "2" },
-            new() { URN = "100004", PhaseOfEducationId = "3" },
-            new() { URN = "100005", PhaseOfEducationId = "4" }
+            new() { URN = "100002", PhaseOfEducationId = "10" },
+            new() { URN = "100003", PhaseOfEducationId = "11" },
+            new() { URN = "100004", PhaseOfEducationId = "12" },
+            new() { URN = "100005", PhaseOfEducationId = "13" }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -1165,7 +1190,6 @@ public class FindSecondarySimilarSchoolsUseCaseTests
                 Name = "Phase of education",
                 Options = new[]
                 {
-                    new { Key = "4", Name = "Primary", Selected = false, Count = 1 },
                     new { Key = "3", Name = "Middle", Selected = false, Count = 3 },
                     new { Key = "1", Name = "Secondary", Selected = true, Count = 2 },
                     new { Key = "2", Name = "All-through", Selected = true, Count = 1 }
@@ -1211,8 +1235,7 @@ public class FindSecondarySimilarSchoolsUseCaseTests
                 Options = new[]
                 {
                     new { Key = "1", Name = "Secondary", Selected = true, Count = 1 },
-                    new { Key = "3", Name = "Middle", Selected = false, Count = 1 },
-                    new { Key = "4", Name = "Primary", Selected = false, Count = 1 }
+                    new { Key = "3", Name = "Middle", Selected = false, Count = 1 }
                 }
             }),
             // Numeric range filters are always included
