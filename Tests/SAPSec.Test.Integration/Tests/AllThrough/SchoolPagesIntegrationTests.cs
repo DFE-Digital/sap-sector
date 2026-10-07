@@ -355,7 +355,7 @@ public class SchoolPagesIntegrationTests(
     }
 
     [Fact]
-    public async Task AttendancePage_ShowsPrototypeContent()
+    public async Task AttendancePage_ShowsIntroductionAndVyedGuidance()
     {
         SetupAllThroughSchool();
         Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));

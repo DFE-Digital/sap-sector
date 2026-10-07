@@ -53,7 +53,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
 
         await toggleButton.ClickAsync();
 
@@ -61,7 +61,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -69,7 +69,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
     }
 
     [Fact]
@@ -200,7 +200,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
 
         await toggleButton.ClickAsync();
 
@@ -208,7 +208,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -216,7 +216,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
     }
 
     [Fact]
@@ -311,7 +311,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
 
         await toggleButton.ClickAsync();
 
@@ -319,7 +319,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -327,7 +327,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
     }
 
     [Fact]
@@ -422,7 +422,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
 
         await toggleButton.ClickAsync();
 
@@ -430,7 +430,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -438,7 +438,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
     }
 
     [Fact]
@@ -533,7 +533,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
 
         await toggleButton.ClickAsync();
 
@@ -541,7 +541,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -549,7 +549,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
     }
 
     [Fact]
@@ -644,7 +644,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
 
         await toggleButton.ClickAsync();
 
@@ -652,7 +652,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -660,7 +660,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
     }
 
     [Fact]
@@ -755,7 +755,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
 
         await toggleButton.ClickAsync();
 
@@ -763,7 +763,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -771,7 +771,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeHiddenAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
     }
 
     [Fact]

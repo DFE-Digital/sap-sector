@@ -78,6 +78,9 @@ public class SimilarSchoolsIntegrationTests(JsonRepositoryIntegrationTestFixture
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("toggleViewLink");
+        content.Should().Contain("data-results-label=\"similar schools\"");
+        content.Should().Contain("id=\"notification-container\"");
+        content.Should().Contain("aria-live=\"polite\"");
     }
 
     [Fact]
