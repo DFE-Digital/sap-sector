@@ -4,6 +4,7 @@ using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Text;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
+using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
@@ -45,6 +46,10 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
 
         var secondaryHeading = page.ElementWithTestIdShouldExist("secondary-attendance-heading");
         secondaryHeading.TrimmedTextContent().Should().Be("Secondary attendance");
+
+        page.QuerySelectorAll("[data-testid$='-attendance-heading']")
+            .Select(x => x.TrimmedTextContent())
+            .Should().Equal("Primary attendance", "Secondary attendance");
     }
 
     [Fact]
@@ -206,6 +211,194 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
             ["Primary schools in England average", "No available data", "No available data", "No available data"]);
     }
 
+    [Fact]
+    public async Task Attendance_TableViews_ValuesRoundTo2DecimalPlaces()
+    {
+        SetupAllThroughSchool();
+
+        Fixture.AbsenceRepository.SetupEstablishmentAbsence(
+            Build.Absence.Establishment(Urn, x => x.WithOverallAbsence(current: "8.1052", previous: "8.315", previous2: "7.8923")));
+
+        Fixture.AbsenceRepository.SetupLAAbsence(
+            Build.Absence.LA("001", x => x
+                .WithOverallAbsencePrimary(current: "9.102", previous: "8.975", previous2: "8.914")
+                .WithOverallAbsenceSecondary(current: "10.104", previous: "9.995", previous2: "9.876")));
+
+        Fixture.AbsenceRepository.SetupEnglandAbsence(
+            Build.Absence.England(x => x
+                .WithOverallAbsencePrimary(current: "7.205", previous: "8.524", previous2: "9.495")
+                .WithOverallAbsenceSecondary(current: "6.115", previous: "6.004", previous2: "5.896")));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Attendance, HttpStatusCode.OK);
+
+        var primaryTable = page.ElementWithTestIdShouldExist<IHtmlTableElement>("primary-absence-table-view-table");
+        primaryTable.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "7.89%", "8.32%", "8.11%"],
+            ["Local authority primary schools average", "8.91%", "8.98%", "9.10%"],
+            ["Primary schools in England average", "9.50%", "8.52%", "7.21%"]);
+
+        var secondaryTable = page.ElementWithTestIdShouldExist<IHtmlTableElement>("secondary-absence-table-view-table");
+        secondaryTable.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "7.89%", "8.32%", "8.11%"],
+            ["Local authority secondary schools average", "9.88%", "10.00%", "10.10%"],
+            ["Secondary schools in England average", "5.90%", "6.00%", "6.12%"]);
+    }
+
+    [Theory]
+    [InlineData("primary")]
+    [InlineData("secondary")]
+    public async Task Attendance_OverallAbsence_ChartSettings(string prefix)
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Attendance, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist($"{prefix}-absence-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "1"),
+            ("axis-max", "10"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist($"{prefix}-absence-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "1"),
+            ("axis-max", "10"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+    }
+
+    [Theory]
+    [InlineData("primary")]
+    [InlineData("secondary")]
+    public async Task Attendance_PersistentAbsence_ChartSettings(string prefix)
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Attendance, HttpStatusCode.OK);
+
+        var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>($"{prefix}-absence-type-filter");
+        filter.SelectOption("Persistent absence");
+
+        var submitButton = page.ElementWithTestIdShouldExist<IHtmlButtonElement>($"{prefix}-absence-type-filter-submit");
+        var newPage = await page.SubmitContainingFormAsync(submitButton);
+
+        var currentYearChart = newPage.ElementWithTestIdShouldExist($"{prefix}-absence-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "5"),
+            ("axis-max", "30"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+
+        var yearByYearChart = newPage.ElementWithTestIdShouldExist($"{prefix}-absence-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "5"),
+            ("axis-max", "30"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+    }
+
+    [Fact]
+    public async Task Attendance_CharacteristicFilter_PrimarySection_UpdatesPrimaryTableOnly()
+    {
+        SetupAllThroughSchool();
+        SetupBoysAndAllPupilsOverallAbsence();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Attendance, HttpStatusCode.OK);
+
+        var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("primary-absence-characteristic-filter");
+        filter.SelectOption("Boys");
+
+        var submitButton = page.ElementWithTestIdShouldExist<IHtmlButtonElement>("primary-absence-characteristic-filter-submit");
+        var newPage = await page.SubmitContainingFormAsync(submitButton);
+
+        var primaryTable = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("primary-absence-table-view-table");
+        primaryTable.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "7.30%", "7.40%", "7.51%"],
+            ["Local authority primary schools average", "5.40%", "5.50%", "5.62%"],
+            ["Primary schools in England average", "4.80%", "4.90%", "5.03%"]);
+
+        var secondaryTable = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("secondary-absence-table-view-table");
+        secondaryTable.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "6.70%", "6.80%", "6.91%"],
+            ["Local authority secondary schools average", "6.30%", "6.40%", "6.57%"],
+            ["Secondary schools in England average", "5.90%", "6.00%", "6.11%"]);
+    }
+
+    [Fact]
+    public async Task Attendance_CharacteristicFilter_SecondarySection_UpdatesSecondaryTableOnly()
+    {
+        SetupAllThroughSchool();
+        SetupBoysAndAllPupilsOverallAbsence();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Attendance, HttpStatusCode.OK);
+
+        var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("secondary-absence-characteristic-filter");
+        filter.SelectOption("Boys");
+
+        var submitButton = page.ElementWithTestIdShouldExist<IHtmlButtonElement>("secondary-absence-characteristic-filter-submit");
+        var newPage = await page.SubmitContainingFormAsync(submitButton);
+
+        var secondaryTable = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("secondary-absence-table-view-table");
+        secondaryTable.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "7.30%", "7.40%", "7.51%"],
+            ["Local authority secondary schools average", "6.80%", "6.90%", "7.07%"],
+            ["Secondary schools in England average", "6.40%", "6.50%", "6.61%"]);
+
+        var primaryTable = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("primary-absence-table-view-table");
+        primaryTable.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "6.70%", "6.80%", "6.91%"],
+            ["Local authority primary schools average", "4.90%", "5.00%", "5.12%"],
+            ["Primary schools in England average", "4.60%", "4.70%", "4.83%"]);
+    }
+
+    [Fact]
+    public async Task Attendance_FiltersChangedOnBothSections_AreAppliedIndependentlyOnSubmit()
+    {
+        SetupAllThroughSchool();
+
+        Fixture.AbsenceRepository.SetupLAAbsence(
+            Build.Absence.LA("001", x => x
+                .WithOverallAbsencePrimary(current: "5.12", previous: "5.00", previous2: "4.90")
+                .WithPersistentAbsencePrimary(current: "20.00", previous: "19.50", previous2: "19.00")
+                .WithOverallAbsenceSecondary(current: "6.57", previous: "6.40", previous2: "6.30")
+                .WithOverallAbsenceGirlsSecondary(current: "6.80", previous: "6.70", previous2: "6.60")));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Attendance, HttpStatusCode.OK);
+
+        page.ElementWithTestIdShouldExist<IHtmlSelectElement>("primary-absence-type-filter").SelectOption("Persistent absence");
+        page.ElementWithTestIdShouldExist<IHtmlSelectElement>("secondary-absence-characteristic-filter").SelectOption("Girls");
+
+        var submitButton = page.ElementWithTestIdShouldExist<IHtmlButtonElement>("primary-absence-type-filter-submit");
+        var newPage = await page.SubmitContainingFormAsync(submitButton);
+
+        var primaryTable = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("primary-absence-table-view-table");
+        primaryTable.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "No available data", "No available data", "No available data"],
+            ["Local authority primary schools average", "19.00%", "19.50%", "20.00%"],
+            ["Primary schools in England average", "No available data", "No available data", "No available data"]);
+
+        var secondaryTable = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("secondary-absence-table-view-table");
+        secondaryTable.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "No available data", "No available data", "No available data"],
+            ["Local authority secondary schools average", "6.60%", "6.70%", "6.80%"],
+            ["Secondary schools in England average", "No available data", "No available data", "No available data"]);
+    }
+
     private static void AssertYearByYearChartPointStyles(IHtmlElement yearByYearChart, params string[] pointStyles)
     {
         var chartData = yearByYearChart.Dataset.Should().ContainKey("chart").WhoseValue;
@@ -214,6 +407,28 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
         {
             chartData.Should().Contain($"\"pointStyle\":\"{pointStyle}\"");
         }
+    }
+
+    private void SetupBoysAndAllPupilsOverallAbsence()
+    {
+        Fixture.AbsenceRepository.SetupEstablishmentAbsence(
+            Build.Absence.Establishment(Urn, x => x
+                .WithOverallAbsence(current: "6.91", previous: "6.80", previous2: "6.70")
+                .WithOverallAbsenceBoys(current: "7.51", previous: "7.40", previous2: "7.30")));
+
+        Fixture.AbsenceRepository.SetupLAAbsence(
+            Build.Absence.LA("001", x => x
+                .WithOverallAbsencePrimary(current: "5.12", previous: "5.00", previous2: "4.90")
+                .WithOverallAbsenceBoysPrimary(current: "5.62", previous: "5.50", previous2: "5.40")
+                .WithOverallAbsenceSecondary(current: "6.57", previous: "6.40", previous2: "6.30")
+                .WithOverallAbsenceBoysSecondary(current: "7.07", previous: "6.90", previous2: "6.80")));
+
+        Fixture.AbsenceRepository.SetupEnglandAbsence(
+            Build.Absence.England(x => x
+                .WithOverallAbsencePrimary(current: "4.83", previous: "4.70", previous2: "4.60")
+                .WithOverallAbsenceBoysPrimary(current: "5.03", previous: "4.90", previous2: "4.80")
+                .WithOverallAbsenceSecondary(current: "6.11", previous: "6.00", previous2: "5.90")
+                .WithOverallAbsenceBoysSecondary(current: "6.61", previous: "6.50", previous2: "6.40")));
     }
 
     private void SetupAllThroughSchool()
