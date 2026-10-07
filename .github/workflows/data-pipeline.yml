@@ -788,6 +788,15 @@ jobs:
             pwsh --version 2>&1 || true
           } > "${context_file}"
 
+      # Log in again: the GitHub OIDC token from the first login is only valid for 5 minutes, and the cluster token is first needed after the slower data steps (AADSTS700024).
+      - name: Azure login (OIDC) before cluster access
+        if: always()
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Capture baseline cluster snapshot
         if: always()
         shell: bash
@@ -1099,6 +1108,15 @@ jobs:
               }' > "$report_file"
             exit 2
           fi
+
+      # Log in again after the ETL, which can outlast the cached tokens, so the maintenance page can always be turned off and backups can run.
+      - name: Azure login (OIDC) after ETL
+        if: always()
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Disable maintenance page
         id: disable_maintenance
