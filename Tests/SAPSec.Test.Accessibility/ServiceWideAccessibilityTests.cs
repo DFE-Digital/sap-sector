@@ -32,6 +32,8 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, IT
 
         new(Routes.AllThroughSchool("100171").Overview),
         new(Routes.AllThroughSchool("100171").KS2),
+        new(Routes.AllThroughSchool("100171").KS4HeadlineMeasures),
+        new(Routes.AllThroughSchool("100171").KS4CoreSubjects),
         new(Routes.AllThroughSchool("100171").ViewSimilarSchools),
         new(Routes.AllThroughSchool("100171").Attendance),
         new(Routes.AllThroughSchool("100171").SchoolDetails),
