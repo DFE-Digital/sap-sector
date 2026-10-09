@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using SAPSec.Web.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures;
@@ -27,7 +28,7 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 /// </summary>
 [Area("Secondary")]
 [Route("school/secondary/{urn}")]
-[Authorize]
+[Authorize(Policy = DsiAuthorizationRequirement.PolicyName)]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,

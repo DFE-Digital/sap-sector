@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -9,11 +10,25 @@ using SAPSec.Core.Authentication;
 using SAPSec.Infrastructure.Json;
 using SAPSec.UI.Tests.TestData;
 using SAPSec.Web;
+using SAPSec.Web.Authorization;
 
 namespace SAPSec.UI.Tests.Deprecated.Infrastructure;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
+    private sealed class AllowAllUrnsAuthorizationHandler : AuthorizationHandler<DsiAuthorizationRequirement>
+    {
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, DsiAuthorizationRequirement requirement)
+        {
+            if (context.User.Identity?.IsAuthenticated == true)
+            {
+                context.Succeed(requirement);
+            }
+
+            return Task.CompletedTask;
+        }
+    }
+
     private IHost? _host;
     private static string? _cachedWebProjectPath;
 
@@ -34,6 +49,17 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.RemoveAll<IDsiClient>();
                 services.AddScoped<IUserService, MockUserService>();
                 services.AddScoped<IDsiClient, MockDsiClient>();
+
+                // UI tests visit many schools while the mock user belongs to one establishment.
+                foreach (var descriptor in services
+                             .Where(d => d.ServiceType == typeof(IAuthorizationHandler)
+                                         && d.ImplementationType == typeof(DsiAuthorizationHandler))
+                             .ToList())
+                {
+                    services.Remove(descriptor);
+                }
+
+                services.AddScoped<IAuthorizationHandler, AllowAllUrnsAuthorizationHandler>();
 
                 services.AddJsonDependencies();
             });

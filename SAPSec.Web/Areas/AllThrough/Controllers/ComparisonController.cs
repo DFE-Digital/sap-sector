@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using SAPSec.Web.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core;
 using SAPSec.Core.FeatureFlags;
@@ -19,7 +20,7 @@ namespace SAPSec.Web.Areas.AllThrough.Controllers;
 
 [Area("AllThrough")]
 [Route("school/all-through/{urn}/view-similar-schools")]
-[Authorize]
+[Authorize(Policy = DsiAuthorizationRequirement.PolicyName)]
 [RequireFeatureFlag(Flags.EnableAllThroughSchools)]
 [RequireSchoolPhase(ExpectedSchoolPhase.AllThrough, "urn")]
 public class ComparisonController(

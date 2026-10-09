@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using SAPSec.Web.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core;
 using SAPSec.Core.Features.Measures.Attendance;
@@ -18,7 +19,7 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 
 [Area("Primary")]
 [Route("school/primary/{urn}/view-similar-schools/{comparatorSchoolUrn}")]
-[Authorize]
+[Authorize(Policy = DsiAuthorizationRequirement.PolicyName)]
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary, "urn")]
 [RequireSchoolPhase(ExpectedSchoolPhase.PrimaryComparisonParticipant, "comparatorSchoolUrn")]
 public class ComparisonController(

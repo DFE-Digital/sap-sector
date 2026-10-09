@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using SAPSec.Web.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Exceptions;
 using SAPSec.Core.FeatureFlags;
@@ -16,7 +17,7 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 
 [Area("Secondary")]
 [Route("school/secondary/{urn}")]
-[Authorize]
+[Authorize(Policy = DsiAuthorizationRequirement.PolicyName)]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SimilarSchoolsController(
         IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse> findSimilarSchoolsUseCase,
