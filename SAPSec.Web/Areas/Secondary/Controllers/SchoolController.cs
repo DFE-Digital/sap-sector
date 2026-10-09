@@ -95,7 +95,7 @@ public class SchoolController(
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             WhatIsASimilarSchoolUrl = Routes.SecondarySchool(urn).WhatIsASimilarSchool,
-            SimilarSchoolDefinitionLinkText = "how DfE defines what a similar school is",
+            SimilarSchoolDefinitionLinkText = "how DfE identifies what a similar school is",
             Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School, similarSchoolsResponse.HasSimilarSchools),
             EnglishMaths = MeasureViewModel.FromSecondaryMeasure(response.EnglishMaths, response.School, similarSchoolsResponse.HasSimilarSchools),
             Destinations = MeasureViewModel.FromSecondaryMeasure(response.Destinations, response.School, similarSchoolsResponse.HasSimilarSchools)
@@ -119,7 +119,7 @@ public class SchoolController(
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             WhatIsASimilarSchoolUrl = Routes.SecondarySchool(urn).WhatIsASimilarSchool,
-            SimilarSchoolDefinitionLinkText = "how DfE defines what a similar school is",
+            SimilarSchoolDefinitionLinkText = "how DfE identifies what a similar school is",
             Measures = [
                 MeasureViewModel.FromSecondaryMeasure(response.EnglishLanguage, response.School, similarSchoolsResponse.HasSimilarSchools),
                 MeasureViewModel.FromSecondaryMeasure(response.EnglishLiterature, response.School, similarSchoolsResponse.HasSimilarSchools ),
