@@ -32,11 +32,26 @@
         notificationContainer.textContent = `Showing ${currentView} of ${getResultsLabel(toggle)}`;
     }
 
+    function focusListStart() {
+        const listView = document.getElementById("listView");
+        const list = listView?.querySelector(".app-school-results");
+        const target = list || listView?.querySelector("a[href], button, input, select, textarea, [tabindex]:not([tabindex='-1'])");
+
+        if (!target) return;
+
+        if (!target.hasAttribute("tabindex")) {
+            target.setAttribute("tabindex", "-1");
+        }
+
+        requestAnimationFrame(() => target.focus());
+    }
+
     function showMap({ persist = true } = {}) {
         const listView = document.getElementById("listView");
         const mapView = document.getElementById("mapView");
         const toggle = document.getElementById("toggleViewLink");
         if (!listView || !mapView || !toggle) return;
+        const shouldRestoreToggleFocus = document.activeElement === toggle;
 
         listView.classList.add("govuk-!-display-none");
         mapView.classList.remove("govuk-!-display-none");
@@ -45,15 +60,18 @@
         toggle.dataset.view = "map";
         setToggleLabel(toggle, "as a list", "map");
 
-        requestAnimationFrame(() => mountToggle(MAP_SLOT_ID));
-        setTimeout(() => mountToggle(MAP_SLOT_ID), 0);
+        mountToggle(MAP_SLOT_ID);
+
+        if (shouldRestoreToggleFocus) {
+            toggle.focus();
+        }
 
         if (persist) sessionStorage.setItem(STORAGE_KEY, "map");
 
         window.dispatchEvent(new Event("map:shown"));
     }
 
-    function showList({ persist = true } = {}) {
+    function showList({ persist = true, focusResults = false } = {}) {
         const listView = document.getElementById("listView");
         const mapView = document.getElementById("mapView");
         const toggle = document.getElementById("toggleViewLink");
@@ -69,6 +87,10 @@
         mountToggle(LIST_SLOT_ID);
 
         if (persist) sessionStorage.setItem(STORAGE_KEY, "list");
+
+        if (focusResults) {
+            focusListStart();
+        }
     }
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -92,7 +114,7 @@
                 announceView(toggleLink, "map");
             }
             else {
-                showList();
+                showList({ focusResults: true });
                 announceView(toggleLink, "list");
             }
             return;
@@ -101,7 +123,7 @@
         const toggleToList = e.target.closest("#toggleToListLink");
         if (toggleToList) {
             e.preventDefault();
-            showList();
+            showList({ focusResults: true });
         }
     });
 
