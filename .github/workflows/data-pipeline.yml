@@ -60,7 +60,7 @@ jobs:
       AKS_NAMESPACE: ${{ secrets.AKS_NAMESPACE }}
       KONDUIT_APP_NAME: ${{ secrets.KONDUIT_APP_NAME }}
 
-      SERVICE_NAME: get-school-improvement-insights
+      SERVICE_NAME: compare-connect-similar-schools
       SERVICE_SHORT: sapsec
       TF_VARS_PATH: terraform/application/config
       DEPLOY_ENV: ${{ matrix.target_env }}
