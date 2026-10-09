@@ -18,7 +18,7 @@ public sealed class SchoolPredecessorRelationshipService(
     {
         ArgumentNullException.ThrowIfNull(establishment);
 
-        if (EstablishmentStatusValues.IsClosed(establishment.EstablishmentStatusId, establishment.EstablishmentStatusName))
+        if (establishment.EstablishmentStatusId is not EstablishmentStatusValues.ClosedId)
         {
             return SchoolPredecessorRelationship.None;
         }

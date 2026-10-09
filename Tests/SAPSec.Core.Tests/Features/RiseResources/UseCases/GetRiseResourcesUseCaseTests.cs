@@ -141,7 +141,7 @@ public class GetRiseResourcesUseCaseTests
             ResourceTitle = "Improving attendance",
             ResourceDescription = "Guidance for schools",
             ResourceUrl = "https://example.gov.uk/attendance",
-            SchoolPhases = [PhaseOfEducationValues.Secondary],
+            EducationStages = [PhaseOfEducationValues.Secondary],
             Category = "Performance and attendance",
             SubCategory = "Attendance",
             MappingMeasures = "Overall absence rate; Persistent absence rate"
@@ -167,7 +167,7 @@ public class GetRiseResourcesUseCaseTests
         {
             ResourceTitle = title,
             Category = category,
-            SchoolPhases = phases
+            EducationStages = phases
         };
 
     private static RiseResourceEntry SubCategorised(
@@ -177,7 +177,7 @@ public class GetRiseResourcesUseCaseTests
             ResourceTitle = title,
             Category = category,
             SubCategory = subCategory,
-            SchoolPhases = phases
+            EducationStages = phases
         };
 
     private static RiseResourceCategoryEntry Category(string name, string description, params string[] subCategories) =>

@@ -15,147 +15,147 @@ public static class PhaseOfEducationValues
     public const string SixteenPlusId = "6";
     public const string AllThroughId = "7";
 
-    public const string Primary = "Primary";
-    public const string Secondary = "Secondary";
-    public const string AllThrough = "All-through";
+    //    public const string Primary = "Primary";
+    //    public const string Secondary = "Secondary";
+    //    public const string AllThrough = "All-through";
 
-    #region Phase Patterns
+    //    #region Phase Patterns
 
-    /// <summary>Patterns that indicate nursery provision</summary>
-    private static readonly string[] NurseryPatterns =
-    {
-        "Nursery"
-    };
+    //    /// <summary>Patterns that indicate nursery provision</summary>
+    //    private static readonly string[] NurseryPatterns =
+    //    {
+    //        "Nursery"
+    //    };
 
-    /// <summary>Patterns that indicate no nursery provision</summary>
-    private static readonly string[] NoNurseryPatterns =
-    {
-        "Primary",
-        "Secondary",
-        "16 plus",
-        "Post-16",
-        "16-19"
-    };
+    //    /// <summary>Patterns that indicate no nursery provision</summary>
+    //    private static readonly string[] NoNurseryPatterns =
+    //    {
+    //        "Primary",
+    //        "Secondary",
+    //        "16 plus",
+    //        "Post-16",
+    //        "16-19"
+    //    };
 
-    /// <summary>Patterns where nursery provision is indeterminate</summary>
-    private static readonly string[] IndeterminatePatterns =
-    {
-        "All-through",
-        "All through",
-        "Middle"
-    };
+    //    /// <summary>Patterns where nursery provision is indeterminate</summary>
+    //    private static readonly string[] IndeterminatePatterns =
+    //    {
+    //        "All-through",
+    //        "All through",
+    //        "Middle"
+    //    };
 
-    #endregion
+    //    #endregion
 
-    #region Helper Methods
+    //    #region Helper Methods
 
-    /// <summary>
-    /// Checks if the phase indicates nursery provision.
-    /// Uses case-insensitive comparison.
-    /// </summary>
-    public static bool IndicatesNursery(string? phase)
-    {
-        if (string.IsNullOrWhiteSpace(phase))
-            return false;
+    //    /// <summary>
+    //    /// Checks if the phase indicates nursery provision.
+    //    /// Uses case-insensitive comparison.
+    //    /// </summary>
+    //    public static bool IndicatesNursery(string? phase)
+    //    {
+    //        if (string.IsNullOrWhiteSpace(phase))
+    //            return false;
 
-        foreach (var pattern in NurseryPatterns)
-        {
-            if (phase.Contains(pattern, StringComparison.OrdinalIgnoreCase))
-                return true;
-        }
+    //        foreach (var pattern in NurseryPatterns)
+    //        {
+    //            if (phase.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+    //                return true;
+    //        }
 
-        return false;
-    }
+    //        return false;
+    //    }
 
-    /// <summary>
-    /// Checks if the phase indicates no nursery provision.
-    /// Uses case-insensitive comparison.
-    /// </summary>
-    public static bool IndicatesNoNursery(string? phase)
-    {
-        if (string.IsNullOrWhiteSpace(phase))
-            return false;
+    //    /// <summary>
+    //    /// Checks if the phase indicates no nursery provision.
+    //    /// Uses case-insensitive comparison.
+    //    /// </summary>
+    //    public static bool IndicatesNoNursery(string? phase)
+    //    {
+    //        if (string.IsNullOrWhiteSpace(phase))
+    //            return false;
 
-        foreach (var pattern in NoNurseryPatterns)
-        {
-            if (phase.Contains(pattern, StringComparison.OrdinalIgnoreCase))
-                return true;
-        }
+    //        foreach (var pattern in NoNurseryPatterns)
+    //        {
+    //            if (phase.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+    //                return true;
+    //        }
 
-        return false;
-    }
+    //        return false;
+    //    }
 
-    /// <summary>
-    /// Checks if the phase is indeterminate for nursery provision.
-    /// Uses case-insensitive comparison.
-    /// </summary>
-    public static bool IsIndeterminate(string? phase)
-    {
-        if (string.IsNullOrWhiteSpace(phase))
-            return false;
+    //    /// <summary>
+    //    /// Checks if the phase is indeterminate for nursery provision.
+    //    /// Uses case-insensitive comparison.
+    //    /// </summary>
+    //    public static bool IsIndeterminate(string? phase)
+    //    {
+    //        if (string.IsNullOrWhiteSpace(phase))
+    //            return false;
 
-        foreach (var pattern in IndeterminatePatterns)
-        {
-            if (phase.Contains(pattern, StringComparison.OrdinalIgnoreCase))
-                return true;
-        }
+    //        foreach (var pattern in IndeterminatePatterns)
+    //        {
+    //            if (phase.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+    //                return true;
+    //        }
 
-        return false;
-    }
+    //        return false;
+    //    }
 
-    public static bool IsPrimary(string? phase)
-    {
-        if (string.IsNullOrWhiteSpace(phase))
-            return false;
+    //    public static bool IsPrimary(string? phase)
+    //    {
+    //        if (string.IsNullOrWhiteSpace(phase))
+    //            return false;
 
-        var trimmedPhase = phase.Trim();
+    //        var trimmedPhase = phase.Trim();
 
-        return string.Equals(trimmedPhase, Primary, StringComparison.OrdinalIgnoreCase);
-    }
+    //        return string.Equals(trimmedPhase, Primary, StringComparison.OrdinalIgnoreCase);
+    //    }
 
-    public static bool IsAllThrough(string? phase)
-    {
-        if (string.IsNullOrWhiteSpace(phase))
-            return false;
+    //    public static bool IsAllThrough(string? phase)
+    //    {
+    //        if (string.IsNullOrWhiteSpace(phase))
+    //            return false;
 
-        var trimmedPhase = phase.Trim();
+    //        var trimmedPhase = phase.Trim();
 
-        return string.Equals(trimmedPhase, AllThrough, StringComparison.OrdinalIgnoreCase);
-    }
+    //        return string.Equals(trimmedPhase, AllThrough, StringComparison.OrdinalIgnoreCase);
+    //    }
 
-    public static bool IsSecondary(string? phase)
-    {
-        if (string.IsNullOrWhiteSpace(phase))
-            return false;
+    //    public static bool IsSecondary(string? phase)
+    //    {
+    //        if (string.IsNullOrWhiteSpace(phase))
+    //            return false;
 
-        return string.Equals(phase.Trim(), Secondary, StringComparison.OrdinalIgnoreCase);
-    }
+    //        return string.Equals(phase.Trim(), Secondary, StringComparison.OrdinalIgnoreCase);
+    //    }
 
-    public static bool IsSearchableIndexPhaseId(string? phaseId)
-    {
-        var trimmedPhaseId = phaseId?.Trim();
+    //    public static bool IsSearchableIndexPhaseId(string? phaseId)
+    //    {
+    //        var trimmedPhaseId = phaseId?.Trim();
 
-        return trimmedPhaseId is PrimaryId or SecondaryId or AllThroughId;
-    }
+    //        return trimmedPhaseId is PrimaryId or SecondaryId or AllThroughId;
+    //    }
 
-    public static bool IsPrimaryOrAllThrough(string? phase)
-        => IsPrimary(phase) || IsAllThrough(phase);
+    //    public static bool IsPrimaryOrAllThrough(string? phase)
+    //        => IsPrimary(phase) || IsAllThrough(phase);
 
-    public static bool IsSearchableSearchPhaseId(
-        string? phaseId,
-        bool primarySchoolsEnabled,
-        bool allThroughSchoolsEnabled)
-    {
-        var trimmedPhaseId = phaseId?.Trim();
+    //    public static bool IsSearchableSearchPhaseId(
+    //        string? phaseId,
+    //        bool primarySchoolsEnabled,
+    //        bool allThroughSchoolsEnabled)
+    //    {
+    //        var trimmedPhaseId = phaseId?.Trim();
 
-        return trimmedPhaseId switch
-        {
-            SecondaryId => true,
-            PrimaryId => primarySchoolsEnabled,
-            AllThroughId => allThroughSchoolsEnabled,
-            _ => false
-        };
-    }
+    //        return trimmedPhaseId switch
+    //        {
+    //            SecondaryId => true,
+    //            PrimaryId => primarySchoolsEnabled,
+    //            AllThroughId => allThroughSchoolsEnabled,
+    //            _ => false
+    //        };
+    //    }
 
-    #endregion
+    //    #endregion
 }

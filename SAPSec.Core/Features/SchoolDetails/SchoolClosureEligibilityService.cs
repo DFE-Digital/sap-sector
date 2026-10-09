@@ -20,7 +20,7 @@ public sealed class SchoolClosureEligibilityService(
     {
         ArgumentNullException.ThrowIfNull(establishment);
 
-        if (!EstablishmentStatusValues.IsClosed(establishment.EstablishmentStatusId, establishment.EstablishmentStatusName))
+        if (establishment.EstablishmentStatusId is not EstablishmentStatusValues.ClosedId)
         {
             return SchoolClosureEligibility.NotClosed;
         }
@@ -76,7 +76,7 @@ public sealed class SchoolClosureEligibilityService(
             // inferred from status: the current school is the predecessor only when the linked
             // school is not itself closed. Both sides closed is an unexpected combination - log it
             // rather than signpost to a dead end.
-            if (EstablishmentStatusValues.IsClosed(candidate.EstablishmentStatusId, candidate.EstablishmentStatusName))
+            if (candidate.EstablishmentStatusId is not EstablishmentStatusValues.ClosedId)
             {
                 logger.LogWarning(
                     "Unexpected relationship: closed school {Urn} has a mapped successor relationship to {SuccessorUrn}, which is also closed.",
