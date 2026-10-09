@@ -44,7 +44,7 @@ jobs:
       AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
       AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
       AKS_NAMESPACE: ${{ secrets.AKS_NAMESPACE }}
-      SERVICE_NAME: get-school-improvement-insights
+      SERVICE_NAME: compare-connect-similar-schools
       SERVICE_SHORT: sapsec
       TF_VARS_PATH: terraform/application/config
       DEPLOY_ENV: ${{ inputs.environment }}

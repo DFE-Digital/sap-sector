@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: get-school-improvement-insights-maintenance
+  name: compare-connect-similar-schools-maintenance
   labels:
-    app: get-school-improvement-insights-maintenance
+    app: compare-connect-similar-schools-maintenance
 spec:
   selector:
-    app: get-school-improvement-insights-maintenance
+    app: compare-connect-similar-schools-maintenance
   ports:
   - name: http
     port: 80
