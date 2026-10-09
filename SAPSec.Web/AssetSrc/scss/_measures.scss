@@ -72,7 +72,8 @@ $app-measure-color-track: #f3f2f1;
   }
 
   .govuk-select {
-    min-width: 260px;
+    width: 260px;
+    max-width: 100%;
   }
 
   .js-enabled & button[type="submit"] {
