@@ -4566,6 +4566,197 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
         response.Biology.TopPerformers.Select(tp => tp.Urn).Should().Equal(["100003", "100002", "100004"]);
     }
 
+    [Fact]
+    public async Task Chemistry_WhenPupilCharacteristicFilterEnabled_ContainsExpectedFilterOptions()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Secondary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var characteristicFilter = response.Chemistry.Filters
+            .Single(f => f.Key == Ks4Chemistry.Filters.PupilCharacteristic.Key);
+
+        characteristicFilter.Name.Should().Be("Pupil characteristic");
+        characteristicFilter.Options.Select(o => o.Name).Should().Equal([
+            "All pupils",
+            "Boys",
+            "Girls",
+            "Disadvantaged pupils",
+            "Non-disadvantaged pupils",
+            "English as an additional language",
+            "Non-mobile pupils"
+        ]);
+        characteristicFilter.Options.Single(o => o.Selected).Key.Should()
+            .Be(Ks4Chemistry.Filters.PupilCharacteristic.Values.AllPupils);
+    }
+
+    [Fact]
+    public async Task Chemistry_WhenPupilCharacteristicFilterDisabled_DoesNotContainFilter()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Secondary()));
+
+        var response = await _sut.Execute(Request("100001", includePupilCharacteristicFilter: false));
+
+        response.Chemistry.Filters
+            .Should().NotContain(f => f.Key == Ks4Chemistry.Filters.PupilCharacteristic.Key);
+    }
+
+    [Theory]
+    [InlineData(Ks4Chemistry.Filters.Grade.Values.Grade4AndAbove, new[] { 41.0, 40.0, 39.0 }, new[] { 43.0, 42.0, 41.0 }, new[] { 44.0, 43.0, 42.0 }, new[] { 45.0, 44.0, 43.0 })]
+    [InlineData(Ks4Chemistry.Filters.Grade.Values.Grade5AndAbove, new[] { 51.0, 50.0, 49.0 }, new[] { 53.0, 52.0, 51.0 }, new[] { 54.0, 53.0, 52.0 }, new[] { 55.0, 54.0, 53.0 })]
+    [InlineData(Ks4Chemistry.Filters.Grade.Values.Grade7AndAbove, new[] { 71.0, 70.0, 69.0 }, new[] { 73.0, 72.0, 71.0 }, new[] { 74.0, 73.0, 72.0 }, new[] { 75.0, 74.0, 73.0 })]
+    public async Task Chemistry_FilterBy_PupilCharacteristicAndGrade_ContainsYearByYearValuesForSelectedCharacteristic(
+        string grade,
+        double[] currentSchool,
+        double[] similarSchools,
+        double[] la,
+        double[] england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            new KS4Performance.EstablishmentPerformance
+            {
+                Id = "100001",
+                Chem49_Dis_Est_Current_Pct = "41", Chem49_Dis_Est_Previous_Pct = "40", Chem49_Dis_Est_Previous2_Pct = "39",
+                Chem59_Dis_Est_Current_Pct = "51", Chem59_Dis_Est_Previous_Pct = "50", Chem59_Dis_Est_Previous2_Pct = "49",
+                Chem79_Dis_Est_Current_Pct = "71", Chem79_Dis_Est_Previous_Pct = "70", Chem79_Dis_Est_Previous2_Pct = "69",
+            },
+            new KS4Performance.EstablishmentPerformance
+            {
+                Id = "100002",
+                Chem49_Dis_Est_Current_Pct = "42", Chem49_Dis_Est_Previous_Pct = "41", Chem49_Dis_Est_Previous2_Pct = "40",
+                Chem59_Dis_Est_Current_Pct = "52", Chem59_Dis_Est_Previous_Pct = "51", Chem59_Dis_Est_Previous2_Pct = "50",
+                Chem79_Dis_Est_Current_Pct = "72", Chem79_Dis_Est_Previous_Pct = "71", Chem79_Dis_Est_Previous2_Pct = "70",
+            },
+            new KS4Performance.EstablishmentPerformance
+            {
+                Id = "100003",
+                Chem49_Dis_Est_Current_Pct = "44", Chem49_Dis_Est_Previous_Pct = "43", Chem49_Dis_Est_Previous2_Pct = "42",
+                Chem59_Dis_Est_Current_Pct = "54", Chem59_Dis_Est_Previous_Pct = "53", Chem59_Dis_Est_Previous2_Pct = "52",
+                Chem79_Dis_Est_Current_Pct = "74", Chem79_Dis_Est_Previous_Pct = "73", Chem79_Dis_Est_Previous2_Pct = "72",
+            });
+
+        _performanceRepo.SetupLAPerformance(
+            new KS4Performance.LAPerformance
+            {
+                Id = "001",
+                Chem49_Dis_LA_Current_Pct = "44", Chem49_Dis_LA_Previous_Pct = "43", Chem49_Dis_LA_Previous2_Pct = "42",
+                Chem59_Dis_LA_Current_Pct = "54", Chem59_Dis_LA_Previous_Pct = "53", Chem59_Dis_LA_Previous2_Pct = "52",
+                Chem79_Dis_LA_Current_Pct = "74", Chem79_Dis_LA_Previous_Pct = "73", Chem79_Dis_LA_Previous2_Pct = "72",
+            });
+
+        _performanceRepo.SetupEnglandPerformance(
+            new KS4Performance.EnglandPerformance
+            {
+                Id = "National",
+                Chem49_Dis_Eng_Current_Pct = "45", Chem49_Dis_Eng_Previous_Pct = "44", Chem49_Dis_Eng_Previous2_Pct = "43",
+                Chem59_Dis_Eng_Current_Pct = "55", Chem59_Dis_Eng_Previous_Pct = "54", Chem59_Dis_Eng_Previous2_Pct = "53",
+                Chem79_Dis_Eng_Current_Pct = "75", Chem79_Dis_Eng_Previous_Pct = "74", Chem79_Dis_Eng_Previous2_Pct = "73",
+            });
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4Chemistry.Filters.Grade.Key] = grade,
+            [Ks4Chemistry.Filters.PupilCharacteristic.Key] = Ks4Chemistry.Filters.PupilCharacteristic.Values.Disadvantaged
+        }));
+
+        response.Chemistry.Series.Should().Equal([
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]),
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, (decimal?)similarSchools[0], (decimal?)similarSchools[1], (decimal?)similarSchools[2]),
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2])
+        ]);
+    }
+
+    [Fact]
+    public async Task Chemistry_FilterBy_NonMobile_ContainsNullValuesForLocalAuthorityAndEngland()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            new KS4Performance.EstablishmentPerformance { Id = "100001", Chem49_NMo_Est_Current_Pct = "40", Chem49_NMo_Est_Previous_Pct = "39", Chem49_NMo_Est_Previous2_Pct = "38" },
+            new KS4Performance.EstablishmentPerformance { Id = "100002", Chem49_NMo_Est_Current_Pct = "42", Chem49_NMo_Est_Previous_Pct = "41", Chem49_NMo_Est_Previous2_Pct = "40" },
+            new KS4Performance.EstablishmentPerformance { Id = "100003", Chem49_NMo_Est_Current_Pct = "44", Chem49_NMo_Est_Previous_Pct = "43", Chem49_NMo_Est_Previous2_Pct = "42" });
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4Chemistry.Filters.PupilCharacteristic.Key] = Ks4Chemistry.Filters.PupilCharacteristic.Values.NonMobile
+        }));
+
+        response.Chemistry.Series.Should().Equal([
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, 40, 39, 38),
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, 43, 42, 41),
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null)
+        ]);
+    }
+
+    [Fact]
+    public async Task Chemistry_FilterBy_PupilCharacteristic_TopPerformersRanksSimilarSchoolsForSelectedCharacteristic()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary()),
+            Build.Establishment("100004", "Test School 4", x => x.Secondary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003", "100004"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            new KS4Performance.EstablishmentPerformance { Id = "100001", Chem49_Dis_Est_Current_Pct = "5" },
+            new KS4Performance.EstablishmentPerformance { Id = "100002", Chem49_Dis_Est_Current_Pct = "20" },
+            new KS4Performance.EstablishmentPerformance { Id = "100003", Chem49_Dis_Est_Current_Pct = "40" },
+            new KS4Performance.EstablishmentPerformance { Id = "100004", Chem49_Dis_Est_Current_Pct = "10" });
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks4Chemistry.Filters.PupilCharacteristic.Key] = Ks4Chemistry.Filters.PupilCharacteristic.Values.Disadvantaged
+        }));
+
+        response.Chemistry.TopPerformers.Select(tp => tp.Urn).Should().Equal(["100003", "100002", "100004"]);
+    }
+
+    [Fact]
+    public async Task Physics_WhenPupilCharacteristicFilterEnabled_ContainsExpectedFilterOptions()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Secondary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var characteristicFilter = response.Physics.Filters
+            .Single(f => f.Key == Ks4Physics.Filters.PupilCharacteristic.Key);
+
+        characteristicFilter.Name.Should().Be("Pupil characteristic");
+        characteristicFilter.Options.Select(o => o.Name).Should().Equal([
+            "All pupils",
+            "Boys",
+            "Girls",
+            "Disadvantaged pupils",
+            "Non-disadvantaged pupils",
+            "English as an additional language",
+            "Non-mobile pupils"
+        ]);
+        characteristicFilter.Options.Single(o => o.Selected).Key.Should()
+            .Be(Ks4Physics.Filters.PupilCharacteristic.Values.AllPupils);
+    }
+
     private GetSchoolKs4CoreSubjectsMeasuresRequest Request(string urn, Dictionary<string, string>? filterBy = null, bool includePupilCharacteristicFilter = true) =>
             new(urn, filterBy ?? [], includePupilCharacteristicFilter);
 }

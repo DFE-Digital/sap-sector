@@ -53,11 +53,13 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCase(
             Ks4CoreSubjects.Chemistry.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                request.IncludePupilCharacteristicFilter),
             Ks4CoreSubjects.Physics.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy)
+                filterBy,
+                request.IncludePupilCharacteristicFilter)
         );
     }
 }
