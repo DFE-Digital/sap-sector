@@ -4566,6 +4566,31 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
         response.Chemistry.TopPerformers.Select(tp => tp.Urn).Should().Equal(["100003", "100002", "100004"]);
     }
 
+    [Fact]
+    public async Task Physics_WhenPupilCharacteristicFilterEnabled_ContainsExpectedFilterOptions()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Secondary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var characteristicFilter = response.Physics.Filters
+            .Single(f => f.Key == Ks4Physics.Filters.PupilCharacteristic.Key);
+
+        characteristicFilter.Name.Should().Be("Pupil characteristic");
+        characteristicFilter.Options.Select(o => o.Name).Should().Equal([
+            "All pupils",
+            "Boys",
+            "Girls",
+            "Disadvantaged pupils",
+            "Non-disadvantaged pupils",
+            "English as an additional language",
+            "Non-mobile pupils"
+        ]);
+        characteristicFilter.Options.Single(o => o.Selected).Key.Should()
+            .Be(Ks4Physics.Filters.PupilCharacteristic.Values.AllPupils);
+    }
+
     private GetSchoolKs4CoreSubjectsMeasuresRequest Request(string urn, Dictionary<string, string>? filterBy = null, bool includePupilCharacteristicFilter = true) =>
             new(urn, filterBy ?? [], includePupilCharacteristicFilter);
 }
