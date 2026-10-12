@@ -273,6 +273,8 @@ public class Program
 
         app.UseAnalytics(app.Environment);
 
+        app.UseMiddleware<HostBannerMiddleware>();
+
         app.MapControllers();
         app.MapRazorPages();
 
