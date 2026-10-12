@@ -81,7 +81,7 @@ public record FindSecondarySimilarSchoolsRequest(
 
 public record FindSecondarySimilarSchoolsResponse(
     bool HasSimilarSchools,
-    SchoolInfo.SchoolInfo CurrentSchool,
+    SchoolInfo.School CurrentSchool,
     IReadOnlyCollection<SortOption> SortOptions,
     IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,
     IPagedCollection<SimilarSchoolResult> ResultsPage,

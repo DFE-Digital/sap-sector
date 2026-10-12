@@ -22,7 +22,7 @@ public record MeasureViewModel(
     private static readonly string[] ComparisonCurrentYearColors = ["#ca357c", "#2a1950", "#2a1950"];
     private static readonly string[] ComparisonYearByYearColors = ["#ca357c", "#2a1950", "#4b9b7d"];
 
-    public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
+    public static MeasureViewModel FromPrimaryMeasure(Measure measure, School schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.PrimarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
@@ -30,14 +30,14 @@ public record MeasureViewModel(
             SchoolYearByYearColors,
             hasSimilarSchools);
 
-    public static MeasureViewModel FromPrimaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
+    public static MeasureViewModel FromPrimaryComparisonMeasure(Measure measure, School schoolInfo, School similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
             urn => Routes.PrimarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
             ComparisonCurrentYearColors,
             ComparisonYearByYearColors);
 
-    public static MeasureViewModel FromAllThroughPrimaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
+    public static MeasureViewModel FromAllThroughPrimaryComparisonMeasure(Measure measure, School schoolInfo, School similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
             urn => Routes.AllThroughSchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).PrimaryComparison(similarSchoolUrn).Similarity,
@@ -45,7 +45,7 @@ public record MeasureViewModel(
             ComparisonYearByYearColors,
             englandSchoolsAverageLabel: "Primary schools in England average");
 
-    public static MeasureViewModel FromAllThroughPrimaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools)
+    public static MeasureViewModel FromAllThroughPrimaryMeasure(Measure measure, School schoolInfo, bool hasSimilarSchools)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.AllThroughSchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).PrimaryComparison(similarSchoolUrn).Similarity,
@@ -53,7 +53,7 @@ public record MeasureViewModel(
             SchoolYearByYearColors,
             hasSimilarSchools);
 
-    public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
+    public static MeasureViewModel FromSecondaryMeasure(Measure measure, School schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
@@ -61,7 +61,7 @@ public record MeasureViewModel(
             SchoolYearByYearColors,
             hasSimilarSchools);
 
-    public static MeasureViewModel FromAllThroughSecondaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools)
+    public static MeasureViewModel FromAllThroughSecondaryMeasure(Measure measure, School schoolInfo, bool hasSimilarSchools)
         => FromMeasure(measure, schoolInfo, null,
             urn => $"{Routes.AllThroughSchool(urn).ViewSimilarSchools}?phase=secondary",
             (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).SecondaryComparison(similarSchoolUrn).Similarity,
@@ -69,14 +69,14 @@ public record MeasureViewModel(
             SchoolYearByYearColors,
             hasSimilarSchools);
 
-    public static MeasureViewModel FromSecondaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
+    public static MeasureViewModel FromSecondaryComparisonMeasure(Measure measure, School schoolInfo, School similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
             urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
             ComparisonCurrentYearColors,
             ComparisonYearByYearColors);
 
-    public static MeasureViewModel FromAllThroughSecondaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
+    public static MeasureViewModel FromAllThroughSecondaryComparisonMeasure(Measure measure, School schoolInfo, School similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
             urn => $"{Routes.AllThroughSchool(urn).ViewSimilarSchools}?phase=secondary",
             (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).SecondaryComparison(similarSchoolUrn).Similarity,
@@ -86,8 +86,8 @@ public record MeasureViewModel(
 
     private static MeasureViewModel FromMeasure(
         Measure measure,
-        SchoolInfo schoolInfo,
-        SchoolInfo? similarSchool,
+        School schoolInfo,
+        School? similarSchool,
         Func<string, string> viewSimilarSchoolsUrl,
         Func<string, string, string> similarSchoolComparisonUrl,
         string[] currentYearChartColors,
@@ -155,8 +155,8 @@ public record MeasureViewModel(
 
     private static string ResolveSeriesLabel(
         MeasureSeriesType seriesType,
-        SchoolInfo currentSchool,
-        SchoolInfo? similarSchool = null,
+        School currentSchool,
+        School? similarSchool = null,
         string englandSchoolsAverageLabel = "Schools in England average") =>
        seriesType switch
        {

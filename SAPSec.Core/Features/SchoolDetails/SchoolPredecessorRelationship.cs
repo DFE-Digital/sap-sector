@@ -4,7 +4,7 @@ namespace SAPSec.Core.Features.SchoolDetails;
 /// Result of evaluating whether a school (which is not itself closed) replaced one or more earlier
 /// schools, and so should show the successor banner signposting back to them.
 /// </summary>
-public sealed record SchoolPredecessorRelationship(IReadOnlyList<SchoolInfo.SchoolInfo> Predecessors)
+public sealed record SchoolPredecessorRelationship(IReadOnlyList<SchoolInfo.School> Predecessors)
 {
     public static readonly SchoolPredecessorRelationship None = new([]);
 

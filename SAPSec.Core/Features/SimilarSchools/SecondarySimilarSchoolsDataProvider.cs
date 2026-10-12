@@ -50,7 +50,7 @@ internal class SecondarySimilarSchoolsDataProvider(
                     return null;
                 }
 
-                var schoolInfo = SchoolInfo.SchoolInfo.Create(establishment);
+                var schoolInfo = SchoolInfo.School.Create(establishment);
                 if (!schoolInfo.HasSecondaryEducationPhase)
                 {
                     return null;

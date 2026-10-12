@@ -7,7 +7,7 @@ namespace SAPSec.Core.Features.SimilarSchools;
 
 public record SimilarSchool
 {
-    public required SchoolInfo.SchoolInfo Info { get; init; }
+    public required SchoolInfo.School Info { get; init; }
     public required BNGCoordinates? Coordinates { get; init; }
     public required int? TotalCapacity { get; init; }
     public required int? TotalPupils { get; init; }
@@ -30,7 +30,7 @@ public record SimilarSchool
     {
         return new SimilarSchool
         {
-            Info = SchoolInfo.SchoolInfo.Create(establishment),
+            Info = SchoolInfo.School.Create(establishment),
             TotalCapacity = establishment.TotalCapacity,
             TotalPupils = establishment.TotalPupils,
             NurseryProvisionName = establishment.NurseryProvisionName,

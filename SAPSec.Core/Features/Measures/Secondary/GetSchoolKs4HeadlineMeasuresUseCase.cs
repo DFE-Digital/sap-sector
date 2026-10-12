@@ -56,7 +56,7 @@ public record GetSchoolKs4HeadlineMeasuresRequest(
     IDictionary<string, string>? FilterBy = null);
 
 public record GetSchoolKs4HeadlineMeasuresResponse(
-    SchoolInfo.SchoolInfo School,
+    SchoolInfo.School School,
     int SimilarSchoolsCount,
     Measure Attainment8,
     Measure EnglishMaths,

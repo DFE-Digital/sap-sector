@@ -64,7 +64,7 @@ public record GetSchoolKs2PerformanceMeasuresRequest(
     IDictionary<string, string>? FilterBy = null);
 
 public record GetSchoolKs2PerformanceMeasuresResponse(
-    SchoolInfo.SchoolInfo School,
+    SchoolInfo.School School,
     int SimilarSchoolsCount,
     Measure MeetingExpectedStandardRwm,
     Measure AchievedHigherStandardRwm,

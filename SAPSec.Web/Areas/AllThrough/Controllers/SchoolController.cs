@@ -25,7 +25,7 @@ namespace SAPSec.Web.Areas.AllThrough.Controllers;
 [RequireFeatureFlag(Flags.EnableAllThroughSchools)]
 [RequireSchoolPhase(ExpectedSchoolPhase.AllThrough)]
 public class SchoolController(
-        IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
+        IUseCase<GetSchoolRequest, GetSchoolResponse> getSchoolInfoUseCase,
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
         IRequestSchoolAccessor requestSchoolAccessor,
         IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
@@ -45,7 +45,7 @@ public class SchoolController(
         var similarSchoolPhases = await GetSimilarSchoolPhasesAsync(urn);
 
         var model = new AllThroughOverviewViewModel(
-            SchoolInfoViewModel.FromSchoolInfo(school.Info),
+            SchoolViewModel.FromSchool(school),
             similarSchoolPhases.HasPrimary,
             similarSchoolPhases.HasSecondary);
 
@@ -64,7 +64,7 @@ public class SchoolController(
 
         var model = new Ks2PerformanceMeasuresPageViewModel
         {
-            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            School = SchoolViewModel.FromSchool(response.School),
             WhatIsASimilarSchoolUrl = Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
             SimilarSchoolDefinitionLinkText = "how DfE identifies what a similar school is",
             MeetingExpectedStandardRwm = MeasureViewModel.FromAllThroughPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School, response.SimilarSchoolsCount > 0),
@@ -96,7 +96,7 @@ public class SchoolController(
         var hasSimilarSecondarySchools = response.SimilarSchoolsCount > 0;
         var model = new Ks4CoreSubjectsPageViewModel
         {
-            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            School = SchoolViewModel.FromSchool(response.School),
             WhatIsASimilarSchoolUrl = Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
             SimilarSchoolDefinitionLinkText = "how DfE identifies what a similar school is",
             Measures = [
@@ -120,7 +120,7 @@ public class SchoolController(
         var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
         await PopulateViewData(school);
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(school.Info));
+        return View(SchoolViewModel.FromSchool(school));
     }
 
     [HttpGet]
@@ -130,7 +130,7 @@ public class SchoolController(
         var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
         await PopulateViewData(school);
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(school.Info));
+        return View(SchoolViewModel.FromSchool(school));
     }
 
     [HttpGet]
@@ -142,7 +142,7 @@ public class SchoolController(
         await PopulateViewData(school);
 
         var model = new AllThroughWhatIsASimilarSchoolViewModel(
-            SchoolInfoViewModel.FromSchoolInfo(school.Info),
+            SchoolViewModel.FromSchool(school),
             similarSchoolPhases.HasPrimary,
             similarSchoolPhases.HasSecondary);
 
@@ -161,13 +161,13 @@ public class SchoolController(
         await PopulateViewData(school);
         ViewData[ViewDataKeys.Title] = title;
 
-        return View("Page", SchoolInfoViewModel.FromSchoolInfo(school.Info));
+        return View("Page", SchoolViewModel.FromSchool(school));
     }
 
-    private async Task PopulateViewData(SchoolInfoWithLinks currentSchool)
+    private async Task PopulateViewData(LinkedSchool currentSchool)
     {
-        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool.Info);
-        ViewData[ViewDataKeys.SchoolNavigation] = await CreateNavigation(currentSchool.Info.Urn);
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchool(currentSchool);
+        ViewData[ViewDataKeys.SchoolNavigation] = await CreateNavigation(currentSchool.Urn);
 
         ViewData[ViewDataKeys.ShowClosedSchoolBanner] = currentSchool.ShowClosedSchoolBanner;
         ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Successors);

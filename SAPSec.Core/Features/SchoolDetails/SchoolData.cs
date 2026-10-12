@@ -1,6 +1,6 @@
 namespace SAPSec.Core.Features.SchoolDetails;
 
 public record SchoolData<T>(
-    SchoolInfo.SchoolInfo SchoolInfo,
+    SchoolInfo.School SchoolInfo,
     T? Data)
     where T : class;

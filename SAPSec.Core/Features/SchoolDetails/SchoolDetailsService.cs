@@ -1,8 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using SAPSec.Core.Exceptions;
-using SAPSec.Core.Features.Availability;
-using SAPSec.Core.Features.SchoolInfo;
-using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SchoolDetails;
@@ -14,6 +11,8 @@ namespace SAPSec.Core.Features.SchoolDetails;
 public sealed class SchoolDetailsService : ISchoolDetailsService
 {
     private readonly IEstablishmentRepository _establishmentRepository;
+    private readonly ISchoolClosureEligibilityService _closureEligibilityService;
+    private readonly ISchoolPredecessorRelationshipService _predecessorRelationshipService;
     private readonly ILogger<SchoolDetailsService> _logger;
 
     // Rules instantiated directly - they are stateless pure functions
@@ -30,93 +29,12 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
         ILogger<SchoolDetailsService> logger)
     {
         _establishmentRepository = establishmentRepository;
-        _logger = logger;
-    }
-
-    public async Task<SchoolDetails> GetByUrnAsync(string urn)
-    {
-        var establishment = await _establishmentRepository.GetEstablishmentAsync(urn);
-
-        if (establishment is null)
-        {
-            throw new NotFoundException($"School not found with URN: {urn}");
-        }
-
-        var establishmentEmail = await _establishmentRepository.GetEstablishmentEmailAsync(urn);
-
-        return MapToSchoolDetails(establishment, establishmentEmail);
-    }
-
-    private SchoolDetails MapToSchoolDetails(
-        Establishment establishment,
-        EstablishmentEmail? establishmentEmail)
-    {
-        return new SchoolDetails
-        {
-            Info = SchoolInfo.SchoolInfo.Create(establishment),
-
-            // Identifiers
-            DfENumber = DataMapper.MapDfENumber(establishment),
-            Ukprn = DataMapper.MapRequiredString(establishment.UKPRN),
-
-            // Location
-            Region = DataMapper.MapString(establishment.DistrictAdministrativeName),
-            UrbanRuralDescription = DataMapper.MapString(establishment.UrbanRuralName),
-
-            // School characteristics
-            AgeRangeLow = DataWithAvailability.FromNullable(establishment.AgeRangeLow),
-            AgeRangeHigh = DataWithAvailability.FromNullable(establishment.AgeRangeHigh),
-            GenderOfEntry = DataMapper.MapString(establishment.GenderName),
-            PhaseOfEducation = DataMapper.MapString(establishment.PhaseOfEducationName),
-            SchoolType = DataMapper.MapString(establishment.TypeOfEstablishmentName),
-            TypeOfEstablishmentCode = DataMapper.MapRequiredString(establishment.TypeOfEstablishmentId),
-            AdmissionsPolicy = DataMapper.MapString(establishment.AdmissionsPolicyName),
-            ReligiousCharacter = DataMapper.MapString(establishment.ReligiousCharacterName),
-
-            // Governance - business rule
-            GovernanceStructure = _governanceRule.Evaluate(establishment),
-            AcademyTrustName = DataMapper.MapTrustName(establishment),
-            AcademyTrustId = DataMapper.MapTrustId(establishment.TrustId),
-
-            // Provisions - business rules
-            HasNurseryProvision = _nurseryProvisionRule.Evaluate(establishment),
-            HasSixthForm = _sixthFormRule.Evaluate(establishment),
-            HasSenUnit = _senUnitRule.Evaluate(establishment),
-            HasResourcedProvision = _resourcedProvisionRule.Evaluate(establishment),
-
-            // Contact
-            HeadteacherName = DataMapper.MapHeadteacher(establishment),
-            Website = DataMapper.MapWebsite(establishment.Website),
-            Telephone = DataMapper.MapString(establishment.TelephoneNum),
-            Email = DataMapper.MapString(establishmentEmail?.MainEmail)
-        };
-    }
-}
-
-/// <summary>
-/// Service that maps establishment data to SchoolDetails.
-/// Business rules are applied internally - no need for DI as they are pure functions.
-/// </summary>
-public sealed class SchoolInfoWithLinksService : ISchoolInfoWithLinksService
-{
-    private readonly IEstablishmentRepository _establishmentRepository;
-    private readonly ISchoolClosureEligibilityService _closureEligibilityService;
-    private readonly ISchoolPredecessorRelationshipService _predecessorRelationshipService;
-    private readonly ILogger<SchoolInfoWithLinksService> _logger;
-
-    public SchoolInfoWithLinksService(
-        IEstablishmentRepository establishmentRepository,
-        ISchoolClosureEligibilityService closureEligibilityService,
-        ISchoolPredecessorRelationshipService predecessorRelationshipService,
-        ILogger<SchoolInfoWithLinksService> logger)
-    {
-        _establishmentRepository = establishmentRepository;
         _closureEligibilityService = closureEligibilityService;
         _predecessorRelationshipService = predecessorRelationshipService;
         _logger = logger;
     }
 
-    public async Task<SchoolInfoWithLinks> GetByUrnAsync(string urn)
+    public async Task<SchoolDetails> GetByUrnAsync(string urn)
     {
         var establishment = await _establishmentRepository.GetEstablishmentAsync(urn);
 
@@ -136,23 +54,15 @@ public sealed class SchoolInfoWithLinksService : ISchoolInfoWithLinksService
 
         var establishmentEmail = await _establishmentRepository.GetEstablishmentEmailAsync(urn);
 
-        return MapToSchoolIfnoWithLinks(establishment, establishmentEmail, closureEligibility, predecessorRelationship);
-    }
-
-    private SchoolInfoWithLinks MapToSchoolIfnoWithLinks(
-        Establishment establishment,
-        EstablishmentEmail? establishmentEmail,
-        SchoolClosureEligibility closureEligibility,
-        SchoolPredecessorRelationship predecessorRelationship)
-    {
-        return new SchoolInfoWithLinks
-        {
-            Info = SchoolInfo.SchoolInfo.Create(establishment),
-
-            // Identifiers
-            ShowClosedSchoolBanner = closureEligibility.ShowClosedSchoolBanner,
-            Successors = closureEligibility.Successors,
-            Predecessors = predecessorRelationship.Predecessors,
-        };
+        return SchoolDetails.Create(
+            establishment,
+            closureEligibility,
+            predecessorRelationship,
+            establishmentEmail,
+            _governanceRule.Evaluate(establishment),
+            _nurseryProvisionRule.Evaluate(establishment),
+            _sixthFormRule.Evaluate(establishment),
+            _senUnitRule.Evaluate(establishment),
+            _resourcedProvisionRule.Evaluate(establishment));
     }
 }

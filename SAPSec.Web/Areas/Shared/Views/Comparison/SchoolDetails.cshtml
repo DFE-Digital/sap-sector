@@ -53,11 +53,11 @@
 <link rel="stylesheet" href="~/css/leaflet.css"/>
 
 @{
-    var comparatorSuccessors = Model.ComparatorSchoolInfoWithLinks.Successors;
-    var comparatorPredecessors = Model.ComparatorSchoolInfoWithLinks.Predecessors;
+    var comparatorSuccessors = Model.ComparatorSchoolDetails.Successors;
+    var comparatorPredecessors = Model.ComparatorSchoolDetails.Predecessors;
 }
 
-@if (Model.ComparatorSchoolInfoWithLinks?.ShowClosedSchoolBanner == true || comparatorSuccessors.Any() || comparatorPredecessors.Any())
+@if (Model.ComparatorSchoolDetails?.ShowClosedSchoolBanner == true || comparatorSuccessors.Any() || comparatorPredecessors.Any())
 {
     @await Component.InvokeAsync("ClosedSchoolBanner", new { variant = ClosedSchoolBannerVariant.Comparator, successors = comparatorSuccessors, predecessors = comparatorPredecessors })
 }

@@ -4,7 +4,7 @@ using SAPSec.Web.Constants;
 namespace SAPSec.Web.Areas.AllThrough.ViewModels;
 
 public record AllThroughWhatIsASimilarSchoolViewModel(
-    SchoolInfoViewModel School,
+    SchoolViewModel School,
     bool HasPrimarySimilarSchools,
     bool HasSecondarySimilarSchools)
 {

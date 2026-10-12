@@ -34,13 +34,13 @@ internal class ComparisonSchoolDetailsDataProvider<TGroupsEntry, TValuesEntry>(
         }
 
         var currentSchool = new SchoolData<BNGCoordinates>(
-            SchoolInfo.SchoolInfo.Create(currentEstablishment),
+            SchoolInfo.School.Create(currentEstablishment),
             BNGCoordinates.TryParse(currentEstablishment.Easting, currentEstablishment.Northing, out var currentCoords)
                 ? currentCoords
                 : null);
 
         var comparatorSchool = new SchoolData<BNGCoordinates>(
-            SchoolInfo.SchoolInfo.Create(comparatorEstablishment),
+            SchoolInfo.School.Create(comparatorEstablishment),
             BNGCoordinates.TryParse(comparatorEstablishment.Easting, comparatorEstablishment.Northing, out var comparatorCoords)
                 ? comparatorCoords
                 : null);

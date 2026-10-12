@@ -60,8 +60,8 @@ public record GetComparisonKs2PerformanceMeasuresRequest(
     IDictionary<string, string>? FilterBy = null);
 
 public record GetComparisonKs2PerformanceMeasuresResponse(
-    SchoolInfo.SchoolInfo CurrentSchool,
-    SchoolInfo.SchoolInfo ComparatorSchool,
+    SchoolInfo.School CurrentSchool,
+    SchoolInfo.School ComparatorSchool,
     Measure MeetingExpectedStandardRwm,
     Measure AchievedHigherStandardRwm,
     Measure AverageScaledScoreReading,

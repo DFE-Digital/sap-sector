@@ -14,7 +14,7 @@ public class GetPrimaryComparisonSimilarityCharacteristicsUseCase(
         string[] urns = [request.CurrentSchoolUrn, request.ComparatorSchoolUrn];
 
         var schools = (await establishmentRepository.GetEstablishmentsAsync(urns))
-            .Select(SchoolInfo.SchoolInfo.Create)
+            .Select(SchoolInfo.School.Create)
             .ToDictionary(s => s.Urn);
 
         if (!schools.TryGetValue(request.CurrentSchoolUrn, out var currentSchool))
@@ -59,6 +59,6 @@ public record GetPrimaryComparisonSimilarityCharacteristicsRequest(
     string ComparatorSchoolUrn);
 
 public record GetPrimaryComparisonSimilarityCharacteristicsResponse(
-    SchoolInfo.SchoolInfo CurrentSchool,
-    SchoolInfo.SchoolInfo ComparatorSchool,
+    SchoolInfo.School CurrentSchool,
+    SchoolInfo.School ComparatorSchool,
     PrimaryComparisonSimilarityCharacteristics SimilarityCharacteristics);

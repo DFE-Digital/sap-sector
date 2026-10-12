@@ -43,7 +43,7 @@ public static class Routes
         return $"/find-a-school/suggest{qs}";
     }
 
-    public static string School(SchoolInfo schoolInfo) =>
+    public static string School(School schoolInfo) =>
         schoolInfo switch
         {
             _ when schoolInfo.IsAllThroughSchool => AllThroughSchool(schoolInfo.Urn).Overview,

@@ -45,8 +45,8 @@ public class ComparisonController(
 
         var model = new SimilarityPageViewModel
         {
-            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
-            ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
+            CurrentSchool = SchoolViewModel.FromSchool(response.CurrentSchool),
+            ComparatorSchool = SchoolViewModel.FromSchool(response.ComparatorSchool),
             CharacteristicsRows = characteristicsFormatter.BuildRows(response.SimilarityCharacteristics)
         };
 
@@ -66,8 +66,8 @@ public class ComparisonController(
 
         var model = new ViewModels.Comparison.Ks4HeadlineMeasuresPageViewModel
         {
-            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
-            ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
+            CurrentSchool = SchoolViewModel.FromSchool(response.CurrentSchool),
+            ComparatorSchool = SchoolViewModel.FromSchool(response.ComparatorSchool),
             Attainment8 = MeasureViewModel.FromSecondaryComparisonMeasure(response.Attainment8, response.CurrentSchool, response.ComparatorSchool),
             EnglishMaths = MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishMaths, response.CurrentSchool, response.ComparatorSchool),
             Destinations = MeasureViewModel.FromSecondaryComparisonMeasure(response.Destinations, response.CurrentSchool, response.ComparatorSchool)
@@ -89,8 +89,8 @@ public class ComparisonController(
 
         var model = new ViewModels.Comparison.Ks4CoreSubjectsPageViewModel
         {
-            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
-            ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
+            CurrentSchool = SchoolViewModel.FromSchool(response.CurrentSchool),
+            ComparatorSchool = SchoolViewModel.FromSchool(response.ComparatorSchool),
             Measures = [
                 MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishLanguage, response.CurrentSchool, response.ComparatorSchool),
                 MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishLiterature, response.CurrentSchool, response.ComparatorSchool),
@@ -116,8 +116,8 @@ public class ComparisonController(
 
         var model = new AttendancePageViewModel
         {
-            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
-            ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
+            CurrentSchool = SchoolViewModel.FromSchool(response.CurrentSchool),
+            ComparatorSchool = SchoolViewModel.FromSchool(response.ComparatorSchool),
             Absence = MeasureViewModel.FromSecondaryComparisonMeasure(response.Absence, response.CurrentSchool, response.ComparatorSchool)
         };
 
@@ -136,14 +136,13 @@ public class ComparisonController(
 
         var schoolDetailsModel = new SchoolDetailsPageViewModel
         {
-            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool.School),
-            ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool.School),
+            CurrentSchool = SchoolViewModel.FromSchool(response.CurrentSchool.School),
+            ComparatorSchool = SchoolViewModel.FromSchool(response.ComparatorSchool.School),
             CurrentSchoolLatitude = response.CurrentSchool.Coordinates?.Latitude,
             CurrentSchoolLongitude = response.CurrentSchool.Coordinates?.Longitude,
             ComparatorSchoolLatitude = response.ComparatorSchool.Coordinates?.Latitude,
             ComparatorSchoolLongitude = response.ComparatorSchool.Coordinates?.Longitude,
             Distance = response.DistanceMiles,
-            ComparatorSchoolInfoWithLinks = SchoolInfoWithLinksViewModel.FromSchoolDetails(response.ComparatorSchoolInfoWithLinks),
             ComparatorSchoolDetails = SchoolDetailsViewModel.FromSchoolDetails(response.ComparatorSchoolDetails)
         };
 
@@ -151,8 +150,8 @@ public class ComparisonController(
     }
 
     private void SetComparisonLayout(
-        SAPSec.Core.Features.SchoolInfo.SchoolInfo currentSchool,
-        SAPSec.Core.Features.SchoolInfo.SchoolInfo comparatorSchool) =>
+        SAPSec.Core.Features.SchoolInfo.School currentSchool,
+        SAPSec.Core.Features.SchoolInfo.School comparatorSchool) =>
         ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.Secondary(
             currentSchool,
             comparatorSchool);

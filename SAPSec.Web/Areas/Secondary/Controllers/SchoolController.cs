@@ -29,7 +29,7 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SchoolController(
-        IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
+        IUseCase<GetSchoolRequest, GetSchoolResponse> getSchoolInfoUseCase,
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
         IRequestSchoolAccessor requestSchoolAccessor,
         IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
@@ -51,7 +51,7 @@ public class SchoolController(
         var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
         var model = new SchoolOverviewPageViewModel
         {
-            School = SchoolInfoViewModel.FromSchoolInfo(school.Info),
+            School = SchoolViewModel.FromSchool(school),
             HasSimilarSchools = similarSchoolsResponse.HasSimilarSchools
         };
 
@@ -76,7 +76,7 @@ public class SchoolController(
         var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
         await PopulateViewData(school);
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(school.Info));
+        return View(SchoolViewModel.FromSchool(school));
     }
 
     [HttpGet]
@@ -93,7 +93,7 @@ public class SchoolController(
 
         var model = new ViewModels.School.Ks4HeadlineMeasuresPageViewModel
         {
-            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            School = SchoolViewModel.FromSchool(response.School),
             Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School, similarSchoolsResponse.HasSimilarSchools),
             EnglishMaths = MeasureViewModel.FromSecondaryMeasure(response.EnglishMaths, response.School, similarSchoolsResponse.HasSimilarSchools),
             Destinations = MeasureViewModel.FromSecondaryMeasure(response.Destinations, response.School, similarSchoolsResponse.HasSimilarSchools)
@@ -116,7 +116,7 @@ public class SchoolController(
 
         var model = new Ks4CoreSubjectsPageViewModel
         {
-            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            School = SchoolViewModel.FromSchool(response.School),
             WhatIsASimilarSchoolUrl = Routes.SecondarySchool(urn).WhatIsASimilarSchool,
             SimilarSchoolDefinitionLinkText = "how DfE defines what a similar school is",
             Measures = [
@@ -145,7 +145,7 @@ public class SchoolController(
 
         var model = new AttendancePageViewModel
         {
-            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            School = SchoolViewModel.FromSchool(response.School),
             Absence = MeasureViewModel.FromPrimaryMeasure(response.Absence, response.School)
         };
 
@@ -165,22 +165,21 @@ public class SchoolController(
         return View(RiseResourcesPageViewModel.FromResponse(response));
     }
 
-    private async Task PopulateViewData(SchoolInfoWithLinks currentSchool)
+    private async Task PopulateViewData(LinkedSchool currentSchool)
     {
-        var similarSchoolsResponse = await GetSimilarSchoolsAsync(currentSchool.Info.Urn);
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(currentSchool.Urn);
 
-        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool.Info);
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchool(currentSchool);
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
-            currentSchool.Info.Urn,
+            currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
             similarSchoolsResponse.HasSimilarSchools,
             await IsRiseResourcesEnabledAsync());
 
-        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Info.Urn);
-        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
-        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
-        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);
+        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = currentSchool.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Predecessors);
     }
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>

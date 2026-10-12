@@ -35,5 +35,5 @@ public record GetSchoolAttendanceMeasuresRequest(
     IDictionary<string, string>? FilterBy = null);
 
 public record GetSchoolAttendanceMeasuresResponse(
-    SchoolInfo.SchoolInfo School,
+    SchoolInfo.School School,
     Measure Absence);

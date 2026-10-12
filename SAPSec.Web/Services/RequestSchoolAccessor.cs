@@ -3,17 +3,17 @@ using SAPSec.Core.Features.SchoolInfo;
 
 namespace SAPSec.Web.Services;
 
-public class RequestSchoolAccessor(ISchoolInfoWithLinksService service) : IRequestSchoolAccessor
+public class RequestSchoolAccessor(ILinkedSchoolService service) : IRequestSchoolAccessor
 {
     private const string HttpContextItemsKeyPrefix = "RequestSchoolAccessor:SchoolDetails:";
 
-    public async Task<SchoolInfoWithLinks> GetAsync(HttpContext? httpContext, string urn)
+    public async Task<LinkedSchool> GetAsync(HttpContext? httpContext, string urn)
     {
         if (httpContext?.Items is not null &&
             httpContext.Items.TryGetValue(BuildCacheKey(urn), out var cachedSchool) &&
-            cachedSchool is SchoolInfoWithLinks schoolInfo)
+            cachedSchool is LinkedSchool linkedSchool)
         {
-            return schoolInfo;
+            return linkedSchool;
         }
 
         var school = await service.GetByUrnAsync(urn);

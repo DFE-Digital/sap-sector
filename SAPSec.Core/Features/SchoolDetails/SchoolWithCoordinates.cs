@@ -2,4 +2,4 @@
 
 namespace SAPSec.Core.Features.SchoolDetails;
 
-public record SchoolWithCoordinates(SchoolInfo.SchoolInfo School, GeographicCoordinates? Coordinates);
+public record SchoolWithCoordinates(SchoolInfo.School School, GeographicCoordinates? Coordinates);

@@ -71,7 +71,7 @@ public record FindPrimarySimilarSchoolsRequest(
     int ResultsPerPage = 10);
 
 public record FindPrimarySimilarSchoolsResponse(
-    SchoolInfo.SchoolInfo CurrentSchool,
+    SchoolInfo.School CurrentSchool,
     IReadOnlyCollection<SortOption> SortOptions,
     IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,
     IPagedCollection<SimilarSchoolResult> ResultsPage,

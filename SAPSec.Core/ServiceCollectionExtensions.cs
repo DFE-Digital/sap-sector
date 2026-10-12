@@ -28,8 +28,8 @@ public static class ServiceCollectionExtensions
         // School info
 
         services.AddSingleton<
-            IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse>,
-            GetSchoolInfoUseCase>();
+            IUseCase<GetSchoolRequest, GetSchoolResponse>,
+            GetSchoolUseCase>();
 
         // School details
 

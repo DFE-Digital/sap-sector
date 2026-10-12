@@ -5,7 +5,7 @@ using SAPSec.Web.Constants;
 namespace SAPSec.Web.Areas.AllThrough.ViewModels;
 
 public record AllThroughSimilarSchoolsPageViewModel(
-    SchoolInfoViewModel School,
+    SchoolViewModel School,
     string SelectedPhase,
     string PrimaryTabUrl,
     string SecondaryTabUrl,
@@ -23,7 +23,7 @@ public record AllThroughSimilarSchoolsPageViewModel(
     public SimilarSchoolsPageViewModel? SelectedSimilarSchools => IsPrimarySelected ? PrimarySimilarSchools : SecondarySimilarSchools;
 
     public static AllThroughSimilarSchoolsPageViewModel FromSchoolInfo(
-        Core.Features.SchoolInfo.SchoolInfo school,
+        Core.Features.SchoolInfo.School school,
         string? phase,
         string primaryTabUrl,
         string secondaryTabUrl,
@@ -37,7 +37,7 @@ public record AllThroughSimilarSchoolsPageViewModel(
             : "primary";
 
         return new(
-            SchoolInfoViewModel.FromSchoolInfo(school),
+            SchoolViewModel.FromSchool(school),
             selectedPhase,
             primaryTabUrl,
             secondaryTabUrl,

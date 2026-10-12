@@ -18,7 +18,7 @@ public class ComparisonMeasureDataProvider<T, TGroupsEntry, TValuesEntry>(
         string[] urns = [currentSchoolUrn, comparatorSchoolUrn];
 
         var schools = (await establishmentRepository.GetEstablishmentsAsync(urns))
-            .Select(SchoolInfo.SchoolInfo.Create)
+            .Select(SchoolInfo.School.Create)
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
         if (!schools.ContainsKey(currentSchoolUrn))

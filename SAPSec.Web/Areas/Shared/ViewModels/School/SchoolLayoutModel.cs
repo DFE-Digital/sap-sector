@@ -1,13 +1,7 @@
-using SAPSec.Core.Features.SchoolDetails;
-using SAPSec.Core.Features.SchoolInfo;
-
 namespace SAPSec.Web.Areas.Shared.ViewModels.School;
 
 public record SchoolLayoutModel(string Urn, string Name)
 {
-    public static SchoolLayoutModel FromSchoolInfo(SchoolInfo schoolInfo) =>
-        new(schoolInfo.Urn, schoolInfo.Name);
-
-    public static SchoolLayoutModel FromSchoolDetails(SchoolDetails schoolDetails) =>
-        FromSchoolInfo(schoolDetails.Info);
+    public static SchoolLayoutModel FromSchool(Core.Features.SchoolInfo.School school) =>
+        new(school.Urn, school.Name);
 }

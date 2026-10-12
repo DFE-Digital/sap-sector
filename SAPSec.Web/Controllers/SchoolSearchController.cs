@@ -202,7 +202,7 @@ public class SchoolSearchController(
         Regex.IsMatch(value.Trim(), @"^(\d+|\d+[\\/]\d+)$");
 
     private RedirectResult RedirectToSchool(Establishment school) =>
-        Redirect(Routes.School(SchoolInfo.Create(school)));
+        Redirect(Routes.School(School.Create(school)));
 
     private RedirectResult RedirectToSchool(SchoolSearchResult school) =>
         Redirect(Routes.School(school.Info));

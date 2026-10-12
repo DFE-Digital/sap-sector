@@ -36,7 +36,7 @@ public class AllThroughWhatIsASimilarSchoolViewModelTests
         bool hasPrimarySimilarSchools,
         bool hasSecondarySimilarSchools) =>
         new(
-            new SchoolInfoViewModel(Urn, "Test school", "Test address"),
+            new SchoolViewModel(Urn, "Test school", "Test address"),
             hasPrimarySimilarSchools,
             hasSecondarySimilarSchools);
 }

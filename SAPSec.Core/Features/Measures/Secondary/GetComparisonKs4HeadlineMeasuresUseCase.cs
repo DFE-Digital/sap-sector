@@ -57,8 +57,8 @@ public record GetComparisonKs4HeadlineMeasuresRequest(
     IDictionary<string, string>? FilterBy = null);
 
 public record GetComparisonKs4HeadlineMeasuresResponse(
-    SchoolInfo.SchoolInfo CurrentSchool,
-    SchoolInfo.SchoolInfo ComparatorSchool,
+    SchoolInfo.School CurrentSchool,
+    SchoolInfo.School ComparatorSchool,
     Measure Attainment8,
     Measure EnglishMaths,
     Measure Destinations);

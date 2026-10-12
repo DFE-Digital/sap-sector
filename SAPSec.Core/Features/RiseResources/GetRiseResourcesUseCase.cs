@@ -23,7 +23,7 @@ public class GetRiseResourcesUseCase(
 public record GetRiseResourcesRequest(string Urn);
 
 public record GetRiseResourcesResponse(
-    SchoolInfo.SchoolInfo School,
+    SchoolInfo.School School,
     IReadOnlyList<RiseResourceCategory> Categories);
 
 public record RiseResourceCategory(

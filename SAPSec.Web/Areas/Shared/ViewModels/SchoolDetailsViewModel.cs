@@ -5,7 +5,7 @@ using SAPSec.Web.ViewModels.Components;
 
 namespace SAPSec.Web.Areas.Shared.ViewModels;
 
-public class SchoolInfoWithLinksViewModel
+public class LinkedSchoolViewModel
 {
     // Identifiers
     public required string Urn { get; init; }
@@ -14,14 +14,14 @@ public class SchoolInfoWithLinksViewModel
     public required IReadOnlyList<SuccessorLinkViewModel> Successors { get; init; }
     public required IReadOnlyList<SuccessorLinkViewModel> Predecessors { get; init; }
 
-    public static SchoolInfoWithLinksViewModel FromSchoolDetails(SchoolInfoWithLinks schoolDetails) =>
+    public static LinkedSchoolViewModel FromSchoolDetails(LinkedSchool school) =>
         new()
         {
-            Urn = schoolDetails.Info.Urn,
-            Name = schoolDetails.Info.Name,
-            ShowClosedSchoolBanner = schoolDetails.ShowClosedSchoolBanner,
-            Successors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors),
-            Predecessors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors),
+            Urn = school.Urn,
+            Name = school.Name,
+            ShowClosedSchoolBanner = school.ShowClosedSchoolBanner,
+            Successors = SuccessorLinkViewModel.FromSuccessors(school.Successors),
+            Predecessors = SuccessorLinkViewModel.FromSuccessors(school.Predecessors),
         };
 }
 
@@ -30,6 +30,9 @@ public class SchoolDetailsViewModel
     // Identifiers
     public required string Urn { get; init; }
     public required string Name { get; init; }
+    public required bool ShowClosedSchoolBanner { get; init; }
+    public required IReadOnlyList<SuccessorLinkViewModel> Successors { get; init; }
+    public required IReadOnlyList<SuccessorLinkViewModel> Predecessors { get; init; }
     public required DataWithAvailability<string> DfENumber { get; init; }
     public required DataWithAvailability<string> Ukprn { get; init; }
 
@@ -93,13 +96,16 @@ public class SchoolDetailsViewModel
     public static SchoolDetailsViewModel FromSchoolDetails(SchoolDetails schoolDetails) =>
         new()
         {
-            Urn = schoolDetails.Info.Urn,
-            Name = schoolDetails.Info.Name,
+            Urn = schoolDetails.Urn,
+            Name = schoolDetails.Name,
+            ShowClosedSchoolBanner = schoolDetails.ShowClosedSchoolBanner,
+            Successors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors),
+            Predecessors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors),
             DfENumber = schoolDetails.DfENumber,
             Ukprn = schoolDetails.Ukprn,
-            Address = schoolDetails.Info.Address.ToString(),
-            LocalAuthorityName = schoolDetails.Info.LocalAuthority.Name,
-            LocalAuthorityCode = schoolDetails.Info.LocalAuthority.Id,
+            Address = schoolDetails.Address.ToString(),
+            LocalAuthorityName = schoolDetails.LocalAuthority.Name,
+            LocalAuthorityCode = schoolDetails.LocalAuthority.Id,
             Region = schoolDetails.Region,
             UrbanRuralDescription = schoolDetails.UrbanRuralDescription,
             AgeRangeLow = schoolDetails.AgeRangeLow,
@@ -122,6 +128,6 @@ public class SchoolDetailsViewModel
             Telephone = schoolDetails.Telephone,
             Email = schoolDetails.Email,
             OfstedProviderId = schoolDetails.OfstedProviderId,
-            IsAllThroughSchool = schoolDetails.Info.IsAllThroughSchool
+            IsAllThroughSchool = schoolDetails.IsAllThroughSchool
         };
 }

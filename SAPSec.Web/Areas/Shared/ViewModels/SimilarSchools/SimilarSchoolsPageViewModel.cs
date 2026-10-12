@@ -102,7 +102,7 @@ public class SimilarSchoolsPageViewModel
     public static SimilarSchoolsPageViewModel Build(
         string phaseLabel,
         IQueryCollection query,
-        SchoolInfo currentSchool,
+        Core.Features.SchoolInfo.School currentSchool,
         IReadOnlyCollection<SortOption> sortOptions,
         IReadOnlyCollection<SimilarSchoolsAvailableFilter> filterOptions,
         IPagedCollection<SimilarSchoolResult> resultsPage,

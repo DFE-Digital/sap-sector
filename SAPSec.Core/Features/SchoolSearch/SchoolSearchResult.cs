@@ -8,13 +8,13 @@ namespace SAPSec.Core.Features.SchoolSearch;
 [ExcludeFromCodeCoverage]
 public record SchoolSearchResult
 (
-    SchoolInfo.SchoolInfo Info,
+    SchoolInfo.School Info,
     string? Latitude,
     string? Longitude
 )
 {
     public static SchoolSearchResult FromNameAndEstablishment(string name, Establishment establishment, GeographicCoordinates? latLong = null) => new(
-        SchoolInfo.SchoolInfo.Create(establishment),
+        SchoolInfo.School.Create(establishment),
         latLong?.Latitude.ToString(CultureInfo.InvariantCulture),
         latLong?.Longitude.ToString(CultureInfo.InvariantCulture));
 }

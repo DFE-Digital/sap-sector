@@ -5,7 +5,7 @@ namespace SAPSec.Web.ViewModels.Components;
 
 public record SuccessorLinkViewModel(string Name, string Url)
 {
-    public static IReadOnlyList<SuccessorLinkViewModel> FromSuccessors(IEnumerable<SchoolInfo> successors) =>
+    public static IReadOnlyList<SuccessorLinkViewModel> FromSuccessors(IEnumerable<School> successors) =>
         successors
             .Select(successor => new SuccessorLinkViewModel(successor.Name, Routes.School(successor)))
             .ToList();

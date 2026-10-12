@@ -20,7 +20,7 @@ public sealed class SchoolClosureEligibilityService(
     {
         ArgumentNullException.ThrowIfNull(establishment);
 
-        var schoolInfo = SchoolInfo.SchoolInfo.Create(establishment);
+        var schoolInfo = SchoolInfo.School.Create(establishment);
 
         if (!schoolInfo.IsClosed)
         {
@@ -43,7 +43,7 @@ public sealed class SchoolClosureEligibilityService(
             Successors: successors);
     }
 
-    private async Task<IReadOnlyList<SchoolInfo.SchoolInfo>> ResolveSuccessorsAsync(
+    private async Task<IReadOnlyList<SchoolInfo.School>> ResolveSuccessorsAsync(
         string urn,
         IReadOnlyCollection<EstablishmentLinks> links)
     {
@@ -61,7 +61,7 @@ public sealed class SchoolClosureEligibilityService(
         var candidateEstablishments = (await establishmentRepository.GetEstablishmentsAsync(candidateUrns))
             .ToDictionary(e => e.URN, StringComparer.Ordinal);
 
-        var successors = new List<SchoolInfo.SchoolInfo>();
+        var successors = new List<SchoolInfo.School>();
 
         foreach (var candidateUrn in candidateUrns)
         {
@@ -78,7 +78,7 @@ public sealed class SchoolClosureEligibilityService(
             // inferred from status: the current school is the predecessor only when the linked
             // school is not itself closed. Both sides closed is an unexpected combination - log it
             // rather than signpost to a dead end.
-            var schoolInfo = SchoolInfo.SchoolInfo.Create(candidate);
+            var schoolInfo = SchoolInfo.School.Create(candidate);
             if (schoolInfo.IsClosed)
             {
                 logger.LogWarning(

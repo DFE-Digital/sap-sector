@@ -7,7 +7,7 @@ public static class SchoolRouteHelper
 {
     public static bool TryGetPhaseRedirectPath(
         PathString requestPath,
-        SchoolInfo school,
+        School school,
         PathString pathBase,
         out string redirectPath)
     {

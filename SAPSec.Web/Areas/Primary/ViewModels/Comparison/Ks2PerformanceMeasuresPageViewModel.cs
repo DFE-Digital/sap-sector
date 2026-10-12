@@ -5,8 +5,8 @@ namespace SAPSec.Web.Areas.Primary.ViewModels.Comparison;
 
 public class Ks2PerformanceMeasuresPageViewModel
 {
-    public required SchoolInfoViewModel CurrentSchool { get; set; }
-    public required SchoolInfoViewModel ComparatorSchool { get; set; }
+    public required SchoolViewModel CurrentSchool { get; set; }
+    public required SchoolViewModel ComparatorSchool { get; set; }
 
     public required MeasureViewModel MeetingExpectedStandardRwm { get; set; }
     public required MeasureViewModel AchievedHigherStandardRwm { get; set; }

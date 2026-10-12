@@ -18,7 +18,7 @@ public sealed class SchoolPredecessorRelationshipService(
     {
         ArgumentNullException.ThrowIfNull(establishment);
 
-        var schoolInfo = SchoolInfo.SchoolInfo.Create(establishment);
+        var schoolInfo = SchoolInfo.School.Create(establishment);
 
         if (schoolInfo.IsClosed)
         {
@@ -41,7 +41,7 @@ public sealed class SchoolPredecessorRelationshipService(
         var candidateEstablishments = (await establishmentRepository.GetEstablishmentsAsync(candidateUrns))
             .ToDictionary(e => e.URN, StringComparer.Ordinal);
 
-        var predecessors = new List<SchoolInfo.SchoolInfo>();
+        var predecessors = new List<SchoolInfo.School>();
 
         foreach (var candidateUrn in candidateUrns)
         {
@@ -56,7 +56,7 @@ public sealed class SchoolPredecessorRelationshipService(
 
             // A predecessor beyond its own data eligibility window would link to a 404 - don't
             // signpost to it.
-            var candidateSchoolInfo = SchoolInfo.SchoolInfo.Create(candidate);
+            var candidateSchoolInfo = SchoolInfo.School.Create(candidate);
             if (!SchoolClosureEligibilityRule.IsEligibleToAppear(candidateSchoolInfo))
             {
                 logger.LogWarning(

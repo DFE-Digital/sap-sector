@@ -24,20 +24,20 @@ public sealed class RequireSchoolPhaseFilter(
             }
 
             var school = await requestSchoolAccessor.GetAsync(context.HttpContext, urn);
-            if (!MatchesExpectedPhase(school.Info, expectedPhase))
+            if (!MatchesExpectedPhase(school, expectedPhase))
             {
-                if (school.Info.IsAllThroughSchool
+                if (school.IsAllThroughSchool
                     && !await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools))
                 {
                     context.Result = new NotFoundResult();
                     return;
                 }
 
-                context.Result = TryBuildRedirectResult(context, school.Info);
+                context.Result = TryBuildRedirectResult(context, school);
                 return;
             }
 
-            if (!await IsFeatureEnabledForSchoolAsync(school.Info, expectedPhase))
+            if (!await IsFeatureEnabledForSchoolAsync(school, expectedPhase))
             {
                 context.Result = new NotFoundResult();
                 return;
@@ -60,7 +60,7 @@ public sealed class RequireSchoolPhaseFilter(
         return !string.IsNullOrWhiteSpace(urn);
     }
 
-    private static bool MatchesExpectedPhase(SchoolInfo school, ExpectedSchoolPhase expectedPhase)
+    private static bool MatchesExpectedPhase(School school, ExpectedSchoolPhase expectedPhase)
         => expectedPhase switch
         {
             ExpectedSchoolPhase.Primary => school.IsPrimarySchool && !school.IsAllThroughSchool,
@@ -71,7 +71,7 @@ public sealed class RequireSchoolPhaseFilter(
             _ => false
         };
 
-    private async Task<bool> IsFeatureEnabledForSchoolAsync(SchoolInfo school, ExpectedSchoolPhase expectedPhase)
+    private async Task<bool> IsFeatureEnabledForSchoolAsync(School school, ExpectedSchoolPhase expectedPhase)
     {
         if (expectedPhase == ExpectedSchoolPhase.AllThrough)
         {
@@ -110,7 +110,7 @@ public sealed class RequireSchoolPhaseFilter(
         return true;
     }
 
-    private IActionResult TryBuildRedirectResult(ActionExecutingContext context, SchoolInfo school)
+    private IActionResult TryBuildRedirectResult(ActionExecutingContext context, School school)
     {
         if (routeParameterNames.Length != 1)
         {

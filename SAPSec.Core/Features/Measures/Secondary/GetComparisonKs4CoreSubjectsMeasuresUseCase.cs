@@ -63,8 +63,8 @@ public record GetComparisonKs4CoreSubjectsMeasuresRequest(
     IDictionary<string, string>? FilterBy = null);
 
 public record GetComparisonKs4CoreSubjectsMeasuresResponse(
-    SchoolInfo.SchoolInfo CurrentSchool,
-    SchoolInfo.SchoolInfo ComparatorSchool,
+    SchoolInfo.School CurrentSchool,
+    SchoolInfo.School ComparatorSchool,
     Measure EnglishLanguage,
     Measure EnglishLiterature,
     Measure Maths,

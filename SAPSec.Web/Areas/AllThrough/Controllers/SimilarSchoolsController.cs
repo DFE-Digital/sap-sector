@@ -1,17 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.AllThrough.Services;
 using SAPSec.Web.Areas.AllThrough.ViewModels;
-using SAPSec.Web.Areas.Shared.ViewModels;
-using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
+using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.ViewModels;
-using SAPSec.Core.FeatureFlags;
 
 namespace SAPSec.Web.Areas.AllThrough.Controllers;
 
@@ -21,7 +20,7 @@ namespace SAPSec.Web.Areas.AllThrough.Controllers;
 [RequireFeatureFlag(Flags.EnableAllThroughSchools)]
 [RequireSchoolPhase(ExpectedSchoolPhase.AllThrough)]
 public class SimilarSchoolsController(
-        IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
+        IUseCase<GetSchoolRequest, GetSchoolResponse> getSchoolInfoUseCase,
         IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
         IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse> findSecondarySimilarSchoolsUseCase,
         IUseCase<GetAllThroughSimilarSchoolPhasesRequest, GetAllThroughSimilarSchoolPhasesResponse> getAllThroughSimilarSchoolPhasesUseCase,
@@ -105,9 +104,9 @@ public class SimilarSchoolsController(
             similarSchoolPhases.HasSecondary));
     }
 
-    private async Task PopulateViewData(SchoolInfo currentSchool)
+    private async Task PopulateViewData(School currentSchool)
     {
-        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchool(currentSchool);
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateAllThrough(
             Url,
             currentSchool.Urn,

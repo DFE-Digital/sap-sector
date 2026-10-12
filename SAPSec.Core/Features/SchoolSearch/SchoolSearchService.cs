@@ -42,7 +42,7 @@ public class SchoolSearchService(
             return null;
         }
 
-        var schoolInfo = SchoolInfo.SchoolInfo.Create(school);
+        var schoolInfo = SchoolInfo.School.Create(school);
 
         return schoolInfo.IsSearchable(primarySchoolsEnabled, allThroughSchoolsEnabled)
             ? school
@@ -75,7 +75,7 @@ public class SchoolSearchService(
                 continue;
             }
 
-            var schoolInfo = SchoolInfo.SchoolInfo.Create(r.School);
+            var schoolInfo = SchoolInfo.School.Create(r.School);
             if (!schoolInfo.IsSearchable(primarySchoolsEnabled, allThroughSchoolsEnabled))
             {
                 continue;

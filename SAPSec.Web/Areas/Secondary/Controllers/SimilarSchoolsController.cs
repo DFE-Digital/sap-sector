@@ -62,7 +62,7 @@ public class SimilarSchoolsController(
         return View(viewModel);
     }
 
-    private async Task PopulateViewData(SchoolInfo currentSchool, bool hasSimilarSchools = true)
+    private async Task PopulateViewData(School currentSchool, bool hasSimilarSchools = true)
     {
         var includeRise = featureFlagService is not null
             && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);

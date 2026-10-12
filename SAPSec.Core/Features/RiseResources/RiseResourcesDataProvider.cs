@@ -30,7 +30,7 @@ internal class RiseResourcesDataProvider(
 
         var categories = BuildOrderedCategories(document.ResourceCategories, applicableResources);
 
-        return new RiseResourcesSourceData(SchoolInfo.SchoolInfo.Create(establishment), categories);
+        return new RiseResourcesSourceData(SchoolInfo.School.Create(establishment), categories);
     }
 
     private static IReadOnlyList<RiseResourceCategory> BuildOrderedCategories(
@@ -129,5 +129,5 @@ internal class RiseResourcesDataProvider(
 }
 
 internal record RiseResourcesSourceData(
-    SchoolInfo.SchoolInfo School,
+    SchoolInfo.School School,
     IReadOnlyList<RiseResourceCategory> Categories);

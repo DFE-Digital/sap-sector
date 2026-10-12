@@ -62,7 +62,7 @@ public record GetSchoolKs4CoreSubjectsMeasuresRequest(
     IDictionary<string, string>? FilterBy = null);
 
 public record GetSchoolKs4CoreSubjectsMeasuresResponse(
-    SchoolInfo.SchoolInfo School,
+    SchoolInfo.School School,
     int SimilarSchoolsCount,
     Measure EnglishLanguage,
     Measure EnglishLiterature,

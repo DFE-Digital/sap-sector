@@ -14,7 +14,7 @@ public static class SchoolClosureEligibilityRule
     /// True if the establishment may still appear in the service: it is not closed, or it is
     /// closed but within the data eligibility window (or its close date is unknown).
     /// </summary>
-    public static bool IsEligibleToAppear(SchoolInfo.SchoolInfo schoolInfo)
+    public static bool IsEligibleToAppear(SchoolInfo.School schoolInfo)
     {
         ArgumentNullException.ThrowIfNull(schoolInfo);
 

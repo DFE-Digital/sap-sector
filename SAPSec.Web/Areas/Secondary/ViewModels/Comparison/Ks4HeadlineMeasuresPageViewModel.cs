@@ -5,8 +5,8 @@ namespace SAPSec.Web.Areas.Secondary.ViewModels.Comparison;
 
 public class Ks4HeadlineMeasuresPageViewModel
 {
-    public required SchoolInfoViewModel CurrentSchool { get; set; }
-    public required SchoolInfoViewModel ComparatorSchool { get; set; }
+    public required SchoolViewModel CurrentSchool { get; set; }
+    public required SchoolViewModel ComparatorSchool { get; set; }
 
     public required MeasureViewModel Attainment8 { get; set; }
     public required MeasureViewModel EnglishMaths { get; set; }

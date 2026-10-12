@@ -54,7 +54,7 @@ public class StartupIndexBuilder(
             var allThroughSchoolsEnabled = await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools);
 
             var schools = (await establishmentRepository.GetAllEstablishmentsAsync())
-                .Where(s => SchoolInfo.Create(s).IsSearchable(primarySchoolsEnabled, allThroughSchoolsEnabled))
+                .Where(s => School.Create(s).IsSearchable(primarySchoolsEnabled, allThroughSchoolsEnabled))
                 .ToList();
 
             if (!schools.Any())
