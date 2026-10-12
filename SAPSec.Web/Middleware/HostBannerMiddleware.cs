@@ -11,7 +11,7 @@ public class HostBannerMiddleware(RequestDelegate next, IWebHostEnvironment envi
 
         context.Items["ShowBanner"] = false;
 
-        if (host == "localhost")
+        if (host == "get-school-improvement-insights-pr-390.test.teacherservices.cloud")
         {
             context.Items["ShowBanner"] = true;
         }
