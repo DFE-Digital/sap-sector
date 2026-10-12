@@ -16,8 +16,8 @@ public static class Build
         return build(new EstablishmentBuilder(urn, name)).Build();
     }
 
-    public static EstablishmentEmail EstablishmentEmail(string urn, string mainEmail, string closeDate = "") =>
-        new() { URN = urn, MainEmail = mainEmail, CloseDate = closeDate };
+    public static EstablishmentEmail EstablishmentEmail(string urn, string mainEmail) =>
+        new() { URN = urn, MainEmail = mainEmail };
 
     public static EstablishmentLinks EstablishmentLink(string urn, string linkUrn, string linkType, string linkName = "") =>
         new() { urn = urn, linkurn = linkUrn, linktype = linkType, linkname = linkName };
