@@ -8,18 +8,6 @@ namespace SAPSec.Data.Dto;
 [ExcludeFromCodeCoverage]
 public class EstablishmentEmail
 {
-    public string Id { get; set; } = string.Empty;
-    public string LAId { get; set; } = string.Empty;
-    public string LAName { get; set; } = string.Empty;
-    public string RegionId { get; set; } = string.Empty;
-    public string RegionName { get; set; } = string.Empty;
-    public string CloseDate { get; set; } = string.Empty;
-    public string EstablishmentName { get; set; } = string.Empty;
-    public string EstablishmentNumber { get; set; } = string.Empty;
-    public string EstablishmentStatusName { get; set; } = string.Empty;
-    public string EstablishmentTypeGroupName { get; set; } = string.Empty;
     public string MainEmail { get; set; } = string.Empty;
-    public string PhaseOfEducationName { get; set; } = string.Empty;
-    public string TypeOfEstablishmentName { get; set; } = string.Empty;
     public string URN { get; set; } = string.Empty;
 }
