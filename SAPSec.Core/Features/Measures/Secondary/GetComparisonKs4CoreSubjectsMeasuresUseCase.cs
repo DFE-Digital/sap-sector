@@ -57,8 +57,7 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
             Ks4CoreSubjects.Physics.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
-                filterBy,
-                request.IncludePupilCharacteristicFilter)
+                filterBy)
         );
     }
 }
