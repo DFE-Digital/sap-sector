@@ -87,12 +87,12 @@ public class RiseResourcesPageIntegrationTests(
             Category("Performance and attendance", "About performance and attendance."),
             Category("Wider school", "About the wider school."));
         Fixture.RiseResourcesRepository.SetupResources(
-            Entry("Teaching maths fluency", "Wider school", "Curriculum and teaching", PhaseOfEducationValues.Secondary),
-            Entry("Reading House", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
-            Entry("Improving Literacy in KS2", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
-            Entry("Improving attendance", "Performance and attendance", "Attendance", PhaseOfEducationValues.Secondary, "All through"),
-            Entry("Pastoral support", "Pupil characteristics", "SEND", PhaseOfEducationValues.Secondary),
-            Entry("Phonics screening support", "Performance and attendance", "Literacy", PhaseOfEducationValues.Primary));
+            Entry("Teaching maths fluency", "Wider school", "Curriculum and teaching", PhaseOfEducationId.Secondary),
+            Entry("Reading House", "Performance and attendance", "Literacy", PhaseOfEducationId.Secondary),
+            Entry("Improving Literacy in KS2", "Performance and attendance", "Literacy", PhaseOfEducationId.Secondary),
+            Entry("Improving attendance", "Performance and attendance", "Attendance", PhaseOfEducationId.Secondary, "All through"),
+            Entry("Pastoral support", "Pupil characteristics", "SEND", PhaseOfEducationId.Secondary),
+            Entry("Phonics screening support", "Performance and attendance", "Literacy", PhaseOfEducationId.Primary));
 
         var page = await Fixture.RequestPageAsync(
             Routes.SecondarySchool("100001").RiseResources, HttpStatusCode.OK);
@@ -145,11 +145,11 @@ public class RiseResourcesPageIntegrationTests(
             Category("Wider school", "About the wider school.", "Curriculum and teaching"));
         Fixture.RiseResourcesRepository.SetupResources(
             // Resource-file order is deliberately not the display order.
-            Entry("Maths guide", "Performance and attendance", "Maths", PhaseOfEducationValues.Secondary),
-            Entry("Attendance guide", "Performance and attendance", "Attendance", PhaseOfEducationValues.Secondary),
-            Entry("Literacy guide", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
-            Entry("Leadership guide", "Wider school", "Leadership and training", PhaseOfEducationValues.Secondary),
-            Entry("Curriculum guide", "Wider school", "Curriculum and teaching", PhaseOfEducationValues.Secondary));
+            Entry("Maths guide", "Performance and attendance", "Maths", PhaseOfEducationId.Secondary),
+            Entry("Attendance guide", "Performance and attendance", "Attendance", PhaseOfEducationId.Secondary),
+            Entry("Literacy guide", "Performance and attendance", "Literacy", PhaseOfEducationId.Secondary),
+            Entry("Leadership guide", "Wider school", "Leadership and training", PhaseOfEducationId.Secondary),
+            Entry("Curriculum guide", "Wider school", "Curriculum and teaching", PhaseOfEducationId.Secondary));
 
         var page = await Fixture.RequestPageAsync(
             Routes.SecondarySchool("100001").RiseResources, HttpStatusCode.OK);
@@ -171,7 +171,7 @@ public class RiseResourcesPageIntegrationTests(
     {
         Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
         Fixture.RiseResourcesRepository.SetupResources(
-            Entry("Phonics screening support", "Performance and attendance", "Literacy", PhaseOfEducationValues.Primary));
+            Entry("Phonics screening support", "Performance and attendance", "Literacy", PhaseOfEducationId.Primary));
 
         var page = await Fixture.RequestPageAsync(
             Routes.SecondarySchool("100001").RiseResources, HttpStatusCode.OK);

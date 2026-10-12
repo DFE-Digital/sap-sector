@@ -27,8 +27,6 @@ public class FindPrimarySimilarSchoolsUseCase(
 
         var data = await dataProvider.GetData(request.CurrentSchoolUrn);
 
-        var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(data.CurrentSimilarSchool);
-
         var hasSimilarSchools = data.SimilarSchools.Count > 0;
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
@@ -42,10 +40,10 @@ public class FindPrimarySimilarSchoolsUseCase(
 
         var allResults = sorted
             .Select(r => new SimilarSchoolResult(
-                r.Item.URN,
-                r.Item.Name,
-                r.Item.Address,
-                r.Item.LocalAuthority,
+                r.Item.Info.Urn,
+                r.Item.Info.Name,
+                r.Item.Info.Address,
+                r.Item.Info.LocalAuthority,
                 r.Item.Coordinates != null ? CoordinateConverter.Convert(r.Item.Coordinates) : null,
                 r.Value))
             .ToList()
@@ -55,7 +53,7 @@ public class FindPrimarySimilarSchoolsUseCase(
         var resultsPage = new PagedCollection<SimilarSchoolResult>(allResults, page, request.ResultsPerPage);
 
         return new(
-            currentSchoolInfo,
+            data.CurrentSimilarSchool.Info,
             sorting.GetPossibleOptions(sortBy).ToList().AsReadOnly(),
             filters.AsAvailableFilters(data.SimilarSchools, i => i.SimilarSchool),
             resultsPage,

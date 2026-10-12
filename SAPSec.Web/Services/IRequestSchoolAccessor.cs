@@ -1,8 +1,8 @@
-using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 
 namespace SAPSec.Web.Services;
 
 public interface IRequestSchoolAccessor
 {
-    Task<SchoolDetails> GetAsync(HttpContext? httpContext, string urn);
+    Task<SchoolInfoWithLinks> GetAsync(HttpContext? httpContext, string urn);
 }

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using SAPSec.Core.FeatureFlags;
-using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.Services;
 
@@ -24,20 +24,20 @@ public sealed class RequireSchoolPhaseFilter(
             }
 
             var school = await requestSchoolAccessor.GetAsync(context.HttpContext, urn);
-            if (!MatchesExpectedPhase(school, expectedPhase))
+            if (!MatchesExpectedPhase(school.Info, expectedPhase))
             {
-                if (school.IsAllThroughSchool()
+                if (school.Info.IsAllThroughSchool
                     && !await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools))
                 {
                     context.Result = new NotFoundResult();
                     return;
                 }
 
-                context.Result = TryBuildRedirectResult(context, school);
+                context.Result = TryBuildRedirectResult(context, school.Info);
                 return;
             }
 
-            if (!await IsFeatureEnabledForSchoolAsync(school, expectedPhase))
+            if (!await IsFeatureEnabledForSchoolAsync(school.Info, expectedPhase))
             {
                 context.Result = new NotFoundResult();
                 return;
@@ -60,18 +60,18 @@ public sealed class RequireSchoolPhaseFilter(
         return !string.IsNullOrWhiteSpace(urn);
     }
 
-    private static bool MatchesExpectedPhase(SchoolDetails school, ExpectedSchoolPhase expectedPhase)
+    private static bool MatchesExpectedPhase(SchoolInfo school, ExpectedSchoolPhase expectedPhase)
         => expectedPhase switch
         {
-            ExpectedSchoolPhase.Primary => school.IsPrimarySchool() && !school.IsAllThroughSchool(),
-            ExpectedSchoolPhase.Secondary => school.IsSecondarySchool(),
-            ExpectedSchoolPhase.AllThrough => school.IsAllThroughSchool(),
-            ExpectedSchoolPhase.PrimaryComparisonParticipant => school.IsPrimarySchool() || school.IsAllThroughSchool(),
-            ExpectedSchoolPhase.SecondaryComparisonParticipant => school.IsSecondarySchool() || school.IsAllThroughSchool(),
+            ExpectedSchoolPhase.Primary => school.IsPrimarySchool && !school.IsAllThroughSchool,
+            ExpectedSchoolPhase.Secondary => school.IsSecondarySchool,
+            ExpectedSchoolPhase.AllThrough => school.IsAllThroughSchool,
+            ExpectedSchoolPhase.PrimaryComparisonParticipant => school.IsPrimarySchool || school.IsAllThroughSchool,
+            ExpectedSchoolPhase.SecondaryComparisonParticipant => school.IsSecondarySchool || school.IsAllThroughSchool,
             _ => false
         };
 
-    private async Task<bool> IsFeatureEnabledForSchoolAsync(SchoolDetails school, ExpectedSchoolPhase expectedPhase)
+    private async Task<bool> IsFeatureEnabledForSchoolAsync(SchoolInfo school, ExpectedSchoolPhase expectedPhase)
     {
         if (expectedPhase == ExpectedSchoolPhase.AllThrough)
         {
@@ -80,14 +80,14 @@ public sealed class RequireSchoolPhaseFilter(
 
         if (expectedPhase == ExpectedSchoolPhase.PrimaryComparisonParticipant)
         {
-            return school.IsAllThroughSchool()
+            return school.IsAllThroughSchool
                 ? await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools)
                 : await featureFlagService.IsEnabledAsync(Flags.EnablePrimarySchools);
         }
 
         if (expectedPhase == ExpectedSchoolPhase.SecondaryComparisonParticipant)
         {
-            return school.IsAllThroughSchool()
+            return school.IsAllThroughSchool
                 ? await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools)
                 : true;
         }
@@ -97,12 +97,12 @@ public sealed class RequireSchoolPhaseFilter(
             return true;
         }
 
-        if (school.IsAllThroughSchool())
+        if (school.IsAllThroughSchool)
         {
             return await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools);
         }
 
-        if (school.IsPrimarySchool())
+        if (school.IsPrimarySchool)
         {
             return await featureFlagService.IsEnabledAsync(Flags.EnablePrimarySchools);
         }
@@ -110,7 +110,7 @@ public sealed class RequireSchoolPhaseFilter(
         return true;
     }
 
-    private IActionResult TryBuildRedirectResult(ActionExecutingContext context, SchoolDetails school)
+    private IActionResult TryBuildRedirectResult(ActionExecutingContext context, SchoolInfo school)
     {
         if (routeParameterNames.Length != 1)
         {

@@ -7,7 +7,7 @@ namespace SAPSec.Core.Features.SchoolDetails;
 public sealed record SchoolClosureEligibility(
     bool IsEligibleForDisplay,
     bool ShowClosedSchoolBanner,
-    IReadOnlyList<SuccessorSchool> Successors)
+    IReadOnlyList<SchoolInfo.SchoolInfo> Successors)
 {
     public static readonly SchoolClosureEligibility NotClosed = new(
         IsEligibleForDisplay: true,

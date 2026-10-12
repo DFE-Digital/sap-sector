@@ -17,11 +17,11 @@
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Address</dt>
-        <dd class="govuk-summary-list__value">@Model.Address.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.Address</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Local authority</dt>
-        <dd class="govuk-summary-list__value">@Model.LocalAuthorityName.DisplayWithCode(Model.LocalAuthorityCode)</dd>
+        <dd class="govuk-summary-list__value">@Model.LocalAuthorityName (@Model.LocalAuthorityCode)</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Region</dt>

@@ -1,5 +1,4 @@
 using SAPSec.Core.FeatureFlags;
-using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Geography;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
@@ -38,7 +37,14 @@ public class SchoolSearchService(
         var allThroughSchoolsEnabled = await _featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
 
-        return school.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled)
+        if (school is null)
+        {
+            return null;
+        }
+
+        var schoolInfo = SchoolInfo.SchoolInfo.Create(school);
+
+        return schoolInfo.IsSearchable(primarySchoolsEnabled, allThroughSchoolsEnabled)
             ? school
             : null;
     }
@@ -69,7 +75,8 @@ public class SchoolSearchService(
                 continue;
             }
 
-            if (!r.School.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled))
+            var schoolInfo = SchoolInfo.SchoolInfo.Create(r.School);
+            if (!schoolInfo.IsSearchable(primarySchoolsEnabled, allThroughSchoolsEnabled))
             {
                 continue;
             }
@@ -82,6 +89,6 @@ public class SchoolSearchService(
             results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, latLong));
         }
 
-        return results.OrderBy(r => r.EstablishmentName).ToList();
+        return results.OrderBy(r => r.Info.Name).ToList();
     }
 }

@@ -85,10 +85,10 @@ public class RiseResourcesPageIntegrationTests(
             Category("Curriculum", "Resources covering curriculum and teaching."));
         Fixture.RiseResourcesRepository.SetupResources(
             // File order puts "Improving Literacy in KS2" before "Choosing a validated phonics teaching programme".
-            Entry("Improving Literacy in KS2", "Curriculum", "Literacy", PhaseOfEducationValues.Primary, "All through"),
-            Entry("Choosing a validated phonics teaching programme", "Curriculum", "Literacy", PhaseOfEducationValues.Primary),
-            Entry("Teaching maths fluency", "Curriculum", "Maths", PhaseOfEducationValues.Primary),
-            Entry("Raising GCSE attainment", "Curriculum", "Maths", PhaseOfEducationValues.Secondary));
+            Entry("Improving Literacy in KS2", "Curriculum", "Literacy", PhaseOfEducationId.Primary, "All through"),
+            Entry("Choosing a validated phonics teaching programme", "Curriculum", "Literacy", PhaseOfEducationId.Primary),
+            Entry("Teaching maths fluency", "Curriculum", "Maths", PhaseOfEducationId.Primary),
+            Entry("Raising GCSE attainment", "Curriculum", "Maths", PhaseOfEducationId.Secondary));
 
         var page = await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").RiseResources, HttpStatusCode.OK);

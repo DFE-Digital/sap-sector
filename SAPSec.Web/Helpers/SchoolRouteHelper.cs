@@ -1,5 +1,4 @@
-using Microsoft.AspNetCore.Http;
-using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Helpers;
@@ -8,7 +7,7 @@ public static class SchoolRouteHelper
 {
     public static bool TryGetPhaseRedirectPath(
         PathString requestPath,
-        SchoolDetails school,
+        SchoolInfo school,
         PathString pathBase,
         out string redirectPath)
     {
@@ -16,9 +15,9 @@ public static class SchoolRouteHelper
 
         var relativePath = school switch
         {
-            _ when school.IsAllThroughSchool() => GetAllThroughPath(requestPath, school.Urn),
-            _ when school.IsPrimarySchool() => GetPrimaryPath(requestPath, school.Urn),
-            _ when school.IsSecondarySchool() => GetSecondaryPath(requestPath, school.Urn),
+            _ when school.IsAllThroughSchool => GetAllThroughPath(requestPath, school.Urn),
+            _ when school.IsPrimarySchool => GetPrimaryPath(requestPath, school.Urn),
+            _ when school.IsSecondarySchool => GetSecondaryPath(requestPath, school.Urn),
             _ => null
         };
 

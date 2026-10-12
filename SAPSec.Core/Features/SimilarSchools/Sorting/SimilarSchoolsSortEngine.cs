@@ -29,7 +29,7 @@ internal static class SimilarSchoolsSortEngine
             .OrderByDescending(
                 i => i.Value.Value.Map(v => Math.Round(v, decimalPlaces, MidpointRounding.AwayFromZero)),
                 DataWithAvailability<decimal>.Comparer)
-            .ThenBy(i => i.Item.Name, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(i => i.Item.Info.Name, StringComparer.OrdinalIgnoreCase)
             .Select(item => new SortedItem<SimilarSchool, DataWithAvailability<string>>(
                 item.Item,
                 new SortOptionValue<DataWithAvailability<string>>(

@@ -208,8 +208,8 @@ public class GetPrimaryComparisonSchoolDetailsUseCaseTests
 
         var response = await _sut.Execute(new("100001", "100002"));
 
-        response.ComparatorSchoolDetails.Urn.Should().Be("100002");
-        response.ComparatorSchoolDetails.Name.Should().Be("Comparator School");
+        response.ComparatorSchoolDetails.Info.Urn.Should().Be("100002");
+        response.ComparatorSchoolDetails.Info.Name.Should().Be("Comparator School");
         response.ComparatorSchoolDetails.Telephone.Value.Should().Be("01234 567890");
         response.ComparatorSchoolDetails.Website.Value.Should().Be("https://similar-school.example.com");
     }

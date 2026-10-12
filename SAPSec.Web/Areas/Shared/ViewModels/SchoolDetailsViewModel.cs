@@ -1,10 +1,11 @@
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Web.ViewModels.Components;
 
 namespace SAPSec.Web.Areas.Shared.ViewModels;
 
-public class SchoolDetailsViewModel
+public class SchoolInfoWithLinksViewModel
 {
     // Identifiers
     public required string Urn { get; init; }
@@ -12,13 +13,30 @@ public class SchoolDetailsViewModel
     public required bool ShowClosedSchoolBanner { get; init; }
     public required IReadOnlyList<SuccessorLinkViewModel> Successors { get; init; }
     public required IReadOnlyList<SuccessorLinkViewModel> Predecessors { get; init; }
+
+    public static SchoolInfoWithLinksViewModel FromSchoolDetails(SchoolInfoWithLinks schoolDetails) =>
+        new()
+        {
+            Urn = schoolDetails.Info.Urn,
+            Name = schoolDetails.Info.Name,
+            ShowClosedSchoolBanner = schoolDetails.ShowClosedSchoolBanner,
+            Successors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors),
+            Predecessors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors),
+        };
+}
+
+public class SchoolDetailsViewModel
+{
+    // Identifiers
+    public required string Urn { get; init; }
+    public required string Name { get; init; }
     public required DataWithAvailability<string> DfENumber { get; init; }
     public required DataWithAvailability<string> Ukprn { get; init; }
 
     // Location
-    public required DataWithAvailability<string> Address { get; init; }
-    public required DataWithAvailability<string> LocalAuthorityName { get; init; }
-    public required DataWithAvailability<string> LocalAuthorityCode { get; init; }
+    public required string Address { get; init; }
+    public required string LocalAuthorityName { get; init; }
+    public required string LocalAuthorityCode { get; init; }
     public required DataWithAvailability<string> Region { get; init; }
     public required DataWithAvailability<string> UrbanRuralDescription { get; init; }
 
@@ -27,8 +45,8 @@ public class SchoolDetailsViewModel
     public required DataWithAvailability<int> AgeRangeHigh { get; init; }
     public required DataWithAvailability<string> GenderOfEntry { get; init; }
     public required DataWithAvailability<string> PhaseOfEducation { get; init; }
-    public required bool IsPrimarySchool { get; init; }
-    public required bool IsAllThroughSchool { get; init; }
+    //public required bool IsPrimarySchool { get; init; }
+    //public required bool IsAllThroughSchool { get; init; }
     public required DataWithAvailability<string> SchoolType { get; init; }
     public required DataWithAvailability<string> TypeOfEstablishmentCode { get; init; }
     public required DataWithAvailability<string> AdmissionsPolicy { get; init; }
@@ -51,6 +69,9 @@ public class SchoolDetailsViewModel
     public required DataWithAvailability<string> Telephone { get; init; }
     public required DataWithAvailability<string> Email { get; init; }
 
+    public required string OfstedProviderId { get; init; }
+    public required bool IsAllThroughSchool { get; init; }
+
     public bool HasAcademyTrust =>
         AcademyTrustName.IsAvailable
         && AcademyTrustId.IsAvailable;
@@ -65,40 +86,26 @@ public class SchoolDetailsViewModel
     {
         get
         {
-            var providerId = IsAllThroughSchool
-                ? GetAllThroughOfstedProviderId()
-                : IsPrimarySchool ? "21" : "23";
-
-            return $"https://reports.ofsted.gov.uk/provider/{providerId}/{Urn}";
+            return $"https://reports.ofsted.gov.uk/provider/{OfstedProviderId}/{Urn}";
         }
     }
-
-    private string GetAllThroughOfstedProviderId() =>
-        TypeOfEstablishmentCode.IsAvailable && TypeOfEstablishmentCode.Value == "49"
-            ? "100003"
-            : "28";
 
     public static SchoolDetailsViewModel FromSchoolDetails(SchoolDetails schoolDetails) =>
         new()
         {
-            Urn = schoolDetails.Urn,
-            Name = schoolDetails.Name,
-            ShowClosedSchoolBanner = schoolDetails.ShowClosedSchoolBanner,
-            Successors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors),
-            Predecessors = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors),
+            Urn = schoolDetails.Info.Urn,
+            Name = schoolDetails.Info.Name,
             DfENumber = schoolDetails.DfENumber,
             Ukprn = schoolDetails.Ukprn,
-            Address = schoolDetails.Address,
-            LocalAuthorityName = schoolDetails.LocalAuthorityName,
-            LocalAuthorityCode = schoolDetails.LocalAuthorityCode,
+            Address = schoolDetails.Info.Address.ToString(),
+            LocalAuthorityName = schoolDetails.Info.LocalAuthority.Name,
+            LocalAuthorityCode = schoolDetails.Info.LocalAuthority.Id,
             Region = schoolDetails.Region,
             UrbanRuralDescription = schoolDetails.UrbanRuralDescription,
             AgeRangeLow = schoolDetails.AgeRangeLow,
             AgeRangeHigh = schoolDetails.AgeRangeHigh,
             GenderOfEntry = schoolDetails.GenderOfEntry,
             PhaseOfEducation = schoolDetails.PhaseOfEducation,
-            IsPrimarySchool = schoolDetails.IsPrimarySchool(),
-            IsAllThroughSchool = schoolDetails.IsAllThroughSchool(),
             SchoolType = schoolDetails.SchoolType,
             TypeOfEstablishmentCode = schoolDetails.TypeOfEstablishmentCode,
             AdmissionsPolicy = schoolDetails.AdmissionsPolicy,
@@ -114,5 +121,7 @@ public class SchoolDetailsViewModel
             Website = schoolDetails.Website,
             Telephone = schoolDetails.Telephone,
             Email = schoolDetails.Email,
+            OfstedProviderId = schoolDetails.OfstedProviderId,
+            IsAllThroughSchool = schoolDetails.Info.IsAllThroughSchool
         };
 }

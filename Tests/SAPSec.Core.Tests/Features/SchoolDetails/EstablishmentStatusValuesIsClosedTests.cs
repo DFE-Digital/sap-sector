@@ -7,28 +7,28 @@ public class EstablishmentStatusValuesIsClosedTests
     [Fact]
     public void IsClosed_ReturnsTrue_ForClosedStatusId()
     {
-        EstablishmentStatusValues.IsClosed(EstablishmentStatusValues.ClosedId, null).Should().BeTrue();
+        EstablishmentStatusId.IsClosed(EstablishmentStatusId.ClosedId, null).Should().BeTrue();
     }
 
     [Fact]
     public void IsClosed_ReturnsTrue_ForClosedStatusNameWhenIdMissing()
     {
-        EstablishmentStatusValues.IsClosed(null, EstablishmentStatusValues.Closed).Should().BeTrue();
+        EstablishmentStatusId.IsClosed(null, EstablishmentStatusId.Closed).Should().BeTrue();
     }
 
     [Theory]
-    [InlineData(EstablishmentStatusValues.OpenId)]
-    [InlineData(EstablishmentStatusValues.OpenButProposedToCloseId)]
-    [InlineData(EstablishmentStatusValues.ProposedToOpenId)]
+    [InlineData(EstablishmentStatusId.OpenId)]
+    [InlineData(EstablishmentStatusId.OpenButProposedToCloseId)]
+    [InlineData(EstablishmentStatusId.ProposedToOpenId)]
     public void IsClosed_ReturnsFalse_ForNonClosedStatusIds(string statusId)
     {
-        EstablishmentStatusValues.IsClosed(statusId, null).Should().BeFalse();
+        EstablishmentStatusId.IsClosed(statusId, null).Should().BeFalse();
     }
 
     [Fact]
     public void IsClosed_ReturnsFalse_WhenStatusIsUnknown()
     {
-        EstablishmentStatusValues.IsClosed(null, null).Should().BeFalse();
-        EstablishmentStatusValues.IsClosed("", "").Should().BeFalse();
+        EstablishmentStatusId.IsClosed(null, null).Should().BeFalse();
+        EstablishmentStatusId.IsClosed("", "").Should().BeFalse();
     }
 }

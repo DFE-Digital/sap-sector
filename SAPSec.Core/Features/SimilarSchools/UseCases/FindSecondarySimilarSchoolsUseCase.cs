@@ -28,7 +28,7 @@ public class FindSecondarySimilarSchoolsUseCase(
             absenceRepository);
 
         var data = await dataProvider.GetData(request.CurrentSchoolUrn);
-        var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(data.CurrentSimilarSchool);
+        var currentSchoolInfo = data.CurrentSimilarSchool.Info;
 
         var hasSimilarSchools = data.SimilarSchools.Count > 0;
 
@@ -46,10 +46,10 @@ public class FindSecondarySimilarSchoolsUseCase(
             {
                 return new SimilarSchoolResult
                 (
-                    sortedItem.Item.URN,
-                    sortedItem.Item.Name,
-                    sortedItem.Item.Address,
-                    sortedItem.Item.LocalAuthority,
+                    sortedItem.Item.Info.Urn,
+                    sortedItem.Item.Info.Name,
+                    sortedItem.Item.Info.Address,
+                    sortedItem.Item.Info.LocalAuthority,
                     sortedItem.Item.Coordinates != null ? CoordinateConverter.Convert(sortedItem.Item.Coordinates) : null,
                     sortedItem.Value
                 );

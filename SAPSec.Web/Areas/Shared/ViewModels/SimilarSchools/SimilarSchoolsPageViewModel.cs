@@ -1,4 +1,5 @@
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Pagination;
 using SAPSec.Core.Sorting;

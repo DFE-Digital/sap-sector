@@ -236,6 +236,7 @@ public class ComparisonController(
             ComparatorSchoolLatitude = response.ComparatorSchool.Coordinates?.Latitude,
             ComparatorSchoolLongitude = response.ComparatorSchool.Coordinates?.Longitude,
             Distance = response.DistanceMiles,
+            ComparatorSchoolInfoWithLinks = SchoolInfoWithLinksViewModel.FromSchoolDetails(response.ComparatorSchoolInfoWithLinks),
             ComparatorSchoolDetails = SchoolDetailsViewModel.FromSchoolDetails(response.ComparatorSchoolDetails)
         };
 

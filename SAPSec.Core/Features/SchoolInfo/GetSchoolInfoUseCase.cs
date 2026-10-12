@@ -17,7 +17,7 @@ public class GetSchoolInfoUseCase(
             throw new NotFoundException($"School with URN {request.Urn} was not found");
         }
 
-        return new(SchoolInfo.FromEstablishment(establishment));
+        return new(SchoolInfo.Create(establishment));
     }
 }
 

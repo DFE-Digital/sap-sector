@@ -47,9 +47,9 @@ public class GetRiseResourcesUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.Secondary()));
         _riseResourcesRepo.SetupResources(
-            Entry("Primary only", "Curriculum", PhaseOfEducationValues.Primary),
-            Entry("Secondary only", "Curriculum", PhaseOfEducationValues.Secondary),
-            Entry("All phases", "Curriculum", PhaseOfEducationValues.Primary, PhaseOfEducationValues.Secondary, "All through"));
+            Entry("Primary only", "Curriculum", PhaseOfEducationId.Primary),
+            Entry("Secondary only", "Curriculum", PhaseOfEducationId.Secondary),
+            Entry("All phases", "Curriculum", PhaseOfEducationId.Primary, PhaseOfEducationId.Secondary, "All through"));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
@@ -62,8 +62,8 @@ public class GetRiseResourcesUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.Primary()));
         _riseResourcesRepo.SetupResources(
-            Entry("Primary only", "Curriculum", PhaseOfEducationValues.Primary),
-            Entry("Secondary only", "Curriculum", PhaseOfEducationValues.Secondary));
+            Entry("Primary only", "Curriculum", PhaseOfEducationId.Primary),
+            Entry("Secondary only", "Curriculum", PhaseOfEducationId.Secondary));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
@@ -76,8 +76,8 @@ public class GetRiseResourcesUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.AllThrough()));
         _riseResourcesRepo.SetupResources(
-            Entry("Primary only", "Curriculum", PhaseOfEducationValues.Primary),
-            Entry("Secondary only", "Curriculum", PhaseOfEducationValues.Secondary),
+            Entry("Primary only", "Curriculum", PhaseOfEducationId.Primary),
+            Entry("Secondary only", "Curriculum", PhaseOfEducationId.Secondary),
             Entry("All through only", "Curriculum", "All through"),
             Entry("Untagged", "Curriculum", "16 plus"));
 
@@ -96,9 +96,9 @@ public class GetRiseResourcesUseCaseTests
             Category("Performance and attendance", "About performance."));
         _riseResourcesRepo.SetupResources(
             // resourceEntries lists a "Performance and attendance" resource first, but config order wins.
-            Entry("Attendance guidance", "Performance and attendance", PhaseOfEducationValues.Secondary),
-            Entry("Leadership guidance", "Wider school", PhaseOfEducationValues.Secondary),
-            Entry("Pastoral guidance", "Pupil characteristics", PhaseOfEducationValues.Secondary));
+            Entry("Attendance guidance", "Performance and attendance", PhaseOfEducationId.Secondary),
+            Entry("Leadership guidance", "Wider school", PhaseOfEducationId.Secondary),
+            Entry("Pastoral guidance", "Pupil characteristics", PhaseOfEducationId.Secondary));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
@@ -118,10 +118,10 @@ public class GetRiseResourcesUseCaseTests
             Category("Performance and attendance", "About performance.", "Literacy", "Maths", "Attendance"));
         _riseResourcesRepo.SetupResources(
             // File order: Maths, Attendance, Literacy, then an unlisted "Science".
-            SubCategorised("Maths guide", "Performance and attendance", "Maths", PhaseOfEducationValues.Secondary),
-            SubCategorised("Attendance guide", "Performance and attendance", "Attendance", PhaseOfEducationValues.Secondary),
-            SubCategorised("Literacy guide", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
-            SubCategorised("Science guide", "Performance and attendance", "Science", PhaseOfEducationValues.Secondary));
+            SubCategorised("Maths guide", "Performance and attendance", "Maths", PhaseOfEducationId.Secondary),
+            SubCategorised("Attendance guide", "Performance and attendance", "Attendance", PhaseOfEducationId.Secondary),
+            SubCategorised("Literacy guide", "Performance and attendance", "Literacy", PhaseOfEducationId.Secondary),
+            SubCategorised("Science guide", "Performance and attendance", "Science", PhaseOfEducationId.Secondary));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
@@ -141,7 +141,7 @@ public class GetRiseResourcesUseCaseTests
             ResourceTitle = "Improving attendance",
             ResourceDescription = "Guidance for schools",
             ResourceUrl = "https://example.gov.uk/attendance",
-            SchoolPhases = [PhaseOfEducationValues.Secondary],
+            SchoolPhases = [PhaseOfEducationId.Secondary],
             Category = "Performance and attendance",
             SubCategory = "Attendance",
             MappingMeasures = "Overall absence rate; Persistent absence rate"

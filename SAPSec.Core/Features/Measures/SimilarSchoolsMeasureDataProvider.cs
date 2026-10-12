@@ -20,7 +20,7 @@ public class SimilarSchoolsMeasureDataProvider<T, TGroupsEntry, TValuesEntry>(
             .ToArray();
 
         var schools = (await establishmentRepository.GetEstablishmentsAsync([currentSchoolUrn, .. similarSchoolUrns]))
-            .Select(SchoolInfo.SchoolInfo.FromEstablishment)
+            .Select(SchoolInfo.SchoolInfo.Create)
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
         if (!schools.ContainsKey(currentSchoolUrn))

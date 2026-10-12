@@ -1,7 +1,5 @@
 using SAPSec.Core.Exceptions;
-using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
-using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.KS2.Performance;
 using SAPSec.Data.Repositories;
 
@@ -42,7 +40,7 @@ internal class PrimarySimilarSchoolsDataProvider(
         var performances = (await performanceRepository.GetByUrnsAsync(urns))
             .ToDictionary(performance => performance.Urn, StringComparer.Ordinal);
 
-        var currentSimilarSchool = SimilarSchool.FromData(currentEstablishment, absences.GetValueOrDefault(currentSchoolUrn)?.EstablishmentAbsence);
+        var currentSimilarSchool = SimilarSchool.Create(currentEstablishment, absences.GetValueOrDefault(currentSchoolUrn)?.EstablishmentAbsence);
 
         var similarSchools = groups
             .Select(group =>
@@ -52,13 +50,14 @@ internal class PrimarySimilarSchoolsDataProvider(
                     return null;
                 }
 
-                if (!IsPrimaryComparisonEstablishment(establishment))
+                var schoolInfo = SchoolInfo.SchoolInfo.Create(establishment);
+                if (!schoolInfo.HasPrimaryEducationPhase)
                 {
                     return null;
                 }
 
                 return new SimilarSchoolSortItem<EstablishmentPerformance>(
-                    SimilarSchool.FromData(establishment, absences.GetValueOrDefault(group.NeighbourURN)?.EstablishmentAbsence),
+                    SimilarSchool.Create(establishment, absences.GetValueOrDefault(group.NeighbourURN)?.EstablishmentAbsence),
                     performances.GetValueOrDefault(group.NeighbourURN)?.EstablishmentPerformance);
             })
             .Where(school => school is not null)
@@ -69,33 +68,6 @@ internal class PrimarySimilarSchoolsDataProvider(
         return new PrimarySimilarSchoolsSourceData(
             currentSimilarSchool,
             similarSchools);
-    }
-
-    private static bool IsPrimaryComparisonEstablishment(Establishment establishment)
-    {
-        if (PhaseOfEducationValues.IsPrimaryOrAllThrough(establishment.PhaseOfEducationName))
-        {
-            return true;
-        }
-
-        if (PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName))
-        {
-            return false;
-        }
-
-        var phaseOfEducationId = establishment.PhaseOfEducationId?.Trim();
-        if (string.IsNullOrWhiteSpace(phaseOfEducationId))
-        {
-            return true;
-        }
-
-        return phaseOfEducationId switch
-        {
-            PhaseOfEducationValues.PrimaryId or
-            PhaseOfEducationValues.MiddleDeemedPrimaryId or
-            PhaseOfEducationValues.AllThroughId => true,
-            _ => false
-        };
     }
 }
 

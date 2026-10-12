@@ -53,11 +53,11 @@
 <link rel="stylesheet" href="~/css/leaflet.css"/>
 
 @{
-    var comparatorSuccessors = Model.ComparatorSchoolDetails?.Successors ?? [];
-    var comparatorPredecessors = Model.ComparatorSchoolDetails?.Predecessors ?? [];
+    var comparatorSuccessors = Model.ComparatorSchoolInfoWithLinks.Successors;
+    var comparatorPredecessors = Model.ComparatorSchoolInfoWithLinks.Predecessors;
 }
 
-@if (Model.ComparatorSchoolDetails?.ShowClosedSchoolBanner == true || comparatorSuccessors.Any() || comparatorPredecessors.Any())
+@if (Model.ComparatorSchoolInfoWithLinks?.ShowClosedSchoolBanner == true || comparatorSuccessors.Any() || comparatorPredecessors.Any())
 {
     @await Component.InvokeAsync("ClosedSchoolBanner", new { variant = ClosedSchoolBannerVariant.Comparator, successors = comparatorSuccessors, predecessors = comparatorPredecessors })
 }
@@ -177,11 +177,11 @@
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Address</dt>
-            <dd class="govuk-summary-list__value">@Model.ComparatorSchoolDetails.Address.Display()</dd>
+            <dd class="govuk-summary-list__value">@Model.ComparatorSchoolDetails.Address.ToString()</dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Local authority</dt>
-            <dd class="govuk-summary-list__value">@Model.ComparatorSchoolDetails.LocalAuthorityName.DisplayWithCode(Model.ComparatorSchoolDetails.LocalAuthorityCode)</dd>
+            <dd class="govuk-summary-list__value">@Model.ComparatorSchoolDetails.LocalAuthorityName (@Model.ComparatorSchoolDetails.LocalAuthorityCode)</dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Region</dt>
@@ -301,7 +301,7 @@
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Ofsted report</dt>
             <dd class="govuk-summary-list__value">
-                <a href="https://reports.ofsted.gov.uk/provider/@(Model.ComparatorSchoolDetails.IsPrimarySchool ? 21 : 23)/@Model.ComparatorSchoolDetails.Urn"
+                <a href="https://reports.ofsted.gov.uk/provider/@(Model.ComparatorSchoolDetails.OfstedProviderId)/@Model.ComparatorSchoolDetails.Urn"
                     class="govuk-link" target="_blank" rel="noopener noreferrer">
                     View the latest Ofsted report (opens in new tab)
                 </a>

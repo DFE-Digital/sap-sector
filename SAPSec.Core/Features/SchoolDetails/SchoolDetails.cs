@@ -8,19 +8,13 @@ namespace SAPSec.Core.Features.SchoolDetails;
 /// </summary>
 public class SchoolDetails
 {
+    public required SchoolInfo.SchoolInfo Info { get; init; }
+
     // Identifiers
-    public required string Urn { get; init; }
-    public required string Name { get; init; }
-    public required bool ShowClosedSchoolBanner { get; init; }
-    public required IReadOnlyList<SuccessorSchool> Successors { get; init; }
-    public required IReadOnlyList<SuccessorSchool> Predecessors { get; init; }
     public required DataWithAvailability<string> DfENumber { get; init; }
     public required DataWithAvailability<string> Ukprn { get; init; }
 
     // Location
-    public required DataWithAvailability<string> Address { get; init; }
-    public required DataWithAvailability<string> LocalAuthorityName { get; init; }
-    public required DataWithAvailability<string> LocalAuthorityCode { get; init; }
     public required DataWithAvailability<string> Region { get; init; }
     public required DataWithAvailability<string> UrbanRuralDescription { get; init; }
 
@@ -50,4 +44,14 @@ public class SchoolDetails
     public required DataWithAvailability<string> Website { get; init; }
     public required DataWithAvailability<string> Telephone { get; init; }
     public required DataWithAvailability<string> Email { get; init; }
+
+    public string OfstedProviderId => Info.IsAllThroughSchool
+        ? GetAllThroughOfstedProviderId()
+        : Info.IsPrimarySchool ? "21" : "23";
+
+    private string GetAllThroughOfstedProviderId() =>
+        TypeOfEstablishmentCode.IsAvailable && TypeOfEstablishmentCode.Value == "49"
+            ? "100003"
+            : "28";
+
 }

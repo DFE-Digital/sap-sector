@@ -1,6 +1,3 @@
-using System.Globalization;
-using SAPSec.Data.Dto;
-
 namespace SAPSec.Core.Features.SchoolDetails;
 
 /// <summary>
@@ -12,22 +9,21 @@ namespace SAPSec.Core.Features.SchoolDetails;
 public static class SchoolClosureEligibilityRule
 {
     private const int DataEligibilityWindowYears = 4;
-    private const string CloseDateFormat = "dd-MM-yyyy";
 
     /// <summary>
     /// True if the establishment may still appear in the service: it is not closed, or it is
     /// closed but within the data eligibility window (or its close date is unknown).
     /// </summary>
-    public static bool IsEligibleToAppear(Establishment establishment)
+    public static bool IsEligibleToAppear(SchoolInfo.SchoolInfo schoolInfo)
     {
-        ArgumentNullException.ThrowIfNull(establishment);
+        ArgumentNullException.ThrowIfNull(schoolInfo);
 
-        if (!EstablishmentStatusValues.IsClosed(establishment.EstablishmentStatusId, establishment.EstablishmentStatusName))
+        if (!schoolInfo.IsClosed)
         {
             return true;
         }
 
-        return !IsBeyondDataEligibilityWindow(establishment.CloseDate);
+        return !IsBeyondDataEligibilityWindow(schoolInfo.CloseDate);
     }
 
     /// <summary>
@@ -35,15 +31,15 @@ public static class SchoolClosureEligibilityRule
     /// date is more than 4 years ago. An unknown close date is treated as eligible - we cannot
     /// prove a school is ineligible without knowing when it closed.
     /// </summary>
-    private static bool IsBeyondDataEligibilityWindow(string? closeDate)
+    private static bool IsBeyondDataEligibilityWindow(DateOnly? closeDate)
     {
-        if (!DateOnly.TryParseExact(closeDate, CloseDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedCloseDate))
+        if (closeDate is null)
         {
             return false;
         }
 
         var cutoff = DateOnly.FromDateTime(DateTime.UtcNow).AddYears(-DataEligibilityWindowYears);
 
-        return parsedCloseDate < cutoff;
+        return closeDate < cutoff;
     }
 }

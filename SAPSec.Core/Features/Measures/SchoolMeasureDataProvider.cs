@@ -20,7 +20,7 @@ public class SchoolMeasureDataProvider<T>(
         var data = await repository.GetByUrnAsync(school.URN);
 
         return new SchoolMeasureData<T>(
-            SchoolInfo.SchoolInfo.FromEstablishment(school),
+            SchoolInfo.SchoolInfo.Create(school),
             data);
     }
 }

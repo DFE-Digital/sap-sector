@@ -9,5 +9,5 @@ public record SchoolLayoutModel(string Urn, string Name)
         new(schoolInfo.Urn, schoolInfo.Name);
 
     public static SchoolLayoutModel FromSchoolDetails(SchoolDetails schoolDetails) =>
-        new(schoolDetails.Urn, schoolDetails.Name);
+        FromSchoolInfo(schoolDetails.Info);
 }

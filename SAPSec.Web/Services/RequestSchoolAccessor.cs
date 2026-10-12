@@ -1,21 +1,22 @@
 using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 
 namespace SAPSec.Web.Services;
 
-public class RequestSchoolAccessor(ISchoolDetailsService schoolDetailsService) : IRequestSchoolAccessor
+public class RequestSchoolAccessor(ISchoolInfoWithLinksService service) : IRequestSchoolAccessor
 {
     private const string HttpContextItemsKeyPrefix = "RequestSchoolAccessor:SchoolDetails:";
 
-    public async Task<SchoolDetails> GetAsync(HttpContext? httpContext, string urn)
+    public async Task<SchoolInfoWithLinks> GetAsync(HttpContext? httpContext, string urn)
     {
         if (httpContext?.Items is not null &&
             httpContext.Items.TryGetValue(BuildCacheKey(urn), out var cachedSchool) &&
-            cachedSchool is SchoolDetails schoolDetails)
+            cachedSchool is SchoolInfoWithLinks schoolInfo)
         {
-            return schoolDetails;
+            return schoolInfo;
         }
 
-        var school = await schoolDetailsService.GetByUrnAsync(urn);
+        var school = await service.GetByUrnAsync(urn);
 
         if (httpContext?.Items is not null)
         {

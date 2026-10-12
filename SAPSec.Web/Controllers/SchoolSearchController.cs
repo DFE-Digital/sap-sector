@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Data.Dto;
 using SAPSec.Web.Constants;
@@ -50,19 +50,19 @@ public class SchoolSearchController(
             {
                 var exactMatches = results
                     .Where(s => string.Equals(
-                        s.EstablishmentName?.Trim(),
+                        s.Info.Name.Trim(),
                         query.Trim(),
                         StringComparison.InvariantCultureIgnoreCase))
                     .ToList();
 
-                if (exactMatches.Count == 1 && !string.IsNullOrWhiteSpace(exactMatches[0].URN))
+                if (exactMatches.Count == 1 && !string.IsNullOrWhiteSpace(exactMatches[0].Info.Urn))
                 {
                     return RedirectToSchool(exactMatches[0]);
                 }
             }
 
             var allLocalAuthorities = results
-                .Select(s => s.LANAme)
+                .Select(s => s.Info.LocalAuthority.Name)
                 .Where(la => !string.IsNullOrWhiteSpace(la))
                 .Distinct()
                 .OrderBy(la => la)
@@ -71,7 +71,7 @@ public class SchoolSearchController(
             if (localAuthorities != null && localAuthorities.Length > 0)
             {
                 results = results
-                    .Where(s => localAuthorities.Contains(s.LANAme))
+                    .Where(s => localAuthorities.Contains(s.Info.LocalAuthority.Name))
                     .ToList();
             }
 
@@ -99,19 +99,13 @@ public class SchoolSearchController(
             // Map all results for display
             var allSchoolsForMap = results.Select(s => new SchoolSearchResultViewModel
             {
-                SchoolName = s.EstablishmentName,
-                URN = s.URN,
-                LocalAuthority = s.LANAme,
+                SchoolName = s.Info.Name,
+                URN = s.Info.Urn,
+                LocalAuthority = s.Info.LocalAuthority.Name,
                 Latitude = s.Latitude,
                 Longitude = s.Longitude,
-                SchoolUrl = BuildSchoolUrl(s.URN, s.PhaseOfEducationName),
-                Address = string.Join(", ", new[]
-                {
-                    s.AddressStreet,
-                    s.AddressLocality,
-                    s.LANAme,
-                    s.AddressPostcode
-                }.Where(x => !string.IsNullOrWhiteSpace(x)))
+                SchoolUrl = Routes.School(s.Info),
+                Address = s.Info.Address.ToString()
             }).ToArray();
 
             return View(new SchoolSearchResultsViewModel
@@ -125,19 +119,13 @@ public class SchoolSearchController(
                 TotalResults = totalResults,
                 Results = pagedResults.Select(s => new SchoolSearchResultViewModel
                 {
-                    SchoolName = s.EstablishmentName,
-                    URN = s.URN,
-                    LocalAuthority = s.LANAme,
+                    SchoolName = s.Info.Name,
+                    URN = s.Info.Urn,
+                    LocalAuthority = s.Info.LocalAuthority.Name,
                     Latitude = s.Latitude,
                     Longitude = s.Longitude,
-                    SchoolUrl = BuildSchoolUrl(s.URN, s.PhaseOfEducationName),
-                    Address = string.Join(", ", new[]
-                    {
-                        s.AddressStreet,
-                        s.AddressLocality,
-                        s.LANAme,
-                        s.AddressPostcode
-                    }.Where(x => !string.IsNullOrWhiteSpace(x)))
+                    SchoolUrl = Routes.School(s.Info),
+                    Address = s.Info.Address.ToString()
                 }).ToArray(),
                 AllResults = allSchoolsForMap
             });
@@ -214,11 +202,8 @@ public class SchoolSearchController(
         Regex.IsMatch(value.Trim(), @"^(\d+|\d+[\\/]\d+)$");
 
     private RedirectResult RedirectToSchool(Establishment school) =>
-        Redirect(BuildSchoolUrl(school.URN, school.PhaseOfEducationName));
+        Redirect(Routes.School(SchoolInfo.Create(school)));
 
     private RedirectResult RedirectToSchool(SchoolSearchResult school) =>
-        Redirect(BuildSchoolUrl(school.URN, school.PhaseOfEducationName));
-
-    private static string BuildSchoolUrl(string urn, string? phaseOfEducationName) =>
-        Routes.School(urn, phaseOfEducationName);
+        Redirect(Routes.School(school.Info));
 }

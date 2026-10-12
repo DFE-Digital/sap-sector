@@ -1,5 +1,4 @@
 using SAPSec.Core.Features.Availability;
-using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Geography;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
@@ -8,57 +7,44 @@ namespace SAPSec.Core.Features.SimilarSchools;
 
 public record SimilarSchool
 {
-    public required string URN { get; set; }
-    public required string Name { get; set; }
-    public required Address Address { get; set; }
-    public required BNGCoordinates? Coordinates { get; set; }
-    public required int? TotalCapacity { get; set; }
-    public required int? TotalPupils { get; set; }
+    public required SchoolInfo.SchoolInfo Info { get; init; }
+    public required BNGCoordinates? Coordinates { get; init; }
+    public required int? TotalCapacity { get; init; }
+    public required int? TotalPupils { get; init; }
     // TODO: convert into reference data (no ID in source data)
-    public required string NurseryProvisionName { get; set; }
-    public required ReferenceData LocalAuthority { get; set; }
-    public required ReferenceData Region { get; set; }
-    public required ReferenceData UrbanRural { get; set; }
-    public required ReferenceData PhaseOfEducation { get; set; }
-    public required ReferenceData OfficialSixthForm { get; set; }
-    public required ReferenceData AdmissionsPolicy { get; set; }
-    public required ReferenceData Gender { get; set; }
-    public required ReferenceData ResourcedProvision { get; set; }
-    public required ReferenceData TypeOfEstablishment { get; set; }
-    public required ReferenceData EstablishmentTypeGroup { get; set; }
-    public required ReferenceData TrustSchoolFlag { get; set; }
-    public required DataWithAvailability<decimal> OverallAbsenceRate { get; set; }
-    public required DataWithAvailability<decimal> PersistentAbsenceRate { get; set; }
+    public required string NurseryProvisionName { get; init; }
+    public required ReferenceData Region { get; init; }
+    public required ReferenceData UrbanRural { get; init; }
+    public required ReferenceData PhaseOfEducation { get; init; }
+    public required ReferenceData OfficialSixthForm { get; init; }
+    public required ReferenceData AdmissionsPolicy { get; init; }
+    public required ReferenceData Gender { get; init; }
+    public required ReferenceData ResourcedProvision { get; init; }
+    public required ReferenceData TypeOfEstablishment { get; init; }
+    public required ReferenceData EstablishmentTypeGroup { get; init; }
+    public required ReferenceData TrustSchoolFlag { get; init; }
+    public required DataWithAvailability<decimal> OverallAbsenceRate { get; init; }
+    public required DataWithAvailability<decimal> PersistentAbsenceRate { get; init; }
 
-    public static SimilarSchool FromData(Establishment currentEstab, EstablishmentAbsence? absence)
+    public static SimilarSchool Create(Establishment establishment, EstablishmentAbsence? absence)
     {
         return new SimilarSchool
         {
-            URN = currentEstab.URN,
-            Name = currentEstab.EstablishmentName,
-            Address = new Address
-            {
-                Street = currentEstab.Street,
-                Locality = currentEstab.Locality,
-                Address3 = currentEstab.Address3,
-                Town = currentEstab.Town,
-                Postcode = currentEstab.Postcode
-            },
-            TotalCapacity = currentEstab.TotalCapacity,
-            TotalPupils = currentEstab.TotalPupils,
-            NurseryProvisionName = currentEstab.NurseryProvisionName,
-            Coordinates = BNGCoordinates.TryParse(currentEstab.Easting, currentEstab.Northing, out var coords) ? coords : null,
-            LocalAuthority = new(currentEstab.LAId, currentEstab.LAName),
-            UrbanRural = new(currentEstab.UrbanRuralId, currentEstab.UrbanRuralName),
-            Region = new(currentEstab.RegionId, currentEstab.RegionName),
-            AdmissionsPolicy = new(currentEstab.AdmissionsPolicyId, currentEstab.AdmissionsPolicyName),
-            PhaseOfEducation = new(currentEstab.PhaseOfEducationId, currentEstab.PhaseOfEducationName),
-            Gender = new(currentEstab.GenderId, currentEstab.GenderName),
-            TypeOfEstablishment = new(currentEstab.TypeOfEstablishmentId, currentEstab.TypeOfEstablishmentName),
-            EstablishmentTypeGroup = new(currentEstab.EstablishmentTypeGroupId, currentEstab.EstablishmentTypeGroupName),
-            TrustSchoolFlag = new(currentEstab.TrustSchoolFlagId, currentEstab.TrustSchoolFlagName),
-            OfficialSixthForm = new(currentEstab.OfficialSixthFormId, currentEstab.OfficialSixthFormName),
-            ResourcedProvision = new(currentEstab.ResourcedProvisionId, currentEstab.ResourcedProvisionName),
+            Info = SchoolInfo.SchoolInfo.Create(establishment),
+            TotalCapacity = establishment.TotalCapacity,
+            TotalPupils = establishment.TotalPupils,
+            NurseryProvisionName = establishment.NurseryProvisionName,
+            Coordinates = BNGCoordinates.TryParse(establishment.Easting, establishment.Northing, out var coords) ? coords : null,
+            UrbanRural = new(establishment.UrbanRuralId, establishment.UrbanRuralName),
+            Region = new(establishment.RegionId, establishment.RegionName),
+            AdmissionsPolicy = new(establishment.AdmissionsPolicyId, establishment.AdmissionsPolicyName),
+            PhaseOfEducation = new(establishment.PhaseOfEducationId, establishment.PhaseOfEducationName),
+            Gender = new(establishment.GenderId, establishment.GenderName),
+            TypeOfEstablishment = new(establishment.TypeOfEstablishmentId, establishment.TypeOfEstablishmentName),
+            EstablishmentTypeGroup = new(establishment.EstablishmentTypeGroupId, establishment.EstablishmentTypeGroupName),
+            TrustSchoolFlag = new(establishment.TrustSchoolFlagId, establishment.TrustSchoolFlagName),
+            OfficialSixthForm = new(establishment.OfficialSixthFormId, establishment.OfficialSixthFormName),
+            ResourcedProvision = new(establishment.ResourcedProvisionId, establishment.ResourcedProvisionName),
             OverallAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Tot_Est_Current_Pct),
             PersistentAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Persistent_Est_Current_Pct)
         };

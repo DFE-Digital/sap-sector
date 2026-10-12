@@ -20,12 +20,14 @@ public sealed class SchoolClosureEligibilityService(
     {
         ArgumentNullException.ThrowIfNull(establishment);
 
-        if (!EstablishmentStatusValues.IsClosed(establishment.EstablishmentStatusId, establishment.EstablishmentStatusName))
+        var schoolInfo = SchoolInfo.SchoolInfo.Create(establishment);
+
+        if (!schoolInfo.IsClosed)
         {
             return SchoolClosureEligibility.NotClosed;
         }
 
-        if (!SchoolClosureEligibilityRule.IsEligibleToAppear(establishment))
+        if (!SchoolClosureEligibilityRule.IsEligibleToAppear(schoolInfo))
         {
             return new SchoolClosureEligibility(IsEligibleForDisplay: false, ShowClosedSchoolBanner: false, Successors: []);
         }
@@ -41,7 +43,7 @@ public sealed class SchoolClosureEligibilityService(
             Successors: successors);
     }
 
-    private async Task<IReadOnlyList<SuccessorSchool>> ResolveSuccessorsAsync(
+    private async Task<IReadOnlyList<SchoolInfo.SchoolInfo>> ResolveSuccessorsAsync(
         string urn,
         IReadOnlyCollection<EstablishmentLinks> links)
     {
@@ -59,7 +61,7 @@ public sealed class SchoolClosureEligibilityService(
         var candidateEstablishments = (await establishmentRepository.GetEstablishmentsAsync(candidateUrns))
             .ToDictionary(e => e.URN, StringComparer.Ordinal);
 
-        var successors = new List<SuccessorSchool>();
+        var successors = new List<SchoolInfo.SchoolInfo>();
 
         foreach (var candidateUrn in candidateUrns)
         {
@@ -76,7 +78,8 @@ public sealed class SchoolClosureEligibilityService(
             // inferred from status: the current school is the predecessor only when the linked
             // school is not itself closed. Both sides closed is an unexpected combination - log it
             // rather than signpost to a dead end.
-            if (EstablishmentStatusValues.IsClosed(candidate.EstablishmentStatusId, candidate.EstablishmentStatusName))
+            var schoolInfo = SchoolInfo.SchoolInfo.Create(candidate);
+            if (schoolInfo.IsClosed)
             {
                 logger.LogWarning(
                     "Unexpected relationship: closed school {Urn} has a mapped successor relationship to {SuccessorUrn}, which is also closed.",
@@ -85,7 +88,7 @@ public sealed class SchoolClosureEligibilityService(
                 continue;
             }
 
-            successors.Add(new SuccessorSchool(candidate.URN, candidate.EstablishmentName, candidate.PhaseOfEducationName));
+            successors.Add(schoolInfo);
         }
 
         return successors;

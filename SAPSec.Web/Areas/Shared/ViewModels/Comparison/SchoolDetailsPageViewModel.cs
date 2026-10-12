@@ -12,7 +12,8 @@ public class SchoolDetailsPageViewModel
     public double? ComparatorSchoolLatitude { get; init; }
     public double? ComparatorSchoolLongitude { get; init; }
     public double? Distance { get; init; }
-    public SchoolDetailsViewModel? ComparatorSchoolDetails { get; init; }
+    public required SchoolInfoWithLinksViewModel ComparatorSchoolInfoWithLinks { get; init; }
+    public required SchoolDetailsViewModel ComparatorSchoolDetails { get; init; }
 
     public string DistanceDisplay =>
         Distance is double d

@@ -5,7 +5,6 @@ using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.RiseResources;
-using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -46,10 +45,10 @@ public class SchoolController(
     public async Task<IActionResult> Index(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
+        await PopulateViewData(school);
 
         var hasSimilarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
-
-        await PopulateViewData(response.School);
 
         var model = new SchoolOverviewPageViewModel
         {
@@ -69,7 +68,8 @@ public class SchoolController(
 
         var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
 
-        await PopulateViewData(response.School);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
+        await PopulateViewData(school);
 
         var model = new Ks2PerformanceMeasuresPageViewModel
         {
@@ -96,7 +96,8 @@ public class SchoolController(
 
         var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
 
-        await PopulateViewData(response.School, similarSchoolsResponse.HasSimilarSchools);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
+        await PopulateViewData(school);
 
         var model = new AttendancePageViewModel
         {
@@ -112,7 +113,9 @@ public class SchoolController(
     public async Task<IActionResult> SchoolDetails(string urn)
     {
         var response = await getSchoolDetailsUseCase.Execute(new(urn));
-        await PopulateViewData(response.SchoolDetails);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
+        await PopulateViewData(school);
+
         return View(SchoolDetailsViewModel.FromSchoolDetails(response.SchoolDetails));
     }
 
@@ -121,7 +124,9 @@ public class SchoolController(
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
-        await PopulateViewData(response.School);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
+        await PopulateViewData(school);
+
         return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
@@ -131,47 +136,26 @@ public class SchoolController(
     public async Task<IActionResult> RiseResources(string urn)
     {
         var schoolInfoResponse = await getSchoolInfoUseCase.Execute(new(urn));
-        await PopulateViewData(schoolInfoResponse.School);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
+        await PopulateViewData(school);
 
         var riseResourcesResponse = await getRiseResourcesUseCase.Execute(new(urn));
 
         return View(RiseResourcesPageViewModel.FromResponse(riseResourcesResponse));
     }
 
-    private async Task PopulateViewData(SchoolInfo currentSchool, bool hasSimilarSchools = true)
+    private async Task PopulateViewData(SchoolInfoWithLinks currentSchool)
     {
-        var similarSchoolsResponse = await GetSimilarSchoolsAsync(currentSchool.Urn);
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(currentSchool.Info.Urn);
 
-        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool.Info);
 
         var includeRise = featureFlagService is not null
             && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
 
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,
-            currentSchool.Urn,
-            ControllerContext.ActionDescriptor.ActionName,
-            similarSchoolsResponse.HasSimilarSchools,
-            includeRise);
-
-        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
-        ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
-        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
-        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);
-    }
-
-    private async Task PopulateViewData(SchoolDetails currentSchool)
-    {
-        var similarSchoolsResponse = await GetSimilarSchoolsAsync(currentSchool.Urn);
-
-        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
-
-        var includeRise = featureFlagService is not null
-            && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
-
-        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
-            Url,
-            currentSchool.Urn,
+            currentSchool.Info.Urn,
             ControllerContext.ActionDescriptor.ActionName,
             similarSchoolsResponse.HasSimilarSchools,
             includeRise);

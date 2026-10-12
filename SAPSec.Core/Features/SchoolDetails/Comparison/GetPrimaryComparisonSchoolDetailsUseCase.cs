@@ -8,6 +8,7 @@ namespace SAPSec.Core.Features.SchoolDetails.Comparison;
 public class GetPrimaryComparisonSchoolDetailsUseCase(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsPrimaryRepository similarSchoolsRepository,
+    ISchoolInfoWithLinksService schoolInfoWithLinksService,
     ISchoolDetailsService schoolDetailsService)
     : IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse>
 {
@@ -17,12 +18,14 @@ public class GetPrimaryComparisonSchoolDetailsUseCase(
 
         var (currentSchool, comparatorSchool) = await dataProvider.GetData(request.CurrentSchoolUrn, request.ComparatorSchoolUrn);
 
-        var similarSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.ComparatorSchoolUrn);
+        var comparatorSchoolInfoWithLinks = await schoolInfoWithLinksService.GetByUrnAsync(request.ComparatorSchoolUrn);
+        var comparatorSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.ComparatorSchoolUrn);
 
         return new(
             new SchoolWithCoordinates(currentSchool.SchoolInfo, currentSchool.Data.ToGeographicCoordinates()),
             new SchoolWithCoordinates(comparatorSchool.SchoolInfo, comparatorSchool.Data.ToGeographicCoordinates()),
             currentSchool.Data?.DistanceMiles(comparatorSchool.Data),
-            similarSchoolDetails);
+            comparatorSchoolInfoWithLinks,
+            comparatorSchoolDetails);
     }
 }

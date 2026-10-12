@@ -1,4 +1,6 @@
+using SAPSec.Core.Authentication;
 using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 
 namespace SAPSec.Web.Constants;
 
@@ -41,12 +43,20 @@ public static class Routes
         return $"/find-a-school/suggest{qs}";
     }
 
-    public static string School(string urn, string? phaseOfEducationName) =>
-        phaseOfEducationName switch
+    public static string School(SchoolInfo schoolInfo) =>
+        schoolInfo switch
         {
-            _ when PhaseOfEducationValues.IsAllThrough(phaseOfEducationName) => AllThroughSchool(urn).Overview,
-            _ when PhaseOfEducationValues.IsPrimary(phaseOfEducationName) => PrimarySchool(urn).Overview,
-            _ => SecondarySchool(urn).Overview
+            _ when schoolInfo.IsAllThroughSchool => AllThroughSchool(schoolInfo.Urn).Overview,
+            _ when schoolInfo.IsPrimarySchool => PrimarySchool(schoolInfo.Urn).Overview,
+            _ => SecondarySchool(schoolInfo.Urn).Overview
+        };
+
+    public static string School(Organisation org) =>
+        org.PhaseOfEducation?.Id.ToString() switch
+        {
+            PhaseOfEducationId.AllThroughId => AllThroughSchool(org.Urn!).Overview,
+            PhaseOfEducationId.PrimaryId or PhaseOfEducationId.MiddleDeemedPrimaryId => PrimarySchool(org.Urn!).Overview,
+            _ => SecondarySchool(org.Urn!).Overview
         };
 
     public static Primary PrimarySchool(string urn) => new Primary(urn);
