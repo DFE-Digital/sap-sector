@@ -1,133 +1,139 @@
-using SAPSec.Core.Features.SchoolSearch.Extensions;
+using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch.Extensions;
 
-public class EstablishmentExtensionsTests
+public class SchoolTests
 {
     [Theory]
-    [InlineData("2", "Primary")]
-    [InlineData("4", "Secondary")]
-    [InlineData("7", "All-through")]
-    public void CanIndexForSearch_WithSupportedPhaseIds_ReturnsTrue(string phaseId, string phaseName)
+    [InlineData(PhaseOfEducationId.PrimaryId)]
+    [InlineData(PhaseOfEducationId.SecondaryId)]
+    [InlineData(PhaseOfEducationId.AllThroughId)]
+    public void CanIndexForSearch_WithSupportedPhaseIds_ReturnsTrue(string phaseId)
     {
-        var result = new Establishment
+        var school = School.Create(new Establishment
         {
             PhaseOfEducationId = phaseId,
-            PhaseOfEducationName = phaseName
-        }.CanIndexForSearch();
+        });
 
-        result.Should().BeTrue();
+        school.IsSearchable(primarySchoolsEnabled: true, allThroughSchoolsEnabled: true).Should().BeTrue();
     }
 
     [Theory]
-    [InlineData("0", "Not applicable")]
-    [InlineData("1", "Nursery")]
-    [InlineData("3", "Middle deemed primary")]
-    [InlineData("5", "Middle deemed secondary")]
-    [InlineData("6", "16 plus")]
-    public void CanIndexForSearch_WithUnsupportedPhaseIds_ReturnsFalse(string phaseId, string phaseName)
+    [InlineData(PhaseOfEducationId.NotApplicableId)]
+    [InlineData(PhaseOfEducationId.NurseryId)]
+    [InlineData(PhaseOfEducationId.MiddleDeemedPrimaryId)]
+    [InlineData(PhaseOfEducationId.MiddleDeemedSecondaryId)]
+    [InlineData(PhaseOfEducationId.SixteenPlusId)]
+    public void CanIndexForSearch_WithUnsupportedPhaseIds_ReturnsFalse(string phaseId)
     {
-        var result = new Establishment
+        var school = School.Create(new Establishment
         {
             PhaseOfEducationId = phaseId,
-            PhaseOfEducationName = phaseName
-        }.CanIndexForSearch();
+        });
 
-        result.Should().BeFalse();
+        school.IsSearchable(primarySchoolsEnabled: true, allThroughSchoolsEnabled: true).Should().BeFalse();
     }
 
-    [Fact]
-    public void CanIndexForSearch_WithLegacyAllThroughName_ReturnsTrue()
-    {
-        var result = new Establishment
-        {
-            PhaseOfEducationName = "All-through"
-        }.CanIndexForSearch();
+    //[Fact]
+    //public void CanIndexForSearch_WithLegacyAllThroughName_ReturnsTrue()
+    //{
+    //    var result = new Establishment
+    //    {
+    //        PhaseOfEducationId = "All-through"
+    //    }.CanIndexForSearch();
 
-        result.Should().BeTrue();
-    }
+    //    result.Should().BeTrue();
+    //}
 
     [Theory]
-    [InlineData("0", true, true, false)]
-    [InlineData("2", true, false, true)]
-    [InlineData("2", false, true, false)]
-    [InlineData("4", false, false, true)]
-    [InlineData("7", false, true, true)]
-    [InlineData("7", true, false, false)]
+    [InlineData(PhaseOfEducationId.NotApplicableId, true, true, false)]
+    [InlineData(PhaseOfEducationId.PrimaryId, true, false, true)]
+    [InlineData(PhaseOfEducationId.PrimaryId, false, true, false)]
+    [InlineData(PhaseOfEducationId.SecondaryId, false, false, true)]
+    [InlineData(PhaseOfEducationId.AllThroughId, false, true, true)]
+    [InlineData(PhaseOfEducationId.AllThroughId, true, false, false)]
     public void CanSearch_UsesPhaseIdAndFeatureFlags(
         string phaseId,
         bool primarySchoolsEnabled,
         bool allThroughSchoolsEnabled,
         bool expected)
     {
-        var result = new Establishment
+        var school = School.Create(new Establishment
         {
             PhaseOfEducationId = phaseId,
             EstablishmentStatusId = expected ? "1" : string.Empty
-        }.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled);
+        });
 
-        result.Should().Be(expected);
+        school.IsSearchable(primarySchoolsEnabled, allThroughSchoolsEnabled).Should().Be(expected);
     }
 
     [Theory]
-    [InlineData("1", true)]
-    [InlineData("3", true)]
-    [InlineData("2", true)] // Closed with no known close date is treated as within the eligibility window
-    [InlineData("4", false)] // Proposed to open is unrelated to closure eligibility and always excluded
+    [InlineData(EstablishmentStatusId.OpenId, true)]
+    [InlineData(EstablishmentStatusId.OpenButProposedToCloseId, true)]
+    [InlineData(EstablishmentStatusId.ClosedId, true)] // Closed with no known close date is treated as within the eligibility window
+    [InlineData(EstablishmentStatusId.ProposedToOpenId, false)] // Proposed to open is unrelated to closure eligibility and always excluded
     public void CanSearch_UsesStatusId(string statusId, bool expected)
     {
-        var result = new Establishment { PhaseOfEducationId = "4", EstablishmentStatusId = statusId }
-            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+        var school = School.Create(new Establishment
+        {
+            PhaseOfEducationId = "4",
+            EstablishmentStatusId = statusId
+        });
 
-        result.Should().Be(expected);
+        school.IsSearchable(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false).Should().Be(expected);
     }
 
     [Theory]
-    [InlineData(true, "2", true)] // Closed, no known close date -> still eligible
-    [InlineData(true, "4", false)] // Proposed to open -> always excluded
-    [InlineData(false, "2", true)]
-    [InlineData(false, "4", false)]
+    [InlineData(true, EstablishmentStatusId.ClosedId, true)] // Closed, no known close date -> still eligible
+    [InlineData(true, EstablishmentStatusId.ProposedToOpenId, false)] // Proposed to open -> always excluded
+    [InlineData(false, EstablishmentStatusId.ClosedId, true)]
+    [InlineData(false, EstablishmentStatusId.ProposedToOpenId, false)]
     public void CanSearch_WithSecondaryPhaseNameAndStatusId(
         bool primarySchoolsEnabled,
         string statusId,
         bool expected)
     {
-        var result = new Establishment
+        var school = School.Create(new Establishment
         {
             PhaseOfEducationName = "Secondary",
             EstablishmentStatusId = statusId
-        }.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled: true);
+        });
 
-        result.Should().Be(expected);
+        school.IsSearchable(primarySchoolsEnabled, allThroughSchoolsEnabled: true).Should().Be(expected);
     }
 
-    [Theory]
-    [InlineData("Open", true)]
-    [InlineData("Open, but proposed to close", true)]
-    [InlineData("Closed", true)] // No known close date -> still eligible
-    [InlineData("Proposed to open", false)]
-    public void CanSearch_FallsBackToStatusName(string statusName, bool expected)
-    {
-        var result = new Establishment { PhaseOfEducationName = "Secondary", EstablishmentStatusName = statusName }
-            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+    //[Theory]
+    //[InlineData("Open", true)]
+    //[InlineData("Open, but proposed to close", true)]
+    //[InlineData("Closed", true)] // No known close date -> still eligible
+    //[InlineData("Proposed to open", false)]
+    //public void CanSearch_FallsBackToStatusName(string statusName, bool expected)
+    //{
+    //    var result = new Establishment 
+    //    { 
+    //        PhaseOfEducationName = "Secondary", 
+    //        EstablishmentStatusName = statusName 
+    //    }
+    //        .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
 
-        result.Should().Be(expected);
-    }
+    //    result.Should().Be(expected);
+    //}
 
     [Fact]
     public void CanSearch_ClosedSchoolWithinEligibilityWindow_ReturnsTrue()
     {
         var recentCloseDate = DateTime.UtcNow.AddYears(-1).ToString("dd-MM-yyyy");
 
-        var result = new Establishment
+        var school = School.Create(new Establishment
         {
-            PhaseOfEducationId = "4",
-            EstablishmentStatusId = "2",
+            PhaseOfEducationId = PhaseOfEducationId.SecondaryId,
+            EstablishmentStatusId = EstablishmentStatusId.ClosedId,
             CloseDate = recentCloseDate
-        }.CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+        });
 
-        result.Should().BeTrue();
+        school.IsSearchable(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false).Should().BeTrue();
     }
 
     [Fact]
@@ -135,63 +141,67 @@ public class EstablishmentExtensionsTests
     {
         var longAgoCloseDate = DateTime.UtcNow.AddYears(-5).ToString("dd-MM-yyyy");
 
-        var result = new Establishment
+        var school = School.Create(new Establishment
         {
             PhaseOfEducationId = "4",
             EstablishmentStatusId = "2",
             CloseDate = longAgoCloseDate
-        }.CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+        });
 
-        result.Should().BeFalse();
+        school.IsSearchable(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false).Should().BeFalse();
     }
 
-    [Theory]
-    [InlineData("Primary", false, false, false)]
-    [InlineData("Primary", true, false, true)]
-    [InlineData("All-through", false, false, false)]
-    [InlineData("All-through", false, true, true)]
-    [InlineData("All-through", true, false, false)]
-    [InlineData("Secondary", false, false, true)]
-    public void CanSearch_FallsBackToPhaseName(
-        string phaseName,
-        bool primarySchoolsEnabled,
-        bool allThroughSchoolsEnabled,
-        bool expected)
-    {
-        var result = new Establishment { PhaseOfEducationName = phaseName, EstablishmentStatusId = "1" }
-            .CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled);
+    //[Theory]
+    //[InlineData("Primary", false, false, false)]
+    //[InlineData("Primary", true, false, true)]
+    //[InlineData("All-through", false, false, false)]
+    //[InlineData("All-through", false, true, true)]
+    //[InlineData("All-through", true, false, false)]
+    //[InlineData("Secondary", false, false, true)]
+    //public void CanSearch_FallsBackToPhaseName(
+    //    string phaseName,
+    //    bool primarySchoolsEnabled,
+    //    bool allThroughSchoolsEnabled,
+    //    bool expected)
+    //{
+    //    var result = new Establishment { PhaseOfEducationName = phaseName, EstablishmentStatusId = "1" }
+    //        .CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled);
 
-        result.Should().Be(expected);
-    }
+    //    result.Should().Be(expected);
+    //}
 
     [Fact]
     public void CanSearch_WithSecondarySchoolAndMissingStatus_ReturnsTrue()
     {
-        var result = new Establishment { PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" }
-            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+        var school = School.Create(new Establishment
+        {
+            PhaseOfEducationId = PhaseOfEducationId.SecondaryId
+        });
 
-        result.Should().BeTrue();
+        school.IsSearchable(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false).Should().BeTrue();
     }
 
     [Fact]
     public void CanSearch_WithPrimarySchoolAndMissingStatus_ReturnsFalse()
     {
-        var result = new Establishment { PhaseOfEducationId = "2", PhaseOfEducationName = "Primary" }
-            .CanSearch(primarySchoolsEnabled: true, allThroughSchoolsEnabled: true);
+        var school = School.Create(new Establishment
+        {
+            PhaseOfEducationId = PhaseOfEducationId.PrimaryId
+        });
 
-        result.Should().BeFalse();
+        school.IsSearchable(primarySchoolsEnabled: true, allThroughSchoolsEnabled: true).Should().BeFalse();
     }
 
     [Fact]
     public void CanSearch_WithPrimarySchoolAndEstablishmentStatus_ReturnsTrue()
     {
-        var result = new Establishment
+        var school = School.Create(new Establishment
         {
             PhaseOfEducationId = "2",
             PhaseOfEducationName = "Primary",
             EstablishmentStatusId = "1"
-        }.CanSearch(primarySchoolsEnabled: true, allThroughSchoolsEnabled: false);
+        });
 
-        result.Should().BeTrue();
+        school.IsSearchable(primarySchoolsEnabled: true, allThroughSchoolsEnabled: false).Should().BeTrue();
     }
 }

@@ -2,8 +2,16 @@
 
 namespace SAPSec.Test.Common.FeatureFlags;
 
-public class MockFeatureFlagService(IFeatureFlagService realImplementation) : IFeatureFlagService
+public class MockFeatureFlagService() : IFeatureFlagService
 {
+    private IFeatureFlagService? _realImplementation;
+
+    public MockFeatureFlagService(IFeatureFlagService realImplementation)
+        : this()
+    {
+        _realImplementation = realImplementation;
+    }
+
     private Dictionary<string, bool> _overrides = new();
 
     public void Override(string featureName, bool enabled) =>
@@ -19,6 +27,11 @@ public class MockFeatureFlagService(IFeatureFlagService realImplementation) : IF
             return enabled;
         }
 
-        return await realImplementation.IsEnabledAsync(featureName);
+        if (_realImplementation is null)
+        {
+            return false;
+        }
+
+        return await _realImplementation.IsEnabledAsync(featureName);
     }
 }

@@ -89,6 +89,6 @@ public class SchoolSearchService(
             results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, latLong));
         }
 
-        return results.OrderBy(r => r.Info.Name).ToList();
+        return results.OrderBy(r => r.School.Name).ToList();
     }
 }

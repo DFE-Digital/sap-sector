@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Test.Common;
+using SAPSec.Test.Common.FeatureFlags;
 using SAPSec.Test.Common.InMemory;
 using Xunit.Abstractions;
 
@@ -15,6 +16,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
 
     private TestOutputLogger<StartupIndexBuilder> logger = new(output);
     private InMemoryEstablishmentRepository establishmentRepo = new();
+    private MockFeatureFlagService featureFlagService = new();
 
     [Fact]
     public async Task StartAsync_PopulatesIndexWithEstablishments_And_Completes()
@@ -27,7 +29,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
 
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
-        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo, featureFlagService,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");
@@ -66,7 +68,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
 
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
-        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo, featureFlagService,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");
@@ -96,7 +98,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
 
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
-        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo, featureFlagService,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");
@@ -151,7 +153,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
 
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
-        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo, featureFlagService,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");

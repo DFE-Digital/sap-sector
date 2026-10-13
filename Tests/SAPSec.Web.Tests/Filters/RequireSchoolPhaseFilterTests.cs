@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using SAPSec.Core.FeatureFlags;
-using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
@@ -32,7 +32,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task SecondaryFilter_WithPrimarySchoolIndex_RedirectsToPrimaryPath()
     {
-        var school = CreateSchoolDetails("123456", "Primary");
+        var school = CreateSchool("123456", PhaseOfEducationId.PrimaryId);
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -50,7 +50,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task PrimaryFilter_WithSecondarySchoolIndex_RedirectsToSecondaryPath()
     {
-        var school = CreateSchoolDetails("123456", "Secondary");
+        var school = CreateSchool("123456", PhaseOfEducationId.SecondaryId);
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -69,7 +69,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task SecondaryFilter_WithPrimarySchoolOnKs4Route_PreservesPathOnPrimaryRedirect()
     {
-        var school = CreateSchoolDetails("123456", "Primary");
+        var school = CreateSchool("123456", PhaseOfEducationId.PrimaryId);
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -87,7 +87,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task PrimaryFilter_WithSecondarySchoolAndPathBase_PreservesPathBaseInRedirect()
     {
-        var school = CreateSchoolDetails("123456", "Secondary");
+        var school = CreateSchool("123456", PhaseOfEducationId.SecondaryId);
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -107,7 +107,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task PrimaryFilter_WithPrimarySchoolAndPrimaryFeatureDisabled_ReturnsNotFound()
     {
-        var school = CreateSchoolDetails("123456", "Primary");
+        var school = CreateSchool("123456", PhaseOfEducationId.PrimaryId);
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -128,7 +128,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task PrimaryFilter_WithAllThroughSchoolAndAllThroughFeatureDisabled_ReturnsNotFound()
     {
-        var school = CreateSchoolDetails("123456", "All-through");
+        var school = CreateSchool("123456", PhaseOfEducationId.AllThroughId);
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -149,7 +149,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task PrimaryFilter_WithAllThroughSchoolAndOnlyAllThroughFeatureEnabled_RedirectsToAllThroughPath()
     {
-        var school = CreateSchoolDetails("123456", "All-through");
+        var school = CreateSchool("123456", PhaseOfEducationId.AllThroughId);
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -174,7 +174,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task AllThroughFilter_WithAllThroughSchoolAndAllThroughFeatureEnabled_AllowsExecution()
     {
-        var school = CreateSchoolDetails("123456", "All-through");
+        var school = CreateSchool("123456", PhaseOfEducationId.AllThroughId);
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -195,7 +195,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task AllThroughFilter_WithAllThroughSchoolAndAllThroughFeatureDisabled_ReturnsNotFound()
     {
-        var school = CreateSchoolDetails("123456", "All-through");
+        var school = CreateSchool("123456", PhaseOfEducationId.AllThroughId);
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -216,7 +216,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task SecondaryFilter_WithUnsupportedSchoolPhase_ReturnsNotFound()
     {
-        var school = CreateSchoolDetails("123456", "Special");
+        var school = CreateSchool("123456", "Special");
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -233,7 +233,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task SecondaryFilter_WithPrimarySchoolOnAttendanceRoute_RedirectsToPrimaryAttendance()
     {
-        var school = CreateSchoolDetails("123456", "Primary");
+        var school = CreateSchool("123456", PhaseOfEducationId.PrimaryId);
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -251,7 +251,7 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task SecondaryFilter_WithPrimarySchoolOnDataRoute_PreservesPathOnPrimaryRedirect()
     {
-        var school = CreateSchoolDetails("123456", "Primary");
+        var school = CreateSchool("123456", PhaseOfEducationId.PrimaryId);
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
@@ -271,10 +271,10 @@ public class RequireSchoolPhaseFilterTests
     {
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(CreateSchoolDetails("123456", "Secondary"));
+            .ReturnsAsync(CreateSchool("123456", PhaseOfEducationId.SecondaryId));
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "654321"))
-            .ReturnsAsync(CreateSchoolDetails("654321", "Secondary"));
+            .ReturnsAsync(CreateSchool("654321", PhaseOfEducationId.SecondaryId));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.Secondary,
@@ -290,10 +290,10 @@ public class RequireSchoolPhaseFilterTests
     {
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(CreateSchoolDetails("123456", "Secondary"));
+            .ReturnsAsync(CreateSchool("123456", PhaseOfEducationId.SecondaryId));
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "654321"))
-            .ReturnsAsync(CreateSchoolDetails("654321", "Primary"));
+            .ReturnsAsync(CreateSchool("654321", PhaseOfEducationId.PrimaryId));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.Secondary,
@@ -309,7 +309,7 @@ public class RequireSchoolPhaseFilterTests
     {
         _requestSchoolAccessorMock
             .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "137157"))
-            .ReturnsAsync(CreateSchoolDetails("137157", "Secondary"));
+            .ReturnsAsync(CreateSchool("137157", PhaseOfEducationId.SecondaryId));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.PrimaryComparisonParticipant,
@@ -410,39 +410,15 @@ public class RequireSchoolPhaseFilterTests
         };
     }
 
-    private static SchoolDetails CreateSchoolDetails(string urn, string phaseOfEducation) =>
-        new()
-        {
-            Name = "Test School",
-            Urn = urn,
-            ShowClosedSchoolBanner = false,
-            Successors = [],
-            Predecessors = [],
-            DfENumber = DataWithAvailability.Available("123/4567"),
-            Ukprn = DataWithAvailability.Available("10012345"),
-            Address = DataWithAvailability.Available("1 Test Street"),
-            LocalAuthorityName = DataWithAvailability.Available("Test LA"),
-            LocalAuthorityCode = DataWithAvailability.Available("123"),
-            Region = DataWithAvailability.Available("Test Region"),
-            UrbanRuralDescription = DataWithAvailability.Available("Urban"),
-            AgeRangeLow = DataWithAvailability.Available(4),
-            AgeRangeHigh = DataWithAvailability.Available(18),
-            GenderOfEntry = DataWithAvailability.Available("Mixed"),
-            PhaseOfEducation = DataWithAvailability.Available(phaseOfEducation),
-            SchoolType = DataWithAvailability.Available("Community school"),
-            TypeOfEstablishmentCode = DataWithAvailability.Available("1"),
-            AdmissionsPolicy = DataWithAvailability.Available("Not applicable"),
-            ReligiousCharacter = DataWithAvailability.Available("None"),
-            GovernanceStructure = DataWithAvailability.NotAvailable<GovernanceType>(),
-            AcademyTrustName = DataWithAvailability.NotAvailable<string>(),
-            AcademyTrustId = DataWithAvailability.NotAvailable<string>(),
-            HasNurseryProvision = DataWithAvailability.Available(false),
-            HasSixthForm = DataWithAvailability.Available(false),
-            HasSenUnit = DataWithAvailability.Available(false),
-            HasResourcedProvision = DataWithAvailability.Available(false),
-            HeadteacherName = DataWithAvailability.Available("Jane Smith"),
-            Website = DataWithAvailability.NotAvailable<string>(),
-            Telephone = DataWithAvailability.NotAvailable<string>(),
-            Email = DataWithAvailability.NotAvailable<string>()
-        };
+    private static LinkedSchool CreateSchool(string urn, string phaseOfEducationId) => new(
+        urn,
+        "Test School",
+        new("123", "Test LA"),
+        new("1 Test Street"),
+        EstablishmentStatusId.OpenId,
+        phaseOfEducationId,
+        null,
+        false,
+        [],
+        []);
 }

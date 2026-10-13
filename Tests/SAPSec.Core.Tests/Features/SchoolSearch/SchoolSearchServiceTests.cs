@@ -267,7 +267,7 @@ public class SchoolSearchServiceTests
         var results = await _sut.SearchAsync("school");
 
         results.Should().ContainSingle();
-        results[0].URN.Should().Be("2");
+        results[0].School.Urn.Should().Be("2");
     }
 
     [Fact]
@@ -289,7 +289,7 @@ public class SchoolSearchServiceTests
         var results = await _sut.SearchAsync("school");
 
         results.Should().HaveCount(2);
-        results.Select(x => x.URN).Should().Contain(["1", "2"]);
+        results.Select(x => x.School.Urn).Should().Contain(["1", "2"]);
     }
 
     [Fact]
@@ -311,7 +311,7 @@ public class SchoolSearchServiceTests
         var results = await _sut.SearchAsync("school");
 
         results.Should().ContainSingle();
-        results[0].URN.Should().Be("1");
+        results[0].School.Urn.Should().Be("1");
     }
 
     [Fact]
@@ -337,7 +337,7 @@ public class SchoolSearchServiceTests
         var results = await _sut.SearchAsync("school");
 
         results.Should().HaveCount(3);
-        results.Select(x => x.URN).Should().Contain(["1", "2", "3"]);
+        results.Select(x => x.School.Urn).Should().Contain(["1", "2", "3"]);
     }
 
     [Fact]
@@ -364,7 +364,7 @@ public class SchoolSearchServiceTests
         var results = await _sut.SearchAsync("school");
 
         results.Should().ContainSingle();
-        results[0].URN.Should().Be("1");
+        results[0].School.Urn.Should().Be("1");
     }
 
     [Fact]
@@ -383,7 +383,7 @@ public class SchoolSearchServiceTests
         var results = await _sut.SuggestAsync("school");
 
         results.Should().ContainSingle();
-        results[0].URN.Should().Be("2");
+        results[0].School.Urn.Should().Be("2");
     }
 
     [Fact]
@@ -481,7 +481,7 @@ public class SchoolSearchServiceTests
         var results = await _sut.SearchAsync("school");
 
         results.Should().ContainSingle();
-        results[0].URN.Should().Be("2");
+        results[0].School.Urn.Should().Be("2");
     }
 
     [Theory]

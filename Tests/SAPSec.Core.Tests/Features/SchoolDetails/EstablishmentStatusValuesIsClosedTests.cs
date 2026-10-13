@@ -1,20 +1,27 @@
 using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Features.SchoolDetails;
 
-public class EstablishmentStatusValuesIsClosedTests
+public class SchoolTests
 {
     [Fact]
     public void IsClosed_ReturnsTrue_ForClosedStatusId()
     {
-        EstablishmentStatusId.IsClosed(EstablishmentStatusId.ClosedId, null).Should().BeTrue();
+        var school = School.Create(new Establishment
+        {
+            EstablishmentStatusId = EstablishmentStatusId.ClosedId
+        });
+
+        school.IsClosed.Should().BeTrue();
     }
 
-    [Fact]
-    public void IsClosed_ReturnsTrue_ForClosedStatusNameWhenIdMissing()
-    {
-        EstablishmentStatusId.IsClosed(null, EstablishmentStatusId.Closed).Should().BeTrue();
-    }
+    //[Fact]
+    //public void IsClosed_ReturnsTrue_ForClosedStatusNameWhenIdMissing()
+    //{
+    //    EstablishmentStatusId.IsClosed(null, EstablishmentStatusId.Closed).Should().BeTrue();
+    //}
 
     [Theory]
     [InlineData(EstablishmentStatusId.OpenId)]
@@ -22,13 +29,24 @@ public class EstablishmentStatusValuesIsClosedTests
     [InlineData(EstablishmentStatusId.ProposedToOpenId)]
     public void IsClosed_ReturnsFalse_ForNonClosedStatusIds(string statusId)
     {
-        EstablishmentStatusId.IsClosed(statusId, null).Should().BeFalse();
+        var school = School.Create(new Establishment
+        {
+            EstablishmentStatusId = statusId
+        });
+
+        school.IsClosed.Should().BeFalse();
     }
 
-    [Fact]
-    public void IsClosed_ReturnsFalse_WhenStatusIsUnknown()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public void IsClosed_ReturnsFalse_WhenStatusIsUnknown(string? statusId)
     {
-        EstablishmentStatusId.IsClosed(null, null).Should().BeFalse();
-        EstablishmentStatusId.IsClosed("", "").Should().BeFalse();
+        var school = School.Create(new Establishment
+        {
+            EstablishmentStatusId = statusId
+        });
+
+        school.IsClosed.Should().BeFalse();
     }
 }

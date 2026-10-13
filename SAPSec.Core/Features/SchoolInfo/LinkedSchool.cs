@@ -30,6 +30,31 @@ public class LinkedSchool
         Predecessors = school.Predecessors;
     }
 
+    public LinkedSchool(
+        string urn,
+        string name,
+        LocalAuthority localAuthority,
+        Address address,
+        string establishmentStatusId,
+        string phaseOfEducationId,
+        DateOnly? closeDate,
+        bool showClosedSchoolBanner,
+        IReadOnlyList<School> successors,
+        IReadOnlyList<School> predecessors)
+        : base(
+            urn,
+            name,
+            localAuthority,
+            address,
+            establishmentStatusId,
+            phaseOfEducationId,
+            closeDate)
+    {
+        ShowClosedSchoolBanner = showClosedSchoolBanner;
+        Successors = successors;
+        Predecessors = predecessors;
+    }
+
     public static LinkedSchool Create(
         Establishment establishment,
         SchoolClosureEligibility closureEligibility,

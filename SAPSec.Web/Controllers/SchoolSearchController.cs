@@ -50,19 +50,19 @@ public class SchoolSearchController(
             {
                 var exactMatches = results
                     .Where(s => string.Equals(
-                        s.Info.Name.Trim(),
+                        s.School.Name.Trim(),
                         query.Trim(),
                         StringComparison.InvariantCultureIgnoreCase))
                     .ToList();
 
-                if (exactMatches.Count == 1 && !string.IsNullOrWhiteSpace(exactMatches[0].Info.Urn))
+                if (exactMatches.Count == 1 && !string.IsNullOrWhiteSpace(exactMatches[0].School.Urn))
                 {
                     return RedirectToSchool(exactMatches[0]);
                 }
             }
 
             var allLocalAuthorities = results
-                .Select(s => s.Info.LocalAuthority.Name)
+                .Select(s => s.School.LocalAuthority.Name)
                 .Where(la => !string.IsNullOrWhiteSpace(la))
                 .Distinct()
                 .OrderBy(la => la)
@@ -71,7 +71,7 @@ public class SchoolSearchController(
             if (localAuthorities != null && localAuthorities.Length > 0)
             {
                 results = results
-                    .Where(s => localAuthorities.Contains(s.Info.LocalAuthority.Name))
+                    .Where(s => localAuthorities.Contains(s.School.LocalAuthority.Name))
                     .ToList();
             }
 
@@ -99,13 +99,13 @@ public class SchoolSearchController(
             // Map all results for display
             var allSchoolsForMap = results.Select(s => new SchoolSearchResultViewModel
             {
-                SchoolName = s.Info.Name,
-                URN = s.Info.Urn,
-                LocalAuthority = s.Info.LocalAuthority.Name,
+                SchoolName = s.School.Name,
+                URN = s.School.Urn,
+                LocalAuthority = s.School.LocalAuthority.Name,
                 Latitude = s.Latitude,
                 Longitude = s.Longitude,
-                SchoolUrl = Routes.School(s.Info),
-                Address = s.Info.Address.ToString()
+                SchoolUrl = Routes.School(s.School),
+                Address = s.School.Address.ToString()
             }).ToArray();
 
             return View(new SchoolSearchResultsViewModel
@@ -119,13 +119,13 @@ public class SchoolSearchController(
                 TotalResults = totalResults,
                 Results = pagedResults.Select(s => new SchoolSearchResultViewModel
                 {
-                    SchoolName = s.Info.Name,
-                    URN = s.Info.Urn,
-                    LocalAuthority = s.Info.LocalAuthority.Name,
+                    SchoolName = s.School.Name,
+                    URN = s.School.Urn,
+                    LocalAuthority = s.School.LocalAuthority.Name,
                     Latitude = s.Latitude,
                     Longitude = s.Longitude,
-                    SchoolUrl = Routes.School(s.Info),
-                    Address = s.Info.Address.ToString()
+                    SchoolUrl = Routes.School(s.School),
+                    Address = s.School.Address.ToString()
                 }).ToArray(),
                 AllResults = allSchoolsForMap
             });
@@ -205,5 +205,5 @@ public class SchoolSearchController(
         Redirect(Routes.School(School.Create(school)));
 
     private RedirectResult RedirectToSchool(SchoolSearchResult school) =>
-        Redirect(Routes.School(school.Info));
+        Redirect(Routes.School(school.School));
 }

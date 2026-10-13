@@ -94,9 +94,9 @@ public class SchoolDetailsServiceTests
         var result = await _sut.GetByUrnAsync("123456");
 
         // Assert
-        result.Address.Value.Should().Be("123 Test Street, Someplace, Somewhere, Sheffield, S1 1AA");
-        result.LocalAuthorityName.Value.Should().Be("Sheffield");
-        result.LocalAuthorityCode.Value.Should().Be("373");
+        result.Address.Should().Be("123 Test Street, Someplace, Somewhere, Sheffield, S1 1AA");
+        result.LocalAuthority.Name.Should().Be("Sheffield");
+        result.LocalAuthority.Id.Should().Be("373");
     }
 
     [Fact]

@@ -1,7 +1,6 @@
 using Microsoft.FeatureManagement;
-using SAPSec.Core.FeatureFlags;
 
-namespace SAPSec.Web.Services;
+namespace SAPSec.Core.FeatureFlags;
 
 public class FeatureFlagService(IFeatureManager featureManager) : IFeatureFlagService
 {

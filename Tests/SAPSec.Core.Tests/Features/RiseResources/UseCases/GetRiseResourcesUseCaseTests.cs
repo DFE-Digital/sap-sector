@@ -1,6 +1,6 @@
 using SAPSec.Core.Exceptions;
 using SAPSec.Core.Features.RiseResources;
-using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
@@ -47,9 +47,9 @@ public class GetRiseResourcesUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.Secondary()));
         _riseResourcesRepo.SetupResources(
-            Entry("Primary only", "Curriculum", PhaseOfEducationId.Primary),
-            Entry("Secondary only", "Curriculum", PhaseOfEducationId.Secondary),
-            Entry("All phases", "Curriculum", PhaseOfEducationId.Primary, PhaseOfEducationId.Secondary, "All through"));
+            Entry("Primary only", "Curriculum", EducationStage.Primary.ToString()),
+            Entry("Secondary only", "Curriculum", EducationStage.Secondary.ToString()),
+            Entry("All phases", "Curriculum", EducationStage.Primary.ToString(), EducationStage.Secondary.ToString()));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
@@ -62,8 +62,8 @@ public class GetRiseResourcesUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.Primary()));
         _riseResourcesRepo.SetupResources(
-            Entry("Primary only", "Curriculum", PhaseOfEducationId.Primary),
-            Entry("Secondary only", "Curriculum", PhaseOfEducationId.Secondary));
+            Entry("Primary only", "Curriculum", EducationStage.Primary.ToString()),
+            Entry("Secondary only", "Curriculum", EducationStage.Secondary.ToString()));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
@@ -76,14 +76,14 @@ public class GetRiseResourcesUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.AllThrough()));
         _riseResourcesRepo.SetupResources(
-            Entry("Primary only", "Curriculum", PhaseOfEducationId.Primary),
-            Entry("Secondary only", "Curriculum", PhaseOfEducationId.Secondary),
-            Entry("All through only", "Curriculum", "All through"),
+            Entry("Primary only", "Curriculum", EducationStage.Primary.ToString()),
+            Entry("Secondary only", "Curriculum", EducationStage.Secondary.ToString()),
+            Entry("All through", "Curriculum", EducationStage.Primary.ToString(), EducationStage.Secondary.ToString()),
             Entry("Untagged", "Curriculum", "16 plus"));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
-        Titles(result).Should().BeEquivalentTo("Primary only", "Secondary only", "All through only");
+        Titles(result).Should().BeEquivalentTo("Primary only", "Secondary only", "All through");
     }
 
     [Fact]
@@ -96,9 +96,9 @@ public class GetRiseResourcesUseCaseTests
             Category("Performance and attendance", "About performance."));
         _riseResourcesRepo.SetupResources(
             // resourceEntries lists a "Performance and attendance" resource first, but config order wins.
-            Entry("Attendance guidance", "Performance and attendance", PhaseOfEducationId.Secondary),
-            Entry("Leadership guidance", "Wider school", PhaseOfEducationId.Secondary),
-            Entry("Pastoral guidance", "Pupil characteristics", PhaseOfEducationId.Secondary));
+            Entry("Attendance guidance", "Performance and attendance", EducationStage.Secondary.ToString()),
+            Entry("Leadership guidance", "Wider school", EducationStage.Secondary.ToString()),
+            Entry("Pastoral guidance", "Pupil characteristics", EducationStage.Secondary.ToString()));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
@@ -118,10 +118,10 @@ public class GetRiseResourcesUseCaseTests
             Category("Performance and attendance", "About performance.", "Literacy", "Maths", "Attendance"));
         _riseResourcesRepo.SetupResources(
             // File order: Maths, Attendance, Literacy, then an unlisted "Science".
-            SubCategorised("Maths guide", "Performance and attendance", "Maths", PhaseOfEducationId.Secondary),
-            SubCategorised("Attendance guide", "Performance and attendance", "Attendance", PhaseOfEducationId.Secondary),
-            SubCategorised("Literacy guide", "Performance and attendance", "Literacy", PhaseOfEducationId.Secondary),
-            SubCategorised("Science guide", "Performance and attendance", "Science", PhaseOfEducationId.Secondary));
+            SubCategorised("Maths guide", "Performance and attendance", "Maths", EducationStage.Secondary.ToString()),
+            SubCategorised("Attendance guide", "Performance and attendance", "Attendance", EducationStage.Secondary.ToString()),
+            SubCategorised("Literacy guide", "Performance and attendance", "Literacy", EducationStage.Secondary.ToString()),
+            SubCategorised("Science guide", "Performance and attendance", "Science", EducationStage.Secondary.ToString()));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
@@ -141,7 +141,7 @@ public class GetRiseResourcesUseCaseTests
             ResourceTitle = "Improving attendance",
             ResourceDescription = "Guidance for schools",
             ResourceUrl = "https://example.gov.uk/attendance",
-            SchoolPhases = [PhaseOfEducationId.Secondary],
+            EducationStages = [EducationStage.Secondary.ToString()],
             Category = "Performance and attendance",
             SubCategory = "Attendance",
             MappingMeasures = "Overall absence rate; Persistent absence rate"
@@ -162,22 +162,22 @@ public class GetRiseResourcesUseCaseTests
     private static IEnumerable<string> Titles(GetRiseResourcesResponse response) =>
         Resources(response).Select(resource => resource.Title);
 
-    private static RiseResourceEntry Entry(string title, string category, params string[] phases) =>
+    private static RiseResourceEntry Entry(string title, string category, params string[] stages) =>
         new()
         {
             ResourceTitle = title,
             Category = category,
-            SchoolPhases = phases
+            EducationStages = stages
         };
 
     private static RiseResourceEntry SubCategorised(
-        string title, string category, string subCategory, params string[] phases) =>
+        string title, string category, string subCategory, params string[] stages) =>
         new()
         {
             ResourceTitle = title,
             Category = category,
             SubCategory = subCategory,
-            SchoolPhases = phases
+            EducationStages = stages
         };
 
     private static RiseResourceCategoryEntry Category(string name, string description, params string[] subCategories) =>

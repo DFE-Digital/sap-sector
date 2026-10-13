@@ -56,7 +56,7 @@ public class EstablishmentBuilder(string urn, string name)
     public EstablishmentBuilder Primary()
     {
         PhaseOfEducationId = Core.Features.SchoolDetails.PhaseOfEducationId.PrimaryId;
-        PhaseOfEducationName = Core.Features.SchoolDetails.PhaseOfEducationId.Primary;
+        PhaseOfEducationName = Core.Features.SchoolDetails.PhaseOfEducationName.Primary;
 
         return this;
     }
@@ -64,7 +64,7 @@ public class EstablishmentBuilder(string urn, string name)
     public EstablishmentBuilder Secondary()
     {
         PhaseOfEducationId = Core.Features.SchoolDetails.PhaseOfEducationId.SecondaryId;
-        PhaseOfEducationName = Core.Features.SchoolDetails.PhaseOfEducationId.Secondary;
+        PhaseOfEducationName = Core.Features.SchoolDetails.PhaseOfEducationName.Secondary;
 
         return this;
     }
@@ -72,7 +72,7 @@ public class EstablishmentBuilder(string urn, string name)
     public EstablishmentBuilder AllThrough()
     {
         PhaseOfEducationId = Core.Features.SchoolDetails.PhaseOfEducationId.AllThroughId;
-        PhaseOfEducationName = Core.Features.SchoolDetails.PhaseOfEducationId.AllThrough;
+        PhaseOfEducationName = Core.Features.SchoolDetails.PhaseOfEducationName.AllThrough;
 
         return this;
     }
@@ -80,7 +80,7 @@ public class EstablishmentBuilder(string urn, string name)
     public EstablishmentBuilder Open()
     {
         EstablishmentStatusId = Core.Features.SchoolDetails.EstablishmentStatusId.OpenId;
-        EstablishmentStatusName = Core.Features.SchoolDetails.EstablishmentStatusId.Open;
+        EstablishmentStatusName = Core.Features.SchoolDetails.EstablishmentStatusName.Open;
 
         return this;
     }
@@ -88,7 +88,7 @@ public class EstablishmentBuilder(string urn, string name)
     public EstablishmentBuilder Closed(string closeDate = "")
     {
         EstablishmentStatusId = Core.Features.SchoolDetails.EstablishmentStatusId.ClosedId;
-        EstablishmentStatusName = Core.Features.SchoolDetails.EstablishmentStatusId.Closed;
+        EstablishmentStatusName = Core.Features.SchoolDetails.EstablishmentStatusName.Closed;
         CloseDate = closeDate;
 
         return this;

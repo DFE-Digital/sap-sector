@@ -1303,7 +1303,7 @@ public class SchoolSearchControllerTests
         var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
         var suggestions = okResult.Value.Should().BeAssignableTo<IReadOnlyList<SchoolSearchResult>>().Subject;
         suggestions.Should().ContainSingle();
-        suggestions[0].EstablishmentName.Should().Be("Secondary School");
+        suggestions[0].School.Name.Should().Be("Secondary School");
     }
 
     [Fact]

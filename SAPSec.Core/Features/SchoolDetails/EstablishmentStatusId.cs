@@ -1,4 +1,11 @@
 namespace SAPSec.Core.Features.SchoolDetails;
+public static class EstablishmentStatusName
+{
+    public const string Open = "Open";
+    public const string Closed = "Closed";
+    public const string OpenButProposedToClose = "Open, but proposed to close";
+    public const string ProposedToOpen = "Proposed to open";
+}
 
 public static class EstablishmentStatusId
 {

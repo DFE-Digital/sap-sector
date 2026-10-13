@@ -1,5 +1,12 @@
 ﻿namespace SAPSec.Core.Features.SchoolDetails;
 
+public static class PhaseOfEducationName
+{
+    public const string Primary = "Primary";
+    public const string Secondary = "Secondary";
+    public const string AllThrough = "All-through";
+}
+
 /// <summary>
 /// Phase of education values and helper methods.
 /// Used to determine provisions like nursery.

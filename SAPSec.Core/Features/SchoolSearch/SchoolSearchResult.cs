@@ -8,7 +8,7 @@ namespace SAPSec.Core.Features.SchoolSearch;
 [ExcludeFromCodeCoverage]
 public record SchoolSearchResult
 (
-    SchoolInfo.School Info,
+    SchoolInfo.School School,
     string? Latitude,
     string? Longitude
 )

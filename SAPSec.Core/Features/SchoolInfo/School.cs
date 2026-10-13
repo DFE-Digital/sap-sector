@@ -17,14 +17,14 @@ public class School
     public Address Address { get; private init; }
     public DateOnly? CloseDate { get; private init; }
 
-    private School(
+    public School(
         string urn,
         string name,
         LocalAuthority localAuthority,
         Address address,
         string establishmentStatusId,
         string phaseOfEducationId,
-        DateOnly? closeDate)
+        DateOnly? closeDate = null)
     {
         Urn = urn;
         Name = name;

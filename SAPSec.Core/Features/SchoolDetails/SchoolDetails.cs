@@ -16,6 +16,31 @@ public class SchoolDetails
     {
     }
 
+    public SchoolDetails(
+        string urn,
+        string name,
+        LocalAuthority localAuthority,
+        Address address,
+        string establishmentStatusId,
+        string phaseOfEducationId,
+        DateOnly? closeDate,
+        bool showClosedSchoolBanner,
+        IReadOnlyList<SchoolInfo.School> successors,
+        IReadOnlyList<SchoolInfo.School> predecessors)
+    : base(
+        urn,
+        name,
+        localAuthority,
+        address,
+        establishmentStatusId,
+        phaseOfEducationId,
+        closeDate,
+        showClosedSchoolBanner,
+        successors,
+        predecessors)
+    {
+    }
+
     // Identifiers
     public required DataWithAvailability<string> DfENumber { get; init; }
     public required DataWithAvailability<string> Ukprn { get; init; }

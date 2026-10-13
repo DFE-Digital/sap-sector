@@ -1,6 +1,6 @@
 using FluentAssertions;
 using SAPSec.Core.FeatureFlags;
-using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
@@ -30,7 +30,7 @@ public class RiseResourcesPageIntegrationTests(
         return base.DisposeAsync();
     }
 
-    private static RiseResourceEntry Entry(string title, string category, string subCategory, params string[] phases) =>
+    private static RiseResourceEntry Entry(string title, string category, string subCategory, params string[] educationStages) =>
         new()
         {
             ResourceTitle = title,
@@ -38,7 +38,7 @@ public class RiseResourcesPageIntegrationTests(
             ResourceUrl = $"https://example.gov.uk/{title.Replace(' ', '-').ToLowerInvariant()}",
             Category = category,
             SubCategory = subCategory,
-            SchoolPhases = phases
+            EducationStages = educationStages
         };
 
     private static RiseResourceCategoryEntry Category(string name, string description, params string[] subCategories) =>
@@ -85,10 +85,10 @@ public class RiseResourcesPageIntegrationTests(
             Category("Curriculum", "Resources covering curriculum and teaching."));
         Fixture.RiseResourcesRepository.SetupResources(
             // File order puts "Improving Literacy in KS2" before "Choosing a validated phonics teaching programme".
-            Entry("Improving Literacy in KS2", "Curriculum", "Literacy", PhaseOfEducationId.Primary, "All through"),
-            Entry("Choosing a validated phonics teaching programme", "Curriculum", "Literacy", PhaseOfEducationId.Primary),
-            Entry("Teaching maths fluency", "Curriculum", "Maths", PhaseOfEducationId.Primary),
-            Entry("Raising GCSE attainment", "Curriculum", "Maths", PhaseOfEducationId.Secondary));
+            Entry("Improving Literacy in KS2", "Curriculum", "Literacy", EducationStage.Primary.ToString(), EducationStage.Secondary.ToString()),
+            Entry("Choosing a validated phonics teaching programme", "Curriculum", "Literacy", EducationStage.Primary.ToString()),
+            Entry("Teaching maths fluency", "Curriculum", "Maths", EducationStage.Primary.ToString()),
+            Entry("Raising GCSE attainment", "Curriculum", "Maths", EducationStage.Secondary.ToString()));
 
         var page = await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").RiseResources, HttpStatusCode.OK);
