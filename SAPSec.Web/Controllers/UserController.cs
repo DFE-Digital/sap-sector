@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Authentication;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Controllers;
@@ -9,9 +10,11 @@ namespace SAPSec.Web.Controllers;
 [Route("user")]
 public class UserController(
     IUserService userService,
+    IAuthorizationService authorizationService,
     ILogger<UserController> logger) : Controller
 {
     private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+    private readonly IAuthorizationService _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
     private readonly ILogger<UserController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet]
@@ -56,6 +59,18 @@ public class UserController(
                 traceId,
                 userId);
             throw new InvalidOperationException($"Current organisation is null for user {userId}.");
+        }
+
+        if ((await _authorizationService.AuthorizeAsync(User, AuthorizationPolicies.TrustOrLocalAuthorityUser)).Succeeded)
+        {
+            _logger.LogInformation(
+                "Redirecting from /user/redirect to your-schools. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Category: {OrganisationCategory}.",
+                traceId,
+                userId,
+                org.Id,
+                org.Name,
+                org.Category?.Name);
+            return Redirect(Routes.YourSchools);
         }
 
         if (!org.IsEstablishment || org.Urn is null)

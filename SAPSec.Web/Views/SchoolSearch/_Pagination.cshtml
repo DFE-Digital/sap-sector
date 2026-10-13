@@ -66,5 +66,7 @@
 }
 
 @functions {
-    string BuildPageUrl(int page) => Routes.FindASchool(Model.Query, page.ToString(), Model.LocalAuthorities);
+    string BuildPageUrl(int page) => Model.BasePath is not null
+        ? $"{Model.BasePath}?page={page}"
+        : Routes.FindASchool(Model.Query, page.ToString(), Model.LocalAuthorities);
 }

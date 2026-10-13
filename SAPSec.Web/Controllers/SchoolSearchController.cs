@@ -97,22 +97,7 @@ public class SchoolSearchController(
             }
 
             // Map all results for display
-            var allSchoolsForMap = results.Select(s => new SchoolSearchResultViewModel
-            {
-                SchoolName = s.EstablishmentName,
-                URN = s.URN,
-                LocalAuthority = s.LANAme,
-                Latitude = s.Latitude,
-                Longitude = s.Longitude,
-                SchoolUrl = BuildSchoolUrl(s.URN, s.PhaseOfEducationName),
-                Address = string.Join(", ", new[]
-                {
-                    s.AddressStreet,
-                    s.AddressLocality,
-                    s.LANAme,
-                    s.AddressPostcode
-                }.Where(x => !string.IsNullOrWhiteSpace(x)))
-            }).ToArray();
+            var allSchoolsForMap = results.Select(SchoolSearchResultViewModel.From).ToArray();
 
             return View(new SchoolSearchResultsViewModel
             {
@@ -123,22 +108,7 @@ public class SchoolSearchController(
                 CurrentPage = page ?? 1,
                 PageSize = PageSize,
                 TotalResults = totalResults,
-                Results = pagedResults.Select(s => new SchoolSearchResultViewModel
-                {
-                    SchoolName = s.EstablishmentName,
-                    URN = s.URN,
-                    LocalAuthority = s.LANAme,
-                    Latitude = s.Latitude,
-                    Longitude = s.Longitude,
-                    SchoolUrl = BuildSchoolUrl(s.URN, s.PhaseOfEducationName),
-                    Address = string.Join(", ", new[]
-                    {
-                        s.AddressStreet,
-                        s.AddressLocality,
-                        s.LANAme,
-                        s.AddressPostcode
-                    }.Where(x => !string.IsNullOrWhiteSpace(x)))
-                }).ToArray(),
+                Results = pagedResults.Select(SchoolSearchResultViewModel.From).ToArray(),
                 AllResults = allSchoolsForMap
             });
         }

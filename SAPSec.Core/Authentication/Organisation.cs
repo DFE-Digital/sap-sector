@@ -127,4 +127,14 @@ public class Organisation
         or OrganisationCategoryIds.SingleAcademyTrust;
 
     public bool IsLocalAuthority => Category?.Id is OrganisationCategoryIds.LocalAuthority;
+
+    /// <summary>
+    /// The GIAS trust (group) UID for a trust organisation; matches Establishment.TrustId.
+    /// </summary>
+    public string? TrustId => IsTrust ? Uid : null;
+
+    /// <summary>
+    /// The GIAS LA code for a local authority organisation; matches Establishment.LAId.
+    /// </summary>
+    public string? LocalAuthorityCode => IsLocalAuthority ? EstablishmentNumber : null;
 }

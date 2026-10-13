@@ -11,6 +11,8 @@ public static class Routes
     public const string AccessDenied = "/error/403";
     public const string TermsAndConditions = "/terms-and-conditions";
 
+    public const string YourSchools = "/your-schools";
+
     public const string FindASchoolBasePath = "/find-a-school";
     public static string FindASchool(string? query = null, string? page = null, string[]? localAuthorities = null)
     {

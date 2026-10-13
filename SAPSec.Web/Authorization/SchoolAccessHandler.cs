@@ -65,12 +65,12 @@ public class SchoolAccessHandler(
     {
         if (org.IsTrust)
         {
-            return Matches(org.Uid, school.AcademyTrustId.Value);
+            return Matches(org.TrustId, school.AcademyTrustId.Value);
         }
 
         if (org.IsLocalAuthority)
         {
-            return Matches(org.EstablishmentNumber, school.LocalAuthorityCode.Value);
+            return Matches(org.LocalAuthorityCode, school.LocalAuthorityCode.Value);
         }
 
         return false;
