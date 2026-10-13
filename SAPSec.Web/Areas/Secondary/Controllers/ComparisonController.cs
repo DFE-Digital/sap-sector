@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core;
-using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolDetails.Comparison;
@@ -28,8 +27,7 @@ public class ComparisonController(
     IUseCase<GetSecondaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
     [FromKeyedServices(ServiceKeys.Secondary)]
     IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse> getSchoolDetailsUseCase,
-    ISecondaryCharacteristicsComparisonFormatter characteristicsFormatter,
-    IFeatureFlagService featureFlagService) : Controller
+    ISecondaryCharacteristicsComparisonFormatter characteristicsFormatter) : Controller
 {
     private const string SimilarityView = "~/Areas/Shared/Views/Comparison/Similarity.cshtml";
     private const string AttendanceView = "~/Areas/Shared/Views/Comparison/Attendance.cshtml";
@@ -85,8 +83,7 @@ public class ComparisonController(
         string comparatorSchoolUrn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var includePupilCharacteristicFilter = await IsKs4CoreSubjectsPupilCharacteristicsEnabledAsync();
-        var response = await getKs4CoreSubjectsUseCase.Execute(new(urn, comparatorSchoolUrn, filters, includePupilCharacteristicFilter));
+        var response = await getKs4CoreSubjectsUseCase.Execute(new(urn, comparatorSchoolUrn, filters));
 
         SetComparisonLayout(response.CurrentSchool, response.ComparatorSchool);
 
@@ -158,8 +155,4 @@ public class ComparisonController(
         ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.Secondary(
             currentSchool,
             comparatorSchool);
-
-    private async Task<bool> IsKs4CoreSubjectsPupilCharacteristicsEnabledAsync() =>
-        featureFlagService is not null
-        && await featureFlagService.IsEnabledAsync(Flags.EnableKs4CoreSubjectsPupilCharacteristics);
 }

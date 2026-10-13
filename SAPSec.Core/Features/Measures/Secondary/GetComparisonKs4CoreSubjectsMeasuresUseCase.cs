@@ -1,4 +1,5 @@
 using SAPSec.Core.Collections;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
@@ -8,7 +9,8 @@ namespace SAPSec.Core.Features.Measures.Secondary;
 public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
-    IKs4PerformanceRepository performanceRepository)
+    IKs4PerformanceRepository performanceRepository,
+    IFeatureFlagService featureFlagService)
     : IUseCase<GetComparisonKs4CoreSubjectsMeasuresRequest, GetComparisonKs4CoreSubjectsMeasuresResponse>
 {
     public async Task<GetComparisonKs4CoreSubjectsMeasuresResponse> Execute(GetComparisonKs4CoreSubjectsMeasuresRequest request)
@@ -21,6 +23,7 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
         var (currentSchoolPerformance, comparatorSchoolPerformance) = await performance.GetData(request.CurrentSchoolUrn, request.ComparatorSchoolUrn);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
+        var includePupilCharacteristicFilter = await featureFlagService.IsEnabledAsync(Flags.EnableKs4CoreSubjectsPupilCharacteristics);
 
         return new(
             currentSchoolPerformance.SchoolInfo,
@@ -29,22 +32,22 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
                 filterBy,
-                request.IncludePupilCharacteristicFilter),
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.EnglishLiterature.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
                 filterBy,
-                request.IncludePupilCharacteristicFilter),
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.Maths.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
                 filterBy,
-                request.IncludePupilCharacteristicFilter),
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.CombinedScience.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
                 filterBy,
-                request.IncludePupilCharacteristicFilter),
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.Biology.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
@@ -53,12 +56,12 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
                 filterBy,
-                request.IncludePupilCharacteristicFilter),
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.Physics.ForSchoolComparison(
                 currentSchoolPerformance,
                 comparatorSchoolPerformance,
                 filterBy,
-                request.IncludePupilCharacteristicFilter)
+                includePupilCharacteristicFilter)
         );
     }
 }
@@ -66,8 +69,7 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
 public record GetComparisonKs4CoreSubjectsMeasuresRequest(
     string CurrentSchoolUrn,
     string ComparatorSchoolUrn,
-    IDictionary<string, string>? FilterBy = null,
-    bool IncludePupilCharacteristicFilter = true);
+    IDictionary<string, string>? FilterBy = null);
 
 public record GetComparisonKs4CoreSubjectsMeasuresResponse(
     SchoolInfo.SchoolInfo CurrentSchool,

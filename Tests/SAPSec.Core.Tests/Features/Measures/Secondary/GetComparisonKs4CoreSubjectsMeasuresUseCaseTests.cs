@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Exceptions;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolInfo;
@@ -14,6 +15,7 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo;
     private readonly InMemoryKs4PerformanceRepository _performanceRepo;
+    private readonly StubFeatureFlagService _featureFlagService;
     private readonly GetComparisonKs4CoreSubjectsMeasuresUseCase _sut;
 
     public GetComparisonKs4CoreSubjectsMeasuresUseCaseTests()
@@ -21,10 +23,12 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
         _establishmentRepo = new();
         _similarSchoolsRepo = new();
         _performanceRepo = new(_establishmentRepo);
+        _featureFlagService = new();
         _sut = new GetComparisonKs4CoreSubjectsMeasuresUseCase(
             _establishmentRepo,
             _similarSchoolsRepo,
-            _performanceRepo);
+            _performanceRepo,
+            _featureFlagService);
     }
 
     [Fact]
@@ -1781,7 +1785,9 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
         _similarSchoolsRepo
             .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
-        var response = await _sut.Execute(Request("100001", "100002", includePupilCharacteristicFilter: false));
+        DisablePupilCharacteristicFilter();
+
+        var response = await _sut.Execute(Request("100001", "100002"));
 
         response.CombinedScience.Filters
             .Should().NotContain(f => f.Key == Ks4CombinedScience.Filters.PupilCharacteristic.Key);
@@ -1907,7 +1913,9 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
         _similarSchoolsRepo
             .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
-        var response = await _sut.Execute(Request("100001", "100002", includePupilCharacteristicFilter: false));
+        DisablePupilCharacteristicFilter();
+
+        var response = await _sut.Execute(Request("100001", "100002"));
 
         response.Chemistry.Filters
             .Should().NotContain(f => f.Key == Ks4Chemistry.Filters.PupilCharacteristic.Key);
@@ -1994,6 +2002,19 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
         ]);
     }
 
-    private GetComparisonKs4CoreSubjectsMeasuresRequest Request(string currentSchoolUrn, string similarSchoolUrn, Dictionary<string, string>? filterBy = null, bool includePupilCharacteristicFilter = true) =>
-            new(currentSchoolUrn, similarSchoolUrn, filterBy ?? [], includePupilCharacteristicFilter);
+    private void DisablePupilCharacteristicFilter() =>
+        _featureFlagService.Ks4CoreSubjectsPupilCharacteristicsEnabled = false;
+
+    private GetComparisonKs4CoreSubjectsMeasuresRequest Request(string currentSchoolUrn, string similarSchoolUrn, Dictionary<string, string>? filterBy = null) =>
+            new(currentSchoolUrn, similarSchoolUrn, filterBy ?? []);
+
+    private sealed class StubFeatureFlagService : IFeatureFlagService
+    {
+        public bool Ks4CoreSubjectsPupilCharacteristicsEnabled { get; set; } = true;
+
+        public Task<bool> IsEnabledAsync(string featureName) =>
+            Task.FromResult(
+                featureName == Flags.EnableKs4CoreSubjectsPupilCharacteristics
+                && Ks4CoreSubjectsPupilCharacteristicsEnabled);
+    }
 }
