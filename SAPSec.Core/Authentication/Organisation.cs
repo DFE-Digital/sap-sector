@@ -122,4 +122,9 @@ public class Organisation
         Category?.Name,
         "Establishment",
         StringComparison.OrdinalIgnoreCase);
+
+    public bool IsTrust => Category?.Id is OrganisationCategoryIds.MultiAcademyTrust
+        or OrganisationCategoryIds.SingleAcademyTrust;
+
+    public bool IsLocalAuthority => Category?.Id is OrganisationCategoryIds.LocalAuthority;
 }

@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
 using SAPSec.Core.FeatureFlags;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Filters;
 using AllThroughComparisonController = SAPSec.Web.Areas.AllThrough.Controllers.ComparisonController;
@@ -30,6 +31,23 @@ public class SchoolRouteAuthorizationTests
     {
         controllerType.GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true)
             .Should().NotBeEmpty();
+    }
+
+    [Theory]
+    [InlineData(typeof(PrimarySchoolController))]
+    [InlineData(typeof(SecondarySchoolController))]
+    [InlineData(typeof(AllThroughSchoolController))]
+    [InlineData(typeof(PrimarySimilarSchoolsController))]
+    [InlineData(typeof(SecondarySimilarSchoolsController))]
+    [InlineData(typeof(AllThroughSimilarSchoolsController))]
+    [InlineData(typeof(PrimaryComparisonController))]
+    [InlineData(typeof(SecondaryComparisonController))]
+    [InlineData(typeof(AllThroughComparisonController))]
+    public void SchoolRouteController_RequiresSchoolAccessPolicy(Type controllerType)
+    {
+        controllerType.GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true)
+            .OfType<AuthorizeAttribute>()
+            .Should().Contain(a => a.Policy == AuthorizationPolicies.SchoolAccess);
     }
 
     [Theory]
