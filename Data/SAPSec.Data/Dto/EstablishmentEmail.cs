@@ -8,6 +8,11 @@ namespace SAPSec.Data.Dto;
 [ExcludeFromCodeCoverage]
 public class EstablishmentEmail
 {
+    public string Id { get; set; } = string.Empty;
+    public string LAId { get; set; } = string.Empty;
+    public string LAName { get; set; } = string.Empty;
+    public string RegionId { get; set; } = string.Empty;
+    public string RegionName { get; set; } = string.Empty;
     public string MainEmail { get; set; } = string.Empty;
     public string URN { get; set; } = string.Empty;
 }
