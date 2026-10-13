@@ -92,6 +92,20 @@ public sealed class RequireSchoolPhaseFilter(
                 : true;
         }
 
+        if (expectedPhase == ExpectedSchoolPhase.PrimaryComparisonParticipant)
+        {
+            return school.IsAllThroughSchool()
+                ? await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools)
+                : await featureFlagService.IsEnabledAsync(Flags.EnablePrimarySchools);
+        }
+
+        if (expectedPhase == ExpectedSchoolPhase.SecondaryComparisonParticipant)
+        {
+            return school.IsAllThroughSchool()
+                ? await featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools)
+                : true;
+        }
+
         if (expectedPhase != ExpectedSchoolPhase.Primary)
         {
             return true;

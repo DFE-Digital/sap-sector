@@ -1,5 +1,4 @@
-﻿@using SAPSec.Core.Features.Measures
-@using SAPSec.Web.ViewModels.Measures
+﻿@using SAPSec.Web.ViewModels.Measures
 
 @model MeasureViewModel
 
@@ -9,10 +8,10 @@
     <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
         <tab-content id="charts" name="Charts" aria-label="Charts">
             <content-toggle>
-                <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)" aria-label="Charts" active="true">
+                <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)" aria-label="@($"{SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)} bar graph")" active="true">
                     <partial name="Measures/_CurrentYearChart" model=@Model.CurrentYear />
                 </toggle-content>
-                <toggle-content id="year-by-year" name="Year by year" aria-label="Year by year chart">
+                <toggle-content id="year-by-year" name="Year by year" aria-label="Year by year line graph">
                     <partial name="Measures/_YearByYearChart" model=@Model.YearByYear />
                 </toggle-content>
             </content-toggle>

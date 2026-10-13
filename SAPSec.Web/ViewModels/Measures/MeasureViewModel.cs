@@ -21,6 +21,11 @@ public record MeasureViewModel(
     // chart-factory.js treats as "local authority", so comparison charts must supply explicit colours.
     private static readonly string[] ComparisonCurrentYearColors = ["#ca357c", "#2a1950", "#2a1950"];
     private static readonly string[] ComparisonYearByYearColors = ["#ca357c", "#2a1950", "#4b9b7d"];
+    // All-through attendance measures are also a 3-series shape (CurrentSchool/LASchoolsAverage/
+    // EnglandSchoolsAverage, no SimilarSchoolsAverage), but need distinct LA/England colours from
+    // the comparison shape above.
+    private static readonly string[] AllThroughCurrentYearColors = ["#ca357c", "#2a1950", "#2a1950"];
+    private static readonly string[] AllThroughYearByYearColors = ["#ca357c", "#5694ca", "#4b9b7d"];
 
     public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
@@ -84,6 +89,26 @@ public record MeasureViewModel(
             ComparisonYearByYearColors,
             englandSchoolsAverageLabel: "Secondary schools in England average");
 
+    // Attendance is a 3-series measure (school, LA average, England average) with no similar schools average
+    // or top performers, so the similar-schools URL delegates are never invoked.
+    public static MeasureViewModel FromAllThroughPrimaryAttendanceMeasure(Measure measure, SchoolInfo schoolInfo)
+        => FromMeasure(measure, schoolInfo, null,
+            _ => throw new InvalidOperationException("Attendance measures have no top performers"),
+            (_, _) => throw new InvalidOperationException("Attendance measures have no top performers"),
+            AllThroughCurrentYearColors,
+            AllThroughYearByYearColors,
+            laSchoolsAverageLabel: "Local authority primary schools average",
+            englandSchoolsAverageLabel: "Primary schools in England average");
+
+    public static MeasureViewModel FromAllThroughSecondaryAttendanceMeasure(Measure measure, SchoolInfo schoolInfo)
+        => FromMeasure(measure, schoolInfo, null,
+            _ => throw new InvalidOperationException("Attendance measures have no top performers"),
+            (_, _) => throw new InvalidOperationException("Attendance measures have no top performers"),
+            AllThroughCurrentYearColors,
+            AllThroughYearByYearColors,
+            laSchoolsAverageLabel: "Local authority secondary schools average",
+            englandSchoolsAverageLabel: "Secondary schools in England average");
+
     private static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,
@@ -93,6 +118,7 @@ public record MeasureViewModel(
         string[] currentYearChartColors,
         string[] yearByYearChartColors,
         bool hasSimilarSchools = true,
+        string laSchoolsAverageLabel = "Local authority schools average",
         string englandSchoolsAverageLabel = "Schools in England average")
     {
         var measureInfo = new MeasureInfoViewModel(
@@ -101,7 +127,7 @@ public record MeasureViewModel(
             measure.Year,
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
-            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool, englandSchoolsAverageLabel)),
+            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool, laSchoolsAverageLabel, englandSchoolsAverageLabel)),
             measure.Series.Select(s => ResolveSeriesPointStyle(s.SeriesType)));
 
         decimal? MapCurrentYear(MeasureSeries series) =>
@@ -157,6 +183,7 @@ public record MeasureViewModel(
         MeasureSeriesType seriesType,
         SchoolInfo currentSchool,
         SchoolInfo? similarSchool = null,
+        string laSchoolsAverageLabel = "Local authority schools average",
         string englandSchoolsAverageLabel = "Schools in England average") =>
        seriesType switch
        {
@@ -164,7 +191,7 @@ public record MeasureViewModel(
            MeasureSeriesType.ComparatorSchool => similarSchool?.Name ??
                throw new InvalidOperationException($"Similar school required to resolve label for Measure Series Type: {Enum.GetName(seriesType)}"),
            MeasureSeriesType.SimilarSchoolsAverage => "Similar schools average",
-           MeasureSeriesType.LASchoolsAverage => "Local authority schools average",
+           MeasureSeriesType.LASchoolsAverage => laSchoolsAverageLabel,
            MeasureSeriesType.EnglandSchoolsAverage => englandSchoolsAverageLabel,
            _ => throw new InvalidOperationException($"No label found for Measure Series Type: {Enum.GetName(seriesType)}")
        };

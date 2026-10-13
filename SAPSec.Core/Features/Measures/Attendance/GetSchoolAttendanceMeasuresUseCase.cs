@@ -24,7 +24,8 @@ public class GetSchoolAttendanceMeasuresUseCase(
             AttendanceMeasures.Absence.ForSchool(
                 request.Phase,
                 currentSchoolPerformance,
-                filterBy));
+                filterBy,
+                request.ScopeKeysToPhase ? request.Phase.KeyPrefix() : ""));
     }
 
 }
@@ -32,7 +33,8 @@ public class GetSchoolAttendanceMeasuresUseCase(
 public record GetSchoolAttendanceMeasuresRequest(
     MeasurePhase Phase,
     string Urn,
-    IDictionary<string, string>? FilterBy = null);
+    IDictionary<string, string>? FilterBy = null,
+    bool ScopeKeysToPhase = false);
 
 public record GetSchoolAttendanceMeasuresResponse(
     SchoolInfo.SchoolInfo School,

@@ -12,12 +12,13 @@ internal static class AttendanceMeasures
         public static Measure ForSchool(
             MeasurePhase phase,
             SchoolMeasureData<AbsenceData> currentSchool,
-            CaseInsensitiveDictionary<string> filters)
+            CaseInsensitiveDictionary<string> filters,
+            string keyPrefix = "")
         {
-            var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(phase, filters);
+            var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(phase, filters, keyPrefix);
 
             return Measure.ForSchoolAttendance(
-                Measures.Absence.Key,
+                $"{keyPrefix}{Measures.Absence.Key}",
                 Measures.Absence.Name,
                 2024,
                 measureDataType,
@@ -32,7 +33,7 @@ internal static class AttendanceMeasures
             SchoolMeasureData<AbsenceData> similarSchool,
             CaseInsensitiveDictionary<string> filters)
         {
-            var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(phase, filters);
+            var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(phase, filters, keyPrefix: "");
 
             return Measure.ForSchoolComparison(
                 Measures.Absence.Key,
@@ -47,14 +48,18 @@ internal static class AttendanceMeasures
 
         private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<AbsenceData> FieldSelector, MeasureDataType MeasureDataType) ResolveFilters(
             MeasurePhase phase,
-            CaseInsensitiveDictionary<string> filters)
+            CaseInsensitiveDictionary<string> filters,
+            string keyPrefix)
         {
-            var type = filters.ContainsKey(Measures.Absence.Filters.Type.Key)
-                ? filters[Measures.Absence.Filters.Type.Key]
+            var typeKey = $"{keyPrefix}{Measures.Absence.Filters.Type.Key}";
+            var characteristicKey = $"{keyPrefix}{Measures.Absence.Filters.PupilCharacteristic.Key}";
+
+            var type = filters.ContainsKey(typeKey)
+                ? filters[typeKey]
                 : Measures.Absence.Filters.Type.Values.Overall;
 
-            var characteristic = filters.ContainsKey(Measures.Absence.Filters.PupilCharacteristic.Key)
-                ? filters[Measures.Absence.Filters.PupilCharacteristic.Key]
+            var characteristic = filters.ContainsKey(characteristicKey)
+                ? filters[characteristicKey]
                 : Measures.Absence.Filters.PupilCharacteristic.Values.AllPupils;
 
             var measureDataType = type == Measures.Absence.Filters.Type.Values.Overall
@@ -63,13 +68,13 @@ internal static class AttendanceMeasures
 
             IEnumerable<MeasureAvailableFilter> availableFilters = [
                 new MeasureAvailableFilter(
-                    Measures.Absence.Filters.Type.Key,
+                    typeKey,
                     Measures.Absence.Filters.Type.Name,
                     Measures.Absence.Filters.Type.Values.AllValues.Select(f =>
                         new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(type)))
                     .ToList()),
                 new MeasureAvailableFilter(
-                    Measures.Absence.Filters.PupilCharacteristic.Key,
+                    characteristicKey,
                     Measures.Absence.Filters.PupilCharacteristic.Name,
                     Measures.Absence.Filters.PupilCharacteristic.Values.AllValues.Select(f =>
                         new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(characteristic)))

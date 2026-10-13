@@ -16,6 +16,22 @@
         if (textEl) textEl.textContent = text;
     }
 
+    function getResultsLabel(toggle) {
+        return toggle.dataset.resultsLabel || "schools";
+    }
+
+    function setToggleLabel(toggle, nextView, currentView) {
+        const resultsLabel = getResultsLabel(toggle);
+        toggle.setAttribute("aria-label", `View ${nextView}, currently showing ${currentView} of ${resultsLabel}`);
+    }
+
+    function announceView(toggle, currentView) {
+        const notificationContainer = document.getElementById("notification-container");
+        if (!notificationContainer) return;
+
+        notificationContainer.textContent = `Showing ${currentView} of ${getResultsLabel(toggle)}`;
+    }
+
     function showMap({ persist = true } = {}) {
         const listView = document.getElementById("listView");
         const mapView = document.getElementById("mapView");
@@ -27,9 +43,8 @@
 
         setToggleText(toggle, "View as a list");
         toggle.dataset.view = "map";
-        toggle.setAttribute("aria-expanded", "true");
+        setToggleLabel(toggle, "as a list", "map");
 
-        // mount into map header (sometimes needs a tick after display change)
         requestAnimationFrame(() => mountToggle(MAP_SLOT_ID));
         setTimeout(() => mountToggle(MAP_SLOT_ID), 0);
 
@@ -49,7 +64,7 @@
 
         setToggleText(toggle, "View on map");
         toggle.dataset.view = "list";
-        toggle.setAttribute("aria-expanded", "false");
+        setToggleLabel(toggle, "on map", "list");
 
         mountToggle(LIST_SLOT_ID);
 
@@ -72,8 +87,14 @@
         if (toggleLink) {
             e.preventDefault();
             const isList = toggleLink.dataset.view === "list";
-            if (isList) showMap();
-            else showList();
+            if (isList) {
+                showMap();
+                announceView(toggleLink, "map");
+            }
+            else {
+                showList();
+                announceView(toggleLink, "list");
+            }
             return;
         }
 
