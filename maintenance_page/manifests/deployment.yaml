@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: get-school-improvement-insights-maintenance
+  name: compare-connect-similar-schools-maintenance
   labels:
-    app: get-school-improvement-insights-maintenance
+    app: compare-connect-similar-schools-maintenance
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: get-school-improvement-insights-maintenance
+      app: compare-connect-similar-schools-maintenance
   template:
     metadata:
       labels:
-        app: get-school-improvement-insights-maintenance
+        app: compare-connect-similar-schools-maintenance
     spec:
       containers:
       - name: maintenance-page
