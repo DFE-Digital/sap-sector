@@ -9,11 +9,15 @@ namespace SAPSec.Core.Tests.Features.SchoolDetails;
 public class SchoolClosureEligibilityServiceTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
+    private readonly Mock<ICurrentTimeProvider> _timeProviderMock = new();
     private readonly SchoolClosureEligibilityService _sut;
 
     public SchoolClosureEligibilityServiceTests()
     {
-        _sut = new SchoolClosureEligibilityService(_establishmentRepo, Mock.Of<ILogger<SchoolClosureEligibilityService>>());
+        _timeProviderMock.Setup(tp => tp.GetCurrentTimeUtc())
+            .Returns(DateTime.UtcNow);
+
+        _sut = new SchoolClosureEligibilityService(_establishmentRepo, _timeProviderMock.Object, Mock.Of<ILogger<SchoolClosureEligibilityService>>());
     }
 
     [Fact]

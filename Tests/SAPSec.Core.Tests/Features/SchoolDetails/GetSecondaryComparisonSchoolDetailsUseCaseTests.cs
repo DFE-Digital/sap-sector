@@ -12,7 +12,7 @@ public class GetSecondaryComparisonSchoolDetailsUseCaseTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
     private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo = new();
-    private readonly Mock<ILogger<SchoolDetailsService>> _loggerMock = new();
+    private readonly Mock<ICurrentTimeProvider> _timeProviderMock = new();
     private readonly GetSecondaryComparisonSchoolDetailsUseCase _sut;
 
     public GetSecondaryComparisonSchoolDetailsUseCaseTests()
@@ -22,9 +22,9 @@ public class GetSecondaryComparisonSchoolDetailsUseCaseTests
             _similarSchoolsRepo,
             new SchoolDetailsService(
                 _establishmentRepo,
-                new SchoolClosureEligibilityService(_establishmentRepo, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
-                new SchoolPredecessorRelationshipService(_establishmentRepo, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
-                _loggerMock.Object));
+                new SchoolClosureEligibilityService(_establishmentRepo, _timeProviderMock.Object, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
+                new SchoolPredecessorRelationshipService(_establishmentRepo, _timeProviderMock.Object, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
+                Mock.Of<ILogger<SchoolDetailsService>>()));
     }
 
     [Fact]

@@ -1,5 +1,6 @@
 using Moq;
 using SAPSec.Core.FeatureFlags;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
@@ -11,6 +12,7 @@ public class SchoolSearchServiceTests
     private readonly Mock<ISchoolSearchIndexReader> _indexReaderMock = new();
     private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
     private readonly Mock<IFeatureFlagService> _featureFlagServiceMock = new();
+    private readonly Mock<ICurrentTimeProvider> _timeProviderMock = new();
     private readonly SchoolSearchService _sut;
 
     public SchoolSearchServiceTests()
@@ -21,11 +23,14 @@ public class SchoolSearchServiceTests
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(false);
+        _timeProviderMock.Setup(tp => tp.GetCurrentTimeUtc())
+            .Returns(DateTime.UtcNow);
 
         _sut = new SchoolSearchService(
             _indexReaderMock.Object,
             _establishmentRepositoryMock.Object,
-            _featureFlagServiceMock.Object);
+            _featureFlagServiceMock.Object,
+            _timeProviderMock.Object);
     }
 
     [Theory]

@@ -9,11 +9,15 @@ namespace SAPSec.Core.Tests.Features.SchoolDetails;
 public class SchoolPredecessorRelationshipServiceTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
+    private readonly Mock<ICurrentTimeProvider> _timeProviderMock = new();
     private readonly SchoolPredecessorRelationshipService _sut;
 
     public SchoolPredecessorRelationshipServiceTests()
     {
-        _sut = new SchoolPredecessorRelationshipService(_establishmentRepo, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>());
+        _timeProviderMock.Setup(tp => tp.GetCurrentTimeUtc())
+            .Returns(DateTime.UtcNow);
+
+        _sut = new SchoolPredecessorRelationshipService(_establishmentRepo, _timeProviderMock.Object, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>());
     }
 
     [Fact]

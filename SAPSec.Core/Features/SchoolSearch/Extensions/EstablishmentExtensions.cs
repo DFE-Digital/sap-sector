@@ -23,7 +23,8 @@ public static class EstablishmentExtensions
     public static bool CanSearch(
         this Establishment? establishment,
         bool primarySchoolsEnabled,
-        bool allThroughSchoolsEnabled)
+        bool allThroughSchoolsEnabled,
+        ICurrentTimeProvider timeProvider)
     {
         if (establishment == null)
         {
@@ -35,7 +36,7 @@ public static class EstablishmentExtensions
             return false;
         }
 
-        if (IsSecondaryExcluded(establishment))
+        if (IsSecondaryExcluded(establishment, timeProvider))
         {
             return false;
         }
@@ -48,7 +49,7 @@ public static class EstablishmentExtensions
         return EstablishmentStatusValues.IsIncludedInSearch(
                 establishment.EstablishmentStatusId,
                 establishment.EstablishmentStatusName)
-            || IsEligibleClosedSchool(establishment);
+            || IsEligibleClosedSchool(establishment, timeProvider);
     }
 
     public static bool IsSearchable(this Establishment? establishment)
@@ -59,9 +60,10 @@ public static class EstablishmentExtensions
     public static bool IsSearchable(
         this Establishment? establishment,
         bool primarySchoolsEnabled,
-        bool allThroughSchoolsEnabled)
+        bool allThroughSchoolsEnabled,
+        ICurrentTimeProvider timeProvider)
     {
-        return establishment.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled);
+        return establishment.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled, timeProvider);
     }
 
     private static bool HasSearchablePhase(
@@ -105,7 +107,7 @@ public static class EstablishmentExtensions
             && string.IsNullOrWhiteSpace(establishment.EstablishmentStatusName);
     }
 
-    private static bool IsSecondaryExcluded(Establishment establishment)
+    private static bool IsSecondaryExcluded(Establishment establishment, ICurrentTimeProvider timeProvider)
     {
         if (!PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName))
         {
@@ -121,7 +123,7 @@ public static class EstablishmentExtensions
 
         if (establishmentStatusId is EstablishmentStatusValues.ClosedId)
         {
-            return !SchoolClosureEligibilityRule.IsEligibleToAppear(establishment);
+            return !new SchoolClosureEligibilityRule(timeProvider).IsEligibleToAppear(establishment);
         }
 
         return false;
@@ -132,7 +134,7 @@ public static class EstablishmentExtensions
     /// eligibility criteria - see <see cref="SchoolClosureEligibilityRule"/>. Schools closed
     /// beyond the eligibility window are not searchable (and 404 if navigated to directly).
     /// </summary>
-    private static bool IsEligibleClosedSchool(Establishment establishment) =>
+    private static bool IsEligibleClosedSchool(Establishment establishment, ICurrentTimeProvider timeProvider) =>
         EstablishmentStatusValues.IsClosed(establishment.EstablishmentStatusId, establishment.EstablishmentStatusName)
-        && SchoolClosureEligibilityRule.IsEligibleToAppear(establishment);
+        && new SchoolClosureEligibilityRule(timeProvider).IsEligibleToAppear(establishment);
 }

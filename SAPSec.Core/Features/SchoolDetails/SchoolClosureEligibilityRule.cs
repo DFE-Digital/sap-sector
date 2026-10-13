@@ -1,7 +1,12 @@
-using System.Globalization;
 using SAPSec.Data.Dto;
+using System.Globalization;
 
 namespace SAPSec.Core.Features.SchoolDetails;
+
+public interface ICurrentTimeProvider
+{
+    DateTime GetCurrentTimeUtc();
+}
 
 /// <summary>
 /// Pure data-eligibility rule: whether a closed school still meets the agreed 4-year data
@@ -9,7 +14,7 @@ namespace SAPSec.Core.Features.SchoolDetails;
 /// additionally needs the establishment's links and so cannot be a pure function of the
 /// establishment alone - see <see cref="SchoolClosureEligibilityService"/>.
 /// </summary>
-public static class SchoolClosureEligibilityRule
+public class SchoolClosureEligibilityRule(ICurrentTimeProvider timeProvider)
 {
     private const int DataEligibilityWindowYears = 4;
     private const string CloseDateFormat = "dd-MM-yyyy";
@@ -18,7 +23,7 @@ public static class SchoolClosureEligibilityRule
     /// True if the establishment may still appear in the service: it is not closed, or it is
     /// closed but within the data eligibility window (or its close date is unknown).
     /// </summary>
-    public static bool IsEligibleToAppear(Establishment establishment)
+    public bool IsEligibleToAppear(Establishment establishment)
     {
         ArgumentNullException.ThrowIfNull(establishment);
 
@@ -35,14 +40,14 @@ public static class SchoolClosureEligibilityRule
     /// date is more than 4 years ago. An unknown close date is treated as eligible - we cannot
     /// prove a school is ineligible without knowing when it closed.
     /// </summary>
-    private static bool IsBeyondDataEligibilityWindow(string? closeDate)
+    private bool IsBeyondDataEligibilityWindow(string? closeDate)
     {
         if (!DateOnly.TryParseExact(closeDate, CloseDateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedCloseDate))
         {
             return false;
         }
 
-        var cutoff = DateOnly.FromDateTime(DateTime.UtcNow).AddYears(-DataEligibilityWindowYears);
+        var cutoff = DateOnly.FromDateTime(timeProvider.GetCurrentTimeUtc()).AddYears(-DataEligibilityWindowYears);
 
         return parsedCloseDate < cutoff;
     }

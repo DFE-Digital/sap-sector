@@ -15,19 +15,18 @@ namespace SAPSec.Core.Tests.Services;
 public class SchoolDetailsServiceTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepository;
-    private readonly Mock<ILogger<SchoolDetailsService>> _loggerMock;
+    private readonly Mock<ICurrentTimeProvider> _timeProviderMock = new();
     private readonly SchoolDetailsService _sut;
 
     public SchoolDetailsServiceTests()
     {
         _establishmentRepository = new InMemoryEstablishmentRepository();
-        _loggerMock = new Mock<ILogger<SchoolDetailsService>>();
 
         _sut = new SchoolDetailsService(
             _establishmentRepository,
-            new SchoolClosureEligibilityService(_establishmentRepository, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
-            new SchoolPredecessorRelationshipService(_establishmentRepository, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
-            _loggerMock.Object);
+            new SchoolClosureEligibilityService(_establishmentRepository, _timeProviderMock.Object, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
+            new SchoolPredecessorRelationshipService(_establishmentRepository, _timeProviderMock.Object, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
+            Mock.Of<ILogger<SchoolDetailsService>>());
     }
 
     [Fact]

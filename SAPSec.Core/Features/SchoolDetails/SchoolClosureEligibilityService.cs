@@ -13,6 +13,7 @@ namespace SAPSec.Core.Features.SchoolDetails;
 /// </summary>
 public sealed class SchoolClosureEligibilityService(
     IEstablishmentRepository establishmentRepository,
+    ICurrentTimeProvider timeProvider,
     ILogger<SchoolClosureEligibilityService> logger)
     : ISchoolClosureEligibilityService
 {
@@ -25,7 +26,7 @@ public sealed class SchoolClosureEligibilityService(
             return SchoolClosureEligibility.NotClosed;
         }
 
-        if (!SchoolClosureEligibilityRule.IsEligibleToAppear(establishment))
+        if (!new SchoolClosureEligibilityRule(timeProvider).IsEligibleToAppear(establishment))
         {
             return new SchoolClosureEligibility(IsEligibleForDisplay: false, ShowClosedSchoolBanner: false, Successors: []);
         }
