@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using SAPSec.Web.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -8,6 +7,7 @@ using SAPSec.Web.Areas.AllThrough.Services;
 using SAPSec.Web.Areas.AllThrough.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.ViewModels;
@@ -17,7 +17,7 @@ namespace SAPSec.Web.Areas.AllThrough.Controllers;
 
 [Area("AllThrough")]
 [Route("school/all-through/{urn}")]
-[Authorize(Policy = DsiAuthorizationRequirement.PolicyName)]
+[Authorize(Policy = AuthorizationPolicies.SchoolAccess)]
 [RequireFeatureFlag(Flags.EnableAllThroughSchools)]
 [RequireSchoolPhase(ExpectedSchoolPhase.AllThrough)]
 public class SimilarSchoolsController(

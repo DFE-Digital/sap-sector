@@ -139,11 +139,16 @@ public class Program
                 .Build();
 
             options.AddPolicy(
-                DsiAuthorizationRequirement.PolicyName,
-                policy => policy.AddRequirements(new DsiAuthorizationRequirement()));
+                AuthorizationPolicies.TrustOrLocalAuthorityUser,
+                policy => policy.AddRequirements(new TrustOrLocalAuthorityUserRequirement()));
+
+            options.AddPolicy(
+                AuthorizationPolicies.SchoolAccess,
+                policy => policy.RequireAuthenticatedUser().AddRequirements(new SchoolAccessRequirement()));
         });
+        builder.Services.AddScoped<IAuthorizationHandler, TrustOrLocalAuthorityUserHandler>();
         builder.Services.AddSingleton<IInternalStaffChecker, DepartmentForEducationInternalStaffChecker>();
-        builder.Services.AddScoped<IAuthorizationHandler, DsiAuthorizationHandler>();
+        builder.Services.AddScoped<IAuthorizationHandler, SchoolAccessHandler>();
 
         builder.Services.AddDfeAnalyticsDependencies(builder.Environment);
 

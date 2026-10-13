@@ -118,8 +118,20 @@ public class Organisation
 
     public List<Service> Services { get; set; } = new();
 
-    public bool IsEstablishment => string.Equals(
+    public bool IsEstablishment => Category?.Id is OrganisationCategoryIds.Establishment
+        || string.Equals(
+            Category?.Name,
+            "Establishment",
+            StringComparison.OrdinalIgnoreCase);
+
+    public bool IsTrust => Category?.Id is OrganisationCategoryIds.MultiAcademyTrust
+        or OrganisationCategoryIds.SingleAcademyTrust;
+
+    public bool IsLocalAuthority => Category?.Id is OrganisationCategoryIds.LocalAuthority;
+
+    // PLACEHOLDER: matched by category name until the DSI category id is confirmed.
+    public bool IsDiocese => string.Equals(
         Category?.Name,
-        "Establishment",
+        OrganisationCategoryIds.DioceseCategoryName,
         StringComparison.OrdinalIgnoreCase);
 }

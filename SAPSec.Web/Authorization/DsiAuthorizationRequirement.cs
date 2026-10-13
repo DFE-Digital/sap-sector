@@ -2,7 +2,4 @@
 
 namespace SAPSec.Web.Authorization;
 
-public class DsiAuthorizationRequirement : IAuthorizationRequirement
-{
-    public const string PolicyName = "DsiAuthorizationPolicy";
-}
+public class DsiAuthorizationRequirement : IAuthorizationRequirement { }

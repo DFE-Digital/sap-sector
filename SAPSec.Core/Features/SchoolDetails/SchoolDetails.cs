@@ -39,6 +39,11 @@ public class SchoolDetails
     public required DataWithAvailability<string> AcademyTrustName { get; init; }
     public required DataWithAvailability<string> AcademyTrustId { get; init; }
 
+    /// <summary>
+    /// GIAS diocese code. Not required so existing builders keep compiling; used for diocese access checks.
+    /// </summary>
+    public DataWithAvailability<string> DioceseId { get; init; } = DataWithAvailability.NotApplicable<string>();
+
     // Provisions
     public required DataWithAvailability<bool> HasNurseryProvision { get; init; }
     public required DataWithAvailability<bool> HasSixthForm { get; init; }

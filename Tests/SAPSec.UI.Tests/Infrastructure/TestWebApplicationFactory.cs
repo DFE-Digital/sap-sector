@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -16,17 +15,9 @@ namespace SAPSec.UI.Tests.Deprecated.Infrastructure;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private sealed class AllowAllUrnsAuthorizationHandler : AuthorizationHandler<DsiAuthorizationRequirement>
+    private sealed class AllUsersInternalStaffChecker : IInternalStaffChecker
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, DsiAuthorizationRequirement requirement)
-        {
-            if (context.User.Identity?.IsAuthenticated == true)
-            {
-                context.Succeed(requirement);
-            }
-
-            return Task.CompletedTask;
-        }
+        public bool IsInternalStaff(Organisation organisation) => true;
     }
 
     private IHost? _host;
@@ -51,15 +42,8 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddScoped<IDsiClient, MockDsiClient>();
 
                 // UI tests visit many schools while the mock user belongs to one establishment.
-                foreach (var descriptor in services
-                             .Where(d => d.ServiceType == typeof(IAuthorizationHandler)
-                                         && d.ImplementationType == typeof(DsiAuthorizationHandler))
-                             .ToList())
-                {
-                    services.Remove(descriptor);
-                }
-
-                services.AddScoped<IAuthorizationHandler, AllowAllUrnsAuthorizationHandler>();
+                services.RemoveAll<IInternalStaffChecker>();
+                services.AddSingleton<IInternalStaffChecker, AllUsersInternalStaffChecker>();
 
                 services.AddJsonDependencies();
             });

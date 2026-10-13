@@ -44,6 +44,12 @@ public static class DsiAuthenticationExtensions
 
         RegisterServices(services);
 
+        services.AddAuthorization(o =>
+        {
+            const string PolicyName = "DsiAuthorizationPolicy";
+            o.AddPolicy(PolicyName, policy => policy.AddRequirements(new DsiAuthorizationRequirement()));
+        });
+        services.AddScoped<IAuthorizationHandler, DsiAuthorizationHandler>();
         return services;
     }
 
