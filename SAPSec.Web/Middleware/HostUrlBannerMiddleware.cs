@@ -3,15 +3,17 @@ using System.Diagnostics.CodeAnalysis;
 namespace SAPSec.Web.Middleware;
 
 [ExcludeFromCodeCoverage]
-public class HostBannerMiddleware(RequestDelegate next, IWebHostEnvironment environment)
+public class HostUrlBannerMiddleware(RequestDelegate next)
 {
-    public async Task InvokeAsync(HttpContext context, IWebHostEnvironment environment)
+    const string HostUrl = "get-school-improvement-insights-pr-390.test.teacherservices.cloud";
+
+    public async Task InvokeAsync(HttpContext context)
     {
         var host = context.Request.Host.Host;
 
         context.Items["ShowBanner"] = false;
 
-        if (host == "get-school-improvement-insights-pr-390.test.teacherservices.cloud")
+        if (host == HostUrl)
         {
             context.Items["ShowBanner"] = true;
         }
