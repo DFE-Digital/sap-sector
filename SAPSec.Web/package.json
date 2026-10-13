@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
-    "@ministryofjustice/frontend": "^7.1.1",
+    "@ministryofjustice/frontend": "^11.1.0",
     "accessible-autocomplete": "^3.0.1",
     "async": "^3.2.6",
     "chart.js": "^4.5.1",
