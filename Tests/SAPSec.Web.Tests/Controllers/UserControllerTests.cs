@@ -21,7 +21,8 @@ public class UserControllerTests
 
     public UserControllerTests()
     {
-        SetupTrustOrLocalAuthorityPolicyResult(AuthorizationResult.Failed());
+        SetupPolicyResult(AuthorizationPolicies.TrustOrLocalAuthorityUser, AuthorizationResult.Failed());
+        SetupPolicyResult(AuthorizationPolicies.DfeUser, AuthorizationResult.Failed());
 
         _controller = new UserController(_userService.Object, _authorizationService.Object, _logger.Object);
         _controller.ControllerContext = new ControllerContext
@@ -134,7 +135,7 @@ public class UserControllerTests
             .ReturnsAsync(new User { Sub = "user-123", Organisations = [organisation] });
         _userService.Setup(x => x.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
             .ReturnsAsync(organisation);
-        SetupTrustOrLocalAuthorityPolicyResult(AuthorizationResult.Success());
+        SetupPolicyResult(AuthorizationPolicies.TrustOrLocalAuthorityUser, AuthorizationResult.Success());
 
         var result = await _controller.Index();
 
@@ -143,19 +144,10 @@ public class UserControllerTests
     }
 
     [Fact]
-    public async Task Index_WhenOrganisationIsNotEstablishmentAndFailsTrustOrLocalAuthorityPolicy_RedirectsToFindASchool()
+    public async Task Index_WhenOtherOrganisationAndDfeUser_RedirectsToFindASchool()
     {
-        var organisation = new Organisation
-        {
-            Id = "org-5",
-            Name = "Other Organisation",
-            Category = new Category { Id = "011", Name = "Government" }
-        };
-
-        _userService.Setup(x => x.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync(new User { Sub = "user-123", Organisations = [organisation] });
-        _userService.Setup(x => x.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync(organisation);
+        SetupUserWithOrganisation(OtherOrganisation());
+        SetupPolicyResult(AuthorizationPolicies.DfeUser, AuthorizationResult.Success());
 
         var result = await _controller.Index();
 
@@ -163,13 +155,60 @@ public class UserControllerTests
         redirect.Url.Should().Be(Routes.FindASchool());
     }
 
-    private void SetupTrustOrLocalAuthorityPolicyResult(AuthorizationResult result)
+    [Fact]
+    public async Task Index_WhenNoOrganisationAndDfeUser_RedirectsToFindASchool()
+    {
+        SetupUserWithOrganisation(null);
+        SetupPolicyResult(AuthorizationPolicies.DfeUser, AuthorizationResult.Success());
+
+        var result = await _controller.Index();
+
+        var redirect = result.Should().BeOfType<RedirectResult>().Subject;
+        redirect.Url.Should().Be(Routes.FindASchool());
+    }
+
+    [Fact]
+    public async Task Index_WhenOtherOrganisationAndNotDfeUser_ReturnsForbidden()
+    {
+        SetupUserWithOrganisation(OtherOrganisation());
+
+        var result = await _controller.Index();
+
+        result.Should().BeOfType<ForbidResult>();
+    }
+
+    [Fact]
+    public async Task Index_WhenNoOrganisationAndNotDfeUser_Throws()
+    {
+        SetupUserWithOrganisation(null);
+
+        var act = () => _controller.Index();
+
+        await act.Should().ThrowAsync<InvalidOperationException>();
+    }
+
+    private static Organisation OtherOrganisation() => new()
+    {
+        Id = "org-5",
+        Name = "Other Organisation",
+        Category = new Category { Id = "011", Name = "Government" }
+    };
+
+    private void SetupUserWithOrganisation(Organisation? organisation)
+    {
+        _userService.Setup(x => x.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
+            .ReturnsAsync(new User { Sub = "user-123", Organisations = organisation is null ? [] : [organisation] });
+        _userService.Setup(x => x.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
+            .ReturnsAsync(organisation);
+    }
+
+    private void SetupPolicyResult(string policyName, AuthorizationResult result)
     {
         _authorizationService
             .Setup(x => x.AuthorizeAsync(
                 It.IsAny<ClaimsPrincipal>(),
                 It.IsAny<object?>(),
-                AuthorizationPolicies.TrustOrLocalAuthorityUser))
+                policyName))
             .ReturnsAsync(result);
     }
 }

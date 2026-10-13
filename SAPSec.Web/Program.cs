@@ -145,9 +145,14 @@ public class Program
             options.AddPolicy(
                 AuthorizationPolicies.SchoolAccess,
                 policy => policy.RequireAuthenticatedUser().AddRequirements(new SchoolAccessRequirement()));
+
+            options.AddPolicy(
+                AuthorizationPolicies.DfeUser,
+                policy => policy.RequireAuthenticatedUser().AddRequirements(new DfeUserRequirement()));
         });
         builder.Services.AddScoped<IAuthorizationHandler, TrustOrLocalAuthorityUserHandler>();
         builder.Services.AddScoped<IAuthorizationHandler, SchoolAccessHandler>();
+        builder.Services.AddScoped<IAuthorizationHandler, DfeUserHandler>();
 
         builder.Services.AddDfeAnalyticsDependencies(builder.Environment);
 

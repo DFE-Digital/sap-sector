@@ -31,6 +31,9 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
     public TestUserOrganisation TestUserOrganisation =>
         _factory!.Services.GetRequiredService<TestUserOrganisation>();
 
+    public TestUserRoles TestUserRoles =>
+        _factory!.Services.GetRequiredService<TestUserRoles>();
+
     public Task InitializeAsync()
     {
         _factory = CreateWebApplicationFactory();

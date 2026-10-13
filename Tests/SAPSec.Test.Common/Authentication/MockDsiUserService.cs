@@ -3,7 +3,9 @@ using System.Security.Claims;
 
 namespace SAPSec.Test.Common.Authentication;
 
-public class MockDsiUserService(TestUserOrganisation? testUserOrganisation = null) : IUserService
+public class MockDsiUserService(
+    TestUserOrganisation? testUserOrganisation = null,
+    TestUserRoles? testUserRoles = null) : IUserService
 {
     private string _currentOrganisationId = "org-123";
 
@@ -121,6 +123,11 @@ public class MockDsiUserService(TestUserOrganisation? testUserOrganisation = nul
 
     public bool HasRole(ClaimsPrincipal principal, string role)
     {
+        if (testUserRoles is not null && principal?.Identity?.IsAuthenticated == true)
+        {
+            return testUserRoles.Roles.Contains(role);
+        }
+
         return principal?.IsInRole(role) == true;
     }
 }

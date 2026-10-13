@@ -52,16 +52,22 @@ public class UserController(
             user.Organisations.Count);
 
         var org = await _userService.GetCurrentOrganisationAsync(User);
-        if (org is null)
+
+        if (org is { IsEstablishment: true, Urn: not null })
         {
-            _logger.LogError(
-                "Current organisation was null in /user/redirect. TraceId: {TraceId}. UserId: {UserId}.",
+            _logger.LogInformation(
+                "Redirecting from /user/redirect to school page. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Urn: {OrganisationUrn}. RedirectTarget: {RedirectTarget}.",
                 traceId,
-                userId);
-            throw new InvalidOperationException($"Current organisation is null for user {userId}.");
+                userId,
+                org.Id,
+                org.Name,
+                org.Urn,
+                Routes.School(org.Urn, org.PhaseOfEducation?.Name));
+
+            return Redirect(Routes.School(org.Urn, org.PhaseOfEducation?.Name));
         }
 
-        if ((await _authorizationService.AuthorizeAsync(User, AuthorizationPolicies.TrustOrLocalAuthorityUser)).Succeeded)
+        if (org is not null && await MeetsPolicyAsync(AuthorizationPolicies.TrustOrLocalAuthorityUser))
         {
             _logger.LogInformation(
                 "Redirecting from /user/redirect to your-schools. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Category: {OrganisationCategory}.",
@@ -73,28 +79,36 @@ public class UserController(
             return Redirect(Routes.YourSchools);
         }
 
-        if (!org.IsEstablishment || org.Urn is null)
+        // DfE users (expected to sign in through Entra ID) may not have a DfE Sign-in organisation.
+        if (await MeetsPolicyAsync(AuthorizationPolicies.DfeUser))
         {
             _logger.LogInformation(
-                "Redirecting from /user/redirect to find-a-school. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Category: {OrganisationCategory}. Urn: {OrganisationUrn}.",
+                "Redirecting from /user/redirect to find-a-school. TraceId: {TraceId}. UserId: {UserId}.",
                 traceId,
-                userId,
-                org.Id,
-                org.Name,
-                org.Category?.Name,
-                org.Urn);
+                userId);
             return Redirect(Routes.FindASchool());
         }
 
-        _logger.LogInformation(
-            "Redirecting from /user/redirect to school page. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Urn: {OrganisationUrn}. RedirectTarget: {RedirectTarget}.",
+        if (org is null)
+        {
+            _logger.LogError(
+                "Current organisation was null in /user/redirect. TraceId: {TraceId}. UserId: {UserId}.",
+                traceId,
+                userId);
+            throw new InvalidOperationException($"Current organisation is null for user {userId}.");
+        }
+
+        _logger.LogWarning(
+            "No starting page for user in /user/redirect; returning forbidden. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Category: {OrganisationCategory}. Urn: {OrganisationUrn}.",
             traceId,
             userId,
             org.Id,
             org.Name,
-            org.Urn,
-            Routes.School(org.Urn, org.PhaseOfEducation?.Name));
-
-        return Redirect(Routes.School(org.Urn, org.PhaseOfEducation?.Name));
+            org.Category?.Name,
+            org.Urn);
+        return Forbid();
     }
+
+    private async Task<bool> MeetsPolicyAsync(string policyName) =>
+        (await _authorizationService.AuthorizeAsync(User, policyName)).Succeeded;
 }

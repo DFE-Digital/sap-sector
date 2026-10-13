@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
         services.RemoveAll<IUserService>();
         services.RemoveAll<IDsiClient>();
         services.TryAddSingleton<TestUserOrganisation>();
+        services.TryAddSingleton<TestUserRoles>();
         services.AddScoped<IUserService, MockDsiUserService>();
         services.AddScoped<IDsiClient, MockDsiApiService>();
 

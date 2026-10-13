@@ -13,6 +13,11 @@ public static class Routes
 
     public const string YourSchools = "/your-schools";
 
+    /// <summary>
+    /// Sends a signed-in user to the right starting page for their organisation.
+    /// </summary>
+    public const string UserHome = "/user/redirect";
+
     public const string FindASchoolBasePath = "/find-a-school";
     public static string FindASchool(string? query = null, string? page = null, string[]? localAuthorities = null)
     {

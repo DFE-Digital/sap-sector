@@ -1,6 +1,11 @@
-﻿@using SAPSec.Web.Constants
+﻿@using Microsoft.AspNetCore.Authorization
+@using SAPSec.Web.Authorization
+@using SAPSec.Web.Constants
+@inject Microsoft.AspNetCore.Authorization.IAuthorizationService AuthorizationService
 @{
     ViewData[ViewDataKeys.Title] = PageTitles.ErrorNotFound;
+    var canSearchAllSchools = User.Identity is { IsAuthenticated: true }
+        && (await AuthorizationService.AuthorizeAsync(User, AuthorizationPolicies.DfeUser)).Succeeded;
 }
 
 <div class="govuk-grid-row">
@@ -13,7 +18,14 @@
             If you pasted the web address, check you copied the entire address.
         </p>
         <p class="govuk-body">
-            You can also <a class="govuk-link" href="/find-a-school">search for a school</a> to find the information you need.
+            @if (canSearchAllSchools)
+            {
+                <text>You can also <a class="govuk-link" href="@Routes.FindASchool()">search for a school</a> to find the information you need.</text>
+            }
+            else
+            {
+                <text>You can also <a class="govuk-link" href="@Routes.UserHome">go back to your start page</a> to find the information you need.</text>
+            }
         </p>
 
         @if (Model.ShowErrorCode)

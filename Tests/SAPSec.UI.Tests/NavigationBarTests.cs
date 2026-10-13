@@ -112,7 +112,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         var href = await serviceNameLink.GetAttributeAsync("href");
 
         // Assert
-        href.Should().Be(Routes.FindASchool(), "Service name should link to home page");
+        href.Should().Be(Routes.UserHome, "Service name should link to the user's home page");
     }
 
     #endregion
