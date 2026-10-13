@@ -35,7 +35,8 @@ public class ComparisonController(
     [FromKeyedServices(ServiceKeys.Secondary)]
     IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse> getSecondarySchoolDetailsUseCase,
     IPrimaryCharacteristicsComparisonFormatter primaryCharacteristicsComparisonFormatter,
-    ISecondaryCharacteristicsComparisonFormatter secondaryCharacteristicsComparisonFormatter)
+    ISecondaryCharacteristicsComparisonFormatter secondaryCharacteristicsComparisonFormatter,
+    IFeatureFlagService featureFlagService)
     : Controller
 {
     private const string SimilarityView = "~/Areas/Shared/Views/Comparison/Similarity.cshtml";
@@ -162,7 +163,8 @@ public class ComparisonController(
     public async Task<IActionResult> SecondaryKs4CoreSubjects(string urn, string comparatorSchoolUrn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getKs4CoreSubjectsUseCase.Execute(new(urn, comparatorSchoolUrn, filters));
+        var includePupilCharacteristicFilter = await IsKs4CoreSubjectsPupilCharacteristicsEnabledAsync();
+        var response = await getKs4CoreSubjectsUseCase.Execute(new(urn, comparatorSchoolUrn, filters, includePupilCharacteristicFilter));
 
         SetSecondaryComparisonLayout(response.CurrentSchool, response.ComparatorSchool);
 
@@ -256,4 +258,7 @@ public class ComparisonController(
             currentSchool,
             comparatorSchool);
 
+    private async Task<bool> IsKs4CoreSubjectsPupilCharacteristicsEnabledAsync() =>
+        featureFlagService is not null
+        && await featureFlagService.IsEnabledAsync(Flags.EnableKs4CoreSubjectsPupilCharacteristics);
 }

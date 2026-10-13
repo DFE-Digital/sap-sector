@@ -109,7 +109,8 @@ public class SchoolController(
     public async Task<IActionResult> Ks4CoreSubjects(string urn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters));
+        var includePupilCharacteristicFilter = await IsKs4CoreSubjectsPupilCharacteristicsEnabledAsync();
+        var response = await getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters, includePupilCharacteristicFilter));
 
         var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
 
@@ -200,6 +201,10 @@ public class SchoolController(
     private async Task<bool> IsRiseResourcesEnabledAsync() =>
         featureFlagService is not null
         && await featureFlagService.IsEnabledAsync(Flags.EnableRiseResources);
+
+    private async Task<bool> IsKs4CoreSubjectsPupilCharacteristicsEnabledAsync() =>
+        featureFlagService is not null
+        && await featureFlagService.IsEnabledAsync(Flags.EnableKs4CoreSubjectsPupilCharacteristics);
 
     private async Task<FindSecondarySimilarSchoolsResponse> GetSimilarSchoolsAsync(string urn)
     {

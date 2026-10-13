@@ -28,38 +28,46 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCase(
             Ks4CoreSubjects.EnglishLanguage.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                request.IncludePupilCharacteristicFilter),
             Ks4CoreSubjects.EnglishLiterature.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                request.IncludePupilCharacteristicFilter),
             Ks4CoreSubjects.Maths.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                request.IncludePupilCharacteristicFilter),
             Ks4CoreSubjects.CombinedScience.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                request.IncludePupilCharacteristicFilter),
             Ks4CoreSubjects.Biology.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                request.IncludePupilCharacteristicFilter),
             Ks4CoreSubjects.Chemistry.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                request.IncludePupilCharacteristicFilter),
             Ks4CoreSubjects.Physics.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy)
+                filterBy,
+                request.IncludePupilCharacteristicFilter)
         );
     }
 }
 
 public record GetSchoolKs4CoreSubjectsMeasuresRequest(
     string Urn,
-    IDictionary<string, string>? FilterBy = null);
+    IDictionary<string, string>? FilterBy = null,
+    bool IncludePupilCharacteristicFilter = true);
 
 public record GetSchoolKs4CoreSubjectsMeasuresResponse(
     SchoolInfo.SchoolInfo School,
