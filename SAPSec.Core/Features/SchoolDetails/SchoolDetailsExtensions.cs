@@ -1,28 +1,28 @@
-namespace SAPSec.Core.Features.SchoolDetails;
+//namespace SAPSec.Core.Features.SchoolDetails;
 
-public static class SchoolDetailsExtensions
-{
-    public static bool IsPrimarySchool(this SchoolDetails school)
-    {
-        ArgumentNullException.ThrowIfNull(school);
+//public static class SchoolDetailsExtensions
+//{
+//    public static bool IsPrimarySchool(this SchoolDetails school)
+//    {
+//        ArgumentNullException.ThrowIfNull(school);
 
-        return school.PhaseOfEducation.HasValue
-            && PhaseOfEducationValues.IsPrimaryOrAllThrough(school.PhaseOfEducation.Value);
-    }
+//        return school.PhaseOfEducation.HasValue
+//            && PhaseOfEducationValues.IsPrimaryOrAllThrough(school.PhaseOfEducation.Value);
+//    }
 
-    public static bool IsAllThroughSchool(this SchoolDetails school)
-    {
-        ArgumentNullException.ThrowIfNull(school);
+//    public static bool IsAllThroughSchool(this SchoolDetails school)
+//    {
+//        ArgumentNullException.ThrowIfNull(school);
 
-        return school.PhaseOfEducation.HasValue
-            && PhaseOfEducationValues.IsAllThrough(school.PhaseOfEducation.Value);
-    }
+//        return school.PhaseOfEducation.HasValue
+//            && PhaseOfEducationValues.IsAllThrough(school.PhaseOfEducation.Value);
+//    }
 
-    public static bool IsSecondarySchool(this SchoolDetails school)
-    {
-        ArgumentNullException.ThrowIfNull(school);
+//    public static bool IsSecondarySchool(this SchoolDetails school)
+//    {
+//        ArgumentNullException.ThrowIfNull(school);
 
-        return school.PhaseOfEducation.HasValue
-            && PhaseOfEducationValues.IsSecondary(school.PhaseOfEducation.Value);
-    }
-}
+//        return school.PhaseOfEducation.HasValue
+//            && PhaseOfEducationValues.IsSecondary(school.PhaseOfEducation.Value);
+//    }
+//}

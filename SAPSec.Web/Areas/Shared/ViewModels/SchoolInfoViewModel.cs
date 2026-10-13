@@ -9,5 +9,5 @@ public record SchoolInfoViewModel(string Urn, string Name, string Address)
         new(schoolInfo.Urn, schoolInfo.Name, schoolInfo.Address.ToString());
 
     public static SchoolInfoViewModel FromSchoolDetails(SchoolDetails schoolDetails) =>
-        new(schoolDetails.Urn, schoolDetails.Name, schoolDetails.Address.GetValueOrDefault(""));
+        new(schoolDetails.Urn, schoolDetails.Name, schoolDetails.Address.ToString());
 }

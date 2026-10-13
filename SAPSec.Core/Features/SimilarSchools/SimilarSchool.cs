@@ -14,6 +14,7 @@ public record SimilarSchool
     public required BNGCoordinates? Coordinates { get; set; }
     public required int? TotalCapacity { get; set; }
     public required int? TotalPupils { get; set; }
+    public required EducationStage EducationStage { get; set; }
     // TODO: convert into reference data (no ID in source data)
     public required string NurseryProvisionName { get; set; }
     public required ReferenceData LocalAuthority { get; set; }
@@ -46,6 +47,7 @@ public record SimilarSchool
             },
             TotalCapacity = currentEstab.TotalCapacity,
             TotalPupils = currentEstab.TotalPupils,
+            EducationStage = EducationStageHelper.FromEstablishment(currentEstab),
             NurseryProvisionName = currentEstab.NurseryProvisionName,
             Coordinates = BNGCoordinates.TryParse(currentEstab.Easting, currentEstab.Northing, out var coords) ? coords : null,
             LocalAuthority = new(currentEstab.LAId, currentEstab.LAName),

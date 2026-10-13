@@ -1,7 +1,6 @@
 using SAPSec.Core.Exceptions;
-using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
-using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.KS2.Performance;
 using SAPSec.Data.Repositories;
 
@@ -52,7 +51,7 @@ internal class PrimarySimilarSchoolsDataProvider(
                     return null;
                 }
 
-                if (!IsPrimaryComparisonEstablishment(establishment))
+                if ((EducationStageHelper.FromEstablishment(establishment) | EducationStage.Primary) == EducationStage.None)
                 {
                     return null;
                 }
@@ -71,32 +70,32 @@ internal class PrimarySimilarSchoolsDataProvider(
             similarSchools);
     }
 
-    private static bool IsPrimaryComparisonEstablishment(Establishment establishment)
-    {
-        if (PhaseOfEducationValues.IsPrimaryOrAllThrough(establishment.PhaseOfEducationName))
-        {
-            return true;
-        }
+    //private static bool IsPrimaryComparisonEstablishment(Establishment establishment)
+    //{
+    //    if (PhaseOfEducationValues.IsPrimaryOrAllThrough(establishment.PhaseOfEducationName))
+    //    {
+    //        return true;
+    //    }
 
-        if (PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName))
-        {
-            return false;
-        }
+    //    if (PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName))
+    //    {
+    //        return false;
+    //    }
 
-        var phaseOfEducationId = establishment.PhaseOfEducationId?.Trim();
-        if (string.IsNullOrWhiteSpace(phaseOfEducationId))
-        {
-            return true;
-        }
+    //    var phaseOfEducationId = establishment.PhaseOfEducationId?.Trim();
+    //    if (string.IsNullOrWhiteSpace(phaseOfEducationId))
+    //    {
+    //        return true;
+    //    }
 
-        return phaseOfEducationId switch
-        {
-            PhaseOfEducationValues.PrimaryId or
-            PhaseOfEducationValues.MiddleDeemedPrimaryId or
-            PhaseOfEducationValues.AllThroughId => true,
-            _ => false
-        };
-    }
+    //    return phaseOfEducationId switch
+    //    {
+    //        PhaseOfEducationValues.PrimaryId or
+    //        PhaseOfEducationValues.MiddleDeemedPrimaryId or
+    //        PhaseOfEducationValues.AllThroughId => true,
+    //        _ => false
+    //    };
+    //}
 }
 
 internal record PrimarySimilarSchoolsSourceData(

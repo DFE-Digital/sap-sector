@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Features.Availability;
+using SAPSec.Core.Features.SchoolInfo;
 
 namespace SAPSec.Core.Features.SchoolDetails;
 
@@ -6,11 +7,12 @@ namespace SAPSec.Core.Features.SchoolDetails;
 /// School details with data availability information.
 /// Pure data container - all logic is in the service layer.
 /// </summary>
-public class SchoolDetails
+public record SchoolDetails(string Urn, string Name, LocalAuthority LocalAuthority, Address Address, EducationStage EducationStage)
+    : SchoolInfo.SchoolInfo(Urn, Name, LocalAuthority, Address, EducationStage)
 {
     // Identifiers
-    public required string Urn { get; init; }
-    public required string Name { get; init; }
+    //public required string Urn { get; init; }
+    //public required string Name { get; init; }
     public required bool ShowClosedSchoolBanner { get; init; }
     public required IReadOnlyList<SuccessorSchool> Successors { get; init; }
     public required IReadOnlyList<SuccessorSchool> Predecessors { get; init; }
@@ -18,9 +20,9 @@ public class SchoolDetails
     public required DataWithAvailability<string> Ukprn { get; init; }
 
     // Location
-    public required DataWithAvailability<string> Address { get; init; }
-    public required DataWithAvailability<string> LocalAuthorityName { get; init; }
-    public required DataWithAvailability<string> LocalAuthorityCode { get; init; }
+    //public required DataWithAvailability<string> Address { get; init; }
+    //public required DataWithAvailability<string> LocalAuthorityName { get; init; }
+    //public required DataWithAvailability<string> LocalAuthorityCode { get; init; }
     public required DataWithAvailability<string> Region { get; init; }
     public required DataWithAvailability<string> UrbanRuralDescription { get; init; }
 
@@ -50,4 +52,6 @@ public class SchoolDetails
     public required DataWithAvailability<string> Website { get; init; }
     public required DataWithAvailability<string> Telephone { get; init; }
     public required DataWithAvailability<string> Email { get; init; }
+
+    public required string OfstedProviderId { get; init; }
 }

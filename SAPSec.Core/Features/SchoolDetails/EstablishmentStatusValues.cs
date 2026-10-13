@@ -7,39 +7,39 @@ public static class EstablishmentStatusValues
     public const string OpenButProposedToCloseId = "3";
     public const string ProposedToOpenId = "4";
 
-    public const string Open = "Open";
-    public const string Closed = "Closed";
-    public const string OpenButProposedToClose = "Open, but proposed to close";
-    public const string ProposedToOpen = "Proposed to open";
+    //    public const string Open = "Open";
+    //    public const string Closed = "Closed";
+    //    public const string OpenButProposedToClose = "Open, but proposed to close";
+    //    public const string ProposedToOpen = "Proposed to open";
 
-    public static bool IsIncludedInSearch(string? statusId, string? statusName)
-    {
-        var trimmedStatusId = statusId?.Trim();
+    //    public static bool IsIncludedInSearch(string? statusId, string? statusName)
+    //    {
+    //        var trimmedStatusId = statusId?.Trim();
 
-        if (trimmedStatusId is OpenId or OpenButProposedToCloseId)
-            return true;
+    //        if (trimmedStatusId is OpenId or OpenButProposedToCloseId)
+    //            return true;
 
-        if (trimmedStatusId is ClosedId or ProposedToOpenId)
-            return false;
+    //        if (trimmedStatusId is ClosedId or ProposedToOpenId)
+    //            return false;
 
-        var trimmedStatusName = statusName?.Trim();
+    //        var trimmedStatusName = statusName?.Trim();
 
-        return string.Equals(trimmedStatusName, Open, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(trimmedStatusName, OpenButProposedToClose, StringComparison.OrdinalIgnoreCase);
-    }
+    //        return string.Equals(trimmedStatusName, Open, StringComparison.OrdinalIgnoreCase)
+    //            || string.Equals(trimmedStatusName, OpenButProposedToClose, StringComparison.OrdinalIgnoreCase);
+    //    }
 
-    public static bool IsClosed(string? statusId, string? statusName)
-    {
-        var trimmedStatusId = statusId?.Trim();
+    //    public static bool IsClosed(string? statusId, string? statusName)
+    //    {
+    //        var trimmedStatusId = statusId?.Trim();
 
-        if (trimmedStatusId is ClosedId)
-            return true;
+    //        if (trimmedStatusId is ClosedId)
+    //            return true;
 
-        if (trimmedStatusId is OpenId or OpenButProposedToCloseId or ProposedToOpenId)
-            return false;
+    //        if (trimmedStatusId is OpenId or OpenButProposedToCloseId or ProposedToOpenId)
+    //            return false;
 
-        var trimmedStatusName = statusName?.Trim();
+    //        var trimmedStatusName = statusName?.Trim();
 
-        return string.Equals(trimmedStatusName, Closed, StringComparison.OrdinalIgnoreCase);
-    }
+    //        return string.Equals(trimmedStatusName, Closed, StringComparison.OrdinalIgnoreCase);
+    //    }
 }
