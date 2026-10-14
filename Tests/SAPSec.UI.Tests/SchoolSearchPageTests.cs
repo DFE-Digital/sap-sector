@@ -95,7 +95,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearch_NumericSearch_NoResults_ShowsErrorMessage()
+    public async Task SchoolSearch_NumericSearch_NoResults_ShowsNoResultsMessage()
     {
         await Page.GotoAsync(Routes.FindASchool());
 
@@ -105,12 +105,12 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var errorSummary = Page.Locator(".govuk-error-summary");
-        var isVisible = await errorSummary.IsVisibleAsync();
-        isVisible.Should().BeTrue("Error summary should be visible");
+        var results = Page.Locator(".app-filter__results-column");
+        var isVisible = await results.IsVisibleAsync();
+        isVisible.Should().BeTrue("Results should be visible");
 
-        var errorMessage = await errorSummary.Locator(".govuk-error-summary__list li").TextContentAsync();
-        errorMessage.Should().Contain("We could not find any schools matching your search criteria");
+        var heading = await results.Locator("h2").TextContentAsync();
+        heading.Should().Contain("No results found for “123”");
     }
 
     [Fact]
@@ -459,10 +459,24 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
     #endregion
 
-    #region No Results Error State Tests
+    #region No Results Tests
 
     [Fact]
-    public async Task SchoolSearch_NoResults_ShowsErrorSummary()
+    public async Task SchoolSearch_NoResults_ShowsNoResultsMessage()
+    {
+        await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var results = Page.Locator(".app-filter__results-column");
+        var isVisible = await results.IsVisibleAsync();
+        isVisible.Should().BeTrue("Results should be visible");
+
+        var heading = await results.Locator("h2").TextContentAsync();
+        heading.Should().Contain("No results found for “XYZNonExistentSchool999”");
+    }
+
+    [Fact]
+    public async Task SchoolSearch_NoResults_DoesNotShowErrorSummary()
     {
         await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -470,48 +484,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         var errorSummary = Page.Locator(".govuk-error-summary");
         var isVisible = await errorSummary.IsVisibleAsync();
 
-        isVisible.Should().BeTrue("Error summary should be visible when no results found");
+        isVisible.Should().BeFalse("Error summary should not be visible when no results found");
     }
 
     [Fact]
-    public async Task SchoolSearch_NoResults_ErrorSummaryHasCorrectTitle()
-    {
-        await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var errorTitle = Page.Locator(".govuk-error-summary__title");
-        var titleText = await errorTitle.TextContentAsync();
-
-        titleText.Should().Contain("There is a problem", "Error summary should have correct title");
-    }
-
-    [Fact]
-    public async Task SchoolSearch_NoResults_ErrorSummaryHasCorrectMessage()
-    {
-        await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var errorMessage = Page.Locator(".govuk-error-summary__list li");
-        var messageText = await errorMessage.TextContentAsync();
-
-        messageText.Should().Contain("We could not find any schools matching your search criteria",
-            "Error summary should contain no results message");
-    }
-
-    [Fact]
-    public async Task SchoolSearch_NoResults_ErrorSummaryLinkPointsToInput()
-    {
-        await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var errorLink = Page.Locator(".govuk-error-summary__list a");
-        var href = await errorLink.GetAttributeAsync("href");
-
-        href.Should().Contain("#__Query", "Error summary link should point to search input");
-    }
-
-    [Fact]
-    public async Task SchoolSearch_NoResults_InputHasErrorStyling()
+    public async Task SchoolSearch_NoResults_InputDoesNotHaveErrorStyling()
     {
         await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -519,11 +496,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         var inputWrapper = Page.Locator(".govuk-form-group--error");
         var hasErrorStyling = await inputWrapper.CountAsync() > 0;
 
-        hasErrorStyling.Should().BeTrue("Form group should have error styling when no results");
+        hasErrorStyling.Should().BeFalse("Form group should not have error styling when no results");
     }
 
     [Fact]
-    public async Task SchoolSearch_NoResults_InlineErrorMessageDisplayed()
+    public async Task SchoolSearch_NoResults_InlineErrorMessageNotDisplayed()
     {
         await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -531,15 +508,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         var inlineError = Page.Locator(".govuk-error-message");
         var isVisible = await inlineError.IsVisibleAsync();
 
-        isVisible.Should().BeTrue("Inline error message should be visible when no results");
-
-        var errorText = await inlineError.TextContentAsync();
-        errorText.Should().Contain("We could not find any schools matching your search criteria",
-            "Inline error should contain no results message");
+        isVisible.Should().BeFalse("Inline error message should not be visible when no results");
     }
 
     [Fact]
-    public async Task SchoolSearch_NoResults_InputHasErrorClass()
+    public async Task SchoolSearch_NoResults_InputDoesNotHaveErrorClass()
     {
         await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -547,7 +520,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         var input = Page.Locator("input.govuk-input--error");
         var hasErrorClass = await input.CountAsync() > 0;
 
-        hasErrorClass.Should().BeTrue("Input should have error class when no results");
+        hasErrorClass.Should().BeFalse("Input should not have error class when no results");
     }
 
     [Fact]
@@ -597,27 +570,6 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         var inputValue = await input.InputValueAsync();
 
         inputValue.Should().Be(searchQuery, "Search query should be preserved in input when no results");
-    }
-
-    [Fact]
-    public async Task SchoolSearch_NumericSearch_NoResults_ShowsErrorSummary()
-    {
-        await Page.GotoAsync(Routes.FindASchool());
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        await Page.Locator("input[name='__Query']").FillAsync("999999");
-        await Page.WaitForTimeoutAsync(600);
-
-        await Page.Locator("button[name='Search']").ClickAsync();
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var errorSummary = Page.Locator(".govuk-error-summary");
-        var isVisible = await errorSummary.IsVisibleAsync();
-
-        isVisible.Should().BeTrue("Error summary should be visible for numeric search with no results");
-
-        var errorMessage = await errorSummary.Locator(".govuk-error-summary__list li").TextContentAsync();
-        errorMessage.Should().Contain("We could not find any schools matching your search criteria");
     }
 
     [Fact]
@@ -743,6 +695,20 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
+    public async Task SchoolSearch_ErrorSummaryHasAlertRole()
+    {
+        await Page.GotoAsync(Routes.FindASchool());
+
+        await Page.Locator("button[name='Search']").ClickAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var alertRole = Page.Locator(".govuk-error-summary [role='alert']");
+        var count = await alertRole.CountAsync();
+
+        count.Should().BeGreaterThan(0, "Error summary should have alert role for accessibility");
+    }
+
+    [Fact]
     public async Task SchoolSearch_ErrorSummaryLinksToField()
     {
         await Page.GotoAsync(Routes.FindASchool());
@@ -789,18 +755,6 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         var exists = await form.CountAsync();
 
         exists.Should().BeGreaterThan(0, "Form should have search role for accessibility");
-    }
-
-    [Fact]
-    public async Task SchoolSearch_NoResults_ErrorSummaryHasAlertRole()
-    {
-        await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var alertRole = Page.Locator(".govuk-error-summary [role='alert']");
-        var count = await alertRole.CountAsync();
-
-        count.Should().BeGreaterThan(0, "Error summary should have alert role for accessibility");
     }
 
     #endregion
