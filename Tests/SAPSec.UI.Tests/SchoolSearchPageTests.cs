@@ -105,11 +105,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var results = Page.Locator(".app-filter__results-column");
-        var isVisible = await results.IsVisibleAsync();
-        isVisible.Should().BeTrue("Results should be visible");
+        var noResults = Page.Locator(".app-no-results");
+        var isVisible = await noResults.IsVisibleAsync();
+        isVisible.Should().BeTrue("No results section  should be visible");
 
-        var heading = await results.Locator("h2").TextContentAsync();
+        var heading = await noResults.Locator("h2").TextContentAsync();
         heading.Should().Contain("No results found for “123”");
     }
 
@@ -467,11 +467,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var results = Page.Locator(".app-filter__results-column");
-        var isVisible = await results.IsVisibleAsync();
-        isVisible.Should().BeTrue("Results should be visible");
+        var noResults = Page.Locator(".app-no-results");
+        var isVisible = await noResults.IsVisibleAsync();
+        isVisible.Should().BeTrue("No results section should be visible");
 
-        var heading = await results.Locator("h2").TextContentAsync();
+        var heading = await noResults.Locator("h2").TextContentAsync();
         heading.Should().Contain("No results found for “XYZNonExistentSchool999”");
     }
 

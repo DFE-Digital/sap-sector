@@ -27,22 +27,26 @@
         })
     }
 
-    <div class="govuk-grid-column-two-thirds app-filter__results-column">
-        @if (!string.IsNullOrWhiteSpace(Model.Query) && !hasResults && !hasError)
-        {
-            <h2 class="govuk-heading-m">No results found for &ldquo;@Model.Query&rdquo;</h2>
-            <h3 class="govuk-heading-s">Try another search</h3>
+    @if (!string.IsNullOrWhiteSpace(Model.Query) && !hasResults && !hasError)
+    {
+        <div class="govuk-grid-column-two-thirds app-no-results">
+            <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-top-2">
+
+            <h2 class="govuk-heading-l govuk-!-margin-top-6">No results found for &ldquo;@Model.Query&rdquo;</h2>
+            <h3 class="govuk-heading-m">Try another search</h3>
             <p class="govuk-body">
                 You may get more results if you try a different spelling or search term.
                 You can also search by URN, DfE number or UKPRN.
             </p>
-            <h3 class="govuk-heading-s">If you expected this school to appear in the results</h3>
+            <h3 class="govuk-heading-m">If you expected this school to appear in the results</h3>
             <p class="govuk-body">
                 Check the school&rsquo;s details on <a class="govuk-link" href="https://get-information-schools.service.gov.uk/Search?SelectedTab=Establishments">Get Information About Schools (opens in new tab)</a>.
                 If you still cannot find the school, contact the support team at <a class="govuk-link" href="mailto:schoolinsights.support@education.gov.uk">schoolinsights.support@education.gov.uk</a>.
             </p>
-        }
+        </div>
+    }
 
+    <div class="govuk-grid-column-two-thirds app-filter__results-column">
         @if (hasResults)
         {
             <div id="toggleWrap" class="results-toggle-wrap">
