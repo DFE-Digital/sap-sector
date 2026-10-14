@@ -38,6 +38,20 @@ public class JsonEstablishmentRepository : IEstablishmentRepository
         return establishments.Where(e => urns.Contains(e.URN)).ToList().AsReadOnly();
     }
 
+    public async Task<IReadOnlyCollection<Establishment>> GetEstablishmentsByTrustIdAsync(string trustId)
+    {
+        var establishments = await _establishmentFile.ReadAllAsync();
+
+        return establishments.Where(e => e.TrustId == trustId).ToList().AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<Establishment>> GetEstablishmentsByLocalAuthorityIdAsync(string laId)
+    {
+        var establishments = await _establishmentFile.ReadAllAsync();
+
+        return establishments.Where(e => e.LAId == laId).ToList().AsReadOnly();
+    }
+
     public async Task<Establishment?> GetEstablishmentAsync(string urn)
     {
         var allEstablishments = await GetEstablishmentsAsync([urn]);

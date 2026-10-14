@@ -49,6 +49,12 @@ public class InMemoryEstablishmentRepository : IEstablishmentRepository
     public Task<IReadOnlyCollection<Establishment>> GetEstablishmentsAsync(IEnumerable<string> urns)
         => Task.FromResult((IReadOnlyCollection<Establishment>)_establishments.Where(x => urns.Contains(x.URN)).ToList());
 
+    public Task<IReadOnlyCollection<Establishment>> GetEstablishmentsByTrustIdAsync(string trustId)
+        => Task.FromResult((IReadOnlyCollection<Establishment>)_establishments.Where(x => x.TrustId == trustId).ToList());
+
+    public Task<IReadOnlyCollection<Establishment>> GetEstablishmentsByLocalAuthorityIdAsync(string laId)
+        => Task.FromResult((IReadOnlyCollection<Establishment>)_establishments.Where(x => x.LAId == laId).ToList());
+
     public Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn)
         => Task.FromResult(_establishmentEmails.FirstOrDefault(i => i.URN == urn));
 

@@ -112,7 +112,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         var href = await serviceNameLink.GetAttributeAsync("href");
 
         // Assert
-        href.Should().Be(Routes.FindASchool(), "Service name should link to home page");
+        href.Should().Be(Routes.UserHome, "Service name should link to the user's home page");
     }
 
     #endregion
@@ -327,7 +327,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
     }
 
     [Fact]
-    public async Task ClickServiceName_NavigatesToHomePage()
+    public async Task ClickServiceName_NavigatesToUsersStartPage()
     {
         // Arrange
         await Page.GotoAsync(_fixture.BaseUrl);
@@ -337,9 +337,9 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         await serviceNameLink.ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        // Assert
+        // Assert - the test user is a school user (Wetherby High School), so they start on their school's page
         var url = new Uri(Page.Url);
-        url.AbsolutePath.Should().Be(Routes.FindASchool());
+        url.AbsolutePath.Should().Be(Routes.SecondarySchool("108088").Overview);
     }
 
     [Fact]

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Authentication;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Controllers;
@@ -9,9 +10,11 @@ namespace SAPSec.Web.Controllers;
 [Route("user")]
 public class UserController(
     IUserService userService,
+    IAuthorizationService authorizationService,
     ILogger<UserController> logger) : Controller
 {
     private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+    private readonly IAuthorizationService _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
     private readonly ILogger<UserController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet]
@@ -49,6 +52,43 @@ public class UserController(
             user.Organisations.Count);
 
         var org = await _userService.GetCurrentOrganisationAsync(User);
+
+        if (org is { IsEstablishment: true, Urn: not null })
+        {
+            _logger.LogInformation(
+                "Redirecting from /user/redirect to school page. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Urn: {OrganisationUrn}. RedirectTarget: {RedirectTarget}.",
+                traceId,
+                userId,
+                org.Id,
+                org.Name,
+                org.Urn,
+                Routes.School(org.Urn, org.PhaseOfEducation?.Name));
+
+            return Redirect(Routes.School(org.Urn, org.PhaseOfEducation?.Name));
+        }
+
+        if (org is not null && await MeetsPolicyAsync(AuthorizationPolicies.TrustOrLocalAuthorityUser))
+        {
+            _logger.LogInformation(
+                "Redirecting from /user/redirect to your-schools. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Category: {OrganisationCategory}.",
+                traceId,
+                userId,
+                org.Id,
+                org.Name,
+                org.Category?.Name);
+            return Redirect(Routes.YourSchools);
+        }
+
+        // DfE users (expected to sign in through Entra ID) may not have a DfE Sign-in organisation.
+        if (await MeetsPolicyAsync(AuthorizationPolicies.DfeUser))
+        {
+            _logger.LogInformation(
+                "Redirecting from /user/redirect to find-a-school. TraceId: {TraceId}. UserId: {UserId}.",
+                traceId,
+                userId);
+            return Redirect(Routes.FindASchool());
+        }
+
         if (org is null)
         {
             _logger.LogError(
@@ -58,28 +98,17 @@ public class UserController(
             throw new InvalidOperationException($"Current organisation is null for user {userId}.");
         }
 
-        if (!org.IsEstablishment || org.Urn is null)
-        {
-            _logger.LogInformation(
-                "Redirecting from /user/redirect to find-a-school. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Category: {OrganisationCategory}. Urn: {OrganisationUrn}.",
-                traceId,
-                userId,
-                org.Id,
-                org.Name,
-                org.Category?.Name,
-                org.Urn);
-            return Redirect(Routes.FindASchool());
-        }
-
-        _logger.LogInformation(
-            "Redirecting from /user/redirect to school page. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Urn: {OrganisationUrn}. RedirectTarget: {RedirectTarget}.",
+        _logger.LogWarning(
+            "No starting page for user in /user/redirect; returning forbidden. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Category: {OrganisationCategory}. Urn: {OrganisationUrn}.",
             traceId,
             userId,
             org.Id,
             org.Name,
-            org.Urn,
-            Routes.School(org.Urn, org.PhaseOfEducation?.Name));
-
-        return Redirect(Routes.School(org.Urn, org.PhaseOfEducation?.Name));
+            org.Category?.Name,
+            org.Urn);
+        return Forbid();
     }
+
+    private async Task<bool> MeetsPolicyAsync(string policyName) =>
+        (await _authorizationService.AuthorizeAsync(User, policyName)).Succeeded;
 }

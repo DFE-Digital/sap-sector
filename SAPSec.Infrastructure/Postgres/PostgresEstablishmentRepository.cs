@@ -50,6 +50,40 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         return result.ToList();
     }
 
+    public async Task<IReadOnlyCollection<Establishment>> GetEstablishmentsByTrustIdAsync(string trustId)
+    {
+        if (string.IsNullOrWhiteSpace(trustId))
+            return [];
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+
+        const string sql = """
+            SELECT *
+            FROM public.v_establishment
+            WHERE "TrustId" = @trustId;
+        """;
+
+        var result = await conn.QueryAsync<Establishment>(sql, new { trustId });
+        return result.ToList();
+    }
+
+    public async Task<IReadOnlyCollection<Establishment>> GetEstablishmentsByLocalAuthorityIdAsync(string laId)
+    {
+        if (string.IsNullOrWhiteSpace(laId))
+            return [];
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+
+        const string sql = """
+            SELECT *
+            FROM public.v_establishment
+            WHERE "LAId" = @laId;
+        """;
+
+        var result = await conn.QueryAsync<Establishment>(sql, new { laId });
+        return result.ToList();
+    }
+
     public async Task<Establishment?> GetEstablishmentAsync(string urn)
     {
         if (string.IsNullOrWhiteSpace(urn))

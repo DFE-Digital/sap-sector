@@ -12,6 +12,7 @@ using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Configuration;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
@@ -136,7 +137,22 @@ public class Program
             options.FallbackPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build();
+
+            options.AddPolicy(
+                AuthorizationPolicies.TrustOrLocalAuthorityUser,
+                policy => policy.AddRequirements(new TrustOrLocalAuthorityUserRequirement()));
+
+            options.AddPolicy(
+                AuthorizationPolicies.SchoolAccess,
+                policy => policy.RequireAuthenticatedUser().AddRequirements(new SchoolAccessRequirement()));
+
+            options.AddPolicy(
+                AuthorizationPolicies.DfeUser,
+                policy => policy.RequireAuthenticatedUser().AddRequirements(new DfeUserRequirement()));
         });
+        builder.Services.AddScoped<IAuthorizationHandler, TrustOrLocalAuthorityUserHandler>();
+        builder.Services.AddScoped<IAuthorizationHandler, SchoolAccessHandler>();
+        builder.Services.AddScoped<IAuthorizationHandler, DfeUserHandler>();
 
         builder.Services.AddDfeAnalyticsDependencies(builder.Environment);
 

@@ -18,7 +18,7 @@ public class CookiePageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         var breadcrumb = Page.Locator(".govuk-breadcrumbs__link").Filter(new() { HasText = "Home" });
 
         await Expect(breadcrumb).ToBeVisibleAsync();
-        (await breadcrumb.GetAttributeAsync("href")).Should().Be(Routes.FindASchool());
+        (await breadcrumb.GetAttributeAsync("href")).Should().Be(Routes.UserHome);
     }
 
     [Fact]

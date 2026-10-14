@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using SAPSec.Core.Features.AssociatedSchools;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
@@ -104,6 +105,7 @@ public static class ServiceCollectionExtensions
     public static void AddServices(this IServiceCollection services)
     {
         services.AddScoped<ISchoolSearchService, SchoolSearchService>();
+        services.AddScoped<IAssociatedSchoolsService, AssociatedSchoolsService>();
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
         services.AddSingleton<ISchoolClosureEligibilityService, SchoolClosureEligibilityService>();
         services.AddSingleton<ISchoolPredecessorRelationshipService, SchoolPredecessorRelationshipService>();

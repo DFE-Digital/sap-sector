@@ -51,13 +51,13 @@ public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixtu
     }
 
     [Fact]
-    public async Task GetSchoolOverview_HomeBreadcrumb_LinksToSchoolSearch()
+    public async Task GetSchoolOverview_HomeBreadcrumb_LinksToUserHome()
     {
         var response = await fixture.Client.GetAsync(SchoolOverviewPath);
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain($"href=\"{Routes.FindASchool()}\">Home</a>");
+        content.Should().Contain($"href=\"{Routes.UserHome}\">Home</a>");
     }
 
     [Fact]
