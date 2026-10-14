@@ -3,21 +3,19 @@ using Moq;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
+using SAPSec.Test.Common.Time;
 
 namespace SAPSec.Core.Tests.Features.SchoolDetails;
 
 public class SchoolPredecessorRelationshipServiceTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
-    private readonly Mock<ICurrentTimeProvider> _timeProviderMock = new();
+    private readonly MockCurrentTimeProvider _timeProvider = new();
     private readonly SchoolPredecessorRelationshipService _sut;
 
     public SchoolPredecessorRelationshipServiceTests()
     {
-        _timeProviderMock.Setup(tp => tp.GetCurrentTimeUtc())
-            .Returns(DateTime.UtcNow);
-
-        _sut = new SchoolPredecessorRelationshipService(_establishmentRepo, _timeProviderMock.Object, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>());
+        _sut = new SchoolPredecessorRelationshipService(_establishmentRepo, _timeProvider, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>());
     }
 
     [Fact]

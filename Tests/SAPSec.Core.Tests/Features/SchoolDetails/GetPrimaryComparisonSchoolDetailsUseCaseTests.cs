@@ -5,6 +5,7 @@ using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.Comparison;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
+using SAPSec.Test.Common.Time;
 
 namespace SAPSec.Core.Tests.Features.SchoolDetails;
 
@@ -12,7 +13,7 @@ public class GetPrimaryComparisonSchoolDetailsUseCaseTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
     private readonly InMemorySimilarSchoolsPrimaryRepository _similarSchoolsRepo = new();
-    private readonly Mock<ICurrentTimeProvider> _timeProviderMock = new();
+    private readonly MockCurrentTimeProvider _timeProvider = new();
     private readonly GetPrimaryComparisonSchoolDetailsUseCase _sut;
 
     public GetPrimaryComparisonSchoolDetailsUseCaseTests()
@@ -22,8 +23,8 @@ public class GetPrimaryComparisonSchoolDetailsUseCaseTests
             _similarSchoolsRepo,
             new SchoolDetailsService(
                 _establishmentRepo,
-                new SchoolClosureEligibilityService(_establishmentRepo, _timeProviderMock.Object, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
-                new SchoolPredecessorRelationshipService(_establishmentRepo, _timeProviderMock.Object, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
+                new SchoolClosureEligibilityService(_establishmentRepo, _timeProvider, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
+                new SchoolPredecessorRelationshipService(_establishmentRepo, _timeProvider, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
                 Mock.Of<ILogger<SchoolDetailsService>>()));
     }
 
