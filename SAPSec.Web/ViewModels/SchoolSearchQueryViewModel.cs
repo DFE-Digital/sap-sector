@@ -9,6 +9,4 @@ public class SchoolSearchQueryViewModel
     public string Query { get; set; } = string.Empty;
 
     public string? Urn { get; set; }
-
-    public bool HasNoResults { get; set; }
 }
