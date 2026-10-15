@@ -97,6 +97,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             GovernanceStructure = _governanceRule.Evaluate(establishment),
             AcademyTrustName = DataMapper.MapTrustName(establishment),
             AcademyTrustId = DataMapper.MapTrustId(establishment.TrustId),
+            DioceseId = DataMapper.MapDioceseId(establishment.DioceseId),
 
             // Provisions - business rules
             HasNurseryProvision = _nurseryProvisionRule.Evaluate(establishment),

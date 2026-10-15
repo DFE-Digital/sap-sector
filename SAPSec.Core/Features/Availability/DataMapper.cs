@@ -112,6 +112,16 @@ public static class DataMapper
             : DataWithAvailability.Available(trustId);
     }
 
+    /// <summary>
+    /// Maps diocese code, returning NotApplicable if the school has no diocese.
+    /// </summary>
+    public static DataWithAvailability<string> MapDioceseId(string? dioceseId)
+    {
+        return string.IsNullOrWhiteSpace(dioceseId)
+            ? DataWithAvailability.NotApplicable<string>()
+            : DataWithAvailability.Available(dioceseId);
+    }
+
 
     private static void AddIfNotEmpty(List<string> parts, string? value)
     {
