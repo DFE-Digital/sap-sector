@@ -124,7 +124,7 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("attainment8-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Test School 1", "99.4", "100.4", "101.4"],
             ["Similar schools average", "102.2", "103.2", "104.2"],
             ["Local authority schools average", "102.5", "103.5", "104.5"],
@@ -156,7 +156,7 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("attainment8-top-performers-table");
 
         table.ShouldHaveRows(
-            ["Rank", "School", "2024 to 2025"],
+            ["Rank", "School", "2025 to 2026"],
             ["1", "Test School 4", "106.3"],
             ["2", "Test School 2", "104.2"],
             ["3", "Test School 3", "104.2"]);
@@ -312,7 +312,7 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("eng-maths-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Test School 1", "79%", "80%", "81%"],
             ["Similar schools average", "69%", "70%", "71%"],
             ["Local authority schools average", "89%", "90%", "91%"],
@@ -346,7 +346,7 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("eng-maths-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Test School 1", "79%", "80%", "81%"],
             ["Similar schools average", "69%", "70%", "71%"],
             ["Local authority schools average", "89%", "90%", "91%"],
@@ -378,7 +378,7 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("eng-maths-top-performers-table");
 
         table.ShouldHaveRows(
-            ["Rank", "School", "2024 to 2025"],
+            ["Rank", "School", "2025 to 2026"],
             ["1", "Test School 4", "22%"],
             ["2", "Test School 3", "21%"],
             ["3", "Test School 2", "20%"]);
@@ -522,7 +522,7 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
         var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("eng-maths-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Test School 1", .. currentSchool],
             ["Similar schools average", .. similarSchools],
             ["Local authority schools average", .. la],

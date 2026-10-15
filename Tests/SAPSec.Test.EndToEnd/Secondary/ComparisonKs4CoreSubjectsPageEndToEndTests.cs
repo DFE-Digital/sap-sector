@@ -55,13 +55,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(3);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
@@ -104,13 +104,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(3);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
@@ -153,13 +153,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(3);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
@@ -202,13 +202,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(3);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
@@ -251,13 +251,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(3);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
@@ -300,13 +300,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(3);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
@@ -349,13 +349,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(3);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
@@ -398,7 +398,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
 
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
-        var currentYearPanel = panel.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var currentYearPanel = panel.Locator("[data-content-toggle-name=\"2025 to 2026\"]");
         var yearByYearPanel = panel.Locator("[data-content-toggle-name=\"Year by year\"]");
         var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 

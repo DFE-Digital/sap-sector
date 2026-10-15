@@ -40,7 +40,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
     [Fact]
     public async Task Attainment8_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        await AssertCanToggleBetweenYearByYearAndCurrentYearView(Attainment8HeaderText, "2024 to 2025");
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(Attainment8HeaderText, "2025 to 2026");
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        foreach (var heading in new[] { "2022 to 2023", "2023 to 2024", "2024 to 2025" })
+        foreach (var heading in new[] { "2023 to 2024", "2024 to 2025", "2025 to 2026" })
         {
             var values = await table.GetTableColumnAsync(heading);
             await Expect(values).ToBeNumericValuesHavingCount(3);
@@ -62,7 +62,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
     [Fact]
     public async Task EnglishMaths_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        await AssertCanToggleBetweenYearByYearAndCurrentYearView(EnglishMathsHeaderText, "2024 to 2025");
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(EnglishMathsHeaderText, "2025 to 2026");
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        foreach (var heading in new[] { "2022 to 2023", "2023 to 2024", "2024 to 2025" })
+        foreach (var heading in new[] { "2023 to 2024", "2024 to 2025", "2025 to 2026" })
         {
             var values = await table.GetTableColumnAsync(heading);
             await Expect(values).ToBePercentageValuesHavingCount(3);
