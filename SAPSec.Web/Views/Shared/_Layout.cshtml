@@ -155,12 +155,12 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
     <div class="govuk-width-container">
         @await RenderSectionAsync("Breadcrumbs", required: false)
     </div>
-    <div class="govuk-width-container">
-        @await Component.InvokeAsync("HostUrlBanner")
-    </div>
+@*     <div class="govuk-width-container app-width-container">
+      
+    </div> *@
     <div class="govuk-width-container app-width-container">
-       
-        <main class="govuk-main-wrapper" id="main-content">
+        <main class="govuk-main-wrapper" id="main-content">                
+           @*  @await Component.InvokeAsync("HostUrlBanner") *@
             @RenderBody()
         </main>
     </div>
