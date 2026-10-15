@@ -1,3 +1,4 @@
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Test.Common.Builders;

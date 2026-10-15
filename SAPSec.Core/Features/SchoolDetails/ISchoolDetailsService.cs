@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Exceptions;
 
 namespace SAPSec.Core.Features.SchoolDetails;
 

@@ -57,6 +57,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<
             IUseCase<GetPrimaryComparisonSimilarityCharacteristicsRequest, GetPrimaryComparisonSimilarityCharacteristicsResponse>,
             GetPrimaryComparisonSimilarityCharacteristicsUseCase>();
+        services.AddSingleton<
+            IUseCase<GetAllThroughSimilarSchoolPhasesRequest, GetAllThroughSimilarSchoolPhasesResponse>,
+            GetAllThroughSimilarSchoolPhasesUseCase>();
 
         // Measures
 
@@ -102,5 +105,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<ISchoolSearchService, SchoolSearchService>();
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
+        services.AddSingleton<ISchoolClosureEligibilityService, SchoolClosureEligibilityService>();
+        services.AddSingleton<ISchoolPredecessorRelationshipService, SchoolPredecessorRelationshipService>();
     }
 }

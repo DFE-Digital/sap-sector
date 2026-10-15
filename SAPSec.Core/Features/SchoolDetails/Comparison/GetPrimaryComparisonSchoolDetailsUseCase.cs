@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Geography;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Data.Repositories;

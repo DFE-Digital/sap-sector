@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using SAPSec.Core.Authentication;
-using SAPSec.Core.Extensions;
+using SAPSec.Core.Text;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Authentication;

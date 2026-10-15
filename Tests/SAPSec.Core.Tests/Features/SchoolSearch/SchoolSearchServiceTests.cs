@@ -1,7 +1,6 @@
 using Moq;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
@@ -17,10 +16,10 @@ public class SchoolSearchServiceTests
     public SchoolSearchServiceTests()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(false);
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(false);
 
         _sut = new SchoolSearchService(
@@ -91,7 +90,7 @@ public class SchoolSearchServiceTests
             EstablishmentStatusId = "1"
         };
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
@@ -112,7 +111,7 @@ public class SchoolSearchServiceTests
             EstablishmentStatusId = "1"
         };
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
@@ -133,7 +132,7 @@ public class SchoolSearchServiceTests
             EstablishmentStatusId = "1"
         };
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
@@ -168,7 +167,7 @@ public class SchoolSearchServiceTests
             EstablishmentStatusId = "1"
         };
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
@@ -179,27 +178,23 @@ public class SchoolSearchServiceTests
         result.Should().Be(establishment);
     }
 
-    [Theory]
-    [InlineData("2")]
-    [InlineData("4")]
-    public async Task SearchByNumberAsync_WithExcludedStatus_ReturnsNull(string statusId)
+    [Fact]
+    public async Task SearchByNumberAsync_WithProposedToOpenStatus_ReturnsNull()
     {
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
-            .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Secondary", EstablishmentStatusId = statusId });
+            .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Secondary", EstablishmentStatusId = "4" });
 
         var result = await _sut.SearchByNumberAsync("123456");
 
         result.Should().BeNull();
     }
 
-    [Theory]
-    [InlineData("2")]
-    [InlineData("4")]
-    public async Task SearchByNumberAsync_WithSecondarySchoolAndExcludedStatus_WhenPrimaryFeatureEnabled_ReturnsNull(string statusId)
+    [Fact]
+    public async Task SearchByNumberAsync_WithSecondarySchoolAndProposedToOpenStatus_WhenPrimaryFeatureEnabled_ReturnsNull()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
@@ -207,7 +202,48 @@ public class SchoolSearchServiceTests
             {
                 URN = "123456",
                 PhaseOfEducationName = "Secondary",
-                EstablishmentStatusId = statusId
+                EstablishmentStatusId = "4"
+            });
+
+        var result = await _sut.SearchByNumberAsync("123456");
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task SearchByNumberAsync_WithClosedSchoolWithinEligibilityWindow_ReturnsSchool()
+    {
+        var recentCloseDate = DateTime.UtcNow.AddYears(-1).ToString("dd-MM-yyyy");
+
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
+            .ReturnsAsync(new Establishment
+            {
+                URN = "123456",
+                PhaseOfEducationName = "Secondary",
+                EstablishmentStatusId = "2",
+                CloseDate = recentCloseDate
+            });
+
+        var result = await _sut.SearchByNumberAsync("123456");
+
+        result.Should().NotBeNull();
+        result!.URN.Should().Be("123456");
+    }
+
+    [Fact]
+    public async Task SearchByNumberAsync_WithClosedSchoolBeyondEligibilityWindow_ReturnsNull()
+    {
+        var longAgoCloseDate = DateTime.UtcNow.AddYears(-5).ToString("dd-MM-yyyy");
+
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
+            .ReturnsAsync(new Establishment
+            {
+                URN = "123456",
+                PhaseOfEducationName = "Secondary",
+                EstablishmentStatusId = "2",
+                CloseDate = longAgoCloseDate
             });
 
         var result = await _sut.SearchByNumberAsync("123456");
@@ -238,7 +274,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_IncludesAllThroughSchools_WhenAllThroughFeatureEnabled()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -260,7 +296,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_ExcludesAllThroughSchools_WhenPrimaryFeatureEnabledAndAllThroughFeatureDisabled()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -282,10 +318,10 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_IncludesPrimarySecondaryAndAllThroughSchools_WhenBothFeaturesEnabled()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -308,7 +344,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_IncludesPrimarySchools_WhenFeatureEnabledAndStatusExistsOnEstablishment()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -351,10 +387,10 @@ public class SchoolSearchServiceTests
     }
 
     [Fact]
-    public async Task SuggestAsync_ExcludesSchools_WithExcludedStatus()
+    public async Task SuggestAsync_ExcludesSchools_WithProposedToOpenStatus()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -362,7 +398,67 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
-                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationId = "2", PhaseOfEducationName = "Primary", EstablishmentStatusId = "2" }
+                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationId = "2", PhaseOfEducationName = "Primary", EstablishmentStatusId = "4" }
+            ]);
+
+        var results = await _sut.SuggestAsync("school");
+
+        results.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task SuggestAsync_IncludesClosedSchools_WithinEligibilityWindow()
+    {
+        var recentCloseDate = DateTime.UtcNow.AddYears(-1).ToString("dd-MM-yyyy");
+
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
+            .ReturnsAsync(true);
+        _indexReaderMock
+            .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
+            .ReturnsAsync([(1, "Primary School")]);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([
+                new Establishment
+                {
+                    URN = "1",
+                    EstablishmentName = "Primary School",
+                    PhaseOfEducationId = "2",
+                    PhaseOfEducationName = "Primary",
+                    EstablishmentStatusId = "2",
+                    CloseDate = recentCloseDate
+                }
+            ]);
+
+        var results = await _sut.SuggestAsync("school");
+
+        results.Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task SuggestAsync_ExcludesClosedSchools_BeyondEligibilityWindow()
+    {
+        var longAgoCloseDate = DateTime.UtcNow.AddYears(-5).ToString("dd-MM-yyyy");
+
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
+            .ReturnsAsync(true);
+        _indexReaderMock
+            .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
+            .ReturnsAsync([(1, "Primary School")]);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([
+                new Establishment
+                {
+                    URN = "1",
+                    EstablishmentName = "Primary School",
+                    PhaseOfEducationId = "2",
+                    PhaseOfEducationName = "Primary",
+                    EstablishmentStatusId = "2",
+                    CloseDate = longAgoCloseDate
+                }
             ]);
 
         var results = await _sut.SuggestAsync("school");
@@ -394,7 +490,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_IncludesSchools_WithIncludedStatusIds(string statusId)
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -410,13 +506,11 @@ public class SchoolSearchServiceTests
         results.Should().ContainSingle();
     }
 
-    [Theory]
-    [InlineData("2")]
-    [InlineData("4")]
-    public async Task SearchAsync_ExcludesSchools_WithExcludedStatusIds(string statusId)
+    [Fact]
+    public async Task SearchAsync_ExcludesSchools_WithProposedToOpenStatusId()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -424,7 +518,7 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
-                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2", EstablishmentStatusId = statusId }
+                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2", EstablishmentStatusId = "4" }
             ]);
 
         var results = await _sut.SearchAsync("school");
@@ -432,13 +526,11 @@ public class SchoolSearchServiceTests
         results.Should().BeEmpty();
     }
 
-    [Theory]
-    [InlineData("2")]
-    [InlineData("4")]
-    public async Task SearchAsync_ExcludesSecondarySchools_WithExcludedStatusIds_WhenPrimaryFeatureEnabled(string statusId)
+    [Fact]
+    public async Task SearchAsync_ExcludesSecondarySchools_WithProposedToOpenStatusId_WhenPrimaryFeatureEnabled()
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
@@ -451,7 +543,59 @@ public class SchoolSearchServiceTests
                     URN = "1",
                     EstablishmentName = "Secondary School",
                     PhaseOfEducationName = "Secondary",
-                    EstablishmentStatusId = statusId
+                    EstablishmentStatusId = "4"
+                }
+            ]);
+
+        var results = await _sut.SearchAsync("school");
+
+        results.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task SearchAsync_IncludesSecondarySchools_ClosedWithinEligibilityWindow()
+    {
+        var recentCloseDate = DateTime.UtcNow.AddYears(-1).ToString("dd-MM-yyyy");
+
+        _indexReaderMock
+            .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
+            .ReturnsAsync([(1, "Secondary School")]);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([
+                new Establishment
+                {
+                    URN = "1",
+                    EstablishmentName = "Secondary School",
+                    PhaseOfEducationName = "Secondary",
+                    EstablishmentStatusId = "2",
+                    CloseDate = recentCloseDate
+                }
+            ]);
+
+        var results = await _sut.SearchAsync("school");
+
+        results.Should().ContainSingle();
+    }
+
+    [Fact]
+    public async Task SearchAsync_ExcludesSecondarySchools_ClosedBeyondEligibilityWindow()
+    {
+        var longAgoCloseDate = DateTime.UtcNow.AddYears(-5).ToString("dd-MM-yyyy");
+
+        _indexReaderMock
+            .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
+            .ReturnsAsync([(1, "Secondary School")]);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([
+                new Establishment
+                {
+                    URN = "1",
+                    EstablishmentName = "Secondary School",
+                    PhaseOfEducationName = "Secondary",
+                    EstablishmentStatusId = "2",
+                    CloseDate = longAgoCloseDate
                 }
             ]);
 
@@ -469,7 +613,7 @@ public class SchoolSearchServiceTests
     public async Task SearchAsync_ExcludesSchools_WithUnsupportedPhaseIds(string phaseId, string phaseName)
     {
         _featureFlagServiceMock
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))

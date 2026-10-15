@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using SAPSec.Core.Features.Availability;
-using SAPSec.Core.Model;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Web.Helpers;
 
-namespace SAPSec.Web.Tests.Helpers;
+namespace SAPSec.Web.Tests.Deprecated.Helpers;
 
 public class DisplayHelpersTests
 {

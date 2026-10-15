@@ -171,18 +171,18 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
 
         await Expect(currentYearPanel).ToBeVisibleAsync();
         await Expect(yearByYearPanel).ToBeHiddenAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
 
         await toggleButton.ClickAsync();
 
         await Expect(currentYearPanel).ToBeHiddenAsync();
         await Expect(yearByYearPanel).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", $"Show {currentYear.ToLowerInvariant()} bar graph");
 
         await toggleButton.ClickAsync();
 
         await Expect(currentYearPanel).ToBeVisibleAsync();
         await Expect(yearByYearPanel).ToBeHiddenAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show year by year line graph");
     }
 }

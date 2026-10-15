@@ -5,8 +5,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using Moq;
 using SAPSec.Core.Authentication;
-using SAPSec.Core.Constants;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.ViewModels;
 
@@ -34,7 +33,7 @@ public class HomeControllerTests
 
         options.Setup(x => x.Value).Returns(new DfeSignInSettings { SignInUri = _signInUri });
         _mockFeatureFlagService
-            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(false);
     }
 

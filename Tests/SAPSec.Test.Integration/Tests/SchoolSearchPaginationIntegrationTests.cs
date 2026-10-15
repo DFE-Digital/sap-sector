@@ -113,6 +113,19 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     }
 
     [Fact]
+    public async Task GetSearch_WithResults_ContainsAccessibleMapListToggle()
+    {
+        var response = await fixture.Client.GetAsync(Routes.FindASchool("School", "1"));
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("id=\"toggleViewLink\"");
+        content.Should().Contain("data-results-label=\"schools\"");
+        content.Should().Contain("id=\"notification-container\"");
+        content.Should().Contain("aria-live=\"polite\"");
+    }
+
+    [Fact]
     public async Task GetSearch_Page2_ContainsPreviousLink()
     {
         var response = await fixture.Client.GetAsync(Routes.FindASchool("School", "2"));

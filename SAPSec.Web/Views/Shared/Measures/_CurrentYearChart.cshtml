@@ -14,7 +14,7 @@
     var decimals = Model.MeasureInfo.DataType switch
     {
         MeasureDataType.Score => 1,
-        MeasureDataType.ScaledScore => 1,
+        MeasureDataType.ScaledScore or MeasureDataType.DestinationsPercentage => 1,
         MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
         _ => 0
     };
@@ -48,7 +48,10 @@
                   data-category-percentage="0.6"
                   data-bar-percentage="1"
                   data-bar-thickness="50"
-                  data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage? "%" : "")"
+                  data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or 
+                                                                    MeasureDataType.OverallAbsencePercentage or 
+                                                                    MeasureDataType.PersistentAbsencePercentage or
+                                                                    MeasureDataType.DestinationsPercentage ? "%" : "")"
                   data-chart="@Html.Raw(JsonSerializer.Serialize(chartData).Replace("\"", "&quot;"))"
                   data-colors="@Html.Raw(JsonSerializer.Serialize(Model.Colors).Replace("\"", "&quot;"))">
            </canvas>
