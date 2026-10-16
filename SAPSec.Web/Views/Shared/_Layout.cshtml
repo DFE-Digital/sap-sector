@@ -156,12 +156,12 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
         @await RenderSectionAsync("Breadcrumbs", required: false)
     </div>
     <div class="govuk-width-container app-width-container">            
-        <main class="govuk-main-wrapper govuk-!-padding-top-2" id="main-content">  
-        @if (currentController is not ("Home" or "SchoolSearch"))
-        {     
-           @await Component.InvokeAsync("HostUrlBanner")
-        }
-        @RenderBody()
+        <main class="govuk-main-wrapper" id="main-content">  
+            @if (currentController is not ("Home" or "SchoolSearch"))
+            {     
+               @await Component.InvokeAsync("HostUrlBanner")
+            }
+            @RenderBody()
         </main>
     </div>
 
