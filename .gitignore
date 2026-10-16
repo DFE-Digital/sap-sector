@@ -519,6 +519,3 @@ SAPData/DataMap/CleanedFiles
 SAPData/Sql
 !SAPData/Sql/00_cleanup.sql
 !SAPData/Sql/run_all.sql
-
-# Local Claude Code settings
-.claude/
