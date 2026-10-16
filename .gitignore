@@ -3,6 +3,10 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+/SAPData/*
+/SAPSec.Infrastructure/Data/Files/Generated/*.json
+SAPSec.Web/Properties/launchSettings.json
+
 # dotenv files
 .env
 
