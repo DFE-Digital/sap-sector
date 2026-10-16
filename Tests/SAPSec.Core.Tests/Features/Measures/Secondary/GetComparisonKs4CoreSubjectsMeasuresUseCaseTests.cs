@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Exceptions;
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Secondary;
@@ -1811,29 +1811,20 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
             .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
-            new KS4Performance.EstablishmentPerformance
-            {
-                Id = "100001",
-                CombSci49_Dis_Est_Current_Pct = "41", CombSci49_Dis_Est_Previous_Pct = "40", CombSci49_Dis_Est_Previous2_Pct = "39",
-                CombSci59_Dis_Est_Current_Pct = "51", CombSci59_Dis_Est_Previous_Pct = "50", CombSci59_Dis_Est_Previous2_Pct = "49",
-                CombSci79_Dis_Est_Current_Pct = "71", CombSci79_Dis_Est_Previous_Pct = "70", CombSci79_Dis_Est_Previous2_Pct = "69",
-            },
-            new KS4Performance.EstablishmentPerformance
-            {
-                Id = "100002",
-                CombSci49_Dis_Est_Current_Pct = "42", CombSci49_Dis_Est_Previous_Pct = "41", CombSci49_Dis_Est_Previous2_Pct = "40",
-                CombSci59_Dis_Est_Current_Pct = "52", CombSci59_Dis_Est_Previous_Pct = "51", CombSci59_Dis_Est_Previous2_Pct = "50",
-                CombSci79_Dis_Est_Current_Pct = "72", CombSci79_Dis_Est_Previous_Pct = "71", CombSci79_Dis_Est_Previous2_Pct = "70",
-            });
+            Build.Ks4Performance.Establishment("100001", x => x
+                .WithCombSci49Disadvantaged(current: "41", prev: "40", prev2: "39")
+                .WithCombSci59Disadvantaged(current: "51", prev: "50", prev2: "49")
+                .WithCombSci79Disadvantaged(current: "71", prev: "70", prev2: "69")),
+            Build.Ks4Performance.Establishment("100002", x => x
+                .WithCombSci49Disadvantaged(current: "42", prev: "41", prev2: "40")
+                .WithCombSci59Disadvantaged(current: "52", prev: "51", prev2: "50")
+                .WithCombSci79Disadvantaged(current: "72", prev: "71", prev2: "70")));
 
         _performanceRepo.SetupEnglandPerformance(
-            new KS4Performance.EnglandPerformance
-            {
-                Id = "National",
-                CombSci49_Dis_Eng_Current_Pct = "45", CombSci49_Dis_Eng_Previous_Pct = "44", CombSci49_Dis_Eng_Previous2_Pct = "43",
-                CombSci59_Dis_Eng_Current_Pct = "55", CombSci59_Dis_Eng_Previous_Pct = "54", CombSci59_Dis_Eng_Previous2_Pct = "53",
-                CombSci79_Dis_Eng_Current_Pct = "75", CombSci79_Dis_Eng_Previous_Pct = "74", CombSci79_Dis_Eng_Previous2_Pct = "73",
-            });
+            Build.Ks4Performance.England(x => x
+                .WithCombSci49Disadvantaged(current: "45", prev: "44", prev2: "43")
+                .WithCombSci59Disadvantaged(current: "55", prev: "54", prev2: "53")
+                .WithCombSci79Disadvantaged(current: "75", prev: "74", prev2: "73")));
 
         var response = await _sut.Execute(Request("100001", "100002", filterBy: new()
         {
