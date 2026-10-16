@@ -10,7 +10,7 @@ using KS4Performance = SAPSec.Data.Dto.KS4.Performance;
 
 namespace SAPSec.Core.Tests.Features.Measures.Secondary;
 
-public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
+public partial class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo;
