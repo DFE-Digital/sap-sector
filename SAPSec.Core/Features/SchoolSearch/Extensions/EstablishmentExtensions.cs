@@ -46,8 +46,9 @@ public static class EstablishmentExtensions
         }
 
         return EstablishmentStatusValues.IsIncludedInSearch(
-            establishment.EstablishmentStatusId,
-            establishment.EstablishmentStatusName);
+                establishment.EstablishmentStatusId,
+                establishment.EstablishmentStatusName)
+            || IsEligibleClosedSchool(establishment);
     }
 
     public static bool IsSearchable(this Establishment? establishment)
@@ -113,7 +114,25 @@ public static class EstablishmentExtensions
 
         var establishmentStatusId = establishment.EstablishmentStatusId?.Trim();
 
-        return establishmentStatusId is EstablishmentStatusValues.ClosedId
-            or EstablishmentStatusValues.ProposedToOpenId;
+        if (establishmentStatusId is EstablishmentStatusValues.ProposedToOpenId)
+        {
+            return true;
+        }
+
+        if (establishmentStatusId is EstablishmentStatusValues.ClosedId)
+        {
+            return !SchoolClosureEligibilityRule.IsEligibleToAppear(establishment);
+        }
+
+        return false;
     }
+
+    /// <summary>
+    /// A closed school still appears in search results where it meets the agreed data
+    /// eligibility criteria - see <see cref="SchoolClosureEligibilityRule"/>. Schools closed
+    /// beyond the eligibility window are not searchable (and 404 if navigated to directly).
+    /// </summary>
+    private static bool IsEligibleClosedSchool(Establishment establishment) =>
+        EstablishmentStatusValues.IsClosed(establishment.EstablishmentStatusId, establishment.EstablishmentStatusName)
+        && SchoolClosureEligibilityRule.IsEligibleToAppear(establishment);
 }

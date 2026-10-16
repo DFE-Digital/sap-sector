@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;
@@ -15,7 +15,7 @@ public class SchoolSchoolDetailsPageIntegrationTests(
 {
     public override Task DisposeAsync()
     {
-        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnablePrimarySchools);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnablePrimarySchools);
 
         return base.DisposeAsync();
     }

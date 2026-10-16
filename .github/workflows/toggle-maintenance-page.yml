@@ -19,6 +19,16 @@ on:
         options:
         - enable
         - disable
+  workflow_call:
+    inputs:
+      environment:
+        description: Environment to update
+        required: true
+        type: string
+      action:
+        description: Route traffic to the maintenance page or back to the app
+        required: true
+        type: string
 
 permissions:
   contents: read

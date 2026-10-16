@@ -1,3 +1,4 @@
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;

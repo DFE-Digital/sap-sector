@@ -1,0 +1,65 @@
+@using SAPSec.Web.ViewModels.Components
+@model ClosedSchoolBannerViewModel
+
+@{
+    var ariaLabel = Model.Variant == ClosedSchoolBannerVariant.Comparator
+        ? "Comparator school closed notice"
+        : "Closed school notice";
+}
+
+<div class="govuk-inset-text guidance-panel app-closed-school-banner" role="region" aria-label="@ariaLabel">
+    @if (Model.HasSuccessors && Model.Successors.Count == 1)
+    {
+        var successor = Model.Successors[0];
+        <p class="govuk-body">
+            This school is closed. It is now <a class="govuk-link" href="@successor.Url">@successor.Name</a>.
+        </p>
+        <p class="govuk-body govuk-!-margin-bottom-0">
+            <a class="govuk-link" href="@successor.Url">View data for @successor.Name</a>
+        </p>
+    }
+    else if (Model.HasSuccessors)
+    {
+        <p class="govuk-body">
+            This school is closed. It is now @Model.SuccessorNamesJoined.
+        </p>
+        <p class="govuk-body govuk-!-margin-bottom-0">
+            You can view information on the new schools:
+        </p>
+        <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
+            @foreach (var successor in Model.Successors)
+            {
+                <li><a class="govuk-link" href="@successor.Url">View data for @successor.Name</a></li>
+            }
+        </ul>
+    }
+    else if (Model.HasPredecessors && Model.Predecessors.Count == 1)
+    {
+        var predecessor = Model.Predecessors[0];
+        <p class="govuk-body">
+            This school was previously <a class="govuk-link" href="@predecessor.Url">@predecessor.Name</a>.
+        </p>
+        <p class="govuk-body govuk-!-margin-bottom-0">
+            <a class="govuk-link" href="@predecessor.Url">View data for @predecessor.Name</a>
+        </p>
+    }
+    else if (Model.HasPredecessors)
+    {
+        <p class="govuk-body">
+            This school was previously @Model.PredecessorNamesJoined.
+        </p>
+        <p class="govuk-body govuk-!-margin-bottom-0">
+            You can view information on the previous schools:
+        </p>
+        <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
+            @foreach (var predecessor in Model.Predecessors)
+            {
+                <li><a class="govuk-link" href="@predecessor.Url">View data for @predecessor.Name</a></li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p class="govuk-body">This school is closed.</p>
+    }
+</div>

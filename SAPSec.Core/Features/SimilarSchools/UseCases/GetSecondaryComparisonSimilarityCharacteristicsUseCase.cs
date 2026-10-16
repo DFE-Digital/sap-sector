@@ -1,3 +1,4 @@
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 

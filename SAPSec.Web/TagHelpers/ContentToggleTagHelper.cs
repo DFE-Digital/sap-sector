@@ -38,29 +38,22 @@ public class ContentToggleTagHelper : TagHelper
             output.Attributes.SetAttribute("id", Id);
         }
 
-        var header = new TagBuilder("div");
-        header.AddCssClass("app-content-toggle__header");
-
         var title = new TagBuilder("h3");
         title.AddCssClass("govuk-heading-m");
         title.AddCssClass("app-content-toggle__title");
         title.InnerHtml.Append(items[activeIndex].Name);
-        if (!string.IsNullOrWhiteSpace(items[activeIndex].AriaLabel))
-        {
-            title.Attributes["aria-label"] = items[activeIndex].AriaLabel;
-        }
 
+        var nextIndex = (activeIndex + 1) % items.Count;
         var button = new TagBuilder("button");
         button.Attributes["type"] = "button";
         button.AddCssClass("govuk-button");
         button.AddCssClass("govuk-button--secondary");
-        button.Attributes["aria-pressed"] = activeIndex == 0 ? "false" : "true";
         button.Attributes["data-module"] = "govuk-button";
-        button.InnerHtml.Append($"Show {items[(activeIndex + 1) % items.Count].Name.ToLowerInvariant()}");
-        if (!string.IsNullOrWhiteSpace(items[(activeIndex + 1) % items.Count].AriaLabel))
-        {
-            button.Attributes["aria-label"] = $"Show {items[(activeIndex + 1) % items.Count].AriaLabel!.ToLowerInvariant()}";
-        }
+        button.Attributes["aria-label"] = BuildToggleButtonAriaLabel(items[nextIndex]);
+        button.InnerHtml.Append($"Show {items[nextIndex].Name.ToLowerInvariant()}");
+
+        var header = new TagBuilder("div");
+        header.AddCssClass("app-content-toggle__header");
 
         header.InnerHtml.AppendHtml(title);
         header.InnerHtml.AppendHtml(button);
@@ -74,6 +67,7 @@ public class ContentToggleTagHelper : TagHelper
             panel.AddCssClass("app-content-toggle__panel");
             panel.Attributes["data-content-toggle-panel"] = "true";
             panel.Attributes["data-content-toggle-name"] = item.Name;
+            panel.Attributes["data-content-toggle-aria-label"] = item.AriaLabel ?? item.Name;
 
             if (!string.IsNullOrWhiteSpace(item.Id))
             {
@@ -93,4 +87,7 @@ public class ContentToggleTagHelper : TagHelper
             output.Content.AppendHtml(panel);
         }
     }
+
+    private static string BuildToggleButtonAriaLabel(ContentToggleItem item) =>
+        $"Show {(item.AriaLabel ?? item.Name).ToLowerInvariant()}";
 }

@@ -1,5 +1,5 @@
 using FluentAssertions;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Test.Common.AngleSharp;
@@ -25,7 +25,7 @@ public class RiseResourcesPageIntegrationTests(
 
     public override Task DisposeAsync()
     {
-        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnableRiseResources);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnableRiseResources);
 
         return base.DisposeAsync();
     }
@@ -47,7 +47,7 @@ public class RiseResourcesPageIntegrationTests(
     [Fact]
     public async Task RiseResources_WhenEnableRiseResourcesFeatureFlagEnabled_ReturnsOk()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
 
         var page = await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").RiseResources, HttpStatusCode.OK);
@@ -60,7 +60,7 @@ public class RiseResourcesPageIntegrationTests(
     [Fact]
     public async Task RiseResources_WhenEnableRiseResourcesFeatureFlagDisabled_ReturnsNotFound()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, false);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, false);
 
         var response = await Fixture.Client.GetAsync(Routes.PrimarySchool("100001").RiseResources);
 
@@ -70,7 +70,7 @@ public class RiseResourcesPageIntegrationTests(
     [Fact]
     public async Task RiseResources_WithNonExistentUrn_ReturnsNotFound()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
 
         var response = await Fixture.Client.GetAsync(Routes.PrimarySchool("999999").RiseResources);
 
@@ -80,7 +80,7 @@ public class RiseResourcesPageIntegrationTests(
     [Fact]
     public async Task RiseResources_GroupsByCategoryThenSubCategory_ForAPrimarySchool()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
         Fixture.RiseResourcesRepository.SetupCategories(
             Category("Curriculum", "Resources covering curriculum and teaching."));
         Fixture.RiseResourcesRepository.SetupResources(

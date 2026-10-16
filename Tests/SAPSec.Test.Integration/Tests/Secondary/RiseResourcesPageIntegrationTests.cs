@@ -1,5 +1,5 @@
 using FluentAssertions;
-using SAPSec.Core.Constants;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Test.Common.AngleSharp;
@@ -25,7 +25,7 @@ public class RiseResourcesPageIntegrationTests(
 
     public override Task DisposeAsync()
     {
-        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnableRiseResources);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnableRiseResources);
 
         return base.DisposeAsync();
     }
@@ -47,7 +47,7 @@ public class RiseResourcesPageIntegrationTests(
     [Fact]
     public async Task RiseResources_WhenEnableRiseResourcesFeatureFlagEnabled_RendersHeaderAndIntro()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
 
         var page = await Fixture.RequestPageAsync(
             Routes.SecondarySchool("100001").RiseResources, HttpStatusCode.OK);
@@ -62,7 +62,7 @@ public class RiseResourcesPageIntegrationTests(
     [Fact]
     public async Task RiseResources_WhenEnableRiseResourcesFeatureFlagDisabled_ReturnsNotFound()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, false);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, false);
 
         var response = await Fixture.Client.GetAsync(Routes.SecondarySchool("100001").RiseResources);
 
@@ -72,7 +72,7 @@ public class RiseResourcesPageIntegrationTests(
     [Fact]
     public async Task RiseResources_WithNonExistentUrn_ReturnsNotFound()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
 
         var response = await Fixture.Client.GetAsync(Routes.SecondarySchool("999999").RiseResources);
 
@@ -82,7 +82,7 @@ public class RiseResourcesPageIntegrationTests(
     [Fact]
     public async Task RiseResources_GroupsByCategoryThenSubCategory_WithContentsLinksDescriptionsAndAlphabeticalResources()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
         Fixture.RiseResourcesRepository.SetupCategories(
             Category("Performance and attendance", "About performance and attendance."),
             Category("Wider school", "About the wider school."));
@@ -139,7 +139,7 @@ public class RiseResourcesPageIntegrationTests(
     [Fact]
     public async Task RiseResources_OrdersSubCategorySectionsAndContentsBySubCategoryConfiguration()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
         Fixture.RiseResourcesRepository.SetupCategories(
             Category("Performance and attendance", "About performance.", "Literacy", "Maths", "Attendance"),
             Category("Wider school", "About the wider school.", "Curriculum and teaching"));
@@ -169,7 +169,7 @@ public class RiseResourcesPageIntegrationTests(
     [Fact]
     public async Task RiseResources_WhenNoResourcesMatchThePhase_ShowsEmptyState()
     {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.FeatureFlagService.Override(Flags.EnableRiseResources, true);
         Fixture.RiseResourcesRepository.SetupResources(
             Entry("Phonics screening support", "Performance and attendance", "Literacy", PhaseOfEducationValues.Primary));
 

@@ -1,7 +1,6 @@
-using SAPSec.Core.Constants;
-using SAPSec.Core.Features.Geography;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolSearch.Extensions;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Geography;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 using System.Text.RegularExpressions;
@@ -35,8 +34,8 @@ public class SchoolSearchService(
             return null;
         }
 
-        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
-        var allThroughSchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools);
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(Flags.EnablePrimarySchools);
+        var allThroughSchoolsEnabled = await _featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
 
         return school.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled)
@@ -46,8 +45,8 @@ public class SchoolSearchService(
 
     private async Task<IReadOnlyList<SchoolSearchResult>> SearchInternalAsync(string query, int maxResults, bool includeCoordinates)
     {
-        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
-        var allThroughSchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools);
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(Flags.EnablePrimarySchools);
+        var allThroughSchoolsEnabled = await _featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools);
         var searchResults = await _indexReader.SearchAsync(query, maxResults);
 
         var results = new List<SchoolSearchResult>();

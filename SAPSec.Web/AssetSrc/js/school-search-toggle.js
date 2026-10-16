@@ -16,29 +16,62 @@
         if (textEl) textEl.textContent = text;
     }
 
+    function getResultsLabel(toggle) {
+        return toggle.dataset.resultsLabel || "schools";
+    }
+
+    function setToggleLabel(toggle, nextView, currentView) {
+        const resultsLabel = getResultsLabel(toggle);
+        toggle.setAttribute("aria-label", `View ${nextView}, currently showing ${currentView} of ${resultsLabel}`);
+    }
+
+    function announceView(toggle, currentView) {
+        const notificationContainer = document.getElementById("notification-container");
+        if (!notificationContainer) return;
+
+        notificationContainer.textContent = `Showing ${currentView} of ${getResultsLabel(toggle)}`;
+    }
+
+    function focusListStart() {
+        const listView = document.getElementById("listView");
+        const list = listView?.querySelector(".app-school-results");
+        const target = list || listView?.querySelector("a[href], button, input, select, textarea, [tabindex]:not([tabindex='-1'])");
+
+        if (!target) return;
+
+        if (!target.hasAttribute("tabindex")) {
+            target.setAttribute("tabindex", "-1");
+        }
+
+        requestAnimationFrame(() => target.focus());
+    }
+
     function showMap({ persist = true } = {}) {
         const listView = document.getElementById("listView");
         const mapView = document.getElementById("mapView");
         const toggle = document.getElementById("toggleViewLink");
         if (!listView || !mapView || !toggle) return;
+        const shouldRestoreToggleFocus = document.activeElement === toggle;
 
         listView.classList.add("govuk-!-display-none");
         mapView.classList.remove("govuk-!-display-none");
 
         setToggleText(toggle, "View as a list");
         toggle.dataset.view = "map";
-        toggle.setAttribute("aria-expanded", "true");
+        setToggleLabel(toggle, "as a list", "map");
 
-        // mount into map header (sometimes needs a tick after display change)
-        requestAnimationFrame(() => mountToggle(MAP_SLOT_ID));
-        setTimeout(() => mountToggle(MAP_SLOT_ID), 0);
+        mountToggle(MAP_SLOT_ID);
+
+        if (shouldRestoreToggleFocus) {
+            toggle.focus();
+        }
 
         if (persist) sessionStorage.setItem(STORAGE_KEY, "map");
 
         window.dispatchEvent(new Event("map:shown"));
     }
 
-    function showList({ persist = true } = {}) {
+    function showList({ persist = true, focusResults = false } = {}) {
         const listView = document.getElementById("listView");
         const mapView = document.getElementById("mapView");
         const toggle = document.getElementById("toggleViewLink");
@@ -49,11 +82,15 @@
 
         setToggleText(toggle, "View on map");
         toggle.dataset.view = "list";
-        toggle.setAttribute("aria-expanded", "false");
+        setToggleLabel(toggle, "on map", "list");
 
         mountToggle(LIST_SLOT_ID);
 
         if (persist) sessionStorage.setItem(STORAGE_KEY, "list");
+
+        if (focusResults) {
+            focusListStart();
+        }
     }
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -72,15 +109,21 @@
         if (toggleLink) {
             e.preventDefault();
             const isList = toggleLink.dataset.view === "list";
-            if (isList) showMap();
-            else showList();
+            if (isList) {
+                showMap();
+                announceView(toggleLink, "map");
+            }
+            else {
+                showList({ focusResults: true });
+                announceView(toggleLink, "list");
+            }
             return;
         }
 
         const toggleToList = e.target.closest("#toggleToListLink");
         if (toggleToList) {
             e.preventDefault();
-            showList();
+            showList({ focusResults: true });
         }
     });
 
