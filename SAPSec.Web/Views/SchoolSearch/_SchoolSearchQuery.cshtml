@@ -4,12 +4,8 @@
 @using SAPSec.Web.Controllers
 @model SAPSec.Web.ViewModels.SchoolSearchQueryViewModel
 @{
-    var hasValidationError = ViewData.ModelState.HasError(nameof(SchoolSearchQueryViewModel.Query));
-    var hasNoResults = Model.HasNoResults;
-    var hasError = hasValidationError || hasNoResults;
-    var errorMessage = hasNoResults
-        ? SchoolSearchController.NoResultsErrorMessage
-        : ViewData.ModelState[nameof(SchoolSearchQueryViewModel.Query)]?.Errors.Select(e => e.ErrorMessage).FirstOrDefault();
+    var hasError = ViewData.ModelState.HasError(nameof(SchoolSearchQueryViewModel.Query));
+    var errorMessage = ViewData.ModelState[nameof(SchoolSearchQueryViewModel.Query)]?.Errors.Select(e => e.ErrorMessage).FirstOrDefault();
 }
 @using (Html.BeginForm(FormMethod.Post, true, new { novalidate = "novalidate", role = "search" }))
 {
@@ -41,6 +37,25 @@
                 <p class="govuk-body govuk-heading-m govuk-!-padding-top-6">
                     Find schools in England to check their performance against similar schools
                 as well as national and local authority averages.</p>
+
+                <details class="govuk-details app-measure-details" data-module="govuk-details">
+                    <summary class="govuk-details__summary">
+                        <span class="govuk-details__summary-text">Schools not included in this service</span>
+                    </summary>
+                    <div class="govuk-details__text">
+                        <p class="govuk-body-s govuk-!-margin-bottom-2">
+                            You cannot use this service to find data about:
+                        </p>
+                        <ul class="govuk-list govuk-list--bullet govuk-!-font-size-16 govuk-!-margin-bottom-2 app-measure-copy-list">
+                            <li>schools outside England</li>
+                            <li>schools that are due to open</li>
+                            <li>schools that are not mainstream state-funded primary, secondary, middle or all-through schools</li>
+                            <li>schools that do not assess pupils, for example nursery and infant schools that do not cover key stage 2</li>
+                            <li>schools that closed, or changed school type, more than 3 academic years ago</li>
+                        </ul>
+                    </div>
+                </details>
+
                 <div id="@nameof(SchoolSearchQueryViewModel.Query)-hint" class="govuk-hint">
                     @SchoolSearchController.Hint
                 </div>
