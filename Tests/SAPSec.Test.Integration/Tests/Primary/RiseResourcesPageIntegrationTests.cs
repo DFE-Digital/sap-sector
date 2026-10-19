@@ -38,7 +38,7 @@ public class RiseResourcesPageIntegrationTests(
             ResourceUrl = $"https://example.gov.uk/{title.Replace(' ', '-').ToLowerInvariant()}",
             Category = category,
             SubCategory = subCategory,
-            SchoolPhases = phases
+            EducationStages = phases
         };
 
     private static RiseResourceCategoryEntry Category(string name, string description, params string[] subCategories) =>

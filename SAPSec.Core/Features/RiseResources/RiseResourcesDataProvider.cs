@@ -1,5 +1,6 @@
 using SAPSec.Core.Exceptions;
-using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Data.Repositories;
 
@@ -9,12 +10,12 @@ internal class RiseResourcesDataProvider(
     IEstablishmentRepository establishmentRepository,
     IRiseResourcesRepository riseResourcesRepository)
 {
-    private static readonly string[] AllThroughSchoolPhases =
-    [
-        PhaseOfEducationValues.Primary,
-        PhaseOfEducationValues.Secondary,
-        PhaseOfEducationValues.AllThrough
-    ];
+    //private static readonly string[] AllThroughSchoolPhases =
+    //[
+    //    PhaseOfEducationValues.Primary,
+    //    PhaseOfEducationValues.Secondary,
+    //    PhaseOfEducationValues.AllThrough
+    //];
 
     public async Task<RiseResourcesSourceData> GetRiseResourcesData(string urn)
     {
@@ -24,7 +25,7 @@ internal class RiseResourcesDataProvider(
         var document = await riseResourcesRepository.GetAsync();
 
         var applicableResources = document.ResourceEntries
-            .Where(entry => AppliesToPhase(entry.SchoolPhases, establishment.PhaseOfEducationName))
+            .Where(entry => AppliesToEstablishment(entry.EducationStages, establishment))
             .ToList();
 
         var categories = BuildOrderedCategories(document.ResourceCategories, applicableResources);
@@ -102,23 +103,26 @@ internal class RiseResourcesDataProvider(
             SubCategory: NullIfBlank(entry.SubCategory),
             MappingMeasures: NullIfBlank(entry.MappingMeasures));
 
-    private static bool AppliesToPhase(IReadOnlyList<string> resourcePhases, string schoolPhase)
+    private static bool AppliesToEstablishment(IReadOnlyList<string> resourceStages, Establishment establishment)
     {
-        var tagged = resourcePhases.Select(NormalisePhase).ToHashSet();
+        var tagged = EducationStage.None;
 
-        IEnumerable<string> wanted = IsAllThrough(schoolPhase)
-            ? AllThroughSchoolPhases.Select(NormalisePhase)
-            : [NormalisePhase(schoolPhase)];
+        foreach (var stage in resourceStages.Select(Enum.Parse<EducationStage>))
+        {
+            tagged = tagged | stage;
+        }
 
-        return wanted.Any(tagged.Contains);
+        var wanted = EducationStageHelper.FromEstablishment(establishment);
+
+        return (tagged & wanted) != EducationStage.None;
     }
 
-    private static bool IsAllThrough(string schoolPhase) =>
-        NormalisePhase(schoolPhase) == NormalisePhase(PhaseOfEducationValues.AllThrough);
+    //private static bool IsAllThrough(string schoolPhase) =>
+    //    NormalisePhase(schoolPhase) == NormalisePhase(PhaseOfEducationValues.AllThrough);
 
-    // "All-through" (constant) vs "All through" (content) — match on either.
-    private static string NormalisePhase(string phase) =>
-        phase.Trim().Replace("-", " ").ToLowerInvariant();
+    //// "All-through" (constant) vs "All through" (content) — match on either.
+    //private static string NormalisePhase(string phase) =>
+    //    phase.Trim().Replace("-", " ").ToLowerInvariant();
 
     private static string? NullIfBlank(string? value) =>
         string.IsNullOrWhiteSpace(value) ? null : value;

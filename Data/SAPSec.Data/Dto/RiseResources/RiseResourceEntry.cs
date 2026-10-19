@@ -8,7 +8,7 @@ public class RiseResourceEntry
     public string ResourceTitle { get; set; } = string.Empty;
     public string ResourceDescription { get; set; } = string.Empty;
     public string ResourceUrl { get; set; } = string.Empty;
-    public IReadOnlyList<string> SchoolPhases { get; set; } = [];
+    public IReadOnlyList<string> EducationStages { get; set; } = [];
     public string Category { get; set; } = string.Empty;
     public string SubCategory { get; set; } = string.Empty;
     public string MappingMeasures { get; set; } = string.Empty;

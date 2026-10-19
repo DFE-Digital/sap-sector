@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SAPSec.Core.Exceptions;
 using SAPSec.Core.Features.Availability;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
@@ -65,11 +66,16 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
         SchoolClosureEligibility closureEligibility,
         SchoolPredecessorRelationship predecessorRelationship)
     {
-        return new SchoolDetails
+        return new SchoolDetails(
+            establishment.URN,
+            establishment.EstablishmentName,
+            LocalAuthority.FromEstablishment(establishment),
+            Address.FromEstablishment(establishment),
+            EducationStageHelper.FromEstablishment(establishment))
         {
             // Identifiers
-            Urn = establishment.URN,
-            Name = establishment.EstablishmentName,
+            //Urn = establishment.URN,
+            //Name = establishment.EstablishmentName,
             ShowClosedSchoolBanner = closureEligibility.ShowClosedSchoolBanner,
             Successors = closureEligibility.Successors,
             Predecessors = predecessorRelationship.Predecessors,
@@ -77,9 +83,9 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             Ukprn = DataMapper.MapRequiredString(establishment.UKPRN),
 
             // Location
-            Address = DataMapper.MapAddress(establishment),
-            LocalAuthorityName = DataMapper.MapString(establishment.LAName),
-            LocalAuthorityCode = DataMapper.MapRequiredString(establishment.LAId),
+            //Address = DataMapper.MapAddress(establishment),
+            //LocalAuthorityName = DataMapper.MapString(establishment.LAName),
+            //LocalAuthorityCode = DataMapper.MapRequiredString(establishment.LAId),
             Region = DataMapper.MapString(establishment.DistrictAdministrativeName),
             UrbanRuralDescription = DataMapper.MapString(establishment.UrbanRuralName),
 

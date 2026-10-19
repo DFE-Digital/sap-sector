@@ -1,5 +1,5 @@
-using System.Globalization;
 using SAPSec.Data.Dto;
+using System.Globalization;
 
 namespace SAPSec.Core.Features.SchoolDetails;
 
@@ -22,7 +22,7 @@ public static class SchoolClosureEligibilityRule
     {
         ArgumentNullException.ThrowIfNull(establishment);
 
-        if (!EstablishmentStatusValues.IsClosed(establishment.EstablishmentStatusId, establishment.EstablishmentStatusName))
+        if (establishment.EstablishmentStatusId is not EstablishmentStatusValues.ClosedId)
         {
             return true;
         }
