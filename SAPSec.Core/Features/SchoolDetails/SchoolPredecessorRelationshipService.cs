@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using SAPSec.Core.Time;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
@@ -11,6 +12,7 @@ namespace SAPSec.Core.Features.SchoolDetails;
 /// </summary>
 public sealed class SchoolPredecessorRelationshipService(
     IEstablishmentRepository establishmentRepository,
+    ICurrentTimeProvider timeProvider,
     ILogger<SchoolPredecessorRelationshipService> logger)
     : ISchoolPredecessorRelationshipService
 {
@@ -54,7 +56,7 @@ public sealed class SchoolPredecessorRelationshipService(
 
             // A predecessor beyond its own data eligibility window would link to a 404 - don't
             // signpost to it.
-            if (!SchoolClosureEligibilityRule.IsEligibleToAppear(candidate))
+            if (!new SchoolClosureEligibilityRule(timeProvider).IsEligibleToAppear(candidate))
             {
                 logger.LogWarning(
                     "School {Urn} has a predecessor relationship to {PredecessorUrn}, which is beyond the data eligibility window and cannot be linked to.",
