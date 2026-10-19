@@ -108,7 +108,7 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
     [Fact]
     public async Task Destinations_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        await AssertCanToggleBetweenYearByYearAndCurrentYearView(DestinationsHeaderText, "2022 to 2023");
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(DestinationsHeaderText, "2023 to 2024");
     }
 
     [Fact]
@@ -121,8 +121,8 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
         await Expect(table).ToBeVisibleAsync();
 
         // Destinations data is only published for the current year in the source data -
-        // 2020 to 2021 and 2021 to 2022 (Previous/Previous2) are genuinely unavailable.
-        var current = await table.GetTableColumnAsync("2022 to 2023");
+        // 2021 to 2022 and 2022 to 2023 (Previous/Previous2) are genuinely unavailable.
+        var current = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(current).ToBePercentageValuesHavingCount(4);
     }
 
@@ -225,7 +225,7 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var values = await table.GetTableColumnAsync("2022 to 2023");
+        var values = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(values).ToBePercentageValuesHavingCount(3);
 
         var schools = await table.GetTableColumnAsync("School");

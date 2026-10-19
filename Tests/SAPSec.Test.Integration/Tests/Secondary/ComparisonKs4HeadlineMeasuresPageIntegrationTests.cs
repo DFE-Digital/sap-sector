@@ -435,7 +435,7 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("destinations-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2020 to 2021", "2021 to 2022", "2022 to 2023"],
+            ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
             ["Test School 1", "79.8%", "80.5%", "81.1%"],
             ["Test School 2", "71.1%", "70.5%", "69.8%"],
             ["Schools in England average", "99.2%", "100.0%", "99.4%"]);
@@ -463,7 +463,7 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("destinations-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2020 to 2021", "2021 to 2022", "2022 to 2023"],
+            ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
             ["Test School 1", "78.9%", "80.3%", "80.9%"],
             ["Test School 2", "69.1%", "70.3%", "70.6%"],
             ["Schools in England average", "99.9%", "99.5%", "96.3%"]);
@@ -577,7 +577,7 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("destinations-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2020 to 2021", "2021 to 2022", "2022 to 2023"],
+            ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
             ["Test School 1", .. currentSchool],
             ["Test School 2", .. similarSchools],
             ["Schools in England average", .. england]);

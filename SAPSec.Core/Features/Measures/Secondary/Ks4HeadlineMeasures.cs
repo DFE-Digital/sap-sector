@@ -144,7 +144,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchool(
                 Ks4Destinations.Key,
                 Ks4Destinations.Name,
-                2022,
+                2023,
                 MeasureDataType.DestinationsPercentage,
                 availableFilters,
                 currentSchool,
@@ -159,7 +159,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchoolComparison(
                 Ks4Destinations.Key,
                 Ks4Destinations.Name,
-                2022,
+                2023,
                 MeasureDataType.DestinationsPercentage,
                 availableFilters,
                 currentSchool,
