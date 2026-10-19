@@ -6,17 +6,16 @@ namespace SAPSec.Web.Middleware;
 public class HostUrlBannerMiddleware(RequestDelegate next)
 {
     const string HostUrl = "get-school-improvement-insights-pr-369.test.teacherservices.cloud";
-    //const string HostUrl = "localhost";
-
+    
     public async Task InvokeAsync(HttpContext context)
     {
         var host = context.Request.Host.Host;
 
-        context.Items["ShowBanner"] = false;
+        context.Items["ShowHostUrlBanner"] = false;
 
         if (host == HostUrl)
         {
-            context.Items["ShowBanner"] = true;
+            context.Items["ShowHostUrlBanner"] = true;
         }
 
         await next(context);
