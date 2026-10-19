@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Exceptions;
+using SAPSec.Core.Exceptions;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolInfo;
@@ -9,11 +10,12 @@ using KS4Performance = SAPSec.Data.Dto.KS4.Performance;
 
 namespace SAPSec.Core.Tests.Features.Measures.Secondary;
 
-public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
+public partial class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo;
     private readonly InMemoryKs4PerformanceRepository _performanceRepo;
+    private readonly StubFeatureFlagService _featureFlagService;
     private readonly GetComparisonKs4CoreSubjectsMeasuresUseCase _sut;
 
     public GetComparisonKs4CoreSubjectsMeasuresUseCaseTests()
@@ -21,10 +23,12 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
         _establishmentRepo = new();
         _similarSchoolsRepo = new();
         _performanceRepo = new(_establishmentRepo);
+        _featureFlagService = new();
         _sut = new GetComparisonKs4CoreSubjectsMeasuresUseCase(
             _establishmentRepo,
             _similarSchoolsRepo,
-            _performanceRepo);
+            _performanceRepo,
+            _featureFlagService);
     }
 
     [Fact]
@@ -1781,7 +1785,9 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
         _similarSchoolsRepo
             .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
-        var response = await _sut.Execute(Request("100001", "100002", includePupilCharacteristicFilter: false));
+        DisablePupilCharacteristicFilter();
+
+        var response = await _sut.Execute(Request("100001", "100002"));
 
         response.CombinedScience.Filters
             .Should().NotContain(f => f.Key == Ks4CombinedScience.Filters.PupilCharacteristic.Key);
@@ -1805,29 +1811,20 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
             .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
-            new KS4Performance.EstablishmentPerformance
-            {
-                Id = "100001",
-                CombSci49_Dis_Est_Current_Pct = "41", CombSci49_Dis_Est_Previous_Pct = "40", CombSci49_Dis_Est_Previous2_Pct = "39",
-                CombSci59_Dis_Est_Current_Pct = "51", CombSci59_Dis_Est_Previous_Pct = "50", CombSci59_Dis_Est_Previous2_Pct = "49",
-                CombSci79_Dis_Est_Current_Pct = "71", CombSci79_Dis_Est_Previous_Pct = "70", CombSci79_Dis_Est_Previous2_Pct = "69",
-            },
-            new KS4Performance.EstablishmentPerformance
-            {
-                Id = "100002",
-                CombSci49_Dis_Est_Current_Pct = "42", CombSci49_Dis_Est_Previous_Pct = "41", CombSci49_Dis_Est_Previous2_Pct = "40",
-                CombSci59_Dis_Est_Current_Pct = "52", CombSci59_Dis_Est_Previous_Pct = "51", CombSci59_Dis_Est_Previous2_Pct = "50",
-                CombSci79_Dis_Est_Current_Pct = "72", CombSci79_Dis_Est_Previous_Pct = "71", CombSci79_Dis_Est_Previous2_Pct = "70",
-            });
+            Build.Ks4Performance.Establishment("100001", x => x
+                .WithCombSci49Disadvantaged(current: "41", prev: "40", prev2: "39")
+                .WithCombSci59Disadvantaged(current: "51", prev: "50", prev2: "49")
+                .WithCombSci79Disadvantaged(current: "71", prev: "70", prev2: "69")),
+            Build.Ks4Performance.Establishment("100002", x => x
+                .WithCombSci49Disadvantaged(current: "42", prev: "41", prev2: "40")
+                .WithCombSci59Disadvantaged(current: "52", prev: "51", prev2: "50")
+                .WithCombSci79Disadvantaged(current: "72", prev: "71", prev2: "70")));
 
         _performanceRepo.SetupEnglandPerformance(
-            new KS4Performance.EnglandPerformance
-            {
-                Id = "National",
-                CombSci49_Dis_Eng_Current_Pct = "45", CombSci49_Dis_Eng_Previous_Pct = "44", CombSci49_Dis_Eng_Previous2_Pct = "43",
-                CombSci59_Dis_Eng_Current_Pct = "55", CombSci59_Dis_Eng_Previous_Pct = "54", CombSci59_Dis_Eng_Previous2_Pct = "53",
-                CombSci79_Dis_Eng_Current_Pct = "75", CombSci79_Dis_Eng_Previous_Pct = "74", CombSci79_Dis_Eng_Previous2_Pct = "73",
-            });
+            Build.Ks4Performance.England(x => x
+                .WithCombSci49Disadvantaged(current: "45", prev: "44", prev2: "43")
+                .WithCombSci59Disadvantaged(current: "55", prev: "54", prev2: "53")
+                .WithCombSci79Disadvantaged(current: "75", prev: "74", prev2: "73")));
 
         var response = await _sut.Execute(Request("100001", "100002", filterBy: new()
         {
@@ -1907,7 +1904,9 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
         _similarSchoolsRepo
             .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
-        var response = await _sut.Execute(Request("100001", "100002", includePupilCharacteristicFilter: false));
+        DisablePupilCharacteristicFilter();
+
+        var response = await _sut.Execute(Request("100001", "100002"));
 
         response.Biology.Filters
             .Should().NotContain(f => f.Key == Ks4Biology.Filters.PupilCharacteristic.Key);
@@ -2033,7 +2032,9 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
         _similarSchoolsRepo
             .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
-        var response = await _sut.Execute(Request("100001", "100002", includePupilCharacteristicFilter: false));
+        DisablePupilCharacteristicFilter();
+
+        var response = await _sut.Execute(Request("100001", "100002"));
 
         response.Chemistry.Filters
             .Should().NotContain(f => f.Key == Ks4Chemistry.Filters.PupilCharacteristic.Key);
@@ -2120,6 +2121,19 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
         ]);
     }
 
-    private GetComparisonKs4CoreSubjectsMeasuresRequest Request(string currentSchoolUrn, string similarSchoolUrn, Dictionary<string, string>? filterBy = null, bool includePupilCharacteristicFilter = true) =>
-            new(currentSchoolUrn, similarSchoolUrn, filterBy ?? [], includePupilCharacteristicFilter);
+    private void DisablePupilCharacteristicFilter() =>
+        _featureFlagService.Ks4CoreSubjectsPupilCharacteristicsEnabled = false;
+
+    private GetComparisonKs4CoreSubjectsMeasuresRequest Request(string currentSchoolUrn, string similarSchoolUrn, Dictionary<string, string>? filterBy = null) =>
+            new(currentSchoolUrn, similarSchoolUrn, filterBy ?? []);
+
+    private sealed class StubFeatureFlagService : IFeatureFlagService
+    {
+        public bool Ks4CoreSubjectsPupilCharacteristicsEnabled { get; set; } = true;
+
+        public Task<bool> IsEnabledAsync(string featureName) =>
+            Task.FromResult(
+                featureName == Flags.EnableKs4CoreSubjectsPupilCharacteristics
+                && Ks4CoreSubjectsPupilCharacteristicsEnabled);
+    }
 }

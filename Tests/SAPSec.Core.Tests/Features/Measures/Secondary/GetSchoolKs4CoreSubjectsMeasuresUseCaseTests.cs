@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Exceptions;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolInfo;
@@ -14,6 +15,7 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo;
     private readonly InMemoryKs4PerformanceRepository _performanceRepo;
+    private readonly StubFeatureFlagService _featureFlagService;
     private readonly GetSchoolKs4CoreSubjectsMeasuresUseCase _sut;
 
     public GetSchoolKs4CoreSubjectsMeasuresUseCaseTests()
@@ -21,10 +23,12 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
         _establishmentRepo = new();
         _similarSchoolsRepo = new();
         _performanceRepo = new(_establishmentRepo);
+        _featureFlagService = new();
         _sut = new GetSchoolKs4CoreSubjectsMeasuresUseCase(
             _establishmentRepo,
             _similarSchoolsRepo,
-            _performanceRepo);
+            _performanceRepo,
+            _featureFlagService);
     }
 
     [Fact]
@@ -3845,7 +3849,9 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("100001", "Test School", x => x.Secondary()));
 
-        var response = await _sut.Execute(Request("100001", includePupilCharacteristicFilter: false));
+        DisablePupilCharacteristicFilter();
+
+        var response = await _sut.Execute(Request("100001"));
 
         response.EnglishLanguage.Filters
             .Should().NotContain(f => f.Key == Ks4EnglishLanguage.Filters.PupilCharacteristic.Key);
@@ -3985,7 +3991,9 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("100001", "Test School", x => x.Secondary()));
 
-        var response = await _sut.Execute(Request("100001", includePupilCharacteristicFilter: false));
+        DisablePupilCharacteristicFilter();
+
+        var response = await _sut.Execute(Request("100001"));
 
         response.EnglishLiterature.Filters
             .Should().NotContain(f => f.Key == Ks4EnglishLiterature.Filters.PupilCharacteristic.Key);
@@ -4125,7 +4133,9 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("100001", "Test School", x => x.Secondary()));
 
-        var response = await _sut.Execute(Request("100001", includePupilCharacteristicFilter: false));
+        DisablePupilCharacteristicFilter();
+
+        var response = await _sut.Execute(Request("100001"));
 
         response.Maths.Filters
             .Should().NotContain(f => f.Key == Ks4Maths.Filters.PupilCharacteristic.Key);
@@ -4265,7 +4275,9 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("100001", "Test School", x => x.Secondary()));
 
-        var response = await _sut.Execute(Request("100001", includePupilCharacteristicFilter: false));
+        DisablePupilCharacteristicFilter();
+
+        var response = await _sut.Execute(Request("100001"));
 
         response.CombinedScience.Filters
             .Should().NotContain(f => f.Key == Ks4CombinedScience.Filters.PupilCharacteristic.Key);
@@ -4431,7 +4443,9 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("100001", "Test School", x => x.Secondary()));
 
-        var response = await _sut.Execute(Request("100001", includePupilCharacteristicFilter: false));
+        DisablePupilCharacteristicFilter();
+
+        var response = await _sut.Execute(Request("100001"));
 
         response.Biology.Filters
             .Should().NotContain(f => f.Key == Ks4Biology.Filters.PupilCharacteristic.Key);
@@ -4597,7 +4611,9 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("100001", "Test School", x => x.Secondary()));
 
-        var response = await _sut.Execute(Request("100001", includePupilCharacteristicFilter: false));
+        DisablePupilCharacteristicFilter();
+
+        var response = await _sut.Execute(Request("100001"));
 
         response.Chemistry.Filters
             .Should().NotContain(f => f.Key == Ks4Chemistry.Filters.PupilCharacteristic.Key);
@@ -4757,6 +4773,19 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
             .Be(Ks4Physics.Filters.PupilCharacteristic.Values.AllPupils);
     }
 
-    private GetSchoolKs4CoreSubjectsMeasuresRequest Request(string urn, Dictionary<string, string>? filterBy = null, bool includePupilCharacteristicFilter = true) =>
-            new(urn, filterBy ?? [], includePupilCharacteristicFilter);
+    private void DisablePupilCharacteristicFilter() =>
+        _featureFlagService.Ks4CoreSubjectsPupilCharacteristicsEnabled = false;
+
+    private GetSchoolKs4CoreSubjectsMeasuresRequest Request(string urn, Dictionary<string, string>? filterBy = null) =>
+            new(urn, filterBy ?? []);
+
+    private sealed class StubFeatureFlagService : IFeatureFlagService
+    {
+        public bool Ks4CoreSubjectsPupilCharacteristicsEnabled { get; set; } = true;
+
+        public Task<bool> IsEnabledAsync(string featureName) =>
+            Task.FromResult(
+                featureName == Flags.EnableKs4CoreSubjectsPupilCharacteristics
+                && Ks4CoreSubjectsPupilCharacteristicsEnabled);
+    }
 }
