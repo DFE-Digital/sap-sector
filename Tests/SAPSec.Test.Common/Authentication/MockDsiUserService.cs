@@ -3,7 +3,9 @@ using System.Security.Claims;
 
 namespace SAPSec.Test.Common.Authentication;
 
-public class MockDsiUserService : IUserService
+public class MockDsiUserService(
+    TestUserOrganisation? testUserOrganisation = null,
+    TestUserRoles? testUserRoles = null) : IUserService
 {
     private string _currentOrganisationId = "org-123";
 
@@ -39,6 +41,19 @@ public class MockDsiUserService : IUserService
             return Task.FromResult<User?>(null);
         }
 
+        if (testUserOrganisation?.Override is { } organisation)
+        {
+            return Task.FromResult<User?>(new User
+            {
+                Sub = _defaultUser.Sub,
+                Email = _defaultUser.Email,
+                GivenName = _defaultUser.GivenName,
+                FamilyName = _defaultUser.FamilyName,
+                Name = _defaultUser.Name,
+                Organisations = [organisation]
+            });
+        }
+
         return Task.FromResult<User?>(_defaultUser);
     }
 
@@ -49,7 +64,12 @@ public class MockDsiUserService : IUserService
             return Task.FromResult<Organisation?>(null);
         }
 
-        var org = _defaultUser.Organisations.FirstOrDefault(o => o.Id == _currentOrganisationId)
+        if (testUserOrganisation?.Override is { } organisation)
+        {
+            return Task.FromResult<Organisation?>(organisation);
+        }
+
+        var org =_defaultUser.Organisations.FirstOrDefault(o => o.Id == _currentOrganisationId)
                   ?? _defaultUser.Organisations.FirstOrDefault();
 
         return Task.FromResult(org);
@@ -103,6 +123,11 @@ public class MockDsiUserService : IUserService
 
     public bool HasRole(ClaimsPrincipal principal, string role)
     {
+        if (testUserRoles is not null && principal?.Identity?.IsAuthenticated == true)
+        {
+            return testUserRoles.Roles.Contains(role);
+        }
+
         return principal?.IsInRole(role) == true;
     }
 }

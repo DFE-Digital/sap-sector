@@ -9,6 +9,11 @@ public class PaginationViewModel
     public int PageSize { get; set; } = 10;
     public string? Query { get; set; }
     public string[]? LocalAuthorities { get; set; }
+
+    /// <summary>
+    /// Page links go to this path with a page query string. When null, links go to find-a-school search.
+    /// </summary>
+    public string? BasePath { get; set; }
     public bool SecondaryOnly { get; set; } = true;
     public bool SimilarSchoolsOnly { get; set; } = true;
 

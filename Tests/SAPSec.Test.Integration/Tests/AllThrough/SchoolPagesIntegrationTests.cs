@@ -716,11 +716,11 @@ public class SchoolPagesIntegrationTests(
         var homeBreadcrumb = page.QuerySelector(".govuk-breadcrumbs__link");
         homeBreadcrumb.Should().NotBeNull();
         homeBreadcrumb!.TextContent.Trim().Should().Be("Home");
-        homeBreadcrumb.GetAttribute("href").Should().Be(Routes.FindASchool());
+        homeBreadcrumb.GetAttribute("href").Should().Be(Routes.UserHome);
     }
 
     [Fact]
-    public async Task OverviewPage_HomeBreadcrumb_LinksToFindASchool()
+    public async Task OverviewPage_HomeBreadcrumb_LinksToUserHome()
     {
         SetupAllThroughSchool();
         Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(Build.PrimaryGroup(Urn, ["100002"]));
@@ -730,7 +730,7 @@ public class SchoolPagesIntegrationTests(
         var homeBreadcrumb = page.QuerySelector(".govuk-breadcrumbs__link");
         homeBreadcrumb.Should().NotBeNull();
         homeBreadcrumb!.TextContent.Trim().Should().Be("Home");
-        homeBreadcrumb.GetAttribute("href").Should().Be(Routes.FindASchool());
+        homeBreadcrumb.GetAttribute("href").Should().Be(Routes.UserHome);
     }
 
     [Fact]
