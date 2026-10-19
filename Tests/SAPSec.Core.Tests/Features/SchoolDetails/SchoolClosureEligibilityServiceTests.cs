@@ -3,17 +3,25 @@ using Moq;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
+using SAPSec.Test.Common.Time;
+using System.Globalization;
 
 namespace SAPSec.Core.Tests.Features.SchoolDetails;
 
-public class SchoolClosureEligibilityServiceTests
+public class SchoolClosureEligibilityServiceTests : IDisposable
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
+    private readonly MockCurrentTimeProvider _timeProvider = new();
     private readonly SchoolClosureEligibilityService _sut;
 
     public SchoolClosureEligibilityServiceTests()
     {
-        _sut = new SchoolClosureEligibilityService(_establishmentRepo, Mock.Of<ILogger<SchoolClosureEligibilityService>>());
+        _sut = new SchoolClosureEligibilityService(_establishmentRepo, _timeProvider, Mock.Of<ILogger<SchoolClosureEligibilityService>>());
+    }
+
+    public void Dispose()
+    {
+        _timeProvider.ClearOverride();
     }
 
     [Fact]
@@ -38,28 +46,46 @@ public class SchoolClosureEligibilityServiceTests
         result.ShowClosedSchoolBanner.Should().BeTrue();
     }
 
-    [Fact]
-    public async Task ClosedSchool_WithinFourYearWindowAndNoSuccessor_IsEligibleAndShowsBanner()
+    [Theory]
+    // 13th Sept 2023 - most recent cutoff date is 12th Sept 2027
+    [InlineData("13-09-2023", "13-09-2027", false)]
+    [InlineData("13-09-2023", "12-09-2027", false)]
+    [InlineData("13-09-2023", "11-09-2027", true)]
+    [InlineData("13-09-2023", "13-09-2026", true)]
+    [InlineData("13-09-2023", "12-09-2026", true)]
+    [InlineData("13-09-2023", "11-09-2026", true)]
+    [InlineData("13-09-2023", "13-09-2025", true)]
+    [InlineData("13-09-2023", "12-09-2025", true)]
+    [InlineData("13-09-2023", "11-09-2025", true)]
+    // 12th Sept 2023 - most recent cutoff date is 12th Sept 2027
+    [InlineData("12-09-2023", "13-09-2027", false)]
+    [InlineData("12-09-2023", "12-09-2027", false)]
+    [InlineData("12-09-2023", "11-09-2027", true)]
+    [InlineData("12-09-2023", "13-09-2026", true)]
+    [InlineData("12-09-2023", "12-09-2026", true)]
+    [InlineData("12-09-2023", "11-09-2026", true)]
+    [InlineData("12-09-2023", "13-09-2025", true)]
+    [InlineData("12-09-2023", "12-09-2025", true)]
+    [InlineData("12-09-2023", "11-09-2025", true)]
+    // 11th Sept 2023 - most recent cutoff date is 12th Sept 2026
+    [InlineData("11-09-2023", "13-09-2027", false)]
+    [InlineData("11-09-2023", "12-09-2027", false)]
+    [InlineData("11-09-2023", "11-09-2027", false)]
+    [InlineData("11-09-2023", "13-09-2026", false)]
+    [InlineData("11-09-2023", "12-09-2026", false)]
+    [InlineData("11-09-2023", "11-09-2026", true)]
+    [InlineData("11-09-2023", "13-09-2025", true)]
+    [InlineData("11-09-2023", "12-09-2025", true)]
+    [InlineData("11-09-2023", "11-09-2025", true)]
+    public async Task ClosedSchool_WithCloseDateAndNoSuccessor_IsEligibleAndShowsBannerIfClosedWithinCutoff(string closeDate, string now, bool expectedEligibility)
     {
-        var recentCloseDate = DateTime.UtcNow.AddYears(-1).ToString("dd-MM-yyyy");
-        var establishment = Build.Establishment("123456", "Test Academy", x => x.Closed(recentCloseDate));
+        _timeProvider.Override(DateTime.ParseExact(now, SchoolClosureEligibilityRule.CloseDateFormat, CultureInfo.InvariantCulture));
+        var establishment = Build.Establishment("123456", "Test Academy", x => x.Closed(closeDate));
 
         var result = await _sut.EvaluateAsync(establishment);
 
-        result.IsEligibleForDisplay.Should().BeTrue();
-        result.ShowClosedSchoolBanner.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task ClosedSchool_BeyondFourYearWindow_IsNotEligibleAndDoesNotShowBanner()
-    {
-        var longAgoCloseDate = DateTime.UtcNow.AddYears(-5).ToString("dd-MM-yyyy");
-        var establishment = Build.Establishment("123456", "Test Academy", x => x.Closed(longAgoCloseDate));
-
-        var result = await _sut.EvaluateAsync(establishment);
-
-        result.IsEligibleForDisplay.Should().BeFalse();
-        result.ShowClosedSchoolBanner.Should().BeFalse();
+        result.IsEligibleForDisplay.Should().Be(expectedEligibility);
+        result.ShowClosedSchoolBanner.Should().Be(expectedEligibility);
     }
 
     [Fact]
