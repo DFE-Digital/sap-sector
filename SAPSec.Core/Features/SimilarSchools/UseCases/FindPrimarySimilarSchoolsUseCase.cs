@@ -14,7 +14,8 @@ public class FindPrimarySimilarSchoolsUseCase(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsPrimaryRepository similarSchoolsRepository,
     IKs2PerformanceRepository performanceRepository,
-    IAbsenceRepository absenceRepository)
+    IAbsenceRepository absenceRepository,
+    IExclusionsRepository exclusionsRepository)
     : IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>
 {
     public async Task<FindPrimarySimilarSchoolsResponse> Execute(FindPrimarySimilarSchoolsRequest request)
@@ -23,7 +24,8 @@ public class FindPrimarySimilarSchoolsUseCase(
             establishmentRepository,
             similarSchoolsRepository,
             performanceRepository,
-            absenceRepository);
+            absenceRepository,
+            exclusionsRepository);
 
         var data = await dataProvider.GetData(request.CurrentSchoolUrn);
 

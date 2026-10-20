@@ -24,3 +24,6 @@ oa_percent_3term_sch_202425_ccss
 pa_percent_3term_sch_202223_ccss
 pa_percent_3term_sch_202324_ccss
 pa_percent_3term_sch_202425_ccss
+
+# Exclusions sources
+exc_school

@@ -2,6 +2,7 @@
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Data.Dto.Exclusions;
 using SAPSec.Test.Common.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools;
@@ -12,6 +13,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemoryKs2PerformanceRepository _performanceRepo;
     private readonly InMemoryAbsenceRepository _absenceRepo;
+    private readonly InMemoryExclusionsRepository _exclusionsRepo;
     private readonly FindPrimarySimilarSchoolsUseCase _sut;
 
     public FindPrimarySimilarSchoolsUseCaseTests()
@@ -20,12 +22,14 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         _similarSchoolsRepo = new();
         _performanceRepo = new(_establishmentRepo);
         _absenceRepo = new(_establishmentRepo);
+        _exclusionsRepo = new(_establishmentRepo);
 
         _sut = new FindPrimarySimilarSchoolsUseCase(
             _establishmentRepo,
             _similarSchoolsRepo,
             _performanceRepo,
-            _absenceRepo);
+            _absenceRepo,
+            _exclusionsRepo);
     }
 
     [Fact]
@@ -151,7 +155,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         // Numeric range filters do not have options so they are always included
         response.FilterOptions.Select(f => f.Key)
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -169,7 +173,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         // Numeric range filters do not have options so they are always included
         response.FilterOptions.Select(f => f.Key)
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -417,7 +421,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -473,7 +480,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -494,7 +504,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         response.FilterOptions.Select(f => f.Key)
             // Numeric range filters are always included
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -526,7 +536,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -549,7 +562,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -590,7 +606,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -702,7 +721,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -745,7 +767,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -766,7 +791,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         response.FilterOptions.Select(f => f.Key)
             // Numeric range filters are always included
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -798,7 +823,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -835,7 +863,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -949,7 +980,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -992,7 +1026,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1013,7 +1050,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         response.FilterOptions.Select(f => f.Key)
             // Numeric range filters are always included
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -1045,7 +1082,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1082,7 +1122,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1197,7 +1240,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1240,7 +1286,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1261,7 +1310,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         response.FilterOptions.Select(f => f.Key)
             // Numeric range filters are always included
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -1293,7 +1342,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1330,7 +1382,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             // Numeric range filters are always included
             f => f.Key.Should().Be("sciu"),
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1539,7 +1594,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Other numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1574,7 +1632,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Other numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1603,7 +1664,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Other numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1700,7 +1764,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1744,7 +1811,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1766,7 +1836,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         response.FilterOptions.Select(f => f.Key)
             // Numeric range filters are always included
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -1799,7 +1869,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1837,7 +1910,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1922,7 +1998,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1965,7 +2044,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -1986,7 +2068,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         response.FilterOptions.Select(f => f.Key)
             // Numeric range filters are always included
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -2019,7 +2101,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2056,7 +2141,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2154,7 +2242,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2193,7 +2284,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2214,7 +2308,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         response.FilterOptions.Select(f => f.Key)
             // Numeric range filters are always included
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -2247,7 +2341,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2285,7 +2382,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2383,7 +2483,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2422,7 +2525,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2443,7 +2549,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         response.FilterOptions.Select(f => f.Key)
             // Numeric range filters are always included
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -2476,7 +2582,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2514,7 +2623,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2645,7 +2757,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2702,7 +2817,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2725,7 +2843,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         response.FilterOptions.Select(f => f.Key)
             // Numeric range filters are always included
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -2760,7 +2878,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2799,7 +2920,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2907,7 +3031,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2949,7 +3076,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -2970,7 +3100,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         response.FilterOptions.Select(f => f.Key)
             // Numeric range filters are always included
-            .Should().Equal("sciu", "oar", "par");
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
     }
 
     [Fact]
@@ -3003,7 +3133,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -3041,7 +3174,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             }),
             // Numeric range filters are always included
             f => f.Key.Should().Be("oar"),
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -3255,7 +3391,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
                 To = new { Key = "oar_t", Value = "51" },
             }),
             // Other numeric range filters are always included
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -3297,7 +3436,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
                 To = new { Key = "oar_t", Value = expectedToValue },
             }),
             // Other numeric range filters are always included
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -3335,7 +3477,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
                     : DataWithAvailability.Available(expectedCurrentSchoolValue)
             }),
             // Other numeric range filters are always included
-            f => f.Key.Should().Be("par")
+            f => f.Key.Should().Be("par"),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -3549,7 +3694,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
                 CurrentSchoolValue = DataWithAvailability.Available("48.0%"),
                 From = new { Key = "par_f", Value = "50" },
                 To = new { Key = "par_t", Value = "51" },
-            })
+            }),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -3591,7 +3739,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
                 CurrentSchoolValue = DataWithAvailability.Available("48.0%"),
                 From = new { Key = "par_f", Value = expectedFromValue },
                 To = new { Key = "par_t", Value = expectedToValue },
-            })
+            }),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
@@ -3629,10 +3780,254 @@ public class FindPrimarySimilarSchoolsUseCaseTests
                 CurrentSchoolValue = expectedCurrentSchoolValue is null
                     ? DataWithAvailability.NotAvailable<string>()
                     : DataWithAvailability.Available(expectedCurrentSchoolValue)
-            })
+            }),
+            f => f.Key.Should().Be("sr"),
+            f => f.Key.Should().Be("pps"),
+            f => f.Key.Should().Be("per")
         );
     }
 
+
+    private static EstablishmentExclusions Exclusions(string urn, string filterKey, string value) => filterKey switch
+    {
+        "sr" => new() { Id = urn, Susp_Tot_Est_Current_Pct = value },
+        "pps" => new() { Id = urn, OnePlusSusp_Tot_Est_Current_Pct = value },
+        "per" => new() { Id = urn, PermExcl_Tot_Est_Current_Pct = value },
+        _ => throw new ArgumentOutOfRangeException(nameof(filterKey))
+    };
+
+    [Theory]
+    [InlineData("sr", "1", "2", new[] { "100004", "100005", "100006" })]
+    [InlineData("pps", "1", "2", new[] { "100004", "100005", "100006" })]
+    [InlineData("per", "1", "2", new[] { "100004", "100005", "100006" })]
+    // Empty From is treated as 0
+    [InlineData("sr", "", "2", new[] { "100002", "100003", "100004", "100005", "100006" })]
+    // Empty To is treated as 999
+    [InlineData("pps", "1", "", new[] { "100004", "100005", "100006", "100007", "100008" })]
+    // Otherwise valid decimals starting with a decimal point are parsed correctly
+    [InlineData("per", ".4", ".6", new[] { "100002" })]
+    // Both empty does not apply the filter
+    [InlineData("sr", "", "", new[] { "100002", "100003", "100004", "100005", "100006", "100007", "100008" })]
+    public async Task FilterBy_ExclusionRates(string filterKey, string from, string to, string[] expectedUrns)
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" },
+            new() { URN = "100004" },
+            new() { URN = "100005" },
+            new() { URN = "100006" },
+            new() { URN = "100007" },
+            new() { URN = "100008" }
+        );
+        _exclusionsRepo.SetupEstablishmentExclusions(
+            Exclusions("100002", filterKey, "0.5"),
+            Exclusions("100003", filterKey, "0.99"),
+            Exclusions("100004", filterKey, "1.00"),
+            Exclusions("100005", filterKey, "1.01"),
+            Exclusions("100006", filterKey, "2.00"),
+            Exclusions("100007", filterKey, "2.01"),
+            Exclusions("100008", filterKey, "3")
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" },
+            new() { URN = "100001", NeighbourURN = "100006" },
+            new() { URN = "100001", NeighbourURN = "100007" },
+            new() { URN = "100001", NeighbourURN = "100008" }
+        );
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [filterKey + "_f"] = [from],
+            [filterKey + "_t"] = [to]
+        }));
+
+        response.ValidationErrors.Should().BeEmpty();
+        response.AllResults.Select(r => r.URN)
+            .Should().BeEquivalentTo(expectedUrns);
+    }
+
+    [Theory]
+    [InlineData("sr", "XXX", "", new[] { "sr_f:Enter a numeric value" })]
+    [InlineData("pps", "", "10..0", new[] { "pps_t:Enter a numeric value" })]
+    [InlineData("per", "XXX", "XXX", new[] { "per_f:Enter a numeric value", "per_t:Enter a numeric value" })]
+    [InlineData("sr", "20", "10", new[] { "sr:The From value must be lower than the To value" })]
+    [InlineData("pps", "5", "5", new[] { "pps:The From value must be lower than the To value" })]
+    [InlineData("per", "-1", "1000", new[] { "per_f:Enter a value between 0 and 999", "per_t:Enter a value between 0 and 999" })]
+    public async Task FilterBy_ExclusionRates_ValidationErrors(string filterKey, string from, string to, string[] expectedValidationErrors)
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" }
+        );
+        _exclusionsRepo.SetupEstablishmentExclusions(
+            Exclusions("100002", filterKey, "1"),
+            Exclusions("100003", filterKey, "30")
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" }
+        );
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [filterKey + "_f"] = [from],
+            [filterKey + "_t"] = [to]
+        }));
+
+        response.ValidationErrors.Select(e => $"{e.Key}:{e.Message}")
+            .Should().BeEquivalentTo(expectedValidationErrors);
+
+        response.FilterOptions.OfType<SimilarSchoolsNumericRangeAvailableFilter>()
+            .SelectMany(f => f.ValidationErrors.Select(e => $"{e.Key}:{e.Message}"))
+            .Should().BeEquivalentTo(expectedValidationErrors);
+    }
+
+    [Theory]
+    [InlineData("sr")]
+    [InlineData("pps")]
+    [InlineData("per")]
+    public async Task FilterBy_ExclusionRates_FiltersOutEstablishmentsWithMissingOrInvalidData(string filterKey)
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" },
+            new() { URN = "100004" },
+            new() { URN = "100005" }
+        );
+        _exclusionsRepo.SetupEstablishmentExclusions(
+            Exclusions("100002", filterKey, "1.5"),
+            Exclusions("100003", filterKey, ""),
+            Exclusions("100004", filterKey, "x")
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" }
+        );
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [filterKey + "_f"] = ["0"],
+            [filterKey + "_t"] = [""]
+        }));
+
+        response.AllResults.Select(r => r.URN)
+            .Should().BeEquivalentTo(["100002"]);
+    }
+
+    [Theory]
+    [InlineData("sr", "Suspension rate", "1.5", "1.50")]
+    [InlineData("pps", "Percentage of pupils suspended", "1.5", "1.50%")]
+    [InlineData("per", "Permanent exclusion rate", "0.123456", "0.12")]
+    [InlineData("sr", "Suspension rate", "x", null)]
+    [InlineData("pps", "Percentage of pupils suspended", "", null)]
+    public async Task FilterBy_ExclusionRates_FilterOptions(string filterKey, string expectedName, string currentSchoolValue, string? expectedCurrentSchoolValue)
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" }
+        );
+        _exclusionsRepo.SetupEstablishmentExclusions(
+            Exclusions("100001", filterKey, currentSchoolValue),
+            Exclusions("100002", filterKey, "1"),
+            Exclusions("100003", filterKey, "2")
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" }
+        );
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [filterKey + "_f"] = ["1.0099999"],
+            [filterKey + "_t"] = ["2"]
+        }));
+
+        response.FilterOptions.Select(f => f.Key)
+            .Should().Equal("sciu", "oar", "par", "sr", "pps", "per");
+        response.FilterOptions.Single(f => f.Key == filterKey).Should().BeEquivalentTo(new
+        {
+            Key = filterKey,
+            Name = expectedName,
+            CurrentSchoolValue = expectedCurrentSchoolValue is null
+                ? DataWithAvailability.NotAvailable<string>()
+                : DataWithAvailability.Available(expectedCurrentSchoolValue),
+            From = new { Key = filterKey + "_f", Value = "1.01" },
+            To = new { Key = filterKey + "_t", Value = "2" },
+        });
+    }
+
+    [Fact]
+    public async Task FilterBy_CombinesAttendanceAndExclusionFiltersWithLogicalAND()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" },
+            new() { URN = "100004" },
+            new() { URN = "100005" }
+        );
+        _absenceRepo.SetupEstablishmentAbsence(
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "5" },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "5" },
+            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "5" },
+            new() { Id = "100005", Abs_Tot_Est_Current_Pct = "20" }
+        );
+        _exclusionsRepo.SetupEstablishmentExclusions(
+            new() { Id = "100002", Susp_Tot_Est_Current_Pct = "1", OnePlusSusp_Tot_Est_Current_Pct = "1", PermExcl_Tot_Est_Current_Pct = "0" },
+            new() { Id = "100003", Susp_Tot_Est_Current_Pct = "10", OnePlusSusp_Tot_Est_Current_Pct = "1", PermExcl_Tot_Est_Current_Pct = "0" },
+            new() { Id = "100004", Susp_Tot_Est_Current_Pct = "1", OnePlusSusp_Tot_Est_Current_Pct = "1", PermExcl_Tot_Est_Current_Pct = "0.5" },
+            new() { Id = "100005", Susp_Tot_Est_Current_Pct = "1", OnePlusSusp_Tot_Est_Current_Pct = "1", PermExcl_Tot_Est_Current_Pct = "0" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" }
+        );
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            ["oar_t"] = ["10"],
+            ["sr_t"] = ["5"],
+            ["pps_f"] = ["0.5"],
+            ["per_t"] = ["0.1"]
+        }));
+
+        response.AllResults.Select(r => r.URN)
+            .Should().BeEquivalentTo(["100002"]);
+    }
+
+    [Fact]
+    public async Task FilterBy_ExclusionRates_WhenNoSchoolsMatch_ReturnsNoResults()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" }
+        );
+        _exclusionsRepo.SetupEstablishmentExclusions([
+            new() { Id = "100002", Susp_Tot_Est_Current_Pct = "1" }
+        ]);
+        _similarSchoolsRepo.SetupGroups([
+            new() { URN = "100001", NeighbourURN = "100002" }
+        ]);
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            ["sr_f"] = ["50"]
+        }));
+
+        response.HasSimilarSchools.Should().BeTrue();
+        response.AllResults.Should().BeEmpty();
+    }
     [Fact]
     public async Task SortBy_DefaultsToRwmExpected()
     {
