@@ -14,7 +14,8 @@ public class FindSecondarySimilarSchoolsUseCase(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
     IKs4PerformanceRepository performanceRepository,
-    IAbsenceRepository absenceRepository)
+    IAbsenceRepository absenceRepository,
+    IExclusionsRepository exclusionsRepository)
     : IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse>
 {
     public async Task<FindSecondarySimilarSchoolsResponse> Execute(FindSecondarySimilarSchoolsRequest request)
@@ -25,7 +26,8 @@ public class FindSecondarySimilarSchoolsUseCase(
             establishmentRepository,
             similarSchoolsRepository,
             performanceRepository,
-            absenceRepository);
+            absenceRepository,
+            exclusionsRepository);
 
         var data = await dataProvider.GetData(request.CurrentSchoolUrn);
         var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(data.CurrentSimilarSchool);
