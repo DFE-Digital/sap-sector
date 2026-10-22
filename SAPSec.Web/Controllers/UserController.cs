@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Authentication;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Controllers;
@@ -49,6 +50,13 @@ public class UserController(
             user.Organisations.Count);
 
         var org = await _userService.GetCurrentOrganisationAsync(User);
+        if (org is { IsEstablishment: true })
+        {
+            return RedirectToSchool(org, traceId, userId);
+        }
+
+        // Further starting pages (e.g. single academy trust, internal DfE users who may have no organisation)
+        // are added as branches above this.
         if (org is null)
         {
             _logger.LogError(
@@ -58,17 +66,29 @@ public class UserController(
             throw new InvalidOperationException($"Current organisation is null for user {userId}.");
         }
 
-        if (!org.IsEstablishment || org.Urn is null)
+        _logger.LogWarning(
+            "No starting page for user in /user/redirect; returning forbidden. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Category: {OrganisationCategory}. Urn: {OrganisationUrn}.",
+            traceId,
+            userId,
+            org.Id,
+            org.Name,
+            org.Category?.Name,
+            org.Urn);
+        return Forbid();
+    }
+
+    private IActionResult RedirectToSchool(Organisation org, string traceId, string userId)
+    {
+        if (org.Urn is null || !HasSupportedPhase(org))
         {
-            _logger.LogInformation(
-                "Redirecting from /user/redirect to find-a-school. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Category: {OrganisationCategory}. Urn: {OrganisationUrn}.",
+            _logger.LogWarning(
+                "School user has no supported school journey in /user/redirect. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. Urn: {OrganisationUrn}. Phase: {Phase}.",
                 traceId,
                 userId,
                 org.Id,
-                org.Name,
-                org.Category?.Name,
-                org.Urn);
-            return Redirect(Routes.FindASchool());
+                org.Urn,
+                org.PhaseOfEducation?.Name);
+            return NotFound();
         }
 
         _logger.LogInformation(
@@ -81,5 +101,13 @@ public class UserController(
             Routes.School(org.Urn, org.PhaseOfEducation?.Name));
 
         return Redirect(Routes.School(org.Urn, org.PhaseOfEducation?.Name));
+    }
+
+    private static bool HasSupportedPhase(Organisation org)
+    {
+        var phase = org.PhaseOfEducation?.Name;
+        return PhaseOfEducationValues.IsPrimary(phase)
+            || PhaseOfEducationValues.IsSecondary(phase)
+            || PhaseOfEducationValues.IsAllThrough(phase);
     }
 }

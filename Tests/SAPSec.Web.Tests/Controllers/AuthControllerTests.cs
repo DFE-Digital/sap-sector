@@ -25,7 +25,7 @@ public class AuthControllerTests
 
     private static class ExpectedRoutes
     {
-        public const string DefaultReturnUrl = Routes.FindASchoolBasePath;
+        public const string DefaultReturnUrl = Routes.UserHome;
         public const string HomeAction = "Index";
         public const string HomeController = "Home";
         public const string ErrorAction = "StatusCodeError";

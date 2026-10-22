@@ -63,7 +63,7 @@ public class HomeControllerTests
         result.Should().BeOfType<ViewResult>();
         var homeViewModel = (result as ViewResult)!.Model as HomeViewModel;
         homeViewModel.Should().NotBeNull();
-        homeViewModel.StartNowUri.Should().Be("/school-search");
+        homeViewModel.StartNowUri.Should().Be(SAPSec.Web.Constants.Routes.UserHome);
         homeViewModel.EnablePrimarySchools.Should().BeFalse();
     }
 }

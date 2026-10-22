@@ -1,5 +1,6 @@
 ﻿@using GovUk.Frontend.AspNetCore
 @using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SAPSec.Web.Authorization
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Extensions
 @using SAPSec.Web.TagHelpers
@@ -107,7 +108,7 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
                 <span class="govuk-service-navigation__service-name">
                     @Html.TrackedAnchor(
                         TrackedLinks.ServiceBanner,
-                        Routes.FindASchool(),
+                        User.Identity is { IsAuthenticated: true } ? Routes.UserHome : Routes.Home,
                         LayoutConstants.ServiceName,
                         classes: new[] { "govuk-service-navigation__link" })
                 </span>
@@ -121,7 +122,7 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
                             Menu
                         </button>
                         <ul class="govuk-service-navigation__list" id="navigation">
-                            <li class="govuk-service-navigation__item @(currentController == "SchoolSearch" ? "govuk-service-navigation__item--active" : "")">
+                            <li authorize-policy="@AuthorizationPolicies.SchoolAccess" class="govuk-service-navigation__item @(currentController == "SchoolSearch" ? "govuk-service-navigation__item--active" : "")">
                                 <a class="govuk-service-navigation__link"
                                     aria-current=@(currentController == "SchoolSearch" ? "page" : null)
                                     href="@Url.Action("Index", "SchoolSearch")">
