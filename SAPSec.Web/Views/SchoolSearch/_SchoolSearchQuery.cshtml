@@ -26,7 +26,7 @@
                     </div>
                 </div>
             }
-            <div class="govuk-form-group @(hasError ? "govuk-form-group--error" : string.Empty)">
+@*             <div class="govuk-form-group @(hasError ? "govuk-form-group--error" : string.Empty)"> *@
                 <h1 class="govuk-label-wrapper">
                     @* The "__" prefix matches the id accessible-autocomplete generates for the
                        visible combobox it swaps in for #Query once JS runs (school-search-suggester.js) *@
@@ -55,7 +55,7 @@
                         </ul>
                     </div>
                 </details>
-
+            <div class="govuk-form-group @(hasError ? "govuk-form-group--error" : string.Empty)">
                 <div id="@nameof(SchoolSearchQueryViewModel.Query)-hint" class="govuk-hint">
                     @SchoolSearchController.Hint
                 </div>
