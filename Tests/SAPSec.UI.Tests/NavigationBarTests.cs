@@ -112,7 +112,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         var href = await serviceNameLink.GetAttributeAsync("href");
 
         // Assert
-        href.Should().Be(Routes.FindASchool(), "Service name should link to home page");
+        href.Should().Be(Routes.UserHome, "Service name should link to home page");
     }
 
     #endregion
@@ -339,7 +339,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
 
         // Assert
         var url = new Uri(Page.Url);
-        url.AbsolutePath.Should().Be(Routes.FindASchool());
+        url.AbsolutePath.Should().Be(Routes.UserHome);
     }
 
     [Fact]
