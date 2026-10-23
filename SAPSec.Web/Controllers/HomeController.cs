@@ -18,7 +18,7 @@ public class HomeController(
     [DefaultBreadcrumb(PageTitles.ServiceHome)]
     public async Task<IActionResult> Index()
     {
-        var startNowUrl = environment.IsProduction() ? configuration.Value.SignInUri : Url.Action("Index", "SchoolSearch", null);
+        var startNowUrl = environment.IsProduction() ? configuration.Value.SignInUri : Routes.UserHome;
         var enablePrimarySchools = await featureFlagService.IsEnabledAsync(Flags.EnablePrimarySchools);
 
         return View(new HomeViewModel

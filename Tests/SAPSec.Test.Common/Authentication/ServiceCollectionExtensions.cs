@@ -8,6 +8,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddTestDsiDependencies(this IServiceCollection services)
     {
+        services.TryAddSingleton<TestUserOrganisation>();
         services.RemoveAll<IUserService>();
         services.RemoveAll<IDsiClient>();
         services.AddScoped<IUserService, MockDsiUserService>();

@@ -42,7 +42,7 @@ public class UserControllerTests
         {
             Id = "org-1",
             Name = "Primary School",
-            Category = new Category { Name = "Establishment" },
+            Category = new Category { Id = "001", Name = "Establishment" },
             Urn = "123456",
             PhaseOfEducation = new PhaseOfEducation { Name = "Primary" }
         };
@@ -70,7 +70,7 @@ public class UserControllerTests
         {
             Id = "org-2",
             Name = "Secondary School",
-            Category = new Category { Name = "Establishment" },
+            Category = new Category { Id = "001", Name = "Establishment" },
             Urn = "654321",
             PhaseOfEducation = new PhaseOfEducation { Name = "Secondary" }
         };
@@ -98,7 +98,7 @@ public class UserControllerTests
         {
             Id = "org-3",
             Name = "All-through School",
-            Category = new Category { Name = "Establishment" },
+            Category = new Category { Id = "001", Name = "Establishment" },
             Urn = "111111",
             PhaseOfEducation = new PhaseOfEducation { Name = "All-through" }
         };
