@@ -26,35 +26,34 @@
                     </div>
                 </div>
             }
-@*             <div class="govuk-form-group @(hasError ? "govuk-form-group--error" : string.Empty)"> *@
-                <h1 class="govuk-label-wrapper">
-                    @* The "__" prefix matches the id accessible-autocomplete generates for the
-                       visible combobox it swaps in for #Query once JS runs (school-search-suggester.js) *@
-                    <label class="govuk-label govuk-label--xl" for="__@nameof(SchoolSearchQueryViewModel.Query)">
-                        @ViewData[ViewDataKeys.Title]
-                    </label>
-                </h1>
-                <p class="govuk-body govuk-heading-m govuk-!-padding-top-6">
-                    Find schools in England to check their performance against similar schools
-                as well as national and local authority averages.</p>
+            <h1 class="govuk-label-wrapper">
+                @* The "__" prefix matches the id accessible-autocomplete generates for the
+                    visible combobox it swaps in for #Query once JS runs (school-search-suggester.js) *@
+                <label class="govuk-label govuk-label--xl" for="__@nameof(SchoolSearchQueryViewModel.Query)">
+                    @ViewData[ViewDataKeys.Title]
+                </label>
+            </h1>
+            <p class="govuk-body govuk-heading-m govuk-!-padding-top-6">
+                Find schools in England to check their performance against similar schools
+            as well as national and local authority averages.</p>
 
-                <details class="govuk-details app-schools-not-included-details" data-module="govuk-details">
-                    <summary class="govuk-details__summary">
-                        <span class="govuk-details__summary-text">Schools not included in this service</span>
-                    </summary>
-                    <div class="govuk-details__text">
-                        <p class="govuk-body-s govuk-!-margin-bottom-2">
-                            You cannot use this service to find data about:
-                        </p>
-                        <ul class="govuk-list govuk-list--bullet govuk-!-font-size-16 govuk-!-margin-bottom-2 app-measure-copy-list">
-                            <li>schools outside England</li>
-                            <li>schools that are due to open</li>
-                            <li>schools that are not mainstream state-funded primary, secondary, middle or all-through schools</li>
-                            <li>schools that do not assess pupils, for example nursery and infant schools that do not cover key stage 2</li>
-                            <li>schools that closed, or changed school type, more than 3 academic years ago</li>
-                        </ul>
-                    </div>
-                </details>
+            <details class="govuk-details app-schools-not-included-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Schools not included in this service</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-2">
+                        You cannot use this service to find data about:
+                    </p>
+                    <ul class="govuk-list govuk-list--bullet govuk-!-font-size-16 govuk-!-margin-bottom-2 app-measure-copy-list">
+                        <li>schools outside England</li>
+                        <li>schools that are due to open</li>
+                        <li>schools that are not mainstream state-funded primary, secondary, middle or all-through schools</li>
+                        <li>schools that do not assess pupils, for example nursery and infant schools that do not cover key stage 2</li>
+                        <li>schools that closed, or changed school type, more than 3 academic years ago</li>
+                    </ul>
+                </div>
+            </details>
             <div class="govuk-form-group @(hasError ? "govuk-form-group--error" : string.Empty)">
                 <div id="@nameof(SchoolSearchQueryViewModel.Query)-hint" class="govuk-hint">
                     @SchoolSearchController.Hint
