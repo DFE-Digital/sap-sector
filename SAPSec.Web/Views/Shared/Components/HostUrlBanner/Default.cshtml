@@ -1,0 +1,17 @@
+@if (Context.Items["ShowHostUrlBanner"] is true)
+{
+    <div class="govuk-notification-banner govuk-!-margin-bottom-5" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                Important
+            </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">
+                The web address for this service has changed.
+            </p>
+                Use the new Compare and connect with similar schools web address <br/>
+                <a class="govuk-notification-banner__link" href="https://compare-connect-similar-schools.education.gov.uk">https://compare-connect.similar-schools.education.gov.uk/</a>    
+        </div>
+    </div>
+}

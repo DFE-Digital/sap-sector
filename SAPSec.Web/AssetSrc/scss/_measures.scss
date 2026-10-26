@@ -16,6 +16,14 @@ $app-measure-color-track: #f3f2f1;
   --chart-color-england: #4b9b7d;
 }
 
+.app-schools-not-included-details {
+    margin-bottom: 20px !important;
+
+    .govuk-details__summary-text {
+        text-decoration: none;
+    }
+}
+
 .app-measure-section {
   background: $app-measure-color-panel-bg;
   padding: 16px;
