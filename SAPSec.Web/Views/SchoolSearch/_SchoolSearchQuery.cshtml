@@ -9,8 +9,9 @@
 }
 @using (Html.BeginForm(FormMethod.Post, true, new { novalidate = "novalidate", role = "search" }))
 {
-    <div class="govuk-grid-row">
+    <div class="govuk-grid-row govuk-!-padding-top-4">
         <div class="govuk-grid-column-two-thirds">
+            @await Component.InvokeAsync("HostUrlBanner")
             @if (hasError)
             {
                 <div class="govuk-error-summary" data-module="govuk-error-summary">
