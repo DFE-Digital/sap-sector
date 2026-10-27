@@ -269,6 +269,36 @@ public static class Measures
         {
             public const string Key = "attainment8";
             public const string Name = "Attainment 8";
+
+            public static class Filters
+            {
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks4Attainment8.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
+            }
         }
 
         public static class Ks4EnglishMaths
@@ -291,6 +321,33 @@ public static class Measures
                         public static readonly FilterValueDefinition[] AllValues = [
                             new(Grade4AndAbove, "Grade 4 and above"),
                             new(Grade5AndAbove, "Grade 5 and above")
+                        ];
+                    }
+                }
+
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks4EnglishMaths.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
                         ];
                     }
                 }
@@ -324,6 +381,31 @@ public static class Measures
                         ];
                     }
                 }
+
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks4Destinations.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                        ];
+                    }
+                }
             }
         }
 
@@ -352,6 +434,33 @@ public static class Measures
                         ];
                     }
                 }
+
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks4EnglishLanguage.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
             }
         }
 
@@ -377,6 +486,33 @@ public static class Measures
                             new(Grade4AndAbove, "Grade 4 and above"),
                             new(Grade5AndAbove, "Grade 5 and above"),
                             new(Grade7AndAbove, "Grade 7 and above")
+                        ];
+                    }
+                }
+
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks4EnglishLiterature.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
                         ];
                     }
                 }
@@ -436,6 +572,33 @@ public static class Measures
                         ];
                     }
                 }
+
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks4Chemistry.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
             }
         }
 
@@ -464,6 +627,34 @@ public static class Measures
                         ];
                     }
                 }
+
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks4Physics.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
+
             }
         }
 
@@ -492,6 +683,34 @@ public static class Measures
                         ];
                     }
                 }
+
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks4Maths.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
+
             }
         }
 
@@ -517,6 +736,33 @@ public static class Measures
                             new(Grade44AndAbove, "Grade 4-4 and above"),
                             new(Grade55AndAbove, "Grade 5-5 and above"),
                             new(Grade77AndAbove, "Grade 7-7 and above")
+                        ];
+                    }
+                }
+
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks4CombinedScience.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
                         ];
                     }
                 }
