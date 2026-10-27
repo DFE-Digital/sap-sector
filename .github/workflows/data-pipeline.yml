@@ -35,7 +35,8 @@ permissions:
 jobs:
   ingest:
     name: Ingest Raw Data & Build Warehouse (${{ matrix.target_env }})
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest is Ubuntu 26.04, where the Microsoft apt repository has no powershell package yet
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
