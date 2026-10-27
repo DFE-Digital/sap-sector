@@ -121,3 +121,11 @@ variable "gcp_table_deletion_protection" {
   description = "Prevents deletion of the event table. Default: true"
   default     = true
 }
+
+variable "redis_managed_cache_sku_name" { default = "Balanced_B1" }
+
+variable "deploy_managed_redis" {
+  type        = bool
+  default     = false
+  description = "Deploy Azure Managed Redis cache"
+}
