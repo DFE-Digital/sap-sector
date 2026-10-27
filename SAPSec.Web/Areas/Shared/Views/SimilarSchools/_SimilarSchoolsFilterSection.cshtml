@@ -1,6 +1,7 @@
 @using SAPSec.Core.Filtering
 @using SAPSec.Core.Features.SimilarSchools
 @using SAPSec.Core.Features.SimilarSchools.UseCases
+@using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools
 @using SAPSec.Web.Constants;
 @using SAPSec.Web.Helpers;
 
@@ -56,6 +57,18 @@
             {
                 <p class="govuk-hint">Percentage of pupils who miss 10% of sessions or more for any reason</p>
             }
+            else if (Model.Key.Equals("sr", StringComparison.InvariantCultureIgnoreCase))
+            {
+                <p class="govuk-hint">Number of suspensions per 100 pupils</p>
+            }
+            else if (Model.Key.Equals("pps", StringComparison.InvariantCultureIgnoreCase))
+            {
+                <p class="govuk-hint">Percentage of pupils who were suspended at least once in a year</p>
+            }
+            else if (Model.Key.Equals("per", StringComparison.InvariantCultureIgnoreCase))
+            {
+                <p class="govuk-hint">Number of permanent exclusions per 100 pupils</p>
+            }
 
             @if (Model is SimilarSchoolsSingleValueAvailableFilter single)
             {
@@ -108,11 +121,14 @@
 
                 var fromError = range.ValidationErrors.Any(v => v.Key == range.From.Key || v.Key == Model.Key);
                 var toError = range.ValidationErrors.Any(v => v.Key == range.To.Key || v.Key == Model.Key);
+                var inputWrapperClasses = SimilarSchoolsViewModelHelpers.IsPercentageRange(Model.Key)
+                    ? "app-filter-range__input"
+                    : "app-filter-range__input app-filter-range__input--no-suffix";
 
                 <div class="app-filter-range">
                     <div class="app-filter-range__from">
                         <label class="govuk-label" for=@range.From.Key>From</label>
-                        <div class="app-filter-range__input">
+                        <div class="@inputWrapperClasses">
                             <input class="govuk-input @(fromError? "govuk-input--error" : "")"
                                    id=@range.From.Key
                                    name=@range.From.Key
@@ -122,7 +138,7 @@
                     </div>
                     <div class="app-filter-range__to">
                         <label class="govuk-label" for=@range.To.Key>To</label>
-                        <div class="app-filter-range__input">
+                        <div class="@inputWrapperClasses">
                             <input class="govuk-input @(toError? "govuk-input--error" : "")"
                                    id=@range.To.Key
                                    name=@range.To.Key

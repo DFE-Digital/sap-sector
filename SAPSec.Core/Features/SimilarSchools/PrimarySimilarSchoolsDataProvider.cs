@@ -11,7 +11,8 @@ internal class PrimarySimilarSchoolsDataProvider(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsPrimaryRepository similarSchoolsRepository,
     IKs2PerformanceRepository performanceRepository,
-    IAbsenceRepository absenceRepository)
+    IAbsenceRepository absenceRepository,
+    IExclusionsRepository exclusionsRepository)
 {
     public async Task<PrimarySimilarSchoolsSourceData> GetData(string currentSchoolUrn)
     {
@@ -39,10 +40,15 @@ internal class PrimarySimilarSchoolsDataProvider(
 
         var absences = (await absenceRepository.GetByUrnsAsync(urns))
             .ToDictionary(absence => absence.Urn, StringComparer.Ordinal);
+        var exclusions = (await exclusionsRepository.GetByUrnsAsync(urns))
+            .ToDictionary(exclusion => exclusion.Urn, StringComparer.Ordinal);
         var performances = (await performanceRepository.GetByUrnsAsync(urns))
             .ToDictionary(performance => performance.Urn, StringComparer.Ordinal);
 
-        var currentSimilarSchool = SimilarSchool.FromData(currentEstablishment, absences.GetValueOrDefault(currentSchoolUrn)?.EstablishmentAbsence);
+        var currentSimilarSchool = SimilarSchool.FromData(
+            currentEstablishment,
+            absences.GetValueOrDefault(currentSchoolUrn)?.EstablishmentAbsence,
+            exclusions.GetValueOrDefault(currentSchoolUrn)?.EstablishmentExclusions);
 
         var similarSchools = groups
             .Select(group =>
@@ -58,7 +64,10 @@ internal class PrimarySimilarSchoolsDataProvider(
                 }
 
                 return new SimilarSchoolSortItem<EstablishmentPerformance>(
-                    SimilarSchool.FromData(establishment, absences.GetValueOrDefault(group.NeighbourURN)?.EstablishmentAbsence),
+                    SimilarSchool.FromData(
+                        establishment,
+                        absences.GetValueOrDefault(group.NeighbourURN)?.EstablishmentAbsence,
+                        exclusions.GetValueOrDefault(group.NeighbourURN)?.EstablishmentExclusions),
                     performances.GetValueOrDefault(group.NeighbourURN)?.EstablishmentPerformance);
             })
             .Where(school => school is not null)
