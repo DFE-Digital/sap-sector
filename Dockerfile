@@ -59,6 +59,7 @@ WORKDIR /app
 # Fix security vulnerabilities in base image
 # - gnupg2/gpgv: Out-of-bounds Write (SNYK-UBUNTU2404-GNUPG2-14849555)
 # - zlib1g, libpam*: Previously identified vulnerabilities
+# - openssl/libssl3t64: CVE-2026-84782 (SNYK-UBUNTU2404-OPENSSL-20267014)
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends \
         gnupg2 \
@@ -67,7 +68,9 @@ RUN apt-get update && \
         libpam0g \
         libpam-modules \
         libpam-modules-bin \
-        libpam-runtime && \
+        libpam-runtime \
+        openssl \
+        libssl3t64 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
