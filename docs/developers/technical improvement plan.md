@@ -1,6 +1,6 @@
 # `sap-sector` Technical Improvement Plan
 
-**Author:** Based on GSII Testability Review v0.1 ([aahmed-dfe/school-profiles-design-feedback](https://github.com/aahmed-dfe/school-profiles-design-feedback))
+**Author:** Based on CCSS Testability Review v0.1 ([aahmed-dfe/school-profiles-design-feedback](https://github.com/aahmed-dfe/school-profiles-design-feedback))
 **Last Updated:** June 2026
 **Status:** Living document
 

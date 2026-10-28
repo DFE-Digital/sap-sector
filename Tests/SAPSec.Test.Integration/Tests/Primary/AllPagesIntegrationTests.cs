@@ -75,7 +75,7 @@ public class AllPagesIntegrationTests(
         var page = await Fixture.RequestPageAsync(path);
 
         var expectedTitle = isComparisonPage ? "Test School 2" : expectedTitleOverride ?? expectedHeading;
-        page.Title.Should().Be($"{expectedTitle} - Get school improvement insights - GOV.UK");
+        page.Title.Should().Be($"{expectedTitle} - Compare and connect with similar schools - GOV.UK");
 
         var h1 = page.QuerySelector("h1.govuk-heading-xl");
         h1.Should().NotBeNull();
