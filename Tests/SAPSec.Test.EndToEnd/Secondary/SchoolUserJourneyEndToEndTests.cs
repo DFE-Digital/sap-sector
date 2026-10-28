@@ -20,7 +20,7 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
     private const string ComparatorSchoolUrn = "141617";
     private const string ComparatorSchoolName = "The Hurlingham Academy";
     private const string OtherSchoolUrn = ComparatorSchoolUrn;
-    private const string AccessDeniedHeading = "You do not have access to Get school improvement insights";
+    private const string AccessDeniedHeading = "You do not have access to Compare and connect with similar schools";
 
     private readonly EndToEndTestsFixture _fixture = fixture;
 
