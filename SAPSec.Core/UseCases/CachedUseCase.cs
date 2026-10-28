@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Http;
-using SAPSec.Core.UseCases;
+using SAPSec.Core.Caching;
 using System.Collections;
 using System.Reflection;
 
-namespace SAPSec.Core;
+namespace SAPSec.Core.UseCases;
 
 public class CachedUseCase<TRequest, TResponse>(IUseCase<TRequest, TResponse> useCase, ICache cache)
     : IUseCase<TRequest, TResponse>

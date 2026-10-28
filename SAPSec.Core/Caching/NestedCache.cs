@@ -1,4 +1,4 @@
-namespace SAPSec.Core;
+namespace SAPSec.Core.Caching;
 
 public class NestedCache(ICache outerCache, ICache innerCache) : ICache
 {
