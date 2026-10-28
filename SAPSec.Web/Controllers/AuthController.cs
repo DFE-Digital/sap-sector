@@ -4,16 +4,19 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Authentication;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Controllers;
 
 [Route("auth")]
 public class AuthController(
     IUserService userService,
-    ILogger<AuthController> logger) : Controller
+    ILogger<AuthController> logger,
+    IStartPageService startPageService) : Controller
 {
     private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
     private readonly ILogger<AuthController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly IStartPageService _startPageService = startPageService ?? throw new ArgumentNullException(nameof(startPageService));
 
     private static class Routes
     {
@@ -29,14 +32,14 @@ public class AuthController(
 
     [HttpGet(Routes.SignIn)]
     [AllowAnonymous]
-    public IActionResult SignIn(string? returnUrl = null)
+    public async Task<IActionResult> SignIn(string? returnUrl = null)
     {
         if (IsUserAuthenticated())
         {
             return RedirectToLocal(returnUrl);
         }
 
-        return ChallengeWithRedirect(returnUrl);
+        return await ChallengeWithRedirect(returnUrl);
     }
 
     [HttpGet(Routes.SignOut)]
@@ -71,11 +74,11 @@ public class AuthController(
         return _userService.IsAuthenticated(User);
     }
 
-    private IActionResult ChallengeWithRedirect(string? returnUrl)
+    private async Task<IActionResult> ChallengeWithRedirect(string? returnUrl)
     {
         var properties = new AuthenticationProperties
         {
-            RedirectUri = returnUrl ?? Constants.Routes.UserHome
+            RedirectUri = returnUrl ?? await _startPageService.GetStartUrlAsync()
         };
 
         return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);

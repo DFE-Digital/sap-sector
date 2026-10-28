@@ -10,6 +10,7 @@ using Moq;
 using SAPSec.Core.Authentication;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
+using SAPSec.Web.Services;
 using System.Security.Claims;
 
 namespace SAPSec.Web.Tests.Deprecated.Controllers;
@@ -22,6 +23,7 @@ public class AuthControllerTests
     private readonly Mock<IUrlHelper> _mockUrlHelper;
     private readonly Mock<IAuthenticationService> _mockAuthService;
     private readonly Mock<ISession> _mockSession;
+    private readonly Mock<IStartPageService> _mockStartPage;
 
     private static class ExpectedRoutes
     {
@@ -39,8 +41,10 @@ public class AuthControllerTests
         _mockAuthService = new Mock<IAuthenticationService>();
         _mockUrlHelper = new Mock<IUrlHelper>();
         _mockSession = new Mock<ISession>();
+        _mockStartPage = new Mock<IStartPageService>();
+        _mockStartPage.Setup(s => s.GetStartUrlAsync(It.IsAny<bool>())).ReturnsAsync(Routes.UserHome);
 
-        _controller = new AuthController(_mockUserService.Object, _mockLogger.Object);
+        _controller = new AuthController(_mockUserService.Object, _mockLogger.Object, _mockStartPage.Object);
 
         SetupControllerContext();
     }
@@ -76,7 +80,7 @@ public class AuthControllerTests
     [Fact]
     public void Constructor_WithNullUserService_ThrowsArgumentNullException()
     {
-        var action = () => new AuthController(null!, _mockLogger.Object);
+        var action = () => new AuthController(null!, _mockLogger.Object, _mockStartPage.Object);
         action.Should().Throw<ArgumentNullException>()
             .WithParameterName("userService");
     }
@@ -84,7 +88,7 @@ public class AuthControllerTests
     [Fact]
     public void Constructor_WithNullLogger_ThrowsArgumentNullException()
     {
-        var action = () => new AuthController(_mockUserService.Object, null!);
+        var action = () => new AuthController(_mockUserService.Object, null!, _mockStartPage.Object);
         action.Should().Throw<ArgumentNullException>()
             .WithParameterName("logger");
     }
@@ -92,7 +96,7 @@ public class AuthControllerTests
     [Fact]
     public void Constructor_WithValidDependencies_CreatesInstance()
     {
-        var controller = new AuthController(_mockUserService.Object, _mockLogger.Object);
+        var controller = new AuthController(_mockUserService.Object, _mockLogger.Object, _mockStartPage.Object);
         controller.Should().NotBeNull();
     }
 
@@ -101,13 +105,13 @@ public class AuthControllerTests
     #region SignIn Tests
 
     [Fact]
-    public void SignIn_WhenUserAlreadyAuthenticated_WithLocalReturnUrl_RedirectsToReturnUrl()
+    public async Task SignIn_WhenUserAlreadyAuthenticated_WithLocalReturnUrl_RedirectsToReturnUrl()
     {
         var returnUrl = "/dashboard";
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
         _mockUrlHelper.Setup(u => u.IsLocalUrl(returnUrl)).Returns(true);
 
-        var result = _controller.SignIn(returnUrl);
+        var result = await _controller.SignIn(returnUrl);
 
         result.Should().BeOfType<RedirectResult>();
         var redirectResult = result as RedirectResult;
@@ -115,11 +119,11 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public void SignIn_WhenUserAlreadyAuthenticated_WithNullReturnUrl_RedirectsToHome()
+    public async Task SignIn_WhenUserAlreadyAuthenticated_WithNullReturnUrl_RedirectsToHome()
     {
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
 
-        var result = _controller.SignIn(null);
+        var result = await _controller.SignIn(null);
 
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
@@ -128,11 +132,11 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public void SignIn_WhenUserAlreadyAuthenticated_WithEmptyReturnUrl_RedirectsToHome()
+    public async Task SignIn_WhenUserAlreadyAuthenticated_WithEmptyReturnUrl_RedirectsToHome()
     {
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
 
-        var result = _controller.SignIn(string.Empty);
+        var result = await _controller.SignIn(string.Empty);
 
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
@@ -141,13 +145,13 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public void SignIn_WhenUserAlreadyAuthenticated_WithExternalUrl_RedirectsToHome()
+    public async Task SignIn_WhenUserAlreadyAuthenticated_WithExternalUrl_RedirectsToHome()
     {
         var externalUrl = "https://malicious-site.com";
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
         _mockUrlHelper.Setup(u => u.IsLocalUrl(externalUrl)).Returns(false);
 
-        var result = _controller.SignIn(externalUrl);
+        var result = await _controller.SignIn(externalUrl);
 
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
@@ -156,11 +160,11 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public void SignIn_WhenUserNotAuthenticated_ReturnsChallengeResult()
+    public async Task SignIn_WhenUserNotAuthenticated_ReturnsChallengeResult()
     {
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(false);
 
-        var result = _controller.SignIn("/returnUrl");
+        var result = await _controller.SignIn("/returnUrl");
 
         result.Should().BeOfType<ChallengeResult>();
         var challengeResult = result as ChallengeResult;
@@ -168,12 +172,12 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public void SignIn_WhenUserNotAuthenticated_WithReturnUrl_SetsCorrectRedirectUri()
+    public async Task SignIn_WhenUserNotAuthenticated_WithReturnUrl_SetsCorrectRedirectUri()
     {
         var returnUrl = "/custom/path";
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(false);
 
-        var result = _controller.SignIn(returnUrl);
+        var result = await _controller.SignIn(returnUrl);
 
         result.Should().BeOfType<ChallengeResult>();
         var challengeResult = result as ChallengeResult;
@@ -181,11 +185,11 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public void SignIn_WhenUserNotAuthenticated_UsesOpenIdConnectScheme()
+    public async Task SignIn_WhenUserNotAuthenticated_UsesOpenIdConnectScheme()
     {
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(false);
 
-        var result = _controller.SignIn(null);
+        var result = await _controller.SignIn(null);
 
         result.Should().BeOfType<ChallengeResult>();
         var challengeResult = result as ChallengeResult;
@@ -319,12 +323,12 @@ public class AuthControllerTests
     [InlineData("https://external.com")]
     [InlineData("//evil.com")]
     [InlineData("http://malicious.org/path")]
-    public void SignIn_AuthenticatedUser_WithExternalUrl_RedirectsToHome(string externalUrl)
+    public async Task SignIn_AuthenticatedUser_WithExternalUrl_RedirectsToHome(string externalUrl)
     {
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
         _mockUrlHelper.Setup(u => u.IsLocalUrl(externalUrl)).Returns(false);
 
-        var result = _controller.SignIn(externalUrl);
+        var result = await _controller.SignIn(externalUrl);
 
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
@@ -336,12 +340,12 @@ public class AuthControllerTests
     [InlineData("/local/path")]
     [InlineData("/dashboard")]
     [InlineData(Routes.FindASchoolBasePath)]
-    public void SignIn_AuthenticatedUser_WithLocalUrl_RedirectsToLocalUrl(string localUrl)
+    public async Task SignIn_AuthenticatedUser_WithLocalUrl_RedirectsToLocalUrl(string localUrl)
     {
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
         _mockUrlHelper.Setup(u => u.IsLocalUrl(localUrl)).Returns(true);
 
-        var result = _controller.SignIn(localUrl);
+        var result = await _controller.SignIn(localUrl);
 
         result.Should().BeOfType<RedirectResult>();
         var redirectResult = result as RedirectResult;
@@ -353,12 +357,12 @@ public class AuthControllerTests
     #region Edge Cases
 
     [Fact]
-    public void SignIn_WithSpecialCharactersInReturnUrl_ProcessesCorrectly()
+    public async Task SignIn_WithSpecialCharactersInReturnUrl_ProcessesCorrectly()
     {
         var specialUrl = "/path?query=value&other=123";
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(false);
 
-        var result = _controller.SignIn(specialUrl);
+        var result = await _controller.SignIn(specialUrl);
 
         result.Should().BeOfType<ChallengeResult>();
         var challengeResult = result as ChallengeResult;
