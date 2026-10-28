@@ -6,6 +6,7 @@
 @using SAPSec.Web.TagHelpers
 @using SAPSec.Web.Configuration
 @inject Microsoft.Extensions.Options.IOptions<AnalyticsSettings> AnalyticsOptions
+@inject SAPSec.Web.Services.IStartPageService StartPage
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var analytics = AnalyticsOptions.Value;
@@ -108,7 +109,7 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
                 <span class="govuk-service-navigation__service-name">
                     @Html.TrackedAnchor(
                         TrackedLinks.ServiceBanner,
-                        User.Identity is { IsAuthenticated: true } ? Routes.UserHome : Routes.Home,
+                        await StartPage.GetStartUrlAsync(User.Identity is { IsAuthenticated: true }),
                         LayoutConstants.ServiceName,
                         classes: new[] { "govuk-service-navigation__link" })
                 </span>

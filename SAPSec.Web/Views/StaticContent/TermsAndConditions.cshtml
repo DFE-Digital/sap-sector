@@ -4,7 +4,7 @@
 }
 
 @section Breadcrumbs {
-    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+    <nav authorize-policy="@SAPSec.Web.Authorization.AuthorizationPolicies.BreadcrumbNavigation" class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
         <ol class="govuk-breadcrumbs__list">
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolSearch")">Home</a>

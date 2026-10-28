@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Routing;
 using SAPSec.Core.Authentication;
+using SAPSec.Core.FeatureFlags;
 
 namespace SAPSec.Web.Authorization;
 
 public class SchoolAccessHandler(
     IUserService userService,
+    IFeatureFlagService featureFlagService,
     ILogger<SchoolAccessHandler> logger)
     : AuthorizationHandler<SchoolAccessRequirement>
 {
@@ -18,6 +19,12 @@ public class SchoolAccessHandler(
             return;
         }
 
+        if (await featureFlagService.IsEnabledAsync(Flags.EnableFindASchool))
+        {
+            context.Succeed(requirement);
+            return;
+        }
+
         var org = await userService.GetCurrentOrganisationAsync(context.User);
         if (org is null)
         {
@@ -27,7 +34,6 @@ public class SchoolAccessHandler(
             return;
         }
 
-        // Only school users are restricted so far; other organisation types are handled by their own stories.
         if (!org.IsEstablishment)
         {
             context.Succeed(requirement);

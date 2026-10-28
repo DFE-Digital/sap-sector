@@ -1,5 +1,6 @@
 using FluentAssertions;
 using SAPSec.Core.Authentication;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
@@ -22,6 +23,7 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
 
     public Task DisposeAsync()
     {
+        fixture.FeatureFlagService.ClearOverrides(Flags.EnableFindASchool);
         fixture.TestUser.Reset();
         return Task.CompletedTask;
     }
@@ -103,16 +105,18 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
     }
 
     [Theory]
+    [InlineData("")]
     [InlineData("Nursery")]
-    [InlineData("16 plus")]
+    [InlineData("Middle deemed secondary")]
     [InlineData("Not applicable")]
-    public async Task UserHome_AsSchoolUserWithUnsupportedPhase_ReturnsNotFound(string phase)
+    public async Task UserHome_AsSchoolUserWithUnrecognisedPhase_StillReachesTheSchoolsRealPage(string phase)
     {
         fixture.TestUser.Phase = phase;
 
-        var response = await fixture.NonRedirectingClient.GetAsync(Routes.UserHome);
+        var response = await fixture.Client.GetAsync(Routes.UserHome);
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.RequestMessage!.RequestUri!.AbsolutePath.Should().Be(Routes.SecondarySchool(OwnUrn).Overview);
     }
 
     [Fact]
@@ -196,5 +200,130 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
+
     #endregion
+
+    #region Breadcrumbs
+
+    public static TheoryData<string> BreadcrumbPages() =>
+    [
+        Routes.SecondarySchool("105574").Overview,
+        Routes.SecondarySchool("105574").KS4HeadlineMeasures,
+        Routes.SecondarySchool("105574").ViewSimilarSchools,
+        Routes.SecondarySchool("105574").WhatIsASimilarSchool,
+        Routes.SecondarySchool("105574").SchoolDetails,
+        "/cookies",
+        Routes.TermsAndConditions
+    ];
+
+    [Theory]
+    [MemberData(nameof(BreadcrumbPages))]
+    public async Task Pages_AsSchoolUser_DoNotShowBreadcrumbs(string path)
+    {
+        var response = await fixture.Client.GetAsync(path);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotContain("govuk-breadcrumbs");
+    }
+
+    [Theory]
+    [MemberData(nameof(BreadcrumbPages))]
+    public async Task Pages_AsNonSchoolUser_StillShowBreadcrumbs(string path)
+    {
+        fixture.TestUser.Reset();
+
+        var response = await fixture.Client.GetAsync(path);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("govuk-breadcrumbs");
+    }
+
+    [Fact]
+    public async Task ComparisonPage_AsSchoolUser_HasBackButtonButNoBreadcrumbs()
+    {
+        fixture.TestUser.Urn = OtherUrn;
+
+        var response = await fixture.Client.GetAsync(
+            Routes.SecondarySchool(OtherUrn).Comparison("137621").KS4HeadlineMeasures);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotContain("govuk-breadcrumbs");
+        content.Should().Contain("govuk-back-link");
+        System.Text.RegularExpressions.Regex.IsMatch(content, @"govuk-back-link[^>]*>\s*View similar schools\s*<")
+            .Should().BeTrue("the back link names the page it returns to");
+        content.Should().Contain(Routes.SecondarySchool(OtherUrn).ViewSimilarSchools);
+    }
+
+    #endregion
+
+    #region Feature flag off
+
+    [Fact]
+    public async Task WhenRestrictionsAreSwitchedOff_SchoolUserCanStillUseFindASchool()
+    {
+        fixture.FeatureFlagService.Override(Flags.EnableFindASchool, true);
+
+        var response = await fixture.NonRedirectingClient.GetAsync(Routes.FindASchool());
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task WhenRestrictionsAreSwitchedOff_SchoolUserCanOpenAnotherSchool_AndSeesFindASchoolInNavigation()
+    {
+        fixture.FeatureFlagService.Override(Flags.EnableFindASchool, true);
+
+        var response = await fixture.Client.GetAsync(Routes.SecondarySchool(OtherUrn).Overview);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("Find a school");
+    }
+
+    [Fact]
+    public async Task ServiceName_WhenFindASchoolIsEnabled_LinksToFindASchool_ForEveryone()
+    {
+        fixture.FeatureFlagService.Override(Flags.EnableFindASchool, true);
+
+        var schoolUser = await fixture.Client.GetStringAsync(SchoolOverviewPath);
+        fixture.TestUser.Reset();
+        var otherUser = await fixture.Client.GetStringAsync(SchoolOverviewPath);
+
+        ServiceNameHref(schoolUser).Should().Be(Routes.FindASchool());
+        ServiceNameHref(otherUser).Should().Be(Routes.FindASchool());
+    }
+
+    [Fact]
+    public async Task WhenRestrictionsAreSwitchedOff_SchoolUserStillSeesBreadcrumbs()
+    {
+        fixture.FeatureFlagService.Override(Flags.EnableFindASchool, true);
+
+        var response = await fixture.Client.GetAsync(SchoolOverviewPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        content.Should().Contain("govuk-breadcrumbs");
+    }
+
+    [Fact]
+    public async Task WhenRestrictionsAreSwitchedOff_UserHomeRoutesAsBefore()
+    {
+        fixture.FeatureFlagService.Override(Flags.EnableFindASchool, true);
+
+        var schoolUser = await fixture.NonRedirectingClient.GetAsync(Routes.UserHome);
+        fixture.TestUser.Reset();
+        var otherUser = await fixture.NonRedirectingClient.GetAsync(Routes.UserHome);
+
+        schoolUser.Headers.Location!.OriginalString.Should().Be(Routes.PrimarySchool(OwnUrn).Overview);
+        otherUser.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        otherUser.Headers.Location!.OriginalString.Should().Be(Routes.FindASchool());
+    }
+
+
+    #endregion
+
+    private static string ServiceNameHref(string content) =>
+        System.Text.RegularExpressions.Regex.Match(content, @"govuk-service-navigation__service-name"">\s*<a[^>]*href=""([^""]*)""").Groups[1].Value;
 }

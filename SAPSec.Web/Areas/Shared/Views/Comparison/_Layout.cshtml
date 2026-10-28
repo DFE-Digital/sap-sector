@@ -1,5 +1,7 @@
 @using SAPSec.Web.Areas.Shared.ViewModels.Comparison
 @using SAPSec.Web.Constants
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -8,6 +10,8 @@
     var layout = ViewData[ViewDataKeys.ComparisonLayout] as ComparisonLayoutModel;
     ViewData[ViewDataKeys.Title] = layout!.ComparatorSchool.Name;
 
+    // Without breadcrumbs (school users) the back link names where it goes.
+    var showBreadcrumbs = (await AuthorizationService.AuthorizeAsync(User, SAPSec.Web.Authorization.AuthorizationPolicies.BreadcrumbNavigation)).Succeeded;
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
     string active(ComparisonNavigationItem item) => item.ActiveActionNames.Contains(currentAction ?? string.Empty)
         ? "govuk-service-navigation__item--active"
@@ -15,7 +19,7 @@
 }
 
 @section Breadcrumbs {
-    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile school-comparison-breadcrumb" aria-label="Breadcrumb">
+    <nav authorize-policy="@SAPSec.Web.Authorization.AuthorizationPolicies.BreadcrumbNavigation" class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile school-comparison-breadcrumb" aria-label="Breadcrumb">
         <ol class="govuk-breadcrumbs__list">
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link" href="@Routes.FindASchool()">Home</a>
@@ -32,7 +36,7 @@
 <div class="govuk-grid-row app-comparison-pages">
     <div class="app-side-navigation-container">
         <a class="govuk-back-link" href="@layout.ViewSimilarSchoolsUrl">
-            Back
+            @(showBreadcrumbs ? "Back" : "View similar schools")
         </a>
     </div>
 

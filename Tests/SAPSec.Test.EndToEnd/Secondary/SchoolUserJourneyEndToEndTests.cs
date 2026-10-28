@@ -58,6 +58,35 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
         await Expect(navigation.GetByText("Sign out")).ToBeVisibleAsync();
     }
 
+    [Theory]
+    [InlineData("/school/secondary/100052")]
+    [InlineData("/school/secondary/100052/ks4-headline-measures")]
+    [InlineData("/school/secondary/100052/view-similar-schools")]
+    [InlineData("/school/secondary/100052/what-is-a-similar-school")]
+    [InlineData("/cookies")]
+    [InlineData("/terms-and-conditions")]
+    public async Task Pages_DoNotShowBreadcrumbs(string path)
+    {
+        await NavigateTo(path);
+
+        await Expect(Page.Locator(".govuk-breadcrumbs")).ToHaveCountAsync(0);
+    }
+
+    [Fact]
+    public async Task ComparisonPage_ShowsBackButton_NotBreadcrumbs_AndBackReturnsToSimilarSchools()
+    {
+        await NavigateTo(Routes.SecondarySchool(OwnSchoolUrn).Comparison(ComparatorSchoolUrn).Similarity);
+
+        await Expect(Page.Locator(".govuk-breadcrumbs")).ToHaveCountAsync(0);
+        var back = Page.Locator("a.govuk-back-link");
+        await Expect(back).ToBeVisibleAsync();
+        await Expect(back).ToHaveTextAsync("View similar schools");
+
+        await back.ClickAsync();
+
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(OwnSchoolUrn).ViewSimilarSchools);
+    }
+
     [Fact]
     public async Task ServiceName_ReturnsToOwnSchoolOverview()
     {

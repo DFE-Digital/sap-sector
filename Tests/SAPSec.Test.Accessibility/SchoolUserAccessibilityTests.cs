@@ -114,6 +114,37 @@ public class SchoolUserAccessibilityTests(AccessibilityTestsFixture fixture) : A
     }
 
     [Theory]
+    [MemberData(nameof(OwnSchoolPages))]
+    public async Task OwnSchoolPages_DoNotShowBreadcrumbs(string urn, string phase, string path)
+    {
+        SignInAsSchool(urn, phase);
+        await NavigateTo(path);
+
+        var breadcrumbs = await Page.Locator(".govuk-breadcrumbs").CountAsync();
+
+        breadcrumbs.Should().Be(0, "school users must not see the breadcrumb navigation");
+    }
+
+    [Theory]
+    [InlineData("/cookies")]
+    [InlineData("/terms-and-conditions")]
+    public async Task StaticPages_AsSchoolUser_HaveNoBreadcrumbs_AndPassAxeAccessibilityChecks(string path)
+    {
+        SignInAsSchool(SecondaryUrn, "Secondary");
+        await NavigateTo(path);
+
+        (await Page.Locator(".govuk-breadcrumbs").CountAsync()).Should().Be(0);
+
+        var results = await Page.RunAxe();
+        var seriousViolations = results.Violations
+            .Where(v => v.Impact == "critical" || v.Impact == "serious")
+            .ToList();
+
+        seriousViolations.Should().BeEmpty(
+            $"Found violations: {string.Join(", ", seriousViolations.Select(v => v.Description))}");
+    }
+
+    [Theory]
     [MemberData(nameof(DeniedPages))]
     public async Task AccessDeniedPage_PassesAxeAccessibilityChecks(string path)
     {

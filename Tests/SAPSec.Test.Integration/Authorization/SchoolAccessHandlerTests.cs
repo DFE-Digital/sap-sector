@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using SAPSec.Core.Authentication;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Test.Common.Authentication;
 using SAPSec.Web.Authorization;
 using System.Security.Claims;
@@ -18,6 +19,8 @@ public class SchoolAccessHandlerTests
         CategoryId = OrganisationCategoryIds.Establishment,
         Urn = OwnUrn
     };
+
+    private bool _restrictionsEnabled = true;
 
     [Theory]
     [InlineData(OwnUrn, true)]
@@ -68,6 +71,19 @@ public class SchoolAccessHandlerTests
         context.HasSucceeded.Should().BeTrue();
     }
 
+    [Theory]
+    [InlineData("108088")]
+    [InlineData("")]
+    public async Task WhenRestrictionsAreSwitchedOff_SchoolUserIsNotRestricted(string requestedUrn)
+    {
+        _restrictionsEnabled = false;
+        var context = CreateContext(HttpContextWithUrn(requestedUrn));
+
+        await CreateHandler().HandleAsync(context);
+
+        context.HasSucceeded.Should().BeTrue();
+    }
+
     [Fact]
     public async Task WhenUserIsNotAuthenticated_DoesNotSucceed()
     {
@@ -80,7 +96,12 @@ public class SchoolAccessHandlerTests
     }
 
     private SchoolAccessHandler CreateHandler() =>
-        new(new MockDsiUserService(_testUser), NullLogger<SchoolAccessHandler>.Instance);
+        new(new MockDsiUserService(_testUser), new FixedFeatureFlagService(enabled: !_restrictionsEnabled), NullLogger<SchoolAccessHandler>.Instance);
+
+    private sealed class FixedFeatureFlagService(bool enabled) : IFeatureFlagService
+    {
+        public Task<bool> IsEnabledAsync(string featureName) => Task.FromResult(enabled);
+    }
 
     private static AuthorizationHandlerContext CreateContext(object? resource) =>
         new([new SchoolAccessRequirement()], new ClaimsPrincipal(new ClaimsIdentity([new Claim("sub", "user-1")], "TestAuth")), resource);
