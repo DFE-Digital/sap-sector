@@ -1,4 +1,5 @@
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Pagination;
 using SAPSec.Core.Sorting;
@@ -104,8 +105,7 @@ public class SimilarSchoolsPageViewModel
         SchoolInfo currentSchool,
         IReadOnlyCollection<SortOption> sortOptions,
         IReadOnlyCollection<SimilarSchoolsAvailableFilter> filterOptions,
-        IPagedCollection<SimilarSchoolResult> resultsPage,
-        IReadOnlyCollection<SimilarSchoolResult> allResults,
+        ResultsPage<SimilarSchoolResult> resultsPage,
         IReadOnlyCollection<ValidationError> validationErrors,
         string viewSimilarSchoolsUrl,
         string whatIsASimilarSchoolUrl,
@@ -117,11 +117,11 @@ public class SimilarSchoolsPageViewModel
         var filterBy = BuildCoreFilters(query);
         var currentFilters = ExtractCurrentFilters(query);
 
-        var schools = resultsPage
+        var schools = resultsPage.Items
             .Select(result => MapToViewModel(result, comparisonUrl))
             .ToList();
 
-        var allSchools = allResults
+        var allSchools = resultsPage.AllItems
             .Select(result => MapToViewModel(result, comparisonUrl))
             .ToList();
 
@@ -144,7 +144,7 @@ public class SimilarSchoolsPageViewModel
             ValidationErrors = validationErrors,
             CurrentPage = resultsPage.CurrentPage,
             PageSize = resultsPage.ItemsPerPage,
-            TotalResults = allResults.Count,
+            TotalResults = resultsPage.TotalCount,
             ViewSimilarSchoolsUrl = viewSimilarSchoolsUrl,
             WhatIsASimilarSchoolUrl = whatIsASimilarSchoolUrl
         };
