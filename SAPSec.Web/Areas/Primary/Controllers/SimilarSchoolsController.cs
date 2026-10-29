@@ -54,7 +54,6 @@ public class SimilarSchoolsController(
             response.SortOptions,
             response.FilterOptions,
             response.ResultsPage,
-            response.AllResults,
             response.ValidationErrors,
             Routes.PrimarySchool(urn).ViewSimilarSchools,
             Routes.PrimarySchool(urn).WhatIsASimilarSchool,

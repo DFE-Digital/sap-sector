@@ -18,10 +18,11 @@
     <PackageReference Include="Lucene.Net" Version="4.8.0-beta00017" />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00017" />
     <PackageReference Include="Lucene.Net.Highlighter" Version="4.8.0-beta00017" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.14" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql" Version="10.0.3" />
     <PackageReference Include="Sep" Version="0.11.5" />
+    <PackageReference Include="StackExchange.Redis" Version="3.4.20" />
   </ItemGroup>
 
   <ItemGroup>

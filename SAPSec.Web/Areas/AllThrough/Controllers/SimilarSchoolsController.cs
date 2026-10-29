@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.AllThrough.Services;
 using SAPSec.Web.Areas.AllThrough.ViewModels;
-using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Authorization;
+using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.ViewModels;
-using SAPSec.Core.FeatureFlags;
 
 namespace SAPSec.Web.Areas.AllThrough.Controllers;
 
@@ -65,7 +65,6 @@ public class SimilarSchoolsController(
                 response.SortOptions,
                 response.FilterOptions,
                 response.ResultsPage,
-                response.AllResults,
                 response.ValidationErrors,
                 selectedPhaseViewSimilarSchoolsUrl,
                 Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
@@ -87,7 +86,6 @@ public class SimilarSchoolsController(
                 response.SortOptions,
                 response.FilterOptions,
                 response.ResultsPage,
-                response.AllResults,
                 response.ValidationErrors,
                 selectedPhaseViewSimilarSchoolsUrl,
                 Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
