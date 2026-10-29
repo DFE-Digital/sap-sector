@@ -1,19 +1,38 @@
+using System.Text.Json;
+
 namespace SAPSec.Core.Caching;
 
 public class InMemoryCache : ICache
 {
-    private Dictionary<string, object?> _store = new();
+    private Dictionary<string, string?> _store = new();
 
-    public async Task<TItem> TryGet<TItem>(string key, Func<Task<TItem>> getItem)
+    public async Task<TValue> TryGet<TValue>(string key, Func<Task<TValue>> getValue)
     {
-        if (_store.TryGetValue(key, out var itemObject) && itemObject is TItem cachedItem)
+        if (_store.TryGetValue(key, out var json))
         {
-            return cachedItem;
+            try
+            {
+                if (json is not null && JsonSerializer.Deserialize<TValue>(json) is TValue cachedValue)
+                {
+                    return cachedValue;
+                }
+            }
+            catch (JsonException ex)
+            {
+                throw new ApplicationException($"Error deserializing cached value for key {key} to type {typeof(TValue).Name}: {ex.Message}{Environment.NewLine} {json}", ex);
+            }
         }
 
-        var item = await getItem();
-        _store[key] = item;
+        var value = await getValue();
+        _store[key] = JsonSerializer.Serialize(value);
 
-        return item;
+        return value;
+    }
+
+    public Task Clear()
+    {
+        _store.Clear();
+
+        return Task.CompletedTask;
     }
 }

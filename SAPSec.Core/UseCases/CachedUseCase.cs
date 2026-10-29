@@ -8,7 +8,7 @@ namespace SAPSec.Core.UseCases;
 public class CachedUseCase<TRequest, TResponse>(IUseCase<TRequest, TResponse> useCase, ICache cache)
     : IUseCase<TRequest, TResponse>
 {
-    public Task<TResponse> Execute(TRequest request)
+    public async Task<TResponse> Execute(TRequest request)
     {
         var properties = typeof(TRequest)
             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
@@ -17,7 +17,14 @@ public class CachedUseCase<TRequest, TResponse>(IUseCase<TRequest, TResponse> us
 
         var key = GetStringValue(request);
 
-        return cache.TryGet($"{useCase.GetType().FullName}:{key}", () => useCase.Execute(request));
+        var cachedResponse = await cache.TryGet($"{useCase.GetType().FullName}{key}", () => useCase.Execute(request));
+
+        if (cachedResponse is null)
+        {
+            throw new ApplicationException($"Cached response for use case {useCase.GetType().FullName} was null");
+        }
+
+        return cachedResponse;
     }
 
     private string GetStringValue(object? value)

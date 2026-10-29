@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SAPSec.Core.Caching;
 using SAPSec.Core.Features.Measures.Attendance;
@@ -69,12 +68,6 @@ public static class ServiceCollectionExtensions
         // Time
 
         services.AddSingleton<ICurrentTimeProvider, CurrentTimeProvider>();
-
-        // Cache
-
-        services.AddSingleton<ICache>(sp => new NestedCache(
-            new RequestCache(sp.GetRequiredService<IHttpContextAccessor>()),
-            new InMemoryCache()));
     }
 
     public static void AddServices(this IServiceCollection services)

@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
 using SAPSec.Core;
+using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
-using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
@@ -22,6 +22,7 @@ using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

@@ -2,5 +2,6 @@ namespace SAPSec.Core.Caching;
 
 public interface ICache
 {
-    Task<TItem> TryGet<TItem>(string key, Func<Task<TItem>> getItem);
+    Task<TValue> TryGet<TValue>(string key, Func<Task<TValue>> getValue);
+    Task Clear();
 }
