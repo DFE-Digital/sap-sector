@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService AuthorizationService
 
+@inject SAPSec.Web.Services.IStartPageService StartPage
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData[ViewDataKeys.SkipLinkTargetId] = "page-content";
@@ -22,7 +23,7 @@
     <nav authorize-policy="@SAPSec.Web.Authorization.AuthorizationPolicies.BreadcrumbNavigation" class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile school-comparison-breadcrumb" aria-label="Breadcrumb">
         <ol class="govuk-breadcrumbs__list">
             <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolSearch")">Home</a>
+                <a class="govuk-breadcrumbs__link" href="@(await StartPage.GetStartUrlAsync(User.Identity is { IsAuthenticated: true }))">Home</a>
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link"
