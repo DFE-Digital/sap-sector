@@ -41,7 +41,7 @@ public class CustomEventControllerTests
     [InlineData("mailto:test@example.com", "mailto_link_click")]
     public async Task CustomEventTracking_SendsCustomEvent(string url, string eventName)
     {
-        var clickData = new ClickData { LinkText = "text", LinkUrl = url };
+        var clickData = new ClickData { EventType = "link_click", LinkText = "text", LinkUrl = url };
 
         var result = await _sut.CustomEventTracking(clickData);
 
@@ -57,7 +57,7 @@ public class CustomEventControllerTests
     [InlineData("https://compare-connect-similar-schools-pr-240.test.teacherservices.cloud/school/123456")]
     public async Task PostCustomEventTracking_DoesNotSendEventForNonMatchingUrls(string url)
     {
-        var clickData = new ClickData { LinkText = "text", LinkUrl = url };
+        var clickData = new ClickData { EventType = "link_click", LinkText = "text", LinkUrl = url };
 
         var result = await _sut.CustomEventTracking(clickData);
 

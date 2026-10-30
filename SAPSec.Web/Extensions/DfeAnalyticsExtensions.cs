@@ -22,12 +22,7 @@ public static class DfeAnalyticsExtensions
             services.AddScoped<ICustomEventService, CustomEventService>();
         }
 
-        // TEMPORARY: "Test" added here alongside the auth bypass in Program.cs -
-        // real DfE Analytics (Dfe.Analytics.AspNetCore.DfeAnalyticsMiddleware)
-        // throws "BigQueryClient has not been configured" on every request,
-        // including /healthcheck, when valid GCP credentials aren't available.
-        // Also avoids polluting real test analytics with synthetic load-test
-        // traffic. Revert alongside the Program.cs auth bypass before merge.
+
         if (environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest") && !isLocalDevelopment)
         {
             services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
