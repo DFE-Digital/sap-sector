@@ -15,6 +15,8 @@ public class Program
         [$"{GeneratedSubFolder}\\LAAbsence"] = "Absence",
         [$"{GeneratedSubFolder}\\EnglandAbsence"] = "Absence",
 
+        [$"{GeneratedSubFolder}\\EstablishmentExclusions"] = "Exclusions",
+
         [$"{GeneratedSubFolder}\\EstablishmentDestinations"] = "KS4\\Destinations",
         [$"{GeneratedSubFolder}\\LADestinations"] = "KS4\\Destinations",
         [$"{GeneratedSubFolder}\\EnglandDestinations"] = "KS4\\Destinations",

@@ -1210,6 +1210,32 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
     }
 
     [Fact]
+    public async Task Destinations_TopPerfomers_RanksByValueToOneDecimalPlace()
+    {
+        // 3.4 and 2.9 both round to 3, so ranking on whole numbers would order them by name instead
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School CCC", x => x.Secondary()),
+            Build.Establishment("100002", "Test School AAA", x => x.Secondary()),
+            Build.Establishment("100003", "Test School BBB", x => x.Secondary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
+
+        _destinationsRepo.SetupEstablishmentDestinations(
+            Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "0.8", prev: "", prev2: "")),
+            Build.Ks4Destinations.Establishment("100002", x => x.WithAllDest(current: "2.9", prev: "", prev2: "")),
+            Build.Ks4Destinations.Establishment("100003", x => x.WithAllDest(current: "3.4", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        response.Destinations.TopPerformers.Should().BeEquivalentTo([
+            new TopPerformer(1, "100003", "Test School BBB", 3.4m, IsCurrentSchool: false),
+            new TopPerformer(2, "100002", "Test School AAA", 2.9m, IsCurrentSchool: false),
+            new TopPerformer(3, "100001", "Test School CCC", 0.8m, IsCurrentSchool: true)
+        ], options => options.WithStrictOrdering());
+    }
+
+    [Fact]
     public async Task Destinations_TopPerfomers_WhenNoPerformanceDataForSchool_SchoolDoesNotAppear()
     {
         _establishmentRepo.SetupEstablishments(

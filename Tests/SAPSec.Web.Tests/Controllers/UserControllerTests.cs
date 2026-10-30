@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Authentication;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using System.Security.Claims;
@@ -14,11 +15,13 @@ public class UserControllerTests
 {
     private readonly Mock<IUserService> _userService = new();
     private readonly Mock<ILogger<UserController>> _logger = new();
+    private readonly Mock<IFeatureFlagService> _featureFlagService = new();
     private readonly UserController _controller;
 
     public UserControllerTests()
     {
-        _controller = new UserController(_userService.Object, _logger.Object);
+        _controller = new UserController(_userService.Object, _featureFlagService.Object, _logger.Object);
+        _featureFlagService.Setup(x => x.IsEnabledAsync(Flags.EnableFindASchool)).ReturnsAsync(false);
         _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext
@@ -42,7 +45,7 @@ public class UserControllerTests
         {
             Id = "org-1",
             Name = "Primary School",
-            Category = new Category { Name = "Establishment" },
+            Category = new Category { Id = "001", Name = "Establishment" },
             Urn = "123456",
             PhaseOfEducation = new PhaseOfEducation { Name = "Primary" }
         };
@@ -70,7 +73,7 @@ public class UserControllerTests
         {
             Id = "org-2",
             Name = "Secondary School",
-            Category = new Category { Name = "Establishment" },
+            Category = new Category { Id = "001", Name = "Establishment" },
             Urn = "654321",
             PhaseOfEducation = new PhaseOfEducation { Name = "Secondary" }
         };
@@ -98,7 +101,7 @@ public class UserControllerTests
         {
             Id = "org-3",
             Name = "All-through School",
-            Category = new Category { Name = "Establishment" },
+            Category = new Category { Id = "001", Name = "Establishment" },
             Urn = "111111",
             PhaseOfEducation = new PhaseOfEducation { Name = "All-through" }
         };

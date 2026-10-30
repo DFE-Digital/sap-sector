@@ -1,4 +1,6 @@
 ﻿using SAPSec.Test.Accessibility.Setup;
+using Microsoft.Extensions.DependencyInjection;
+using SAPSec.Test.Common.Authentication;
 using Xunit;
 
 namespace SAPSec.Test.EndToEnd.Setup;
@@ -8,6 +10,9 @@ public class AccessibilityTestsFixture : IAsyncLifetime
     private AccessibilityTestsWebApplicationFactory? _factory;
 
     public string BaseUrl { get; private set; } = null!;
+
+    public TestUserOrganisation TestUser =>
+        _factory!.BrowserHostServices.GetRequiredService<TestUserOrganisation>();
 
     public Task InitializeAsync()
     {

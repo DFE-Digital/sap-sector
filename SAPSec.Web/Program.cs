@@ -12,6 +12,7 @@ using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Configuration;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
@@ -73,6 +74,7 @@ public class Program
         });
         builder.Services.AddFeatureManagement();
         builder.Services.AddSingleton<IFeatureFlagService, FeatureFlagService>();
+        builder.Services.AddSingleton<IStartPageService, StartPageService>();
         builder.Services.Configure<CustomEventLocations>(builder.Configuration.GetSection("CustomEventLocations"));
         builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
 
@@ -136,7 +138,17 @@ public class Program
             options.FallbackPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build();
+
+            options.AddPolicy(
+                AuthorizationPolicies.SchoolAccess,
+                policy => policy.RequireAuthenticatedUser().AddRequirements(new SchoolAccessRequirement()));
+
+            options.AddPolicy(
+                AuthorizationPolicies.BreadcrumbNavigation,
+                policy => policy.AddRequirements(new BreadcrumbNavigationRequirement()));
         });
+        builder.Services.AddScoped<IAuthorizationHandler, SchoolAccessHandler>();
+        builder.Services.AddScoped<IAuthorizationHandler, BreadcrumbNavigationHandler>();
 
         builder.Services.AddDfeAnalyticsDependencies(builder.Environment);
 
