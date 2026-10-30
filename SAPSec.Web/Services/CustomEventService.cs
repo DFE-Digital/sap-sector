@@ -11,20 +11,20 @@ namespace SAPSec.Web.Services;
 /// <param name="eventSender"></param>
 public class CustomEventService(IHttpContextAccessor httpContextAccessor, IEventSender eventSender) : ICustomEventService
 {
-    public async Task SendCustomEvent(ClickData clickData, string eventName)
+    public async Task SendCustomEvent(EventData eventData, string eventName)
     {
         var customEvent = eventSender.CreateEvent(eventName);
 
-        switch (clickData.EventType)
+        switch (eventData.EventType)
         {
-            case "linkClick":
-                customEvent.AddData(clickData.LinkText, clickData.LinkText);
+            case EventType.LinkClick:
+                customEvent.AddData(eventData.LinkText, eventData.LinkText);
                 break;
-            case "detailsClick":
-                customEvent.AddData(clickData.DetailsSectionName, clickData.DetailsSectionLabel, clickData.DetailsInteractionType);
+            case EventType.DetailsClick:
+                customEvent.AddData(eventData.DetailsSectionName, eventData.DetailsSectionLabel, eventData.DetailsInteractionType);
                 break;
             default:
-                throw new ArgumentException($"Unknown event type: {clickData.EventType}");
+                throw new ArgumentException($"Unknown event type: {eventData.EventType}");
         }
 
         await eventSender.SendEventAsync(customEvent);

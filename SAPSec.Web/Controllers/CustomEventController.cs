@@ -15,29 +15,21 @@ namespace SAPSec.Web.Controllers;
 [AllowAnonymous]
 public class CustomEventController(ICustomEventService customEventService, IOptions<CustomEventLocations> customEventLocations) : Controller
 {
-    private const string DetailsClick = "details_click";
-    private const string LinkClick = "link_click";
-
     [HttpPost("/custom-event-tracking")]
-    public async Task<IActionResult> CustomEventTracking([FromBody] ClickData clickData)
+    public async Task<IActionResult> CustomEventTracking([FromBody] EventData eventData)
     {
-        //if (clickData is null || string.IsNullOrWhiteSpace(clickData.EventType))
-        //{
-        //    return BadRequest("EventType is required.");
-        //}
-
-        switch (clickData.EventType)
+        switch (eventData.EventType)
         {
-            case DetailsClick:
-                await ProcessDetailsClick(clickData);
+            case EventType.DetailsClick:
+                await ProcessDetailsClick(eventData);
                 break;
 
-            case LinkClick:
-                await ProcessLinkClick(clickData);
+            case EventType.LinkClick:
+                await ProcessLinkClick(eventData);
                 break;
 
             default:
-                return BadRequest($"Unsupported event type: {clickData.EventType}");
+                return BadRequest($"Unsupported event type: {eventData.EventType}");
         }
 
         // Don't record the request from '/custom-event-tracking' as an additional web request event.
@@ -45,37 +37,37 @@ public class CustomEventController(ICustomEventService customEventService, IOpti
         return Ok();
     }
 
-    private async Task<IActionResult> ProcessDetailsClick(ClickData clickData)
+    private async Task<IActionResult> ProcessDetailsClick(EventData eventData)
     {
-        await customEventService.SendCustomEvent(clickData, "details_click");
+        await customEventService.SendCustomEvent(eventData, "details_click");
 
         await customEventService.IgnoreWebRequestEvent();
 
         return Ok();
     }
 
-    private async Task<IActionResult> ProcessLinkClick(ClickData clickData)
+    private async Task<IActionResult> ProcessLinkClick(EventData eventData)
     {
-        if (clickData.LinkUrl.StartsWith(customEventLocations.Value.FeedbackForm))
+        if (eventData.LinkUrl.StartsWith(customEventLocations.Value.FeedbackForm))
         {
-            clickData.LinkText = clickData.LinkUrl;
-            await customEventService.SendCustomEvent(clickData, "feedback_link_click");
+            eventData.LinkText = eventData.LinkUrl;
+            await customEventService.SendCustomEvent(eventData, "feedback_link_click");
 
             return Ok();
         }
 
-        if (clickData.LinkUrl.Contains(customEventLocations.Value.SignIn))
+        if (eventData.LinkUrl.Contains(customEventLocations.Value.SignIn))
         {
-            clickData.LinkText = clickData.LinkUrl;
-            await customEventService.SendCustomEvent(clickData, "cta_start_now_click");
+            eventData.LinkText = eventData.LinkUrl;
+            await customEventService.SendCustomEvent(eventData, "cta_start_now_click");
 
             return Ok();
         }
 
-        if (clickData.LinkUrl.StartsWith(customEventLocations.Value.MailTo))
+        if (eventData.LinkUrl.StartsWith(customEventLocations.Value.MailTo))
         {
-            clickData.LinkText = clickData.LinkUrl;
-            await customEventService.SendCustomEvent(clickData, "mailto_link_click");
+            eventData.LinkText = eventData.LinkUrl;
+            await customEventService.SendCustomEvent(eventData, "mailto_link_click");
 
             return Ok();
         }
@@ -83,12 +75,12 @@ public class CustomEventController(ICustomEventService customEventService, IOpti
         //check for outbound link clicks
         var serviceUrlsRegex = new Regex(string.Join("|", customEventLocations.Value.ServiceUrls.Select(url => $@"^{Regex.Escape(url)}/.*$")));
 
-        Match match = serviceUrlsRegex.Match(clickData.LinkUrl);
+        Match match = serviceUrlsRegex.Match(eventData.LinkUrl);
 
         //"-pr-" checks for review app url
-        if (!match.Success && !clickData.LinkUrl.Contains("-pr-"))
+        if (!match.Success && !eventData.LinkUrl.Contains("-pr-"))
         {
-            await customEventService.SendCustomEvent(clickData, "outbound_link_click");
+            await customEventService.SendCustomEvent(eventData, "outbound_link_click");
 
             return Ok();
         }

@@ -14,7 +14,7 @@ public class CustomEventControllerTests(JsonRepositoryIntegrationTestFixture fix
     [Fact]
     public async Task PostCustomEventTracking_ReturnsOK()
     {
-        var payload = new ClickData { EventType = "link_click", LinkUrl = "https://forms.cloud.microsoft/Pages", LinkText = "Text" };
+        var payload = new EventData { EventType = EventType.LinkClick, LinkUrl = "https://forms.cloud.microsoft/Pages", LinkText = "Text" };
 
         var response = await fixture.Client.PostAsJsonAsync("/custom-event-tracking", payload);
 

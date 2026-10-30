@@ -1,6 +1,6 @@
 ﻿namespace SAPSec.Core.CustomEvents;
 
-public class ClickData
+public class EventData
 {
     public string EventType { get; set; } = string.Empty;
     public string LinkText { get; set; } = string.Empty;

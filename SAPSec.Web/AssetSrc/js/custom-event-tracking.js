@@ -4,19 +4,13 @@
         if (!link) return;
 
         const data = {
-            EventType: 'link_click',
+            EventType: 'linkClick',
             Url: link.href,
             Text: link.innerText.trim()
         };
 
         sendCustomEvent(data);
     });
-
-    //need to pass
-    //Key = section_name - e.g. Progress 8
-    //Value 1 = details_lable e.g. - information on Progress 8
-    //Value 2 = interaction_type - open/close
-
 
     document.addEventListener('toggle', function (event) {
         const details = event.target.closest('details');
@@ -26,7 +20,7 @@
         const summary = details.querySelector('summary');
 
         const data = {
-            Eventtype : 'details-click'
+            EventType : 'detailsClick',
             SectionName: h2.innerText.trim() ?? '',
             SectionLabel: summary.textContent?.trim() ?? '',
             InteractionType: `${details.open ? 'open' : 'closed'}`
