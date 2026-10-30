@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using SAPSec.Core.CustomEvents;
 using SAPSec.Test.Integration.Setup;
 using System.Net;
 using System.Net.Http.Json;
@@ -13,7 +14,7 @@ public class CustomEventControllerTests(JsonRepositoryIntegrationTestFixture fix
     [Fact]
     public async Task PostCustomEventTracking_ReturnsOK()
     {
-        var payload = new { LinkUrl = "https://forms.cloud.microsoft/Pages", LinkText = "Text" };
+        var payload = new ClickData { EventType = "link_click", LinkUrl = "https://forms.cloud.microsoft/Pages", LinkText = "Text" };
 
         var response = await fixture.Client.PostAsJsonAsync("/custom-event-tracking", payload);
 
