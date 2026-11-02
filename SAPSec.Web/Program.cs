@@ -116,7 +116,10 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests")
+        var bypassTestAuthentication = builder.Environment.IsEnvironment("Test") &&
+            builder.Configuration.GetValue<bool>("LoadTesting:BypassAuthentication");
+
+        if (bypassTestAuthentication || builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest")
         {
             builder.Services.AddAuthentication(options =>
             {
