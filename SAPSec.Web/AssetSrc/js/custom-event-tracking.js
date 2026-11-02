@@ -5,8 +5,8 @@
 
         const data = {
             EventType: 'linkClick',
-            Url: link.href,
-            Text: link.innerText.trim()
+            LinkUrl: link.href,
+            LinkText: link.innerText.trim()
         };
 
         sendCustomEvent(data);
@@ -21,9 +21,9 @@
 
         const data = {
             EventType : 'detailsClick',
-            SectionName: h2.innerText.trim() ?? '',
-            SectionLabel: summary.textContent?.trim() ?? '',
-            InteractionType: `${details.open ? 'open' : 'closed'}`
+            DetailsSectionName: h2.innerText.trim() ?? '',
+            DetailsSectionLabel: summary.textContent?.trim() ?? '',
+            DetailsInteractionType: `${details.open ? 'open' : 'closed'}`
         };
 
         sendCustomEvent(data);
