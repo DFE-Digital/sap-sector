@@ -41,13 +41,13 @@ public class CustomEventControllerTests
     [InlineData("mailto:test@example.com", "mailto_link_click")]
     public async Task CustomEventTracking_SendsCustomEvent(string url, string eventName)
     {
-        var clickData = new ClickData { Text = "text", Url = url };
+        var clickData = new EventData { EventType = EventType.LinkClick, LinkText = "text", LinkUrl = url };
 
         var result = await _sut.CustomEventTracking(clickData);
 
         result.Should().BeOfType<OkResult>();
 
-        _customEventServiceMock.Verify(x => x.SendCustomEvent(It.Is<ClickData>(c => c.Url == url), eventName), Times.Once);
+        _customEventServiceMock.Verify(x => x.SendCustomEvent(It.Is<EventData>(c => c.LinkUrl == url), eventName), Times.Once);
     }
 
     [Theory]
@@ -57,12 +57,12 @@ public class CustomEventControllerTests
     [InlineData("https://compare-connect-similar-schools-pr-240.test.teacherservices.cloud/school/123456")]
     public async Task PostCustomEventTracking_DoesNotSendEventForNonMatchingUrls(string url)
     {
-        var clickData = new ClickData { Text = "text", Url = url };
+        var clickData = new EventData { EventType = EventType.LinkClick, LinkText = "text", LinkUrl = url };
 
         var result = await _sut.CustomEventTracking(clickData);
 
         result.Should().BeOfType<OkResult>();
 
-        _customEventServiceMock.Verify(x => x.SendCustomEvent(It.Is<ClickData>(c => c.Url == url), It.IsAny<string>()), Times.Never);
+        _customEventServiceMock.Verify(x => x.SendCustomEvent(It.Is<EventData>(c => c.LinkUrl == url), It.IsAny<string>()), Times.Never);
     }
 }

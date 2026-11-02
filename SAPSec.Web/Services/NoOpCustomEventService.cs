@@ -8,7 +8,7 @@ namespace SAPSec.Web.Services;
 /// </summary>
 public class NoOpCustomEventService : ICustomEventService
 {
-    public Task SendCustomEvent(ClickData clickData, string eventName)
+    public Task SendCustomEvent(EventData clickData, string eventName)
     {
         return Task.CompletedTask;
     }
