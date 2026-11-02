@@ -1,6 +1,7 @@
 using FluentAssertions;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
+using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
@@ -41,6 +42,7 @@ public class SchoolUserComparisonLayoutIntegrationTests(
     {
         var (path, similarSchoolsPath) = SetUp(phase);
         Fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
+        Fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
         Fixture.TestUser.Urn = OwnUrn;
 
         var content = await GetAsync(path);
@@ -68,6 +70,7 @@ public class SchoolUserComparisonLayoutIntegrationTests(
     {
         var (path, _) = SetUp(phase);
         Fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
+        Fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
         Fixture.TestUser.Urn = OwnUrn;
         Fixture.FeatureFlagService.Override(Flags.EnableFindASchool, true);
 

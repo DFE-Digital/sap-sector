@@ -14,10 +14,11 @@ public class MockDsiUserService : IUserService
         _defaultUser = CreateDefaultUser(
             testUserOrganisation?.CategoryId ?? TestUserOrganisation.DefaultCategoryId,
             testUserOrganisation?.Urn ?? TestUserOrganisation.DefaultUrn,
-            testUserOrganisation?.Phase ?? TestUserOrganisation.DefaultPhase);
+            testUserOrganisation?.Phase ?? TestUserOrganisation.DefaultPhase,
+            testUserOrganisation?.Name ?? TestUserOrganisation.NonDfeOrganisationName);
     }
 
-    private static User CreateDefaultUser(string categoryId, string urn, string phase) => new()
+    private static User CreateDefaultUser(string categoryId, string urn, string phase, string organisationName) => new()
     {
         Sub = "test-user-123",
         Email = "test@example.com",
@@ -29,7 +30,7 @@ public class MockDsiUserService : IUserService
             new()
             {
                 Id = "org-123",
-                Name = "Test Organisation",
+                Name = organisationName,
                 LegalName = "TEST ORGANISATION LTD",
                 Urn = urn,
                 Ukprn = "10012345",

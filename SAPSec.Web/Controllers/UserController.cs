@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Controllers;
@@ -11,10 +12,12 @@ namespace SAPSec.Web.Controllers;
 public class UserController(
     IUserService userService,
     IFeatureFlagService featureFlagService,
+    IDfeUserIdentifier dfeUserIdentifier,
     ILogger<UserController> logger) : Controller
 {
     private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
     private readonly IFeatureFlagService _featureFlagService = featureFlagService ?? throw new ArgumentNullException(nameof(featureFlagService));
+    private readonly IDfeUserIdentifier _dfeUserIdentifier = dfeUserIdentifier ?? throw new ArgumentNullException(nameof(dfeUserIdentifier));
     private readonly ILogger<UserController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet]
@@ -61,6 +64,17 @@ public class UserController(
         if (org is { IsEstablishment: true })
         {
             return RedirectToSchool(org, traceId, userId);
+        }
+
+        // DfE Sign-in puts the "Department for Education" organisation in the Local Authority category (002),
+        // so this check must stay above any local authority routing added later.
+        if (await _dfeUserIdentifier.IsDfeUserAsync(User))
+        {
+            _logger.LogInformation(
+                "Redirecting DfE user from /user/redirect to find-a-school. TraceId: {TraceId}. UserId: {UserId}.",
+                traceId,
+                userId);
+            return Redirect(Routes.FindASchool());
         }
 
         // Further starting pages (e.g. single academy trust, internal DfE users who may have no organisation)

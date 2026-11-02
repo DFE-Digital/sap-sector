@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.Playwright;
 using SAPSec.Core.Authentication;
+using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
 using Xunit;
@@ -27,6 +28,7 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
     public override async Task InitializeAsync()
     {
         _fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
+        _fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
         _fixture.TestUser.Urn = OwnSchoolUrn;
         _fixture.TestUser.Phase = "Secondary";
 

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using System.Security.Claims;
@@ -16,11 +17,12 @@ public class UserControllerTests
     private readonly Mock<IUserService> _userService = new();
     private readonly Mock<ILogger<UserController>> _logger = new();
     private readonly Mock<IFeatureFlagService> _featureFlagService = new();
+    private readonly Mock<IDfeUserIdentifier> _dfeUserIdentifier = new();
     private readonly UserController _controller;
 
     public UserControllerTests()
     {
-        _controller = new UserController(_userService.Object, _featureFlagService.Object, _logger.Object);
+        _controller = new UserController(_userService.Object, _featureFlagService.Object, _dfeUserIdentifier.Object, _logger.Object);
         _featureFlagService.Setup(x => x.IsEnabledAsync(Flags.EnableFindASchool)).ReturnsAsync(false);
         _controller.ControllerContext = new ControllerContext
         {
@@ -115,5 +117,42 @@ public class UserControllerTests
 
         var redirect = result.Should().BeOfType<RedirectResult>().Subject;
         redirect.Url.Should().Be(Routes.AllThroughSchool("111111").Overview);
+    }
+
+    [Fact]
+    public async Task Index_WhenDfeUserWhoIsNotASchool_RedirectsToFindASchool()
+    {
+        SetupUserWithOrganisation(OtherOrganisation());
+        _dfeUserIdentifier.Setup(x => x.IsDfeUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(true);
+
+        var result = await _controller.Index();
+
+        var redirect = result.Should().BeOfType<RedirectResult>().Subject;
+        redirect.Url.Should().Be(Routes.FindASchool());
+    }
+
+    [Fact]
+    public async Task Index_WhenNonDfeUserWhoIsNotASchool_ReturnsForbidden()
+    {
+        SetupUserWithOrganisation(OtherOrganisation());
+
+        var result = await _controller.Index();
+
+        result.Should().BeOfType<ForbidResult>();
+    }
+
+    private static Organisation OtherOrganisation() => new()
+    {
+        Id = "org-4",
+        Name = "Department for Education",
+        Category = new Category { Id = "011", Name = "Government" }
+    };
+
+    private void SetupUserWithOrganisation(Organisation organisation)
+    {
+        _userService.Setup(x => x.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
+            .ReturnsAsync(new User { Sub = "user-123", Organisations = [organisation] });
+        _userService.Setup(x => x.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
+            .ReturnsAsync(organisation);
     }
 }

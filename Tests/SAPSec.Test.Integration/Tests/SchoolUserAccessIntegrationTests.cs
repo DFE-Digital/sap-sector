@@ -1,5 +1,6 @@
 using FluentAssertions;
 using SAPSec.Core.Authentication;
+using SAPSec.Test.Common.Authentication;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
@@ -17,6 +18,7 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
     public Task InitializeAsync()
     {
         fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
+        fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
         fixture.TestUser.Urn = OwnUrn;
         return Task.CompletedTask;
     }
@@ -40,13 +42,26 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
     }
 
     [Fact]
-    public async Task FindASchool_AsUserAllowedByPolicy_IsAvailable()
+    public async Task FindASchool_AsDfeUser_IsAvailable()
     {
         fixture.TestUser.Reset();
 
         var response = await fixture.NonRedirectingClient.GetAsync(Routes.FindASchool());
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Theory]
+    [InlineData(OrganisationCategoryIds.LocalAuthority)]
+    [InlineData(OrganisationCategoryIds.MultiAcademyTrust)]
+    [InlineData(OrganisationCategoryIds.SingleAcademyTrust)]
+    public async Task FindASchool_AsNonDfeUserWhoIsNotASchool_ReturnsAccessDenied(string categoryId)
+    {
+        ActAsNonDfeUser(categoryId);
+
+        var response = await fixture.NonRedirectingClient.GetAsync(Routes.FindASchool());
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
     [Fact]
@@ -61,7 +76,7 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
     }
 
     [Fact]
-    public async Task SchoolOverview_AsNonSchoolUser_ShowsFindASchoolInNavigation()
+    public async Task SchoolOverview_AsDfeUser_ShowsFindASchoolInNavigation()
     {
         fixture.TestUser.Reset();
 
@@ -70,6 +85,18 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("Find a school");
+    }
+
+    [Fact]
+    public async Task SchoolOverview_AsNonDfeUserWhoIsNotASchool_DoesNotShowFindASchoolInNavigation()
+    {
+        ActAsNonDfeUser(OrganisationCategoryIds.LocalAuthority);
+
+        var response = await fixture.Client.GetAsync(SchoolOverviewPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotContain("Find a school");
     }
 
     [Fact]
@@ -120,13 +147,24 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
     }
 
     [Fact]
-    public async Task UserHome_AsNonSchoolUser_ReturnsAccessDenied()
+    public async Task UserHome_AsNonDfeUserWhoIsNotASchool_ReturnsAccessDenied()
+    {
+        ActAsNonDfeUser(OrganisationCategoryIds.LocalAuthority);
+
+        var response = await fixture.NonRedirectingClient.GetAsync(Routes.UserHome);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+    }
+
+    [Fact]
+    public async Task UserHome_AsDfeUser_RedirectsToFindASchool()
     {
         fixture.TestUser.Reset();
 
         var response = await fixture.NonRedirectingClient.GetAsync(Routes.UserHome);
 
-        response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        response.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        response.Headers.Location!.OriginalString.Should().Be(Routes.FindASchool());
     }
 
     #region School URN restriction
@@ -229,7 +267,7 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
 
     [Theory]
     [MemberData(nameof(BreadcrumbPages))]
-    public async Task Pages_AsNonSchoolUser_StillShowBreadcrumbs(string path)
+    public async Task Pages_AsDfeUser_StillShowBreadcrumbs(string path)
     {
         fixture.TestUser.Reset();
 
@@ -238,6 +276,20 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("govuk-breadcrumbs");
+    }
+
+    [Theory]
+    [MemberData(nameof(BreadcrumbPages))]
+    public async Task Pages_AsNonDfeUserWhoIsNotASchool_DoNotShowBreadcrumbs(string path)
+    {
+        // The "Home" breadcrumb leads to Find a school, which these users cannot use.
+        ActAsNonDfeUser(OrganisationCategoryIds.LocalAuthority);
+
+        var response = await fixture.Client.GetAsync(path);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotContain("govuk-breadcrumbs");
     }
 
     [Fact]
@@ -323,6 +375,13 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
 
 
     #endregion
+
+    private void ActAsNonDfeUser(string categoryId)
+    {
+        fixture.TestUser.Reset();
+        fixture.TestUser.CategoryId = categoryId;
+        fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
+    }
 
     private static string ServiceNameHref(string content) =>
         System.Text.RegularExpressions.Regex.Match(content, @"govuk-service-navigation__service-name"">\s*<a[^>]*href=""([^""]*)""").Groups[1].Value;

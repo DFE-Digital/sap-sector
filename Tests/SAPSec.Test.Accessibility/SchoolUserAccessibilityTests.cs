@@ -1,6 +1,7 @@
 using Deque.AxeCore.Playwright;
 using FluentAssertions;
 using SAPSec.Core.Authentication;
+using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.Accessibility.Setup;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
@@ -23,6 +24,7 @@ public class SchoolUserAccessibilityTests(AccessibilityTestsFixture fixture) : A
     {
         await base.InitializeAsync();
         Fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
+        Fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
     }
 
     public override async Task DisposeAsync()

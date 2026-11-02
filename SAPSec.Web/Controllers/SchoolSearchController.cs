@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace SAPSec.Web.Controllers;
 
-[Authorize(Policy = AuthorizationPolicies.SchoolAccess)]
+[Authorize(Policy = AuthorizationPolicies.FindASchool)]
 [Route("find-a-school")]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,

@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Test.Common.Authentication;
@@ -10,7 +11,12 @@ namespace SAPSec.Test.Integration.Authorization;
 
 public class BreadcrumbNavigationHandlerTests
 {
-    private readonly TestUserOrganisation _testUser = new() { CategoryId = OrganisationCategoryIds.Establishment };
+    private readonly TestUserOrganisation _testUser = new()
+    {
+        CategoryId = OrganisationCategoryIds.Establishment,
+        Name = TestUserOrganisation.NonDfeOrganisationName
+    };
+
     private bool _restrictionsEnabled = true;
 
     [Fact]
@@ -26,9 +32,22 @@ public class BreadcrumbNavigationHandlerTests
     [Theory]
     [InlineData(OrganisationCategoryIds.LocalAuthority)]
     [InlineData(OrganisationCategoryIds.MultiAcademyTrust)]
-    public async Task NonSchoolUser_StillGetsBreadcrumbs(string categoryId)
+    public async Task NonDfeUserWhoIsNotASchool_WithRestrictionsOn_DoesNotGetBreadcrumbs(string categoryId)
     {
+        // Their "Home" breadcrumb would lead to Find a school, which they cannot use.
         _testUser.CategoryId = categoryId;
+        var context = CreateContext(authenticated: true);
+
+        await CreateHandler().HandleAsync(context);
+
+        context.HasSucceeded.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task DfeUser_WithRestrictionsOn_GetsBreadcrumbs()
+    {
+        _testUser.CategoryId = OrganisationCategoryIds.LocalAuthority;
+        _testUser.Name = TestUserOrganisation.DfeOrganisationName;
         var context = CreateContext(authenticated: true);
 
         await CreateHandler().HandleAsync(context);
@@ -57,8 +76,15 @@ public class BreadcrumbNavigationHandlerTests
         context.HasSucceeded.Should().BeTrue();
     }
 
-    private BreadcrumbNavigationHandler CreateHandler() =>
-        new(new MockDsiUserService(_testUser), new FixedFeatureFlagService(enabled: !_restrictionsEnabled));
+    private BreadcrumbNavigationHandler CreateHandler()
+    {
+        var userService = new MockDsiUserService(_testUser);
+        var dfeUserIdentifier = new DfeUserIdentifier(
+            userService,
+            Options.Create(new DfeUserOptions { OrganisationNames = [TestUserOrganisation.DfeOrganisationName] }));
+
+        return new(userService, new FixedFeatureFlagService(enabled: !_restrictionsEnabled), dfeUserIdentifier);
+    }
 
     private static AuthorizationHandlerContext CreateContext(bool authenticated) =>
         new(
