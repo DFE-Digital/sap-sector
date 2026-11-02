@@ -28,7 +28,7 @@ public static class DfeAnalyticsExtensions
         // including /healthcheck, when valid GCP credentials aren't available.
         // Also avoids polluting real test analytics with synthetic load-test
         // traffic. Revert alongside the Program.cs auth bypass before merge.
-        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest" or "Test") && !isLocalDevelopment)
+        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest") && !isLocalDevelopment)
         {
             services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -46,7 +46,7 @@ public static class DfeAnalyticsExtensions
         // including /healthcheck, when valid GCP credentials aren't available.
         // Also avoids polluting real test analytics with synthetic load-test
         // traffic. Revert alongside the Program.cs auth bypass before merge.
-        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest" or "Test") && !isLocalDevelopment)
+        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest") && !isLocalDevelopment)
         {
             app.UseDfeAnalytics();
         }
