@@ -75,7 +75,7 @@ public class SchoolController(
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             WhatIsASimilarSchoolUrl = Routes.PrimarySchool(urn).WhatIsASimilarSchool,
-            SimilarSchoolDefinitionLinkText = "how DfE defines what a similar school is",
+            SimilarSchoolDefinitionLinkText = "how DfE identifies what a similar school is",
             MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School, similarSchoolsResponse.HasSimilarSchools),
             AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardRwm, response.School, similarSchoolsResponse.HasSimilarSchools),
             AverageScaledScoreReading = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreReading, response.School, similarSchoolsResponse.HasSimilarSchools),

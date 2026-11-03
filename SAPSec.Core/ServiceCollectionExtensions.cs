@@ -9,6 +9,7 @@ using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Time;
 using SAPSec.Core.UseCases;
 using System.Diagnostics.CodeAnalysis;
 
@@ -99,6 +100,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<
             IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse>,
             GetRiseResourcesUseCase>();
+
+        // Time
+
+        services.AddSingleton<ICurrentTimeProvider, CurrentTimeProvider>();
     }
 
     public static void AddServices(this IServiceCollection services)

@@ -5,6 +5,7 @@ using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
+using SAPSec.Test.Common.Time;
 
 namespace SAPSec.Core.Tests.Services;
 
@@ -15,19 +16,18 @@ namespace SAPSec.Core.Tests.Services;
 public class SchoolDetailsServiceTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepository;
-    private readonly Mock<ILogger<SchoolDetailsService>> _loggerMock;
+    private readonly MockCurrentTimeProvider _timeProvider = new();
     private readonly SchoolDetailsService _sut;
 
     public SchoolDetailsServiceTests()
     {
         _establishmentRepository = new InMemoryEstablishmentRepository();
-        _loggerMock = new Mock<ILogger<SchoolDetailsService>>();
 
         _sut = new SchoolDetailsService(
             _establishmentRepository,
-            new SchoolClosureEligibilityService(_establishmentRepository, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
-            new SchoolPredecessorRelationshipService(_establishmentRepository, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
-            _loggerMock.Object);
+            new SchoolClosureEligibilityService(_establishmentRepository, _timeProvider, Mock.Of<ILogger<SchoolClosureEligibilityService>>()),
+            new SchoolPredecessorRelationshipService(_establishmentRepository, _timeProvider, Mock.Of<ILogger<SchoolPredecessorRelationshipService>>()),
+            Mock.Of<ILogger<SchoolDetailsService>>());
     }
 
     [Fact]

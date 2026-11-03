@@ -93,7 +93,8 @@ jobs:
   test:
     name: Run Unit & Integration Tests with Coverage
     if: ${{ github.event_name != 'workflow_dispatch' }}
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest is Ubuntu 26.04, which Playwright 1.56 has no browsers for
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       pull-requests: write
@@ -217,7 +218,8 @@ jobs:
     environment:
       name: review
       url: ${{ steps.deploy_review.outputs.environment_url }}
-    runs-on: ubuntu-latest
+    # Pinned: uses pwsh, and ubuntu-latest (Ubuntu 26.04) has no powershell package yet
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write
       pull-requests: write
@@ -596,7 +598,8 @@ jobs:
     environment:
       name: ${{ inputs.environment }}
       url: ${{ steps.deploy_manual.outputs.environment_url }}
-    runs-on: ubuntu-latest
+    # Pinned: uses pwsh, and ubuntu-latest (Ubuntu 26.04) has no powershell package yet
+    runs-on: ubuntu-24.04
     permissions:
       id-token: write
       pull-requests: write

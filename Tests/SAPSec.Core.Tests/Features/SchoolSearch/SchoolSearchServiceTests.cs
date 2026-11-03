@@ -3,6 +3,7 @@ using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
+using SAPSec.Test.Common.Time;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch;
 
@@ -11,6 +12,7 @@ public class SchoolSearchServiceTests
     private readonly Mock<ISchoolSearchIndexReader> _indexReaderMock = new();
     private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
     private readonly Mock<IFeatureFlagService> _featureFlagServiceMock = new();
+    private readonly MockCurrentTimeProvider _timeProvider = new();
     private readonly SchoolSearchService _sut;
 
     public SchoolSearchServiceTests()
@@ -25,7 +27,8 @@ public class SchoolSearchServiceTests
         _sut = new SchoolSearchService(
             _indexReaderMock.Object,
             _establishmentRepositoryMock.Object,
-            _featureFlagServiceMock.Object);
+            _featureFlagServiceMock.Object,
+            _timeProvider);
     }
 
     [Theory]

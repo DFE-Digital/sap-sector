@@ -1041,7 +1041,6 @@ public class SchoolSearchControllerTests
         viewResult!.Model.Should().BeEquivalentTo(new SchoolSearchResultsViewModel
         {
             Query = "AB",
-            HasNoResults = false
         });
     }
 
@@ -1063,7 +1062,6 @@ public class SchoolSearchControllerTests
         viewResult!.Model.Should().BeEquivalentTo(new SchoolSearchResultsViewModel
         {
             Query = string.Empty,
-            HasNoResults = false
         });
         _controller.ModelState.IsValid.Should().BeFalse();
     }

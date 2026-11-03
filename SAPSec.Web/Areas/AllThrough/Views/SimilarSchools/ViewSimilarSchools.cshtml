@@ -92,15 +92,11 @@
 }
 else if (Model.ShouldShowPrimaryEmptyState)
 {
-    <p class="govuk-body" data-testid="primary-similar-schools-empty-state">
-        Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.
-    </p>
+    <partial name="_PhaseEmptyState" model='"primary-similar-schools-empty-state"' />
 }
 else if (Model.ShouldShowSecondaryEmptyState)
 {
-    <p class="govuk-body" data-testid="secondary-similar-schools-empty-state">
-        Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.
-    </p>
+    <partial name="_PhaseEmptyState" model='"secondary-similar-schools-empty-state"' />
 }
 
 @section Scripts {

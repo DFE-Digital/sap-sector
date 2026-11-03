@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Data.Dto;
 using SAPSec.Web.Constants;
@@ -17,7 +16,7 @@ public class SchoolSearchController(
 {
     private const int PageSize = 10;
     public const string Hint = "Enter a school name, URN, DfE number or UKPRN";
-    public const string NoResultsErrorMessage = "We could not find any schools matching your search criteria";
+    public const string NoResultsErrorMessage = "Enter a school name (minimum 3 characters), URN, DfE number or UKPRN";
 
     [HttpGet]
     public async Task<IActionResult> Index(
@@ -32,6 +31,15 @@ public class SchoolSearchController(
         using (logger.BeginScope(new { query, page }))
         {
             if (page < 1) page = 1;
+
+            if (!string.IsNullOrWhiteSpace(query) && query.Length < 3)
+            {
+                ModelState.AddModelError("Query", NoResultsErrorMessage);
+                return View(new SchoolSearchResultsViewModel
+                {
+                    Query = query,
+                });
+            }
 
             if (IsSchoolNumberCandidate(query))
             {
@@ -117,7 +125,6 @@ public class SchoolSearchController(
             return View(new SchoolSearchResultsViewModel
             {
                 Query = query ?? string.Empty,
-                HasNoResults = !string.IsNullOrWhiteSpace(query) && totalResults == 0,
                 LocalAuthorities = allLocalAuthorities,
                 SelectedLocalAuthorities = localAuthorities ?? Array.Empty<string>(),
                 CurrentPage = page ?? 1,
@@ -149,12 +156,16 @@ public class SchoolSearchController(
     {
         using (logger.BeginScope(new { searchQueryViewModel }))
         {
+            if (string.IsNullOrWhiteSpace(searchQueryViewModel.Query) || searchQueryViewModel.Query.Length < 3)
+            {
+                ModelState.AddModelError("Query", NoResultsErrorMessage);
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(new SchoolSearchResultsViewModel
                 {
-                    Query = searchQueryViewModel.Query,
-                    HasNoResults = false
+                    Query = searchQueryViewModel.Query
                 });
             }
 
@@ -172,7 +183,6 @@ public class SchoolSearchController(
                 return RedirectToSchool(school);
             }
 
-            ModelState.AddModelError("Query", NoResultsErrorMessage);
             var fallbackRouteValues = BuildSearchRouteValues(
                 searchQueryViewModel.Query);
 

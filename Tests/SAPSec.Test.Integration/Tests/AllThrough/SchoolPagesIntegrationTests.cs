@@ -79,7 +79,7 @@ public class SchoolPagesIntegrationTests(
 
         var link = page.QuerySelector(".app-overview a");
         link.Should().NotBeNull();
-        link!.TextContent.Trim().Should().Be("how the DfE defines what a similar school is");
+        link!.TextContent.Trim().Should().Be("how DfE identifies what a similar school is");
         link.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).WhatIsASimilarSchool);
 
         page.QuerySelectorAll(".app-overview h2")
@@ -288,8 +288,7 @@ public class SchoolPagesIntegrationTests(
 
         var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
 
-        page.ElementWithTestIdShouldExist("primary-similar-schools-empty-state")
-            .TextContent.Trim().Should().Be("Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.");
+        AssertPhaseEmptyState(page.ElementWithTestIdShouldExist("primary-similar-schools-empty-state"));
         page.QuerySelector("[data-testid='primary-similar-schools-filter']").Should().BeNull();
         page.QuerySelector("#sort-by").Should().BeNull();
         page.QuerySelector("#map").Should().BeNull();
@@ -355,8 +354,7 @@ public class SchoolPagesIntegrationTests(
 
         var page = await Fixture.RequestPageAsync($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
 
-        page.ElementWithTestIdShouldExist("secondary-similar-schools-empty-state")
-            .TextContent.Trim().Should().Be("Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.");
+        AssertPhaseEmptyState(page.ElementWithTestIdShouldExist("secondary-similar-schools-empty-state"));
         page.QuerySelector("[data-testid='secondary-similar-schools-filter']").Should().BeNull();
         page.QuerySelector("#sort-by").Should().BeNull();
         page.QuerySelector("#map").Should().BeNull();
@@ -962,6 +960,17 @@ public class SchoolPagesIntegrationTests(
 
         navigationItems.Select(x => x.TextContent.Trim()).Should().Equal(expectedItems.Select(x => x.Text));
         navigationItems.Select(x => x.GetAttribute("href")).Should().Equal(expectedItems.Select(x => x.Href));
+    }
+
+    private static void AssertPhaseEmptyState(AngleSharp.Dom.IElement emptyState)
+    {
+        emptyState.QuerySelectorAll("p").Select(x => x.TextContent.Trim())
+            .Should().Equal(
+                "There are no similar schools for this phase.",
+                "This may be because the school has recently:",
+                "You can still view similar schools for the other phase.");
+        emptyState.QuerySelectorAll("li").Select(x => x.TextContent.Trim())
+            .Should().Equal("converted to an all-through school", "opened");
     }
 
     private static void AssertSelectedNavigationItem(IDocument page, string expectedText, string expectedHref)

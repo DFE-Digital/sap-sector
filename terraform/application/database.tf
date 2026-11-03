@@ -16,3 +16,25 @@ module "postgres" {
   azure_maintenance_window       = var.azure_maintenance_window
   server_version                 = "16"
 }
+
+module "redis-managed-cache" {
+  source = "./vendor/modules/aks//aks/redis_managed"
+
+  count = var.deploy_managed_redis ? 1 : 0
+
+  name          = "cache"
+  namespace     = var.namespace
+  environment   = local.environment
+  service_name  = var.service_name
+  service_short = var.service_short
+  config_short  = var.config_short
+
+  cluster_configuration_map = module.cluster_data.configuration_map
+
+  use_azure = var.deploy_azure_backing_services
+
+  azure_resource_prefix   = var.azure_resource_prefix
+  azure_enable_monitoring = var.enable_monitoring
+  azure_managed_redis_sku = var.redis_managed_cache_sku_name
+  azure_maxmemory_policy  = "AllKeysLRU"
+}

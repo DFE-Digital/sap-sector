@@ -1,6 +1,7 @@
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Geography;
+using SAPSec.Core.Time;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 using System.Text.RegularExpressions;
@@ -10,7 +11,8 @@ namespace SAPSec.Core.Features.SchoolSearch;
 public class SchoolSearchService(
     ISchoolSearchIndexReader _indexReader,
     IEstablishmentRepository _establishmentRepository,
-    IFeatureFlagService _featureFlagService) : ISchoolSearchService
+    IFeatureFlagService _featureFlagService,
+    ICurrentTimeProvider timeProvider) : ISchoolSearchService
 {
     private const int MaxResults = 1000;
     private const int MaxSuggestions = 10;
@@ -38,7 +40,7 @@ public class SchoolSearchService(
         var allThroughSchoolsEnabled = await _featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
 
-        return school.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled)
+        return school.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled, timeProvider)
             ? school
             : null;
     }
@@ -69,7 +71,7 @@ public class SchoolSearchService(
                 continue;
             }
 
-            if (!r.School.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled))
+            if (!r.School.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled, timeProvider))
             {
                 continue;
             }

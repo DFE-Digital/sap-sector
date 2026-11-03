@@ -1,10 +1,13 @@
 using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Data.Dto;
+using SAPSec.Test.Common.Time;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch.Extensions;
 
 public class EstablishmentExtensionsTests
 {
+    private readonly MockCurrentTimeProvider _timeProvider = new();
+
     [Theory]
     [InlineData("2", "Primary")]
     [InlineData("4", "Secondary")]
@@ -65,7 +68,7 @@ public class EstablishmentExtensionsTests
         {
             PhaseOfEducationId = phaseId,
             EstablishmentStatusId = expected ? "1" : string.Empty
-        }.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled);
+        }.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled, _timeProvider);
 
         result.Should().Be(expected);
     }
@@ -78,7 +81,7 @@ public class EstablishmentExtensionsTests
     public void CanSearch_UsesStatusId(string statusId, bool expected)
     {
         var result = new Establishment { PhaseOfEducationId = "4", EstablishmentStatusId = statusId }
-            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false, _timeProvider);
 
         result.Should().Be(expected);
     }
@@ -97,7 +100,7 @@ public class EstablishmentExtensionsTests
         {
             PhaseOfEducationName = "Secondary",
             EstablishmentStatusId = statusId
-        }.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled: true);
+        }.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled: true, _timeProvider);
 
         result.Should().Be(expected);
     }
@@ -110,7 +113,7 @@ public class EstablishmentExtensionsTests
     public void CanSearch_FallsBackToStatusName(string statusName, bool expected)
     {
         var result = new Establishment { PhaseOfEducationName = "Secondary", EstablishmentStatusName = statusName }
-            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false, _timeProvider);
 
         result.Should().Be(expected);
     }
@@ -125,7 +128,7 @@ public class EstablishmentExtensionsTests
             PhaseOfEducationId = "4",
             EstablishmentStatusId = "2",
             CloseDate = recentCloseDate
-        }.CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+        }.CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false, _timeProvider);
 
         result.Should().BeTrue();
     }
@@ -140,7 +143,7 @@ public class EstablishmentExtensionsTests
             PhaseOfEducationId = "4",
             EstablishmentStatusId = "2",
             CloseDate = longAgoCloseDate
-        }.CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+        }.CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false, _timeProvider);
 
         result.Should().BeFalse();
     }
@@ -159,7 +162,7 @@ public class EstablishmentExtensionsTests
         bool expected)
     {
         var result = new Establishment { PhaseOfEducationName = phaseName, EstablishmentStatusId = "1" }
-            .CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled);
+            .CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled, _timeProvider);
 
         result.Should().Be(expected);
     }
@@ -168,7 +171,7 @@ public class EstablishmentExtensionsTests
     public void CanSearch_WithSecondarySchoolAndMissingStatus_ReturnsTrue()
     {
         var result = new Establishment { PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" }
-            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
+            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false, _timeProvider);
 
         result.Should().BeTrue();
     }
@@ -177,7 +180,7 @@ public class EstablishmentExtensionsTests
     public void CanSearch_WithPrimarySchoolAndMissingStatus_ReturnsFalse()
     {
         var result = new Establishment { PhaseOfEducationId = "2", PhaseOfEducationName = "Primary" }
-            .CanSearch(primarySchoolsEnabled: true, allThroughSchoolsEnabled: true);
+            .CanSearch(primarySchoolsEnabled: true, allThroughSchoolsEnabled: true, _timeProvider);
 
         result.Should().BeFalse();
     }
@@ -190,7 +193,7 @@ public class EstablishmentExtensionsTests
             PhaseOfEducationId = "2",
             PhaseOfEducationName = "Primary",
             EstablishmentStatusId = "1"
-        }.CanSearch(primarySchoolsEnabled: true, allThroughSchoolsEnabled: false);
+        }.CanSearch(primarySchoolsEnabled: true, allThroughSchoolsEnabled: false, _timeProvider);
 
         result.Should().BeTrue();
     }
