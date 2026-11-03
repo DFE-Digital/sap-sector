@@ -21,7 +21,10 @@ public class SimilarSchoolsFilters(CaseInsensitiveDictionary<IEnumerable<string>
         new SimilarSchoolsTypeOfSpecialistProvisionFilter("sp", "Type of specialist provision", filterValues, currentSchool),
         new SimilarSchoolsReferenceDataFilter("goe", "Gender of entry", filterValues, currentSchool, s => s.Gender),
         new SimilarSchoolsOverallAbsenceRateFilter("oar", "Overall absence rate", filterValues, currentSchool),
-        new SimilarSchoolsPersistentAbsenceRateFilter("par", "Persistent absence rate", filterValues, currentSchool)
+        new SimilarSchoolsPersistentAbsenceRateFilter("par", "Persistent absence rate", filterValues, currentSchool),
+        new SimilarSchoolsRateFilter("sr", "Suspension rate", filterValues, currentSchool, s => s.SuspensionRate, "0.00"),
+        new SimilarSchoolsRateFilter("pps", "Percentage of pupils suspended", filterValues, currentSchool, s => s.PupilsSuspendedRate, "0.00\\%"),
+        new SimilarSchoolsRateFilter("per", "Permanent exclusion rate", filterValues, currentSchool, s => s.PermanentExclusionRate, "0.00")
     }.ToDictionary(x => x.Key).AsCaseInsensitive();
 
     public IReadOnlyCollection<ValidationError> Validate()

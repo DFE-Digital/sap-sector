@@ -16,6 +16,7 @@ namespace SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 public class SimilarSchoolsPageViewModel
 {
     public const string NoResultsMessage = "There are no similar schools available for this school.";
+    public const string NoFilteredResultsMessage = "There are no schools that match your search.";
     public const string FocusTargetQueryParameter = "focusTarget";
     public const string FocusTargetFilters = "filters";
     public const string FocusTargetSort = "sort";
@@ -47,6 +48,7 @@ public class SimilarSchoolsPageViewModel
     public bool HasPreviousPage => CurrentPage > 1;
     public bool HasNextPage => CurrentPage < TotalPages;
     public bool HasActiveFilters => SelectedFilterTags.Any();
+    public string EmptyResultsMessage => HasActiveFilters ? NoFilteredResultsMessage : NoResultsMessage;
 
     public static string BuildFocusUrl(string url, string focusTarget)
     {

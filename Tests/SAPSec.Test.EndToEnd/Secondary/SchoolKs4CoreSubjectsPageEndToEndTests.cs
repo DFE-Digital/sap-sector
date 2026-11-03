@@ -44,7 +44,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
-        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2025 to 2026\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
         var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
@@ -61,7 +61,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2025 to 2026 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -82,7 +82,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var values = await table.GetTableColumnAsync("2024 to 2025");
+        var values = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(values).ToBePercentageValuesHavingCount(3);
 
         var schools = await table.GetTableColumnAsync("School");
@@ -113,13 +113,13 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(4);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(4);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(4);
     }
 
@@ -155,7 +155,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
-        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2025 to 2026\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
         var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
@@ -172,7 +172,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2025 to 2026 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -193,7 +193,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var values = await table.GetTableColumnAsync("2024 to 2025");
+        var values = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(values).ToBePercentageValuesHavingCount(3);
 
         var schools = await table.GetTableColumnAsync("School");
@@ -224,13 +224,13 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(4);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(4);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(4);
     }
 
@@ -266,7 +266,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
-        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2025 to 2026\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
         var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
@@ -283,7 +283,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2025 to 2026 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -304,7 +304,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var values = await table.GetTableColumnAsync("2024 to 2025");
+        var values = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(values).ToBePercentageValuesHavingCount(3);
 
         var schools = await table.GetTableColumnAsync("School");
@@ -335,13 +335,13 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(4);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(4);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(4);
     }
 
@@ -377,7 +377,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
-        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2025 to 2026\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
         var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
@@ -394,7 +394,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2025 to 2026 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -415,7 +415,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var values = await table.GetTableColumnAsync("2024 to 2025");
+        var values = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(values).ToBePercentageValuesHavingCount(3);
 
         var schools = await table.GetTableColumnAsync("School");
@@ -446,13 +446,13 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(4);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(4);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(4);
     }
 
@@ -488,7 +488,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
-        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2025 to 2026\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
         var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
@@ -505,7 +505,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2025 to 2026 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -526,7 +526,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var values = await table.GetTableColumnAsync("2024 to 2025");
+        var values = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(values).ToBePercentageValuesHavingCount(3);
 
         var schools = await table.GetTableColumnAsync("School");
@@ -557,13 +557,13 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(4);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(4);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(4);
     }
 
@@ -599,7 +599,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
-        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2025 to 2026\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
         var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
@@ -616,7 +616,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2025 to 2026 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -637,7 +637,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var values = await table.GetTableColumnAsync("2024 to 2025");
+        var values = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(values).ToBePercentageValuesHavingCount(3);
 
         var schools = await table.GetTableColumnAsync("School");
@@ -668,13 +668,13 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(4);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(4);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(4);
     }
 
@@ -710,7 +710,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
-        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2025 to 2026\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
         var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
@@ -727,7 +727,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         await Expect(yearByYearPanel).ToBeVisibleAsync();
 
         await Expect(toggleButton).ToBeVisibleAsync();
-        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2024 to 2025 bar graph");
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-label", "Show 2025 to 2026 bar graph");
 
         await toggleButton.ClickAsync();
 
@@ -748,7 +748,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var values = await table.GetTableColumnAsync("2024 to 2025");
+        var values = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(values).ToBePercentageValuesHavingCount(3);
 
         var schools = await table.GetTableColumnAsync("School");
@@ -779,13 +779,13 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
+        var previous2 = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous2).ToBePercentageValuesHavingCount(4);
 
-        var previous = await table.GetTableColumnAsync("2023 to 2024");
+        var previous = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(previous).ToBePercentageValuesHavingCount(4);
 
-        var current = await table.GetTableColumnAsync("2024 to 2025");
+        var current = await table.GetTableColumnAsync("2025 to 2026");
         await Expect(current).ToBePercentageValuesHavingCount(4);
     }
 

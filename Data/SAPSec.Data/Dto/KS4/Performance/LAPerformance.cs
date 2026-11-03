@@ -492,5 +492,7 @@ public class LAPerformance
     public string Physics79_Tot_LA_Previous_Pct { get; set; } = string.Empty;
     public string Physics79_Tot_LA_Previous2_Num { get; set; } = string.Empty;
     public string Physics79_Tot_LA_Previous2_Pct { get; set; } = string.Empty;
-    public string Prog8_Avg_LA_Previous2_Num { get; set; } = string.Empty;
+    public string Prog8_Tot_LA_Current_Num { get; set; } = string.Empty;
+    public string Prog8_Tot_LA_Previous_Num { get; set; } = string.Empty;
+    public string Prog8_Tot_LA_Previous2_Num { get; set; } = string.Empty;
 }

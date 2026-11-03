@@ -30,6 +30,7 @@
     <None Remove="Data\Files\Generated\EnglandPerformance.json" />
     <None Remove="Data\Files\Generated\Establishment.json" />
     <None Remove="Data\Files\Generated\EstablishmentAbsence.json" />
+    <None Remove="Data\Files\Generated\EstablishmentExclusions.json" />
     <None Remove="Data\Files\Generated\EstablishmentDestinations.json" />
     <None Remove="Data\Files\Generated\EstablishmentEmail.json" />
     <None Remove="Data\Files\Generated\EstablishmentGroupLinks.json" />
@@ -65,6 +66,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Files\Generated\EstablishmentAbsence.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\EstablishmentExclusions.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Files\Generated\EstablishmentDestinations.json">
