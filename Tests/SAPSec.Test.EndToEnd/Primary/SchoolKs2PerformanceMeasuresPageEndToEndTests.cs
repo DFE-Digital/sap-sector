@@ -27,7 +27,7 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
     {
         await base.InitializeAsync();
         await NavigateTo(Routes.FindASchool());
-        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(Urn);
+        await Page.GetByLabel("Compare and connect with similar schools", new() { Exact = true }).FillAsync(Urn);
         await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(PrimarySchoolRoute.Overview);
         await Page.GetByText("KS2", new() { Exact = true }).ClickAsync();

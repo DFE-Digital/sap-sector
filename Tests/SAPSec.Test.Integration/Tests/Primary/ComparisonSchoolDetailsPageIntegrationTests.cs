@@ -66,7 +66,7 @@ public class ComparisonSchoolDetailsPageIntegrationTests(
         var page = await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").Comparison("100002").SchoolDetails);
 
-        page.Title.Should().Be("Comparator School - Get school improvement insights - GOV.UK");
+        page.Title.Should().Be("Comparator School - Compare and connect with similar schools - GOV.UK");
 
         var heading = page.ElementShouldExist("h1.govuk-heading-xl");
         heading.TrimmedTextContent().Should().Be("Comparator School");

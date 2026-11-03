@@ -395,6 +395,11 @@
   padding: 0 15px;
 }
 
+.app-side-navigation__item {
+  margin-left:0px !important;
+  padding-left:10px !important;
+}
+
 .app-body-container-with-side-navigation {
   margin-top: 15px !important;
 }
@@ -1101,6 +1106,11 @@
     &:has(.govuk-input--error):after {
       border-color: #d4351c;
     }
+  }
+
+  // Rates that are not percentages (e.g. per 100 pupils) have no % suffix
+  .app-filter-range__input--no-suffix:after {
+    display: none;
   }
 
   .app-filter-range__from {
