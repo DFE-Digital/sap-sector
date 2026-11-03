@@ -105,7 +105,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("eng-lang-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -133,7 +133,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("eng-lang-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -232,7 +232,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("eng-lang-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", .. currentSchool],
             ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
@@ -295,7 +295,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("eng-lit-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -323,7 +323,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("eng-lit-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -438,7 +438,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("eng-lit-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", .. currentSchool],
             ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
@@ -498,7 +498,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -526,7 +526,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -640,7 +640,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", .. currentSchool],
             ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
@@ -700,7 +700,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("comb-sci-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -728,7 +728,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("comb-sci-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -843,7 +843,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("comb-sci-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", .. currentSchool],
             ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
@@ -904,7 +904,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("bio-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -933,7 +933,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("bio-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -1047,7 +1047,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("bio-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", .. currentSchool],
             ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
@@ -1107,7 +1107,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("chem-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -1135,7 +1135,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("chem-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -1249,7 +1249,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("chem-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", .. currentSchool],
             ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
@@ -1309,7 +1309,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("phys-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -1337,7 +1337,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("phys-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", "79%", "80%", "81%"],
             ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
@@ -1451,7 +1451,7 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
         var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("phys-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["School(s)", "2023 to 2024", "2024 to 2025", "2025 to 2026"],
             ["Current School", .. currentSchool],
             ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);

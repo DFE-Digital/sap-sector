@@ -10,6 +10,11 @@ namespace SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 /// </summary>
 public static class SimilarSchoolsViewModelHelpers
 {
+    // Range filters measured per 100 pupils rather than as a percentage
+    private static readonly HashSet<string> Per100PupilsRangeKeys = new(["sr", "per"], StringComparer.InvariantCultureIgnoreCase);
+
+    public static bool IsPercentageRange(string key) => !Per100PupilsRangeKeys.Contains(key);
+
     public static List<SimilarSchoolsFilterGroupViewModel> BuildFilterGroups(
         IReadOnlyCollection<SimilarSchoolsAvailableFilter> filterOptions)
     {
@@ -17,7 +22,7 @@ public static class SimilarSchoolsViewModelHelpers
         {
             ("Location", ["dist", "reg", "ur"]),
             ("School characteristics", ["st", "poe", "sciu", "gs", "np", "sf", "ap", "sp", "goe"]),
-            ("Attendance", ["oar", "par"])
+            ("Attendance and exclusion", ["oar", "par", "sr", "pps", "per"])
         };
 
         var grouped = new List<SimilarSchoolsFilterGroupViewModel>();
@@ -83,11 +88,12 @@ public static class SimilarSchoolsViewModelHelpers
                     (range.To.Key, range.To.Value)
                 ];
                 var queryString = BuildQueryStringWithout(currentFilters, sortBy, exclude);
+                var unit = IsPercentageRange(range.Key) ? "%" : "";
                 var rangeText = (string.IsNullOrWhiteSpace(range.From.Value), string.IsNullOrWhiteSpace(range.To.Value)) switch
                 {
-                    (false, false) => $"from {range.From.Value}% to {range.To.Value}%",
-                    (false, true) => $"over {range.From.Value}%",
-                    (true, false) => $"up to {range.To.Value}%",
+                    (false, false) => $"from {range.From.Value}{unit} to {range.To.Value}{unit}",
+                    (false, true) => $"over {range.From.Value}{unit}",
+                    (true, false) => $"up to {range.To.Value}{unit}",
                     _ => ""
                 };
                 tags.Add(new SimilarSchoolsSelectedFilterTagViewModel($"{range.Name} {rangeText}".Trim(), AppendQueryString(baseUrl, queryString)));

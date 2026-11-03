@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Data.Dto;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 using System.Text.RegularExpressions;
 
 namespace SAPSec.Web.Controllers;
 
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.SchoolAccess)]
 [Route("find-a-school")]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,

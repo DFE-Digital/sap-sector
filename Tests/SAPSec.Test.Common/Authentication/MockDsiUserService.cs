@@ -7,7 +7,17 @@ public class MockDsiUserService : IUserService
 {
     private string _currentOrganisationId = "org-123";
 
-    private readonly User _defaultUser = new()
+    private readonly User _defaultUser;
+
+    public MockDsiUserService(TestUserOrganisation? testUserOrganisation = null)
+    {
+        _defaultUser = CreateDefaultUser(
+            testUserOrganisation?.CategoryId ?? TestUserOrganisation.DefaultCategoryId,
+            testUserOrganisation?.Urn ?? TestUserOrganisation.DefaultUrn,
+            testUserOrganisation?.Phase ?? TestUserOrganisation.DefaultPhase);
+    }
+
+    private static User CreateDefaultUser(string categoryId, string urn, string phase) => new()
     {
         Sub = "test-user-123",
         Email = "test@example.com",
@@ -21,13 +31,17 @@ public class MockDsiUserService : IUserService
                 Id = "org-123",
                 Name = "Test Organisation",
                 LegalName = "TEST ORGANISATION LTD",
-                Urn = "123456",
+                Urn = urn,
                 Ukprn = "10012345",
-                Category = new Category { Id = "001", Name = "Establishment" },
+                Category = new Category
+                {
+                    Id = categoryId,
+                    Name = categoryId == OrganisationCategoryIds.Establishment ? "Establishment" : "Other"
+                },
                 Type = new Core.Authentication.Type { Id = "34", Name = "Academy Converter" },
                 Status = new Status { Id = 1, Name = "Open", TagColor = "green" },
                 Address = "123 Test Street, Test Town, TS1 1TT",
-                PhaseOfEducation = new PhaseOfEducation { Id = 2, Name = "Primary" }
+                PhaseOfEducation = new PhaseOfEducation { Id = 2, Name = phase }
             }
         }
     };

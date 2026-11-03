@@ -16,6 +16,10 @@ namespace SAPSec.Test.Accessibility.Setup;
 public class AccessibilityTestsWebApplicationFactory : WebApplicationFactory<Program>
 {
     private IHost? _host;
+
+    /// <summary>The services of the host that serves the browser (not the in-memory TestServer host).</summary>
+    public IServiceProvider BrowserHostServices => _host?.Services
+        ?? throw new InvalidOperationException("The browser host has not been started");
     private static string? _cachedWebProjectPath;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

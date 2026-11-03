@@ -3,6 +3,7 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Geography;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
+using SAPSec.Data.Dto.Exclusions;
 
 namespace SAPSec.Core.Features.SimilarSchools;
 
@@ -29,8 +30,11 @@ public record SimilarSchool
     public required ReferenceData TrustSchoolFlag { get; set; }
     public required DataWithAvailability<decimal> OverallAbsenceRate { get; set; }
     public required DataWithAvailability<decimal> PersistentAbsenceRate { get; set; }
+    public required DataWithAvailability<decimal> SuspensionRate { get; set; }
+    public required DataWithAvailability<decimal> PupilsSuspendedRate { get; set; }
+    public required DataWithAvailability<decimal> PermanentExclusionRate { get; set; }
 
-    public static SimilarSchool FromData(Establishment currentEstab, EstablishmentAbsence? absence)
+    public static SimilarSchool FromData(Establishment currentEstab, EstablishmentAbsence? absence, EstablishmentExclusions? exclusions)
     {
         return new SimilarSchool
         {
@@ -60,7 +64,10 @@ public record SimilarSchool
             OfficialSixthForm = new(currentEstab.OfficialSixthFormId, currentEstab.OfficialSixthFormName),
             ResourcedProvision = new(currentEstab.ResourcedProvisionId, currentEstab.ResourcedProvisionName),
             OverallAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Tot_Est_Current_Pct),
-            PersistentAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Persistent_Est_Current_Pct)
+            PersistentAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Persistent_Est_Current_Pct),
+            SuspensionRate = DataWithAvailability.FromDecimalString(exclusions?.Susp_Tot_Est_Current_Pct),
+            PupilsSuspendedRate = DataWithAvailability.FromDecimalString(exclusions?.OnePlusSusp_Tot_Est_Current_Pct),
+            PermanentExclusionRate = DataWithAvailability.FromDecimalString(exclusions?.PermExcl_Tot_Est_Current_Pct)
         };
     }
 }
