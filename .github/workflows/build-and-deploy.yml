@@ -446,6 +446,15 @@ jobs:
 
           ls -lh "${BACKUP_FILE}"
           gzip -t "${BACKUP_FILE}"
+
+          # The dump refreshes every materialized view at the end. In the small review Postgres pod, parallel workers
+          # and JIT on the wide KS4 views use more memory than the pod has and the worker is OOM-killed, so run the
+          # restore in a single process without JIT.
+          RESTORE_FILE="seed-restore.sql.gz"
+          { printf 'SET max_parallel_workers_per_gather = 0;\nSET jit = off;\n'; gzip -dc "${BACKUP_FILE}"; } | gzip > "${RESTORE_FILE}"
+          gzip -t "${RESTORE_FILE}"
+          BACKUP_FILE="${RESTORE_FILE}"
+
           max_attempts=3
           delay=10
           log_file="$(mktemp)"
@@ -877,6 +886,15 @@ jobs:
 
           ls -lh "${BACKUP_FILE}"
           gzip -t "${BACKUP_FILE}"
+
+          # The dump refreshes every materialized view at the end. In the small review Postgres pod, parallel workers
+          # and JIT on the wide KS4 views use more memory than the pod has and the worker is OOM-killed, so run the
+          # restore in a single process without JIT.
+          RESTORE_FILE="seed-restore.sql.gz"
+          { printf 'SET max_parallel_workers_per_gather = 0;\nSET jit = off;\n'; gzip -dc "${BACKUP_FILE}"; } | gzip > "${RESTORE_FILE}"
+          gzip -t "${RESTORE_FILE}"
+          BACKUP_FILE="${RESTORE_FILE}"
+
           max_attempts=3
           delay=10
           log_file="$(mktemp)"

@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
+using SAPSec.Data.Dto.Exclusions;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
@@ -22,6 +23,7 @@ public static class ServiceCollectionExtensions
         services.RemoveAll<IKs4PerformanceRepository>();
         services.RemoveAll<IKs4DestinationsRepository>();
         services.RemoveAll<IAbsenceRepository>();
+        services.RemoveAll<IExclusionsRepository>();
 
         services.AddJsonFile<Establishment>(JsonDataSource.Generated);
         services.AddJsonFile<EstablishmentEmail>(JsonDataSource.Generated);
@@ -47,6 +49,8 @@ public static class ServiceCollectionExtensions
         services.AddJsonFile<LAAbsence>(JsonDataSource.Generated);
         services.AddJsonFile<EnglandAbsence>(JsonDataSource.Generated);
 
+        services.AddJsonFile<EstablishmentExclusions>(JsonDataSource.Generated);
+
         services.AddSingleton<IEstablishmentRepository, JsonEstablishmentRepository>();
         services.AddSingleton<ISimilarSchoolsPrimaryRepository, JsonSimilarSchoolsPrimaryRepository>();
         services.AddSingleton<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
@@ -54,6 +58,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
         services.AddSingleton<IKs4DestinationsRepository, JsonKs4DestinationsRepository>();
         services.AddSingleton<IAbsenceRepository, JsonAbsenceRepository>();
+        services.AddSingleton<IExclusionsRepository, JsonExclusionsRepository>();
 
         return services;
     }
