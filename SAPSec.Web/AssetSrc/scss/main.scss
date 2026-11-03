@@ -1108,6 +1108,11 @@
     }
   }
 
+  // Rates that are not percentages (e.g. per 100 pupils) have no % suffix
+  .app-filter-range__input--no-suffix:after {
+    display: none;
+  }
+
   .app-filter-range__from {
     margin-right: 15px;
   }

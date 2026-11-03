@@ -10,3 +10,10 @@ school-email-addresses-24-08-2026
 # KS4 sources
 ees_ks4_202223_api
 
+
+# Exclusions sources
+exc_school
+
+# KS4 core subjects pupil characteristics
+202526_subject_school_pupil_entriesachievements_characteristics_provisional
+202526_subject_local_authority_pupil_entriesachievements_characteristics_provisional

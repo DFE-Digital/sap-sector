@@ -17,7 +17,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchool(
                 Ks4Attainment8.Key,
                 Ks4Attainment8.Name,
-                2024,
+                2025,
                 MeasureDataType.Score,
                 availableFilters,
                 currentSchool,
@@ -32,7 +32,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchoolComparison(
                 Ks4Attainment8.Key,
                 Ks4Attainment8.Name,
-                2024,
+                2025,
                 MeasureDataType.Score,
                 availableFilters,
                 currentSchool,
@@ -173,7 +173,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchool(
                 Ks4EnglishMaths.Key,
                 Ks4EnglishMaths.Name,
-                2024,
+                2025,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -188,7 +188,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchoolComparison(
                 Ks4EnglishMaths.Key,
                 Ks4EnglishMaths.Name,
-                2024,
+                2025,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -426,7 +426,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchool(
                 Ks4Destinations.Key,
                 Ks4Destinations.Name,
-                2022,
+                2023,
                 MeasureDataType.DestinationsPercentage,
                 availableFilters,
                 currentSchool,
@@ -441,7 +441,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchoolComparison(
                 Ks4Destinations.Key,
                 Ks4Destinations.Name,
-                2022,
+                2023,
                 MeasureDataType.DestinationsPercentage,
                 availableFilters,
                 currentSchool,
