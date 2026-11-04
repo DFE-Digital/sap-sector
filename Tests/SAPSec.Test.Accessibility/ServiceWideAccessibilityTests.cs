@@ -44,6 +44,10 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, IT
         new(Routes.SecondarySchool("100182").KS4CoreSubjects),
         new(Routes.SecondarySchool("100182").Attendance),
         new(Routes.SecondarySchool("100182").ViewSimilarSchools),
+        // Attendance and exclusion filters expanded with selected ranges
+        new($"{Routes.SecondarySchool("100182").ViewSimilarSchools}?sr_f=1&sr_t=20&pps_t=10&per_t=0.5"),
+        // Filters that match no schools
+        new($"{Routes.SecondarySchool("100182").ViewSimilarSchools}?sr_f=900"),
         new(Routes.SecondarySchool("100182").SchoolDetails),
         new(Routes.SecondarySchool("100182").WhatIsASimilarSchool),
         new(Routes.SecondarySchool("100182").RiseResources),

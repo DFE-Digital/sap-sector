@@ -2,6 +2,7 @@ using FluentAssertions;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
+using SAPSec.Data.Dto.Exclusions;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
@@ -358,5 +359,104 @@ public class ViewSimilarSchoolsPageIntegrationTests(
         var response = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").ViewSimilarSchools, HttpStatusCode.NotFound);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchools_ShowsAttendanceAndExclusionFilters()
+    {
+        SetupSchoolsWithExclusions();
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").ViewSimilarSchools, HttpStatusCode.OK);
+
+        var filter = page.ElementWithTestIdShouldExist("primary-similar-schools-filter");
+        var group = filter.QuerySelectorAll("fieldset")
+            .Single(f => f.QuerySelector("legend")?.TextContent.Trim() == "Attendance and exclusion");
+        group.QuerySelectorAll(".app-filter-section__title").Select(t => t.TextContent.Trim())
+            .Should().Equal("Overall absence rate", "Persistent absence rate", "Suspension rate", "Percentage of pupils suspended", "Permanent exclusion rate");
+
+        // All collapsed by default
+        group.QuerySelectorAll(".app-filter-section__toggle").Select(t => t.GetAttribute("aria-expanded"))
+            .Should().AllBe("false");
+
+        page.QuerySelector("#filter-sr .govuk-hint")!.TextContent.Trim().Should().Be("Number of suspensions per 100 pupils");
+        page.QuerySelector("#filter-pps .govuk-hint")!.TextContent.Trim().Should().Be("Percentage of pupils who were suspended at least once in a year");
+        page.QuerySelector("#filter-per .govuk-hint")!.TextContent.Trim().Should().Be("Number of permanent exclusions per 100 pupils");
+
+        page.QuerySelector("#filter-sr .govuk-inset-text")!.TextContent.Should().Contain("This school:").And.Contain("1.50");
+        page.QuerySelector("#filter-pps .govuk-inset-text")!.TextContent.Should().Contain("2.25%");
+        page.QuerySelector("#filter-per .govuk-inset-text")!.TextContent.Should().Contain("0.12");
+
+        // Only the percentage of pupils suspended inputs show a % suffix
+        page.QuerySelectorAll("#filter-pps .app-filter-range__input--no-suffix").Should().BeEmpty();
+        page.QuerySelectorAll("#filter-sr .app-filter-range__input--no-suffix").Should().HaveCount(2);
+        page.QuerySelectorAll("#filter-per .app-filter-range__input--no-suffix").Should().HaveCount(2);
+        foreach (var key in new[] { "sr", "pps", "per" })
+        {
+            page.QuerySelector($"#filter-{key} input#{key}_f").Should().NotBeNull();
+            page.QuerySelector($"#filter-{key} input#{key}_t").Should().NotBeNull();
+        }
+    }
+
+    [Theory]
+    [InlineData("sr_f=2&sr_t=5", "Suspension rate from 2 to 5", "Test School 3")]
+    [InlineData("pps_t=3", "Percentage of pupils suspended up to 3%", "Test School 2")]
+    [InlineData("per_f=.5", "Permanent exclusion rate over 0.5", "Test School 3")]
+    public async Task ViewSimilarSchools_FiltersByExclusionRates(string query, string expectedTag, string expectedSchool)
+    {
+        SetupSchoolsWithExclusions();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.PrimarySchool("100001").ViewSimilarSchools}?{query}", HttpStatusCode.OK);
+
+        var list = page.ElementWithTestIdShouldExist("primary-similar-schools-list");
+        list.QuerySelectorAll(".app-school-result > a").Select(a => a.TextContent.Trim())
+            .Should().Equal(expectedSchool);
+
+        page.QuerySelectorAll(".app-filter__tag").Select(t => t.TextContent.Replace("Remove this filter", "").Trim())
+            .Should().Equal(expectedTag);
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchools_CombinesAttendanceAndExclusionFiltersWithLogicalAND()
+    {
+        SetupSchoolsWithExclusions();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.PrimarySchool("100001").ViewSimilarSchools}?oar_t=5.5&sr_f=2", HttpStatusCode.OK);
+
+        page.QuerySelector("#similar-schools-results")!.TextContent.Trim().Should().Be("There are no schools that match your search.");
+        page.QuerySelectorAll(".app-filter__tag").Should().HaveCount(2);
+    }
+
+    [Theory]
+    [InlineData("sr_f=abc", "sr_f-error", "Enter a numeric value")]
+    [InlineData("pps_f=5&pps_t=1", "pps-error", "The From value must be lower than the To value")]
+    public async Task ViewSimilarSchools_ExclusionFilterValidationErrors(string query, string errorId, string expectedError)
+    {
+        SetupSchoolsWithExclusions();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.PrimarySchool("100001").ViewSimilarSchools}?{query}", HttpStatusCode.OK);
+
+        page.QuerySelector($"#{errorId}")!.TextContent.Should().Contain(expectedError);
+    }
+
+    private void SetupSchoolsWithExclusions()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            new Establishment { URN = "100001", EstablishmentName = "Test School 1", LAId = "001", LAName = "Test LA 1", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", NurseryProvisionName = "No", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", Easting = 100000, Northing = 100000, TotalCapacity = 300, TotalPupils = 210 },
+            new Establishment { URN = "100002", EstablishmentName = "Test School 2", LAId = "002", LAName = "Test LA 2", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", NurseryProvisionName = "No", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", Easting = 108046, Northing = 100000, TotalCapacity = 300, TotalPupils = 220 },
+            new Establishment { URN = "100003", EstablishmentName = "Test School 3", LAId = "003", LAName = "Test LA 3", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", NurseryProvisionName = "No", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", Easting = 108047, Northing = 100000, TotalCapacity = 300, TotalPupils = 230 });
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            new SimilarSchoolsPrimaryGroupsEntry { URN = "100001", NeighbourURN = "100002", Rank = "1", Dist = "0.1" },
+            new SimilarSchoolsPrimaryGroupsEntry { URN = "100001", NeighbourURN = "100003", Rank = "2", Dist = "0.2" });
+
+        Fixture.AbsenceRepository.SetupEstablishmentAbsence(
+            new EstablishmentAbsence { Id = "100001", Abs_Tot_Est_Current_Pct = "4.5", Abs_Persistent_Est_Current_Pct = "12.0" },
+            new EstablishmentAbsence { Id = "100002", Abs_Tot_Est_Current_Pct = "5.1", Abs_Persistent_Est_Current_Pct = "13.0" },
+            new EstablishmentAbsence { Id = "100003", Abs_Tot_Est_Current_Pct = "6.1", Abs_Persistent_Est_Current_Pct = "14.0" });
+
+        Fixture.ExclusionsRepository.SetupEstablishmentExclusions(
+            new EstablishmentExclusions { Id = "100001", Susp_Tot_Est_Current_Pct = "1.5", OnePlusSusp_Tot_Est_Current_Pct = "2.25", PermExcl_Tot_Est_Current_Pct = "0.1234" },
+            new EstablishmentExclusions { Id = "100002", Susp_Tot_Est_Current_Pct = "1.0", OnePlusSusp_Tot_Est_Current_Pct = "2.0", PermExcl_Tot_Est_Current_Pct = "0" },
+            new EstablishmentExclusions { Id = "100003", Susp_Tot_Est_Current_Pct = "4.0", OnePlusSusp_Tot_Est_Current_Pct = "6.0", PermExcl_Tot_Est_Current_Pct = "0.6" });
     }
 }

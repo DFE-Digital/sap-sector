@@ -45,8 +45,14 @@ public record TopPerformer(
     private static decimal TopPerformerSortValue(decimal? value, MeasureDataType dataType) =>
         Math.Round(value!.Value, DisplayDecimalPlaces(dataType), MidpointRounding.AwayFromZero);
 
-    private static int DisplayDecimalPlaces(MeasureDataType dataType) =>
-        dataType is MeasureDataType.Score or MeasureDataType.ScaledScore ? 1 : 0;
+    // Must match the decimal places the page shows (MeasureBreakdownViewModel.DisplayNumber),
+    // so schools are only tied when their displayed values are equal.
+    private static int DisplayDecimalPlaces(MeasureDataType dataType) => dataType switch
+    {
+        MeasureDataType.Score or MeasureDataType.ScaledScore or MeasureDataType.DestinationsPercentage => 1,
+        MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
+        _ => 0
+    };
 
     private sealed record TopPerformerCandidate(
         string Urn,

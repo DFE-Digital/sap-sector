@@ -19,7 +19,7 @@ public static class PostgresDependenciesExtensions
         services.AddRepository<IKs4PerformanceRepository, PostgresKs4PerformanceRepository, CachedKs4PerformanceRepository>(configuration);
         services.AddRepository<IKs4DestinationsRepository, PostgresKs4DestinationsRepository, CachedKs4DestinationsRepository>(configuration);
         services.AddRepository<IKs2PerformanceRepository, PostgresKs2PerformanceRepository, CachedKs2PerformanceRepository>(configuration);
-        services.AddRepository<IAbsenceRepository, PostgresAbsenceRepository, CachedAbsenceRepository>(configuration);
+        services.AddRepository<IExclusionsRepository, PostgresExclusionsRepository, CachedExclusionsRepository>(configuration);
 
         return services;
     }

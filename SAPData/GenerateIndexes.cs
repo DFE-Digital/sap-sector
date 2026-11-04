@@ -42,6 +42,7 @@ public class GenerateIndexes
             { "v_establishment_subject_entries", "\"school_urn\"" },
 
             { "v_establishment_absence",      "\"Id\"" },
+            { "v_establishment_exclusions",   "\"Id\"" },
             { "v_establishment_destinations", "\"Id\"" },
             { "v_establishment_performance",  "\"Id\"" },
             { "v_establishment_workforce",    "\"Id\"" },

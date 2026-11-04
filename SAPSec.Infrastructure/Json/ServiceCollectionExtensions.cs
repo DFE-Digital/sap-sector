@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using SAPSec.Core.Caching;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
+using SAPSec.Data.Dto.Exclusions;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
@@ -24,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.RemoveAll<IKs4PerformanceRepository>();
         services.RemoveAll<IKs4DestinationsRepository>();
         services.RemoveAll<IAbsenceRepository>();
+        services.RemoveAll<IExclusionsRepository>();
 
         services.AddJsonFile<Establishment>(JsonDataSource.Generated);
         services.AddJsonFile<EstablishmentEmail>(JsonDataSource.Generated);
@@ -48,14 +50,14 @@ public static class ServiceCollectionExtensions
         services.AddJsonFile<EstablishmentAbsence>(JsonDataSource.Generated);
         services.AddJsonFile<LAAbsence>(JsonDataSource.Generated);
         services.AddJsonFile<EnglandAbsence>(JsonDataSource.Generated);
+        services.AddJsonFile<EstablishmentExclusions>(JsonDataSource.Generated);
 
-        services.AddRepository<IEstablishmentRepository, JsonEstablishmentRepository, CachedEstablishmentRepository>(configuration);
-        services.AddRepository<ISimilarSchoolsPrimaryRepository, JsonSimilarSchoolsPrimaryRepository, CachedSimilarSchoolsPrimaryRepository>(configuration);
         services.AddRepository<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository, CachedSimilarSchoolsSecondaryRepository>(configuration);
         services.AddRepository<IKs4PerformanceRepository, JsonKs4PerformanceRepository, CachedKs4PerformanceRepository>(configuration);
         services.AddRepository<IKs4DestinationsRepository, JsonKs4DestinationsRepository, CachedKs4DestinationsRepository>(configuration);
         services.AddRepository<IKs2PerformanceRepository, JsonKs2PerformanceRepository, CachedKs2PerformanceRepository>(configuration);
         services.AddRepository<IAbsenceRepository, JsonAbsenceRepository, CachedAbsenceRepository>(configuration);
+        services.AddRepository<IExclusionsRepository, JsonExclusionsRepository, CachedExclusionsRepository>(configuration);
 
         return services;
     }
