@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SAPSec.Core.Caching;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
@@ -12,7 +14,7 @@ namespace SAPSec.Infrastructure.Json;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddJsonDependencies(this IServiceCollection services)
+    public static IServiceCollection AddJsonDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         // JSON files
         services.RemoveAll<IEstablishmentRepository>();
@@ -47,13 +49,13 @@ public static class ServiceCollectionExtensions
         services.AddJsonFile<LAAbsence>(JsonDataSource.Generated);
         services.AddJsonFile<EnglandAbsence>(JsonDataSource.Generated);
 
-        services.AddSingleton<IEstablishmentRepository, JsonEstablishmentRepository>();
-        services.AddSingleton<ISimilarSchoolsPrimaryRepository, JsonSimilarSchoolsPrimaryRepository>();
-        services.AddSingleton<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
-        services.AddSingleton<IKs2PerformanceRepository, JsonKs2PerformanceRepository>();
-        services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
-        services.AddSingleton<IKs4DestinationsRepository, JsonKs4DestinationsRepository>();
-        services.AddSingleton<IAbsenceRepository, JsonAbsenceRepository>();
+        services.AddRepository<IEstablishmentRepository, JsonEstablishmentRepository, CachedEstablishmentRepository>(configuration);
+        services.AddRepository<ISimilarSchoolsPrimaryRepository, JsonSimilarSchoolsPrimaryRepository, CachedSimilarSchoolsPrimaryRepository>(configuration);
+        services.AddRepository<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository, CachedSimilarSchoolsSecondaryRepository>(configuration);
+        services.AddRepository<IKs4PerformanceRepository, JsonKs4PerformanceRepository, CachedKs4PerformanceRepository>(configuration);
+        services.AddRepository<IKs4DestinationsRepository, JsonKs4DestinationsRepository, CachedKs4DestinationsRepository>(configuration);
+        services.AddRepository<IKs2PerformanceRepository, JsonKs2PerformanceRepository, CachedKs2PerformanceRepository>(configuration);
+        services.AddRepository<IAbsenceRepository, JsonAbsenceRepository, CachedAbsenceRepository>(configuration);
 
         return services;
     }

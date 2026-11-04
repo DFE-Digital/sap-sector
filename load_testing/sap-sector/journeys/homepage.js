@@ -7,7 +7,7 @@ export function homepageJourney (environment, config) {
     const response = http.get(`${environment.baseUrl}/`)
 
     performanceCheck(response, 'Homepage', config.expectedResponseTimes.homepage)
-    contentCheck(response, 'Get school improvement insights', 'Homepage heading')
+    contentCheck(response, 'Compare and connect with similar schools.', 'Homepage heading')
 
     sleep(1)
   })

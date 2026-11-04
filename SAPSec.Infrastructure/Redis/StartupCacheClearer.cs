@@ -1,14 +1,19 @@
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using SAPSec.Core.Caching;
 
 namespace SAPSec.Infrastructure.Redis;
 
 public class StartupCacheClearer(
-    ICache cache)
+    ICache cache,
+    IOptions<CachingConfiguration> config)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        await cache.Clear();
+        if (config.Value.ClearCacheOnStartup)
+        {
+            await cache.Clear();
+        }
     }
 }

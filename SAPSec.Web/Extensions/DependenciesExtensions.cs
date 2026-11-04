@@ -1,3 +1,4 @@
+using SAPSec.Core;
 using SAPSec.Core.Caching;
 using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Data.Repositories;
@@ -24,15 +25,30 @@ public static class DependenciesExtensions
         services.AddSingleton<IJsonFileFactory, JsonFileFactory>();
         services.AddJsonFile<RiseResourcesDocument>(JsonDataSource.RiseResources);
         services.AddSingleton<IRiseResourcesRepository, JsonRiseResourcesRepository>();
+    }
 
-        // Caching
+    public static void AddCaching(this IServiceCollection services, IConfiguration configuration, Action<IServiceCollection, IConfiguration> configure)
+    {
+        var config = configuration.GetSection(nameof(CachingConfiguration)).Get<CachingConfiguration>();
+
+        if (config is not null && config.EnableCaching)
+        {
+            services.Configure<CachingConfiguration>(configuration.GetSection(nameof(CachingConfiguration)));
+            services.AddHostedService<StartupCacheClearer>();
+            configure(services, configuration);
+        }
+    }
+
+    public static void AddRequestCache(this IServiceCollection services)
+    {
         services.AddSingleton<RequestCache>();
-        services.AddSingleton<RedisCache>();
-        services.AddSingleton<InMemoryCache>();
-
         services.AddSingleton<ICache>(sp => new NestedCache(
             sp.GetRequiredService<RequestCache>(),
-            sp.GetRequiredService<RedisCache>()));
-        services.AddHostedService<StartupCacheClearer>();
+            sp.GetRequiredKeyedService<ICache>(ServiceKeys.RealImplementation)));
+    }
+
+    public static void AddInMemoryCache(this IServiceCollection services)
+    {
+        services.AddKeyedSingleton<ICache, InMemoryCache>(ServiceKeys.RealImplementation);
     }
 }

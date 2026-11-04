@@ -37,4 +37,34 @@ public class PostgresCache(NpgsqlDataSourceFactory factory) : ICache
         using var conn = await factory.Create().OpenConnectionAsync();
         await conn.ExecuteAsync("TRUNCATE TABLE cache");
     }
+
+    public async Task<TValue?> Get<TValue>(string key)
+    {
+        using var conn = await factory.Create().OpenConnectionAsync();
+
+        var json = await conn.QuerySingleOrDefaultAsync<string?>("SELECT value FROM cache WHERE key = @key",
+            new { key });
+
+        try
+        {
+            if (json is not null && JsonSerializer.Deserialize<TValue>(json) is TValue cachedValue)
+            {
+                return cachedValue;
+            }
+        }
+        catch (JsonException ex)
+        {
+            throw new ApplicationException($"Error deserializing cached value for key {key} to type {typeof(TValue).Name}: {ex.Message}{Environment.NewLine} {json}", ex);
+        }
+
+        return default(TValue?);
+    }
+
+    public async Task Set<TValue>(string key, TValue value)
+    {
+        using var conn = await factory.Create().OpenConnectionAsync();
+
+        await conn.ExecuteAsync("INSERT INTO cache VALUES(@key, @value::json)",
+            new { key, value = JsonSerializer.Serialize(value) });
+    }
 }
