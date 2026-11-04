@@ -484,6 +484,10 @@ The wider strategy — unit, integration, HTTP, UI, accessibility, security, loa
 
 The pipeline runs through the **School Data Ingestion Pipeline** workflow (`data-pipeline.yml`), which can target test or production and can also produce a seed backup for a review app. Raw data files are never committed. See [`SAPData/README.md`](SAPData/README.md) and [`docs/data/`](docs/data/).
 
+After successful production ETL, the workflow restarts the AKS application deployment and waits up to five minutes for the rollout. Before removing maintenance routing, it probes `/healthcheck` through a temporary, runner-local port-forward to the application service, requiring HTTP 200 and `Healthy` within 30 attempts (five-second pauses and up to five seconds per request). This bypasses the maintenance ingress. A failed restart or health check fails the job and leaves maintenance enabled; inspect the pipeline report and logs before using the maintenance toggle workflow to restore traffic manually.
+
+The workflow identity requires Kubernetes permissions to patch and watch deployments, read services and pods, and create pod port-forwards. Restart and maintenance routing remain disabled for test. Existing maintenance restoration on ETL failure is unchanged.
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Deployment

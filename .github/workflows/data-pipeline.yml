@@ -1089,10 +1089,95 @@ jobs:
             exit 2
           fi
 
+      - name: Restart application and verify health
+        id: restart_application
+        if: ${{ success() && steps.etl.outcome == 'success' && matrix.target_env != 'test' }}
+        timeout-minutes: 12
+        shell: bash
+        run: |
+          set -euo pipefail
+          app_name="${SERVICE_NAME}-${DEPLOY_ENV}"
+          health_file="${PIPELINE_LOG_DIR}/application-healthcheck.txt"
+          forward_log="${PIPELINE_LOG_DIR}/application-port-forward.log"
+
+          kubectl -n "${NAMESPACE}" rollout restart "deployment/${app_name}"
+          kubectl -n "${NAMESPACE}" rollout status "deployment/${app_name}" --timeout=300s
+
+          service_port="$(kubectl -n "${NAMESPACE}" get service "${app_name}" -o jsonpath='{.spec.ports[0].port}')"
+          if [[ ! "${service_port}" =~ ^[0-9]+$ ]]; then
+            echo "::error::Could not determine the application service port for ${app_name}."
+            exit 1
+          fi
+
+          # Bypass the ingress, which still routes public traffic to maintenance.
+          kubectl -n "${NAMESPACE}" port-forward --address 127.0.0.1 "service/${app_name}" "18080:${service_port}" > "${forward_log}" 2>&1 &
+          forward_pid=$!
+          cleanup() {
+            if kill -0 "${forward_pid}" 2>/dev/null; then
+              kill "${forward_pid}"
+            fi
+            wait "${forward_pid}" || true
+          }
+          trap cleanup EXIT
+
+          for attempt in $(seq 1 30); do
+            if ! kill -0 "${forward_pid}" 2>/dev/null; then
+              echo "::error::Application port-forward stopped before health verification completed."
+              cat "${forward_log}"
+              exit 1
+            fi
+
+            if status_code="$(curl --silent --show-error --connect-timeout 2 --max-time 5 \
+              --output "${health_file}" --write-out '%{http_code}' \
+              http://127.0.0.1:18080/healthcheck)"; then
+              if [ "${status_code}" = "200" ] && [ "$(cat "${health_file}")" = "Healthy" ]; then
+                echo "Application restart verified: /healthcheck returned HTTP 200 and Healthy."
+                exit 0
+              fi
+              echo "Health check attempt ${attempt}/30 returned HTTP ${status_code}:"
+              cat "${health_file}"
+              echo
+            else
+              echo "Health check attempt ${attempt}/30 could not reach the application."
+            fi
+            sleep 5
+          done
+
+          echo "::error::Application did not return HTTP 200 and Healthy after restart; maintenance remains enabled."
+          cat "${forward_log}"
+          exit 1
+
+      - name: Summarise application restart
+        if: ${{ always() && matrix.target_env != 'test' }}
+        shell: pwsh
+        run: |
+          $status = "${{ steps.restart_application.outcome }}"
+          $summaryText = if ($status -eq "success") {
+            "Restarted application and verified /healthcheck returned HTTP 200 and Healthy."
+          } elseif ($status -eq "skipped") {
+            "Application restart was skipped because preceding pipeline steps did not succeed."
+          } else {
+            "Application restart or health verification did not succeed; maintenance was not disabled."
+          }
+          $summary = [pscustomobject]@{
+            stage = "application-restart"
+            status = $status
+            utcTime = [DateTime]::UtcNow.ToString("o")
+            summary = $summaryText
+            metadata = [ordered]@{
+              environment = $env:DEPLOY_ENV
+              namespace = $env:NAMESPACE
+              deployment = "${env:SERVICE_NAME}-${env:DEPLOY_ENV}"
+              healthcheckPath = "/healthcheck"
+            }
+          }
+          $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $env:PIPELINE_REPORT_DIR "stage-09a-application-restart.json")
+
       - name: Disable maintenance page
         id: disable_maintenance
         # TODO: re-enable for test once maintenance page setup is verified there
-        if: ${{ always() && matrix.target_env != 'test' && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
+        # Preserve ETL-failure recovery, but never reopen after successful ETL without a healthy restart.
+        if: ${{ always() && matrix.target_env != 'test' && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && (steps.etl.outcome != 'success' || steps.restart_application.outcome == 'success') }}
         shell: bash
         run: |
           set -euo pipefail
@@ -1118,11 +1203,18 @@ jobs:
           } else {
             "${{ steps.disable_maintenance.outcome }}"
           }
+          $summaryText = if ($status -eq "completed") {
+            "Restored ingress configuration after ETL."
+          } elseif ("${{ steps.etl.outcome }}" -eq "success" -and "${{ steps.restart_application.outcome }}" -ne "success") {
+            "Kept maintenance enabled because application restart and health verification did not succeed."
+          } else {
+            "Maintenance restore did not complete; see the step outcome and logs."
+          }
           $summary = [pscustomobject]@{
             stage = "maintenance-disable"
             status = $status
             utcTime = [DateTime]::UtcNow.ToString("o")
-            summary = "Restored ingress configuration after ETL."
+            summary = $summaryText
             metadata = [ordered]@{
               environment = $env:DEPLOY_ENV
               restoreStatus = "${{ steps.disable_maintenance.outputs.restore_status }}"
