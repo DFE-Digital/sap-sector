@@ -7,9 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Authentication;
+using SAPSec.Core.Caching;
 using SAPSec.Infrastructure.Json;
 using SAPSec.UI.Tests.TestData;
 using SAPSec.Web;
+using SAPSec.Web.Extensions;
 
 namespace SAPSec.UI.Tests.Deprecated.Infrastructure;
 
@@ -40,6 +42,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddScoped<IDsiClient, MockDsiClient>();
 
                 services.AddJsonDependencies(configuration);
+                services.AddNestedCache<RequestCache, InMemoryCache>();
             });
     }
 

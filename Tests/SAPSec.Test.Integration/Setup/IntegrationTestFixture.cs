@@ -62,6 +62,7 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
 
     public virtual async Task DisposeAsync()
     {
+        await ClearDown();
         Client?.Dispose();
         NonRedirectingClient?.Dispose();
 
@@ -106,5 +107,6 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
         return document;
     }
 
+    public abstract Task ClearDown();
     protected abstract IntegrationTestsWebApplicationFactory CreateWebApplicationFactory();
 }
