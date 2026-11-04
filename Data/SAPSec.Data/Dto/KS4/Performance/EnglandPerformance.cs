@@ -591,6 +591,15 @@ public class EnglandPerformance
     public string Physics49_Tot_Eng_Previous_Pct { get; set; } = string.Empty;
     public string Physics49_Tot_Eng_Previous2_Num { get; set; } = string.Empty;
     public string Physics49_Tot_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Physics49_Dis_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Physics49_Dis_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Physics49_Dis_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Physics49_NDi_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Physics49_NDi_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Physics49_NDi_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Physics49_EAL_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Physics49_EAL_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Physics49_EAL_Eng_Previous2_Pct { get; set; } = string.Empty;
     public string Physics59_Boy_Eng_Current_Num { get; set; } = string.Empty;
     public string Physics59_Boy_Eng_Current_Pct { get; set; } = string.Empty;
     public string Physics59_Boy_Eng_Previous_Num { get; set; } = string.Empty;
@@ -609,6 +618,15 @@ public class EnglandPerformance
     public string Physics59_Tot_Eng_Previous_Pct { get; set; } = string.Empty;
     public string Physics59_Tot_Eng_Previous2_Num { get; set; } = string.Empty;
     public string Physics59_Tot_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Physics59_Dis_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Physics59_Dis_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Physics59_Dis_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Physics59_NDi_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Physics59_NDi_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Physics59_NDi_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Physics59_EAL_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Physics59_EAL_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Physics59_EAL_Eng_Previous2_Pct { get; set; } = string.Empty;
     public string Physics79_Boy_Eng_Current_Num { get; set; } = string.Empty;
     public string Physics79_Boy_Eng_Current_Pct { get; set; } = string.Empty;
     public string Physics79_Boy_Eng_Previous_Num { get; set; } = string.Empty;
@@ -627,4 +645,13 @@ public class EnglandPerformance
     public string Physics79_Tot_Eng_Previous_Pct { get; set; } = string.Empty;
     public string Physics79_Tot_Eng_Previous2_Num { get; set; } = string.Empty;
     public string Physics79_Tot_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Physics79_Dis_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Physics79_Dis_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Physics79_Dis_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Physics79_NDi_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Physics79_NDi_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Physics79_NDi_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Physics79_EAL_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Physics79_EAL_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Physics79_EAL_Eng_Previous2_Pct { get; set; } = string.Empty;
 }
