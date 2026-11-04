@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SAPSec.Core.Caching;
 using SAPSec.Core.Features.Measures.Attendance;
@@ -11,7 +12,6 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Time;
-using SAPSec.Core.UseCases;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SAPSec.Core;
@@ -26,44 +26,44 @@ public static class ServiceKeys
 [ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
-    public static void AddUseCases(this IServiceCollection services)
+    public static void AddUseCases(this IServiceCollection services, IConfiguration configuration)
     {
         // School info
 
-        services.AddUseCase<GetSchoolInfoUseCase>();
+        services.AddUseCase<GetSchoolInfoUseCase>(configuration);
 
         // School details
 
-        services.AddUseCase<GetSchoolDetailsUseCase>();
-        services.AddKeyedUseCase<GetPrimaryComparisonSchoolDetailsUseCase>(ServiceKeys.Primary);
-        services.AddKeyedUseCase<GetSecondaryComparisonSchoolDetailsUseCase>(ServiceKeys.Secondary);
+        services.AddUseCase<GetSchoolDetailsUseCase>(configuration);
+        services.AddKeyedUseCase<GetPrimaryComparisonSchoolDetailsUseCase>(ServiceKeys.Primary, configuration);
+        services.AddKeyedUseCase<GetSecondaryComparisonSchoolDetailsUseCase>(ServiceKeys.Secondary, configuration);
 
         // Similar schools
 
-        services.AddUseCase<FindPrimarySimilarSchoolsUseCase>();
-        services.AddUseCase<FindSecondarySimilarSchoolsUseCase>();
-        services.AddUseCase<GetSecondaryComparisonSimilarityCharacteristicsUseCase>();
-        services.AddUseCase<GetPrimaryComparisonSimilarityCharacteristicsUseCase>();
-        services.AddUseCase<GetAllThroughSimilarSchoolPhasesUseCase>();
+        services.AddUseCase<FindPrimarySimilarSchoolsUseCase>(configuration);
+        services.AddUseCase<FindSecondarySimilarSchoolsUseCase>(configuration);
+        services.AddUseCase<GetSecondaryComparisonSimilarityCharacteristicsUseCase>(configuration);
+        services.AddUseCase<GetPrimaryComparisonSimilarityCharacteristicsUseCase>(configuration);
+        services.AddUseCase<GetAllThroughSimilarSchoolPhasesUseCase>(configuration);
 
         // Measures
 
-        services.AddUseCase<GetSchoolKs2PerformanceMeasuresUseCase>();
-        services.AddUseCase<GetComparisonKs2PerformanceMeasuresUseCase>();
+        services.AddUseCase<GetSchoolKs2PerformanceMeasuresUseCase>(configuration);
+        services.AddUseCase<GetComparisonKs2PerformanceMeasuresUseCase>(configuration);
 
-        services.AddUseCase<GetSchoolKs4HeadlineMeasuresUseCase>();
-        services.AddUseCase<GetComparisonKs4HeadlineMeasuresUseCase>();
+        services.AddUseCase<GetSchoolKs4HeadlineMeasuresUseCase>(configuration);
+        services.AddUseCase<GetComparisonKs4HeadlineMeasuresUseCase>(configuration);
 
-        services.AddUseCase<GetSchoolKs4CoreSubjectsMeasuresUseCase>();
-        services.AddUseCase<GetComparisonKs4CoreSubjectsMeasuresUseCase>();
+        services.AddUseCase<GetSchoolKs4CoreSubjectsMeasuresUseCase>(configuration);
+        services.AddUseCase<GetComparisonKs4CoreSubjectsMeasuresUseCase>(configuration);
 
-        services.AddUseCase<GetSchoolAttendanceMeasuresUseCase>();
-        services.AddUseCase<GetPrimaryComparisonAttendanceMeasuresUseCase>();
-        services.AddUseCase<GetSecondaryComparisonAttendanceMeasuresUseCase>();
+        services.AddUseCase<GetSchoolAttendanceMeasuresUseCase>(configuration);
+        services.AddUseCase<GetPrimaryComparisonAttendanceMeasuresUseCase>(configuration);
+        services.AddUseCase<GetSecondaryComparisonAttendanceMeasuresUseCase>(configuration);
 
         // RISE Resources
 
-        services.AddUseCase<GetRiseResourcesUseCase>();
+        services.AddUseCase<GetRiseResourcesUseCase>(configuration);
 
         // Time
 
@@ -76,73 +76,5 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
         services.AddSingleton<ISchoolClosureEligibilityService, SchoolClosureEligibilityService>();
         services.AddSingleton<ISchoolPredecessorRelationshipService, SchoolPredecessorRelationshipService>();
-    }
-
-    private static void AddUseCase<TImplementation>(this IServiceCollection services)
-        where TImplementation : class
-        => services.AddUseCase(typeof(TImplementation));
-
-    private static void AddUseCase(this IServiceCollection services, Type implementationType)
-    {
-        var interfaceType = GetInterfaceType(implementationType);
-
-        services.AddKeyedSingleton(interfaceType, ServiceKeys.RealImplementation, implementationType);
-        services.AddSingleton(interfaceType, sp =>
-            sp.GetCachedUseCase(interfaceType, ServiceKeys.RealImplementation));
-    }
-
-    private static void AddKeyedUseCase<TImplementation>(this IServiceCollection services, string serviceKey)
-        where TImplementation : class
-        => services.AddKeyedUseCase(serviceKey, typeof(TImplementation));
-
-    private static void AddKeyedUseCase(this IServiceCollection services, string serviceKey, Type implementationType)
-    {
-        var interfaceType = GetInterfaceType(implementationType);
-
-        services.AddKeyedSingleton(interfaceType, $"{ServiceKeys.RealImplementation}|{serviceKey}", implementationType);
-        services.AddKeyedSingleton(interfaceType, serviceKey, (sp, k) =>
-            sp.GetCachedUseCase(interfaceType, $"{ServiceKeys.RealImplementation}|{k}"));
-    }
-
-    private static Type GetInterfaceType(Type implementationType)
-    {
-        var interfaceTypes = implementationType.FindInterfaces((t, _) =>
-            t.IsGenericType && t.GetGenericTypeDefinition().Equals(typeof(IUseCase<,>)), null);
-
-        if (interfaceTypes.Length != 1)
-        {
-            throw new ApplicationException($"Use case type should only have a single IUseCase definition: {implementationType.FullName}");
-        }
-
-        var interfaceType = interfaceTypes.First();
-
-        if (interfaceType.GenericTypeArguments.Length != 2)
-        {
-            throw new ApplicationException($"Use case interface type should have two type parameters: {interfaceType.FullName}");
-        }
-
-        return interfaceType;
-    }
-
-    private static object GetCachedUseCase(this IServiceProvider sp, Type interfaceType, string serviceKey)
-    {
-        var useCase = sp.GetKeyedService(interfaceType, serviceKey);
-
-        if (useCase is null)
-        {
-            throw new ApplicationException($"No use case implemention defined for interface: {interfaceType.FullName}");
-        }
-
-        var cachedUseCaseType = typeof(CachedUseCase<,>).MakeGenericType(interfaceType.GenericTypeArguments);
-
-        var cache = sp.GetRequiredService<ICache>();
-        var cachedUseCase = Activator.CreateInstance(cachedUseCaseType, useCase, cache);
-
-        if (cachedUseCase is null)
-        {
-            throw new ApplicationException($"Instance was null: {cachedUseCaseType.FullName}");
-        }
-
-        return cachedUseCase;
     }
 }

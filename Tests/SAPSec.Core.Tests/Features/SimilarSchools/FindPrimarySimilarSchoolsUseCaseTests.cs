@@ -3846,7 +3846,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         }));
 
         response.ValidationErrors.Should().BeEmpty();
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -3918,7 +3918,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey + "_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -4002,7 +4002,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["per_t"] = ["0.1"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -4026,7 +4026,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         }));
 
         response.HasSimilarSchools.Should().BeTrue();
-        response.AllResults.Should().BeEmpty();
+        response.ResultsPage.AllItems.Should().BeEmpty();
     }
     [Fact]
     public async Task SortBy_DefaultsToRwmExpected()

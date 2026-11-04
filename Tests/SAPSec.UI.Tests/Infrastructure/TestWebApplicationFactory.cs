@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -27,6 +28,9 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseContentRoot(webProjectPath);
         builder.UseWebRoot(Path.Combine(webProjectPath, "wwwroot"));
 
+        var configuration = new ConfigurationBuilder()
+            .Build();
+
         builder
             .ConfigureServices(services =>
             {
@@ -35,7 +39,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddScoped<IUserService, MockUserService>();
                 services.AddScoped<IDsiClient, MockDsiClient>();
 
-                services.AddJsonDependencies();
+                services.AddJsonDependencies(configuration);
             });
     }
 

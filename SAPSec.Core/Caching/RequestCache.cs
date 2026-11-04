@@ -7,6 +7,13 @@ public class RequestCache(IHttpContextAccessor contextAccessor) : ICache
     public async Task<TValue> TryGet<TValue>(string key, Func<Task<TValue>> getValue)
     {
         var httpContext = contextAccessor.HttpContext;
+
+        // If HttpContext is null (e.g. on application startup) bypass cache altogether
+        if (httpContext is null)
+        {
+            return await getValue();
+        }
+
         if (httpContext.Items.TryGetValue(key, out var item) && item is TValue cachedValue)
         {
             return cachedValue;

@@ -11,10 +11,16 @@ export const secondarySchoolUrns = [
 ]
 
 export const primarySchoolUrns = [
-  '100590', '100747', '100749', '101193', '101206', '101230', '101243', '103080',
+  '101193', '101206', '101230',
+  '109567',
+  '136413'
+]
+
+export const allThroughSchoolUrns = [
+  '100590', '100747', '100749', '101243', '103080',
   '107562', '109567', '112951', '116407', '125279', '134369', '135264', '135296',
   '135367', '135423', '135507', '135563', '135584', '135597', '135619', '135866',
-  '135958', '135966', '136413', '136454'
+  '135958', '135966', '136454'
 ]
 
 export function randomSecondaryUrn () {
@@ -23,4 +29,8 @@ export function randomSecondaryUrn () {
 
 export function randomPrimaryUrn () {
   return primarySchoolUrns[Math.floor(Math.random() * primarySchoolUrns.length)]
+}
+
+export function randomAllThroughUrn () {
+  return allThroughSchoolUrns[Math.floor(Math.random() * allThroughSchoolUrns.length)]
 }

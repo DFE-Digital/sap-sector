@@ -50,9 +50,9 @@ public abstract class IntegrationTestsWebApplicationFactory : WebApplicationFact
                 services.AddSingleton<IFeatureFlagService>(provider =>
                     new MockFeatureFlagService(provider.GetRequiredService<FeatureFlagService>()));
 
-                ConfigureServices(services);
+                ConfigureServices(services, configuration);
             });
     }
 
-    protected abstract IServiceCollection ConfigureServices(IServiceCollection services);
+    protected abstract IServiceCollection ConfigureServices(IServiceCollection services, IConfiguration configuration);
 }

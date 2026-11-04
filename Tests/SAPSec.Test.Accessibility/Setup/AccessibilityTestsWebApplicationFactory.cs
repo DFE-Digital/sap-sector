@@ -45,7 +45,7 @@ public class AccessibilityTestsWebApplicationFactory : WebApplicationFactory<Pro
             .ConfigureServices(services =>
             {
                 services.AddTestDsiDependencies();
-                services.AddJsonDependencies();
+                services.AddJsonDependencies(configuration);
                 services.AddScoped<ICustomEventService, NoOpCustomEventService>();
             });
     }

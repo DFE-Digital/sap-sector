@@ -5,6 +5,7 @@ using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Helpers;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Filters;
 

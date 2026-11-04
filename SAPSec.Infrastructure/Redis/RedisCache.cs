@@ -1,13 +1,14 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SAPSec.Core.Caching;
 using StackExchange.Redis;
 using System.Text.Json;
 
 namespace SAPSec.Infrastructure.Redis;
 
-public class RedisCache(ILogger<RedisCache> logger) : ICache, IDisposable
+public class RedisCache(IOptions<RedisConfiguration> config, ILogger<RedisCache> logger) : ICache, IDisposable
 {
-    private ConnectionMultiplexer _conn = ConnectionMultiplexer.Connect("localhost");
+    private ConnectionMultiplexer _conn = ConnectionMultiplexer.Connect(config.Value.ConnectionString);
 
     public void Dispose()
     {
