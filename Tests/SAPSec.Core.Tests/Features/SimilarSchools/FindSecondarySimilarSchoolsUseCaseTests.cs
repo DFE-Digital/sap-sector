@@ -3847,7 +3847,7 @@ public class FindSecondarySimilarSchoolsUseCaseTests
         }));
 
         response.ValidationErrors.Should().BeEmpty();
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -3919,7 +3919,7 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             [filterKey + "_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -4003,7 +4003,7 @@ public class FindSecondarySimilarSchoolsUseCaseTests
             ["per_t"] = ["0.1"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -4027,7 +4027,7 @@ public class FindSecondarySimilarSchoolsUseCaseTests
         }));
 
         response.HasSimilarSchools.Should().BeTrue();
-        response.AllResults.Should().BeEmpty();
+        response.ResultsPage.AllItems.Should().BeEmpty();
     }
     [Fact]
     public async Task SortBy_DefaultsToAttainment8()

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
 using SAPSec.Core;
 using SAPSec.Core.Authentication;
+using SAPSec.Core.Caching;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
@@ -201,8 +202,10 @@ public class Program
 
         builder.Services.AddCaching(builder.Configuration, (services, config) =>
         {
-            services.AddRequestCache();
+            // If caching is enabled:
             services.AddRedisCache(config);
+            services.AddNestedCache<RequestCache, RedisCache>();
+            services.AddHostedService<StartupCacheClearer>();
         });
 
         // Add custom error handler for NotFoundExceptions

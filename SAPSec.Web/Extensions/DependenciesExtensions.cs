@@ -1,9 +1,9 @@
-using SAPSec.Core;
+using J2N.Collections.Generic.Extensions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SAPSec.Core.Caching;
 using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Data.Repositories;
 using SAPSec.Infrastructure.Json;
-using SAPSec.Infrastructure.Redis;
 using SAPSec.Web.Areas.AllThrough.Services;
 using SAPSec.Web.Formatters;
 using System.Diagnostics.CodeAnalysis;
@@ -34,21 +34,17 @@ public static class DependenciesExtensions
         if (config is not null && config.EnableCaching)
         {
             services.Configure<CachingConfiguration>(configuration.GetSection(nameof(CachingConfiguration)));
-            services.AddHostedService<StartupCacheClearer>();
+            services.AddSingleton<RequestCache>();
+            services.AddSingleton<InMemoryCache>();
             configure(services, configuration);
         }
     }
 
-    public static void AddRequestCache(this IServiceCollection services)
+    public static void AddNestedCache<TOuterCache, TInnerCache>(this IServiceCollection services)
+        where TOuterCache : class, ICache
+        where TInnerCache : class, ICache
     {
-        services.AddSingleton<RequestCache>();
-        services.AddSingleton<ICache>(sp => new NestedCache(
-            sp.GetRequiredService<RequestCache>(),
-            sp.GetRequiredKeyedService<ICache>(ServiceKeys.RealImplementation)));
-    }
-
-    public static void AddInMemoryCache(this IServiceCollection services)
-    {
-        services.AddKeyedSingleton<ICache, InMemoryCache>(ServiceKeys.RealImplementation);
+        services.RemoveAll<ICache>();
+        services.AddSingleton<ICache, NestedCache<TOuterCache, TInnerCache>>();
     }
 }
