@@ -123,9 +123,13 @@ public class SchoolController(
         var response = await getSchoolInfoUseCase.Execute(new(urn));
         await PopulateViewData(response.School);
 
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(response.School.Urn);
+
         var model = new WhatIsASimilarSchoolViewModel(
             SchoolInfoViewModel.FromSchoolInfo(response.School),
-            Routes.PrimarySchool(response.School.Urn).ViewSimilarSchools);
+            Routes.PrimarySchool(response.School.Urn).Overview,
+            Routes.PrimarySchool(response.School.Urn).ViewSimilarSchools,
+            similarSchoolsResponse.HasSimilarSchools);
 
         return View("~/Areas/Shared/Views/School/WhatIsASimilarSchool.cshtml", model);
     }
