@@ -50,6 +50,11 @@ variable "postgres_flexible_server_sku" {
   default     = "B_Standard_B1ms"
   description = "SKU for the PostgreSQL flexible server. Use 'GP_Standard_D2ds_v4' for production"
 }
+variable "postgres_server_version" {
+  type        = string
+  default     = "18"
+  description = "Version of PostgreSQL to use for PostgreSQL flexible server"
+}
 variable "enable_postgres_high_availability" {
   type        = bool
   default     = false
