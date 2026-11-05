@@ -313,6 +313,29 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
 
     #region Feature flag off
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task AccessDenied_ContentFollowsFindASchoolFlag(bool enableFindASchool)
+    {
+        fixture.FeatureFlagService.Override(Flags.EnableFindASchool, enableFindASchool);
+        var response = await fixture.NonRedirectingClient.GetAsync("/error/403");
+        var content = await response.Content.ReadAsStringAsync();
+
+        if (enableFindASchool)
+        {
+            content.Should().Contain("assign your DfE Sign-in to an organisation");
+            content.Should().Contain("help with DfE Sign-in");
+            content.Should().NotContain("Access for establishment groups");
+        }
+        else
+        {
+            content.Should().Contain("Access for establishment groups");
+            content.Should().Contain("Request access to an organisation");
+            content.Should().NotContain("assign your DfE Sign-in to an organisation");
+        }
+    }
+
     [Fact]
     public async Task WhenRestrictionsAreSwitchedOff_SchoolUserCanStillUseFindASchool()
     {
