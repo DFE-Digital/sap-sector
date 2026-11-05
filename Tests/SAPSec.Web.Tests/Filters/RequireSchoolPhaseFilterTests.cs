@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Moq;
+using SAPSec.Core.Authentication;
+using SAPSec.Core.Time;
+using SAPSec.Data.Repositories;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
@@ -359,6 +362,9 @@ public class RequireSchoolPhaseFilterTests
         var filter = new RequireSchoolPhaseFilter(
             _requestSchoolAccessorMock.Object,
             _featureFlagServiceMock.Object,
+            new SchoolUserAccessService(
+                Mock.Of<IUserService>(), _featureFlagServiceMock.Object,
+                Mock.Of<IEstablishmentRepository>(), Mock.Of<ICurrentTimeProvider>()),
             expectedSchoolPhase,
             routeParameterNames ?? routeValues.Select(x => x.Key).ToArray());
 

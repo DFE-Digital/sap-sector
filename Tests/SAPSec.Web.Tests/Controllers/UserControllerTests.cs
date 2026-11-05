@@ -5,9 +5,13 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
+using SAPSec.Core.Time;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Repositories;
 using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
+using SAPSec.Web.Services;
 using System.Security.Claims;
 
 namespace SAPSec.Web.Tests.Deprecated.Controllers;
@@ -22,7 +26,19 @@ public class UserControllerTests
 
     public UserControllerTests()
     {
-        _controller = new UserController(_userService.Object, _featureFlagService.Object, _dfeUserIdentifier.Object, _logger.Object);
+        var establishmentRepository = new Mock<IEstablishmentRepository>();
+        establishmentRepository.Setup(x => x.GetEstablishmentAsync(It.IsAny<string>()))
+            .ReturnsAsync((string urn) => new Establishment
+            {
+                URN = urn,
+                PhaseOfEducationName = "Secondary",
+                EstablishmentStatusId = "1"
+            });
+        var schoolUserAccessService = new SchoolUserAccessService(
+            _userService.Object, _featureFlagService.Object,
+            establishmentRepository.Object, Mock.Of<ICurrentTimeProvider>());
+        _controller = new UserController(_userService.Object, _featureFlagService.Object,
+            _dfeUserIdentifier.Object, schoolUserAccessService, _logger.Object);
         _featureFlagService.Setup(x => x.IsEnabledAsync(Flags.EnableFindASchool)).ReturnsAsync(false);
         _controller.ControllerContext = new ControllerContext
         {
