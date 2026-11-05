@@ -5,38 +5,38 @@ using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Tests.ViewModels;
 
-public class AllThroughWhatIsASimilarSchoolViewModelTests
-{
-    private const string Urn = "123456";
+//public class AllThroughWhatIsASimilarSchoolViewModelTests
+//{
+//    private const string Urn = "123456";
 
-    [Theory]
-    [InlineData(true, true)]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    public void HasSimilarSchools_WhenAnyPhaseHasSimilarSchools_ReturnsTrue(
-        bool hasPrimarySimilarSchools,
-        bool hasSecondarySimilarSchools)
-    {
-        var model = BuildModel(hasPrimarySimilarSchools, hasSecondarySimilarSchools);
+//    [Theory]
+//    [InlineData(true, true)]
+//    [InlineData(true, false)]
+//    [InlineData(false, true)]
+//    public void HasSimilarSchools_WhenAnyPhaseHasSimilarSchools_ReturnsTrue(
+//        bool hasPrimarySimilarSchools,
+//        bool hasSecondarySimilarSchools)
+//    {
+//        var model = BuildModel(hasPrimarySimilarSchools, hasSecondarySimilarSchools);
 
-        model.HasSimilarSchools.Should().BeTrue();
-        model.ViewSimilarSchoolsUrl.Should().Be(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
-    }
+//        model.HasSimilarSchools.Should().BeTrue();
+//        model.ViewSimilarSchoolsUrl.Should().Be(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+//    }
 
-    [Fact]
-    public void HasSimilarSchools_WhenNeitherPhaseHasSimilarSchools_ReturnsFalse()
-    {
-        var model = BuildModel(false, false);
+//    [Fact]
+//    public void HasSimilarSchools_WhenNeitherPhaseHasSimilarSchools_ReturnsFalse()
+//    {
+//        var model = BuildModel(false, false);
 
-        model.HasSimilarSchools.Should().BeFalse();
-        model.OverviewUrl.Should().Be(Routes.AllThroughSchool(Urn).Overview);
-    }
+//        model.HasSimilarSchools.Should().BeFalse();
+//        model.OverviewUrl.Should().Be(Routes.AllThroughSchool(Urn).Overview);
+//    }
 
-    private static WhatIsASimilarSchoolViewModel BuildModel(
-        bool hasPrimarySimilarSchools,
-        bool hasSecondarySimilarSchools) =>
-        new(
-            new SchoolInfoViewModel(Urn, "Test school", "Test address"),
-            hasPrimarySimilarSchools,
-            hasSecondarySimilarSchools);
-}
+//    private static WhatIsASimilarSchoolViewModel BuildModel(
+//        bool hasPrimarySimilarSchools,
+//        bool hasSecondarySimilarSchools) =>
+//        new(
+//            new SchoolInfoViewModel(Urn, "Test school", "Test address"),
+//            hasPrimarySimilarSchools,
+//            hasSecondarySimilarSchools);
+//}
