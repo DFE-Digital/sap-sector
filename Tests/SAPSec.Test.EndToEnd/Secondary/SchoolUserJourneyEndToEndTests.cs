@@ -21,7 +21,7 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
     private const string ComparatorSchoolUrn = "141617";
     private const string ComparatorSchoolName = "The Hurlingham Academy";
     private const string OtherSchoolUrn = ComparatorSchoolUrn;
-    private const string AccessDeniedHeading = "You do not have access to Compare and connect with similar schools";
+    private const string AccessDeniedHeading = "You do not have access";
 
     private readonly EndToEndTestsFixture _fixture = fixture;
 
@@ -107,7 +107,7 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
         var response = await Page.GotoAsync(path);
 
         response!.Status.Should().Be(403);
-        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading, Exact = true })).ToBeVisibleAsync();
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
         var response = await Page.GotoAsync(Routes.SecondarySchool(OtherSchoolUrn).Overview);
 
         response!.Status.Should().Be(403);
-        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading, Exact = true })).ToBeVisibleAsync();
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
         var response = await Page.GotoAsync(Routes.SecondarySchool(ComparatorSchoolUrn).ViewSimilarSchools);
 
         response!.Status.Should().Be(403);
-        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading, Exact = true })).ToBeVisibleAsync();
     }
 
     [Fact]
