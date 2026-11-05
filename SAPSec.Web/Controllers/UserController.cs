@@ -4,6 +4,7 @@ using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Controllers;
 
@@ -13,6 +14,7 @@ public class UserController(
     IUserService userService,
     IFeatureFlagService featureFlagService,
     IDfeUserIdentifier dfeUserIdentifier,
+    SchoolUserAccessService schoolUserAccessService,
     ILogger<UserController> logger) : Controller
 {
     private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -63,6 +65,11 @@ public class UserController(
 
         if (org is { IsEstablishment: true })
         {
+            if (!await schoolUserAccessService.CanAccessAsync(User))
+            {
+                return NotFound();
+            }
+
             return RedirectToSchool(org, traceId, userId);
         }
 
