@@ -122,7 +122,12 @@ public class SchoolController(
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
         await PopulateViewData(response.School);
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+
+        var model = new WhatIsASimilarSchoolViewModel(
+            SchoolInfoViewModel.FromSchoolInfo(response.School),
+            Routes.PrimarySchool(response.School.Urn).ViewSimilarSchools);
+
+        return View("~/Areas/Shared/Views/School/WhatIsASimilarSchool.cshtml", model);
     }
 
     [HttpGet]

@@ -1,6 +1,6 @@
 using FluentAssertions;
-using SAPSec.Web.Areas.AllThrough.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels;
+using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Tests.ViewModels;
@@ -32,7 +32,7 @@ public class AllThroughWhatIsASimilarSchoolViewModelTests
         model.OverviewUrl.Should().Be(Routes.AllThroughSchool(Urn).Overview);
     }
 
-    private static AllThroughWhatIsASimilarSchoolViewModel BuildModel(
+    private static WhatIsASimilarSchoolViewModel BuildModel(
         bool hasPrimarySimilarSchools,
         bool hasSecondarySimilarSchools) =>
         new(

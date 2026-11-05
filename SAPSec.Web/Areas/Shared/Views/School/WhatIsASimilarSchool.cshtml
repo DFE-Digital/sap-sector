@@ -1,15 +1,13 @@
-@using SAPSec.Core.Features.SchoolDetails
 @using SAPSec.Web.Constants;
-@using SAPSec.Web.Helpers
-@using SAPSec.Web.Areas.Shared.ViewModels;
+@using SAPSec.Web.Areas.Shared.ViewModels.School;
 
-@model SchoolInfoViewModel
+@model WhatIsASimilarSchoolViewModel
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = "What is a similar school?";
 }
 
-<span class="govuk-caption-xl">@Model.Name</span>
+<span class="govuk-caption-xl">@Model.School.Name</span>
 <h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
 <p class="govuk-body">
@@ -20,19 +18,31 @@
     While schools may not match on every characteristic, they are included because they share many similarities.
 </p>
 
-<p class="govuk-body">
-    You can <a href="@SAPSec.Web.Constants.Routes.SecondarySchool(Model.Urn).ViewSimilarSchools" class="govuk-link">view all the schools most similar to this one</a> and select an individual school to see its similarity, performance and contact details
-</p>
+
+@if (Model.HasSimilarSchools)
+{
+    <p class="govuk-body">
+        You can <a href="@Model.ViewSimilarSchoolsUrl" class="govuk-link">view all the schools most similar to this one</a> and select an individual school to see its similarity, performance and contact details
+    </p>
+}
+else
+{
+    <p class="govuk-body">
+        <a href="@Model.OverviewUrl" class="govuk-link">This school cannot currently be compared with similar schools.</a>
+    </p>
+}
+
+
 
 <h2 class="govuk-heading-m govuk-!-padding-top-6">Characteristics used to find similar schools</h2>
 
-<h2 class="govuk-heading-m govuk-!-padding-top-6">Prior attainment</h2>
+<h2 class="govuk-heading-m govuk-!-padding-top-4">Prior attainment</h2>
 
 <table class="govuk-table">
     <tbody class="govuk-table__body"> 
     <tr class="govuk-table__row">
             <td class="govuk-table__cell govuk-!-font-weight-bold govuk-!-width-one-third">KS4 prior attainment</td>
-        <td class="govuk-table__cell">The key stage 4 (KS 4) model uses a key stage 2 (KS2) reading and maths combined measure.</td>
+        <td class="govuk-table__cell">The key stage 4 (KS4) model uses a key stage 2 (KS2) reading and maths combined measure.</td>
     </tr>
     <tr class="govuk-table__row">
             <td class="govuk-table__cell govuk-!-font-weight-bold">KS2 prior attainment</td>
@@ -41,30 +51,36 @@
     </tbody>
 </table>
 
-<h2 class="govuk-heading-m govuk-!-padding-top-6">Disadvantage</h2>
+<h2 class="govuk-heading-m govuk-!-padding-top-1">Disadvantage</h2>
 
 <table class="govuk-table">
     <tbody class="govuk-table__body">
         <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold govuk-!-width-one-third">Disadvantaged</td>
+            <td class="govuk-table__cell govuk-!-font-weight-bold govuk-!-width-one-third">Ever 6 FSM</td>
             <td class="govuk-table__cell">Percentage of pupils eligible for free school meals at any time during the past 6 years.</td>
         </tr>
         <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">IDACI</td>
-            <td class="govuk-table__cell">Proportion of children aged 0 to 15 who live in income-deprived families in an area.</td>
+            <td class="govuk-table__cell govuk-!-font-weight-bold">IDACI score</td>
+            <td class="govuk-table__cell">
+                Proportion of children aged 0 to 15 who live in income-deprived families in an area.
+                <div class="govuk-!-margin-top-2">
+                    <a href="https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025/english-indices-of-deprivation-2025-statistical-release" class="govuk-link" target="_blank" rel="noopener noreferrer">Find out more about English indices of deprivation (opens in new tab)</a>
+                </div>
+            </td>
         </tr>
         <tr class="govuk-table__row">
             <td class="govuk-table__cell govuk-!-font-weight-bold">POLAR4 quintile</td>
-            <td class="govuk-table__cell">Average Participation of Local Areas (POLAR4) quitile: area across the UK grouped into quintiles based on the proportion of young
+            <td class="govuk-table__cell">Average Participation of Local Areas (POLAR4) quintile: areas across the UK grouped into quintiles based on the proportion of young
                                                       people who enter higher education, reflecting differences in education opportunity and aspiration.
-            <br>
-            Find out more about POLAR4 on the Office for Students website (opens in new tab)
+            <div class="govuk-!-margin-top-2">
+               <a href="https://www.officeforstudents.org.uk/data-and-analysis/young-participation-by-area/about-polar-and-adult-he/" class="govuk-link" target="_blank" rel="noopener noreferrer">Find out more about POLAR4 on the Office for Students website (opens in new tab)</a>
+            </div>
             </td>
         </tr>
     </tbody>
 </table>
 
-<h2 class="govuk-heading-m govuk-!-padding-top-6">Pupil cohort information</h2>
+<h2 class="govuk-heading-m govuk-!-padding-top-1">Pupil cohort information</h2>
 
 <table class="govuk-table">
     <tbody class="govuk-table__body">
@@ -73,13 +89,13 @@
             <td class="govuk-table__cell">Total number of pupils on roll (all ages)</td>
         </tr>
         <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Pupils stability rate</td>
+            <td class="govuk-table__cell govuk-!-font-weight-bold">Pupil stability rate</td>
             <td class="govuk-table__cell">Percentage of pupils admitted to the school at the standard time of admission.</td>
         </tr>
     </tbody>
 </table>
 
-<h2 class="govuk-heading-m govuk-!-padding-top-6">Inclusion</h2>
+<h2 class="govuk-heading-m govuk-!-padding-top-1">Inclusion</h2>
 
 <table class="govuk-table">
     <tbody class="govuk-table__body">
@@ -90,15 +106,15 @@
         <tr class="govuk-table__row">
             <td class="govuk-table__cell govuk-!-font-weight-bold">SEN support</td>
             <td class="govuk-table__cell">Percentage of pupils who have SEN support without an EHC plan.</td>
+        </tr>
         <tr class="govuk-table__row">
             <td class="govuk-table__cell govuk-!-font-weight-bold">EAL</td>
-            <td class="govuk-table__cell">Percentage of pupils who have English as an additional lanuage.</td>
-        </tr>
+            <td class="govuk-table__cell">Percentage of pupils who have English as an additional language.</td>
         </tr>
     </tbody>
 </table>
 
-<h2 class="govuk-heading-m govuk-!-padding-top-6">Which schools have been identified as similar?</h2>
+<h2 class="govuk-heading-m govuk-!-padding-top-3">How have these schools have been identified as similar?</h2>
 
 <p class="govuk-body">
    We use the DfE and Ofsted model for attainment to identify similar schools.
@@ -110,10 +126,10 @@
 </p>
 
 <p class="govuk-body">
-    You can <a href="@SAPSec.Web.Constants.Routes.SecondarySchool(Model.Urn).ViewSimilarSchools" class="govuk-link">Find out more about the similar model for attainment (open in new tab)</a>
+    <a href="https://www.gov.uk/government/publications/similar-schools-model-for-attainment" class="govuk-link" target="_blank" rel="noopener noreferrer">Find out more about the similar schools model for attainment (opens in new tab)</a>
 </p>
 
-<h2 class="govuk-heading-m govuk-!-padding-top-6">Annual updates to similar schools data</h2>
+<h2 class="govuk-heading-m govuk-!-padding-top-4">Annual updates to similar schools data</h2>
 
 <p class="govuk-body">
     As school characteristics such as levels of disadvantage and SEN support change over time, the group of similar
