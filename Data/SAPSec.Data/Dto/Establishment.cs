@@ -31,6 +31,8 @@ public class Establishment
     public string GenderName { get; set; } = string.Empty;
     public string ReligiousCharacterId { get; set; } = string.Empty;
     public string ReligiousCharacterName { get; set; } = string.Empty;
+    public string DioceseId { get; set; } = string.Empty;
+    public string DioceseName { get; set; } = string.Empty;
     public string TelephoneNum { get; set; } = string.Empty;
     public int? TotalCapacity { get; set; } = null;
     public int? TotalPupils { get; set; } = null;

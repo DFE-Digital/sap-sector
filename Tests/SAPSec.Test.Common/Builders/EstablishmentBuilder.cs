@@ -33,6 +33,8 @@ public class EstablishmentBuilder(string urn, string name)
     string AdmissionsPolicyName = string.Empty;
     string TrustId = string.Empty;
     string TrustName = string.Empty;
+    string DioceseId = string.Empty;
+    string DioceseName = string.Empty;
     string TrustSchoolFlagId = string.Empty;
     string TrustSchoolFlagName = string.Empty;
     string EstablishmentTypeGroupId = string.Empty;
@@ -197,6 +199,14 @@ public class EstablishmentBuilder(string urn, string name)
         return this;
     }
 
+    public EstablishmentBuilder WithDiocese(string id, string? name = null)
+    {
+        DioceseId = id;
+        DioceseName = name ?? string.Empty;
+
+        return this;
+    }
+
     public EstablishmentBuilder WithTrustSchoolFlag(string id, string? name = null)
     {
         TrustSchoolFlagId = id;
@@ -312,6 +322,8 @@ public class EstablishmentBuilder(string urn, string name)
             TrustName = TrustName,
             TrustSchoolFlagId = TrustSchoolFlagId,
             TrustSchoolFlagName = TrustSchoolFlagName,
+            DioceseId = DioceseId,
+            DioceseName = DioceseName,
             EstablishmentTypeGroupId = EstablishmentTypeGroupId,
             EstablishmentTypeGroupName = EstablishmentTypeGroupName,
             NurseryProvisionName = NurseryProvisionName,
