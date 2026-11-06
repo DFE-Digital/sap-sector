@@ -59,8 +59,11 @@ WORKDIR /app
 # Fix security vulnerabilities in base image
 # - gnupg2/gpgv: Out-of-bounds Write (SNYK-UBUNTU2404-GNUPG2-14849555)
 # - zlib1g, libpam*: Previously identified vulnerabilities
+# - apt/libapt-pkg6.0t64: upgraded alongside gpgv so apt's dependency on gpgv stays satisfied
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends \
+        apt \
+        libapt-pkg6.0t64 \
         gnupg2 \
         gpgv \
         zlib1g \
