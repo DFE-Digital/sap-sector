@@ -176,12 +176,13 @@ public class SchoolController(
         var similarSchoolPhases = await GetSimilarSchoolPhasesAsync(urn);
         await PopulateViewData(response.School);
 
-        var model = new AllThroughWhatIsASimilarSchoolViewModel(
+        var model = new WhatIsASimilarSchoolViewModel(
             SchoolInfoViewModel.FromSchoolInfo(response.School),
-            similarSchoolPhases.HasPrimary,
-            similarSchoolPhases.HasSecondary);
+            Routes.AllThroughSchool(response.School.Urn).Overview,
+            Routes.AllThroughSchool(response.School.Urn).ViewSimilarSchools,
+            similarSchoolPhases.HasPrimary || similarSchoolPhases.HasSecondary);
 
-        return View(model);
+        return View("~/Areas/Shared/Views/School/WhatIsASimilarSchool.cshtml", model);
     }
 
     [HttpGet]
