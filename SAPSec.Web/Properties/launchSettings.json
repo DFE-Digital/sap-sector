@@ -10,6 +10,15 @@
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:3000;http://localhost:5013"
     },
+    "LoadTest": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "LoadTest"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:5099"
+    },
     "Container (Dockerfile)": {
       "commandName": "Docker",
       "launchBrowser": true,

@@ -7,6 +7,35 @@ for how to run it.
 
 ## Status
 
+### Increased-pool retest preparation
+
+The application now reads `Database:MaxPoolSize` (default 100) and optionally
+`Database:ConnectionTimeoutSeconds` (otherwise the connection string/driver
+timeout is preserved). The singleton `NpgsqlDataSourceFactory` lazily creates
+and reuses one data source, so repositories share its connection pool.
+
+Terraform's test configuration supplies a pool size of 300 per replica and a
+60-second connection timeout without modifying the vendored connection string.
+With two replicas, this allows 600 connections against Test's reported limit
+of 856; account for extra replicas, rolling deployments and other services
+when monitoring actual usage. Production retains the default pool of 100
+until its database limit is confirmed.
+
+For this temporary test run, Terraform also sets
+`LoadTesting__BypassAuthentication=true`. The application honours this flag
+only in the `Test` ASP.NET environment, using automatic test authentication
+while retaining real Postgres repositories. Remove or disable that Terraform
+setting after testing and redeploy.
+
+The increased-pool stress run has **not yet been performed**. All measured
+ceilings and operating targets below remain from the original pool-100 run.
+From `load_testing`, run `k6 run -e ENVIRONMENT=test -e AUTH_OFF=true -e SCENARIO=stress sap-sector/load-test.js`.
+This targets the configured test URL. Capture `pg_stat_activity`, database connection metrics,
+pod restart/liveness events and replica counts; analyse the summary with
+`analyse.cjs` before replacing the measured ceiling and operating targets.
+Local real-Postgres pool-100/pool-300 saturation checks and production sizing
+also remain outstanding.
+
 Results available for service assessment (raised by Robert Rees).
 
 Two staircase runs against the deployed `test` environment with real
@@ -157,11 +186,10 @@ hardware.
 with the pool at 100 per replica. Raising the pool size should raise the
 ceiling further, so these figures are conservative.
 
-**Proposed fix (not yet implemented).** Set the Npgsql `Maximum Pool Size`
-explicitly rather than relying on the default of 100, kept within the
-database's `max_connections` across both replicas. This would be wired
-through the app's connection setup (`SAPSec.Infrastructure/Postgres/NpgsqlDataSourceFactory.cs`),
-ideally read from configuration so `test` and `production` can differ.
+**Implemented configuration, awaiting retest.** Npgsql `Maximum Pool Size`
+is now read from `Database:MaxPoolSize` by
+`SAPSec.Infrastructure/Postgres/NpgsqlDataSourceFactory.cs`, defaulting to 100.
+Terraform supplies 300 for test; deployment and measurement are still pending.
 PgBouncer - built into Azure Flexible Server - is a tidier longer-term
 option that multiplexes many app connections onto few database ones, letting
 the app pool generously without each connection pinning a database backend.
@@ -198,7 +226,7 @@ production-spec database run above.
 
 ## Open actions
 
-1. **Raise the Npgsql connection pool size** (not yet implemented) and re-run
+1. **Deploy the configured Npgsql connection pool size** and re-run
    to confirm the ceiling moves up. Set `Maximum Pool Size` explicitly - it
    currently sits at 100 per replica (confirmed by infra) - keeping
    `2 replicas × pool size` within the database's `max_connections`; consider

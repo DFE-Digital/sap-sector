@@ -10,11 +10,11 @@ export const secondarySchoolUrns = [
   '137083', '137309', '137383', '137577', '137704', '137775'
 ]
 
+// Primary-phase schools only (PhaseOfEducationName = 'Primary'). The other URNs in
+// TestEstablishmentUrns.json are All-through schools, which the /school/primary/...
+// routes 404 on unless EnableAllThroughSchools is on.
 export const primarySchoolUrns = [
-  '100590', '100747', '100749', '101193', '101206', '101230', '101243', '103080',
-  '107562', '109567', '112951', '116407', '125279', '134369', '135264', '135296',
-  '135367', '135423', '135507', '135563', '135584', '135597', '135619', '135866',
-  '135958', '135966', '136413', '136454'
+  '101193', '101206', '101230', '109567', '136413'
 ]
 
 export function randomSecondaryUrn () {

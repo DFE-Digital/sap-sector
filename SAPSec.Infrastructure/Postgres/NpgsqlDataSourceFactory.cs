@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using System.Globalization;
 
 namespace SAPSec.Infrastructure.Postgres;
 
@@ -22,7 +23,19 @@ public sealed class NpgsqlDataSourceFactory
                     "'ConnectionStrings__PostgresConnectionString' (CI / containers).");
             }
 
-            return NpgsqlDataSource.Create(connectionString);
+            var settings = new NpgsqlConnectionStringBuilder(connectionString)
+            {
+                MaxPoolSize = configuration["Database:MaxPoolSize"] is { } poolSize
+                    ? int.Parse(poolSize, CultureInfo.InvariantCulture)
+                    : 100
+            };
+
+            if (configuration["Database:ConnectionTimeoutSeconds"] is { } timeout)
+            {
+                settings.Timeout = int.Parse(timeout, CultureInfo.InvariantCulture);
+            }
+
+            return NpgsqlDataSource.Create(settings.ConnectionString);
 
         }, isThreadSafe: true);
     }
