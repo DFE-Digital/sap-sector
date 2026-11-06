@@ -490,7 +490,7 @@ The DTOs are not written by hand. The chain is:
 
 1. the `SAPData` project generates the SQL scripts
 2. running `run-all.sql` against a local PostgreSQL database builds the views and writes out a JSON file per view
-3. `SAPSec.DtoGenerator` reads those JSON files and generates the C# DTOs
+3. `SAPSec.DtoGenerator` reads those JSON files and generates the C# DTOs. For KS2 and KS4 performance models, it also includes every non-ignored property mapped for that phase and establishment/LA/England range in `SAPData/DataMap/datamap.csv`. This keeps fields in the generated models even when an older JSON snapshot lacks them. Snapshot values supply existing property types; missing mapped metric fields use strings to preserve suppression codes.
 
 The JSON files are produced anyway, because the automated tests use them as fixtures. Generating the DTOs from files that already exist is simpler than connecting to the database and reading catalogue metadata to do the same thing.
 
@@ -498,7 +498,7 @@ This replaced an earlier approach where the JSON files and the DTOs were kept in
 
 Two things to know when working on this:
 
-- **The generator has to be run at the right time.** If a view changes and nobody reruns `SAPSec.DtoGenerator`, the DTOs drift from the database and nothing warns you. This is the main weakness of the approach. It is comparable to remembering to regenerate EF models, except EF can warn when its models no longer match the local database.
+- **The generator has to be run at the right time.** When the data map or a view changes, rerun `SAPSec.DtoGenerator` and commit the generated DTOs. Performance field names come from the same data map used to build the views, so refreshing JSON snapshots is no longer required just to discover newly mapped performance fields. Other models still infer their properties from JSON snapshots.
 - **These JSON files are not a runtime data source.** They exist for DTO generation and tests. The exception is KS2 performance, covered in section 15.
 
 ---

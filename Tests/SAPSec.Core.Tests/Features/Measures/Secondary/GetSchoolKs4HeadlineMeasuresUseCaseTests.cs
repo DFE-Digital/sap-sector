@@ -1170,6 +1170,56 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
         ]);
     }
 
+    [Theory]
+    [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade4AndAbove, Ks4EnglishMaths.Filters.PupilCharacteristic.Values.NonMobile, 63.2, 64.4)]
+    [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade5AndAbove, Ks4EnglishMaths.Filters.PupilCharacteristic.Values.NonMobile, 39.6, 41.6)]
+    [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade4AndAbove, Ks4EnglishMaths.Filters.PupilCharacteristic.Values.NonDisadvantaged, 69.4, 63.5)]
+    [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade5AndAbove, Ks4EnglishMaths.Filters.PupilCharacteristic.Values.NonDisadvantaged, 43.7, 40.4)]
+    public async Task EnglishMaths_HistoricalCharacteristics_AppearInOverviewAndComparison(
+        string grade, string characteristic, double schoolValue, double comparatorValue)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("145327", "Own school", x => x.Secondary()),
+            Build.Establishment("148003", "Similar school", x => x.Secondary()));
+        _similarSchoolsRepo.SetupGroups(Build.SecondaryGroup("145327", ["148003"]));
+        _performanceRepo.SetupEstablishmentPerformance(
+            new EstablishmentPerformance
+            {
+                Id = "145327",
+                EngMaths49_NMo_Est_Previous2_Pct = "63.2",
+                EngMaths59_NMo_Est_Previous2_Pct = "39.6",
+                EngMaths49_NDi_Est_Previous2_Pct = "69.4",
+                EngMaths59_NDi_Est_Previous2_Pct = "43.7"
+            },
+            new EstablishmentPerformance
+            {
+                Id = "148003",
+                EngMaths49_NMo_Est_Previous2_Pct = "64.4",
+                EngMaths59_NMo_Est_Previous2_Pct = "41.6",
+                EngMaths49_NDi_Est_Previous2_Pct = "63.5",
+                EngMaths59_NDi_Est_Previous2_Pct = "40.4"
+            });
+        Dictionary<string, string> filters = new()
+        {
+            [Ks4EnglishMaths.Filters.Grade.Key] = grade,
+            [Ks4EnglishMaths.Filters.PupilCharacteristic.Key] = characteristic
+        };
+
+        var overview = await _sut.Execute(Request("145327", filterBy: filters));
+        overview.EnglishMaths.Series.Single(s => s.SeriesType == MeasureSeriesType.CurrentSchool)
+            .Previous2.Should().Be((decimal)schoolValue);
+        overview.EnglishMaths.Series.Single(s => s.SeriesType == MeasureSeriesType.SimilarSchoolsAverage)
+            .Previous2.Should().Be((decimal)comparatorValue);
+
+        var comparisonUseCase = new GetComparisonKs4HeadlineMeasuresUseCase(
+            _establishmentRepo, _similarSchoolsRepo, _performanceRepo, _destinationsRepo);
+        var comparison = await comparisonUseCase.Execute(new("145327", "148003", filters));
+        comparison.EnglishMaths.Series.Single(s => s.SeriesType == MeasureSeriesType.CurrentSchool)
+            .Previous2.Should().Be((decimal)schoolValue);
+        comparison.EnglishMaths.Series.Single(s => s.SeriesType == MeasureSeriesType.ComparatorSchool)
+            .Previous2.Should().Be((decimal)comparatorValue);
+    }
+
     [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade4AndAbove)]
     [InlineData(Ks4EnglishMaths.Filters.Grade.Values.Grade5AndAbove)]
     [Theory]

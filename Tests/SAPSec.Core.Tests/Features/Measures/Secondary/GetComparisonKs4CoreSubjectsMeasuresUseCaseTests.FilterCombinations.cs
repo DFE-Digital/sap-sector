@@ -58,12 +58,6 @@ public partial class GetComparisonKs4CoreSubjectsMeasuresUseCaseTests
                     _ => establishmentCode
                 };
 
-                // The national data contains Physics breakdowns only for all pupils,
-                // boys and girls; the remaining characteristics have no England values.
-                if (subject.Definition == typeof(Ks4Physics)
-                    && englandCode is "Dis" or "NDi" or "EAL")
-                    englandCode = "";
-
                 yield return
                 [
                     subject.ResponseProperty, subject.FieldPrefix + gradeCodes[grade],

@@ -258,7 +258,7 @@ internal static class Ks4HeadlineMeasures
                     _ when characteristic.EqualsCaseInsensitive(Ks4EnglishMaths.Filters.PupilCharacteristic.Values.NonDisadvantaged) => (
                         x => x?.EstablishmentPerformance?.EngMaths59_NDi_Est_Current_Pct,
                         x => x?.EstablishmentPerformance?.EngMaths59_NDi_Est_Previous_Pct,
-                        x => null),
+                        x => x?.EstablishmentPerformance?.EngMaths59_NDi_Est_Previous2_Pct),
                     _ when characteristic.EqualsCaseInsensitive(Ks4EnglishMaths.Filters.PupilCharacteristic.Values.Eal) => (
                         x => x?.EstablishmentPerformance?.EngMaths59_EAL_Est_Current_Pct,
                         x => x?.EstablishmentPerformance?.EngMaths59_EAL_Est_Previous_Pct,
@@ -266,7 +266,7 @@ internal static class Ks4HeadlineMeasures
                     _ when characteristic.EqualsCaseInsensitive(Ks4EnglishMaths.Filters.PupilCharacteristic.Values.NonMobile) => (
                         x => x?.EstablishmentPerformance?.EngMaths59_NMo_Est_Current_Pct,
                         x => x?.EstablishmentPerformance?.EngMaths59_NMo_Est_Previous_Pct,
-                        x => null),
+                        x => x?.EstablishmentPerformance?.EngMaths59_NMo_Est_Previous2_Pct),
                     _ => (
                         x => x?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct,
                         x => x?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct,
@@ -291,7 +291,7 @@ internal static class Ks4HeadlineMeasures
                 _ when characteristic.EqualsCaseInsensitive(Ks4EnglishMaths.Filters.PupilCharacteristic.Values.NonDisadvantaged) => (
                     x => x?.EstablishmentPerformance?.EngMaths49_NDi_Est_Current_Pct,
                     x => x?.EstablishmentPerformance?.EngMaths49_NDi_Est_Previous_Pct,
-                    x => null),
+                    x => x?.EstablishmentPerformance?.EngMaths49_NDi_Est_Previous2_Pct),
                 _ when characteristic.EqualsCaseInsensitive(Ks4EnglishMaths.Filters.PupilCharacteristic.Values.Eal) => (
                     x => x?.EstablishmentPerformance?.EngMaths49_EAL_Est_Current_Pct,
                     x => x?.EstablishmentPerformance?.EngMaths49_EAL_Est_Previous_Pct,
@@ -299,7 +299,7 @@ internal static class Ks4HeadlineMeasures
                 _ when characteristic.EqualsCaseInsensitive(Ks4EnglishMaths.Filters.PupilCharacteristic.Values.NonMobile) => (
                     x => x?.EstablishmentPerformance?.EngMaths49_NMo_Est_Current_Pct,
                     x => x?.EstablishmentPerformance?.EngMaths49_NMo_Est_Previous_Pct,
-                    x => null),
+                    x => x?.EstablishmentPerformance?.EngMaths49_NMo_Est_Previous2_Pct),
                 _ => (
                     x => x?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct,
                     x => x?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct,
