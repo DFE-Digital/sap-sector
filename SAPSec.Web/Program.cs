@@ -9,7 +9,7 @@ using Microsoft.FeatureManagement;
 using SAPSec.Core;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Infrastructure.Json;
-using SAPSec.Infrastructure.LuceneSearch;
+using SAPSec.Infrastructure.PostgresSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Configuration;
@@ -182,8 +182,8 @@ public class Program
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
 
-        // Add relevant dependencies for Lucene Search, implementation through SearchService.
-        builder.Services.AddLuceneDependencies();
+        // School search uses Postgres full text search, implementation through SearchService.
+        builder.Services.AddSingleton<SAPSec.Core.Features.SchoolSearch.ISchoolSearchIndexReader, PostgresSchoolSearchIndexReader>();
 
         // Service and Repo depencencies.
         builder.Services.AddUseCases();

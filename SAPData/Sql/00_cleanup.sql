@@ -81,4 +81,62 @@ EXCEPTION WHEN others THEN
 END;
 $$;
 
+-- =========================
+-- Search synonyms + normalize_text
+-- =========================
+
+CREATE TABLE IF NOT EXISTS public.thesaurus_synonyms (
+    word TEXT PRIMARY KEY,
+    expansion TEXT NOT NULL
+);
+TRUNCATE public.thesaurus_synonyms;
+
+INSERT INTO public.thesaurus_synonyms (word, expansion) VALUES
+    ('st', 'st saint'),
+    ('saint', 'saint st'),
+    ('ss', 'ss saints'),
+    ('saints', 'saints ss'),
+    ('cofe', 'cofe church of england'),
+    ('church of england', 'church of england cofe'),
+    ('rm', 'rm roman catholic catholic'),
+    ('roman catholic', 'roman catholic rm catholic'),
+    ('catholic', 'catholic rm roman catholic'),
+    ('ave', 'ave aven avenue'),
+    ('aven', 'aven ave avenue'),
+    ('avenue', 'avenue ave aven'),
+    ('rd', 'rd road'),
+    ('road', 'road rd'),
+    ('ln', 'ln lane'),
+    ('lane', 'lane ln'),
+    ('dr', 'dr drive'),
+    ('drive', 'drive dr'),
+    ('mt', 'mt mount'),
+    ('mount', 'mount mt'),
+    ('ct', 'ct court'),
+    ('court', 'court ct'),
+    ('pl', 'pl place'),
+    ('place', 'place pl'),
+    ('blvd', 'blvd boulevard'),
+    ('boulevard', 'boulevard blvd'),
+    ('sq', 'sq square'),
+    ('square', 'square sq');
+
+-- Lower-cases text and expands each synonym (or multi-word phrase, longest first) to
+-- 'word + synonyms' so index and query agree. STABLE because it reads thesaurus_synonyms.
+CREATE OR REPLACE FUNCTION public.normalize_text(input_text TEXT)
+RETURNS TEXT
+LANGUAGE plpgsql
+STABLE
+AS $$
+DECLARE
+    result TEXT := lower(coalesce(input_text, ''));
+    r RECORD;
+BEGIN
+    FOR r IN SELECT word, expansion FROM public.thesaurus_synonyms ORDER BY length(word) DESC, word LOOP
+        result := regexp_replace(result, '\m' || r.word || '\M', r.expansion, 'g');
+    END LOOP;
+    RETURN result;
+END;
+$$;
+
 \echo 'Cleanup complete.'

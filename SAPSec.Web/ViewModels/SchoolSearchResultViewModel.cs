@@ -1,4 +1,3 @@
-using Lucene.Net.Search;
 
 namespace SAPSec.Web.ViewModels;
 

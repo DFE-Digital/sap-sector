@@ -24,7 +24,7 @@ Controllers must:
 Controllers must not:
 - contain business logic
 - access the database
-- build Lucene queries
+- build search queries
 
 Refactor when controllers grow large.
 
