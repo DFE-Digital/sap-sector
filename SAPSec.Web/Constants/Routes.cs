@@ -10,6 +10,7 @@ public static class Routes
     public const string Error = "/error";
     public const string AccessDenied = "/error/403";
     public const string TermsAndConditions = "/terms-and-conditions";
+    public const string UserHome = "/user/redirect";
 
     public const string FindASchoolBasePath = "/find-a-school";
     public static string FindASchool(string? query = null, string? page = null, string[]? localAuthorities = null)

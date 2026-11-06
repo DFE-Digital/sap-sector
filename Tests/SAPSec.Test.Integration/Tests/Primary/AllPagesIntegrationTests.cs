@@ -106,13 +106,13 @@ public class AllPagesIntegrationTests(
         if (path.StartsWith(Routes.PrimarySchool("100001").Comparison("100002").BasePath))
         {
             navigationItems.Should().SatisfyRespectively(
-                n => n.ShouldLinkTo("Home", Routes.FindASchool()),
+                n => n.ShouldLinkTo("Home", Routes.UserHome),
                 n => n.ShouldLinkTo("View similar schools", Routes.PrimarySchool("100001").ViewSimilarSchools));
         }
         else
         {
             navigationItems.Should().SatisfyRespectively(
-                n => n.ShouldLinkTo("Home", Routes.FindASchool()));
+                n => n.ShouldLinkTo("Home", Routes.UserHome));
         }
     }
 

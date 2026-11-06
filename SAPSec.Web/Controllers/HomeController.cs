@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using SmartBreadcrumbs.Attributes;
 
@@ -13,12 +14,13 @@ namespace SAPSec.Web.Controllers;
 public class HomeController(
     IOptions<DfeSignInSettings> configuration,
     IWebHostEnvironment environment,
-    IFeatureFlagService featureFlagService) : Controller
+    IFeatureFlagService featureFlagService,
+    IStartPageService startPageService) : Controller
 {
     [DefaultBreadcrumb(PageTitles.ServiceHome)]
     public async Task<IActionResult> Index()
     {
-        var startNowUrl = environment.IsProduction() ? configuration.Value.SignInUri : Url.Action("Index", "SchoolSearch", null);
+        var startNowUrl = environment.IsProduction() ? configuration.Value.SignInUri : await startPageService.GetStartUrlAsync();
         var enablePrimarySchools = await featureFlagService.IsEnabledAsync(Flags.EnablePrimarySchools);
 
         return View(new HomeViewModel

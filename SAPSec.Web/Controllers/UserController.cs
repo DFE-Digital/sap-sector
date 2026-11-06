@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Authentication;
+using SAPSec.Core.FeatureFlags;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Controllers;
 
@@ -9,9 +12,14 @@ namespace SAPSec.Web.Controllers;
 [Route("user")]
 public class UserController(
     IUserService userService,
+    IFeatureFlagService featureFlagService,
+    IDfeUserIdentifier dfeUserIdentifier,
+    SchoolUserAccessService schoolUserAccessService,
     ILogger<UserController> logger) : Controller
 {
     private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+    private readonly IFeatureFlagService _featureFlagService = featureFlagService ?? throw new ArgumentNullException(nameof(featureFlagService));
+    private readonly IDfeUserIdentifier _dfeUserIdentifier = dfeUserIdentifier ?? throw new ArgumentNullException(nameof(dfeUserIdentifier));
     private readonly ILogger<UserController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet]
@@ -49,6 +57,35 @@ public class UserController(
             user.Organisations.Count);
 
         var org = await _userService.GetCurrentOrganisationAsync(User);
+
+        if (await _featureFlagService.IsEnabledAsync(Flags.EnableFindASchool))
+        {
+            return RedirectWithoutRestrictions(org, userId);
+        }
+
+        if (org is { IsEstablishment: true })
+        {
+            if (!await schoolUserAccessService.CanAccessAsync(User))
+            {
+                return NotFound();
+            }
+
+            return RedirectToSchool(org, traceId, userId);
+        }
+
+        // DfE Sign-in puts the "Department for Education" organisation in the Local Authority category (002),
+        // so this check must stay above any local authority routing added later.
+        if (await _dfeUserIdentifier.IsDfeUserAsync(User))
+        {
+            _logger.LogInformation(
+                "Redirecting DfE user from /user/redirect to find-a-school. TraceId: {TraceId}. UserId: {UserId}.",
+                traceId,
+                userId);
+            return Redirect(Routes.FindASchool());
+        }
+
+        // Further starting pages (e.g. single academy trust, internal DfE users who may have no organisation)
+        // are added as branches above this.
         if (org is null)
         {
             _logger.LogError(
@@ -58,17 +95,41 @@ public class UserController(
             throw new InvalidOperationException($"Current organisation is null for user {userId}.");
         }
 
-        if (!org.IsEstablishment || org.Urn is null)
+        _logger.LogWarning(
+            "No starting page for user in /user/redirect; returning forbidden. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Category: {OrganisationCategory}. Urn: {OrganisationUrn}.",
+            traceId,
+            userId,
+            org.Id,
+            org.Name,
+            org.Category?.Name,
+            org.Urn);
+        return Forbid();
+    }
+
+    // How users were routed before the school user rules, kept while they are behind a feature flag.
+    private IActionResult RedirectWithoutRestrictions(Organisation? org, string userId)
+    {
+        if (org is null)
         {
-            _logger.LogInformation(
-                "Redirecting from /user/redirect to find-a-school. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}. OrganisationName: {OrganisationName}. Category: {OrganisationCategory}. Urn: {OrganisationUrn}.",
+            _logger.LogError("Current organisation was null in /user/redirect. UserId: {UserId}.", userId);
+            throw new InvalidOperationException($"Current organisation is null for user {userId}.");
+        }
+
+        return !org.IsEstablishment || org.Urn is null
+            ? Redirect(Routes.FindASchool())
+            : Redirect(Routes.School(org.Urn, org.PhaseOfEducation?.Name));
+    }
+
+    private IActionResult RedirectToSchool(Organisation org, string traceId, string userId)
+    {
+        if (org.Urn is null)
+        {
+            _logger.LogWarning(
+                "School user has no URN in /user/redirect. TraceId: {TraceId}. UserId: {UserId}. OrganisationId: {OrganisationId}.",
                 traceId,
                 userId,
-                org.Id,
-                org.Name,
-                org.Category?.Name,
-                org.Urn);
-            return Redirect(Routes.FindASchool());
+                org.Id);
+            return NotFound();
         }
 
         _logger.LogInformation(
