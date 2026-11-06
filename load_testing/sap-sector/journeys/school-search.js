@@ -14,11 +14,11 @@ export function schoolSearchJourney (environment, config) {
   group('SAP Sector: School Search Journey', function () {
     const landing = http.get(`${environment.baseUrl}/find-a-school`, authParams())
     performanceCheck(landing, 'Find a school - landing', config.expectedResponseTimes.search)
-    contentCheck(landing, 'Search by name or school ID', 'Find a school landing')
+    contentCheck(landing, 'Enter a school name, URN, DfE number or UKPRN', 'Find a school landing')
     sleep(1)
 
     const term = searchTerms[Math.floor(Math.random() * searchTerms.length)]
-    const results = http.get(`${environment.baseUrl}/find-a-school/search?query=${encodeURIComponent(term)}`, authParams())
+    const results = http.get(`${environment.baseUrl}/find-a-school?query=${encodeURIComponent(term)}`, authParams())
     performanceCheck(results, 'Find a school - search results', config.expectedResponseTimes.search)
     contentCheck(results, 'app-school-result', 'Find a school results')
     sleep(1)

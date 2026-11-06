@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
 using SAPSec.Core;
+using SAPSec.Core.Authentication;
+using SAPSec.Core.Caching;
 using SAPSec.Core.FeatureFlags;
-using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
+using SAPSec.Infrastructure.Redis;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Configuration;
 using SAPSec.Web.Extensions;
@@ -22,6 +24,7 @@ using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -116,7 +119,7 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests")
+        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest")
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -125,6 +128,12 @@ public class Program
                 options.DefaultChallengeScheme = "TestScheme";
             })
             .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
+
+            if (builder.Environment.EnvironmentName is "LoadTest")
+            {
+                builder.Services.AddScoped<IUserService, MockDsiUserService>();
+                builder.Services.AddScoped<IDsiClient, MockDsiApiService>();
+            }
         }
         else
         {
@@ -186,10 +195,18 @@ public class Program
         builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
-        builder.Services.AddUseCases();
+        builder.Services.AddUseCases(builder.Configuration);
         builder.Services.AddServices();
-        builder.Services.AddPostgresqlDependencies();
+        builder.Services.AddPostgresqlDependencies(builder.Configuration);
         builder.Services.AddDependencies();
+
+        builder.Services.AddCaching(builder.Configuration, (services, config) =>
+        {
+            // If caching is enabled:
+            services.AddRedisCache(config);
+            services.AddNestedCache<RequestCache, RedisCache>();
+            services.AddHostedService<StartupCacheClearer>();
+        });
 
         // Add custom error handler for NotFoundExceptions
         builder.Services.AddProblemDetails();
@@ -299,5 +316,208 @@ public class Program
         return environmentName.Equals("production", StringComparison.OrdinalIgnoreCase)
                || environmentName.Equals("prod", StringComparison.OrdinalIgnoreCase)
                || environmentName.Equals("pd", StringComparison.OrdinalIgnoreCase);
+    }
+
+    public class MockDsiUserService : IUserService
+    {
+        private string _currentOrganisationId = "org-123";
+
+        private readonly User _defaultUser = new()
+        {
+            Sub = "test-user-123",
+            Email = "test@example.com",
+            GivenName = "Test",
+            FamilyName = "User",
+            Name = "Test User",
+            Organisations = new List<Organisation>
+        {
+            new()
+            {
+                Id = "org-123",
+                Name = "Test Organisation",
+                LegalName = "TEST ORGANISATION LTD",
+                Urn = "123456",
+                Ukprn = "10012345",
+                Category = new Category { Id = "001", Name = "Establishment" },
+                Type = new Core.Authentication.Type { Id = "34", Name = "Academy Converter" },
+                Status = new Status { Id = 1, Name = "Open", TagColor = "green" },
+                Address = "123 Test Street, Test Town, TS1 1TT",
+                PhaseOfEducation = new PhaseOfEducation { Id = 2, Name = "Primary" }
+            }
+        }
+        };
+
+        public Task<User?> GetUserFromClaimsAsync(ClaimsPrincipal principal)
+        {
+            if (principal?.Identity?.IsAuthenticated != true)
+            {
+                return Task.FromResult<User?>(null);
+            }
+
+            return Task.FromResult<User?>(_defaultUser);
+        }
+
+        public Task<Organisation?> GetCurrentOrganisationAsync(ClaimsPrincipal principal)
+        {
+            if (principal?.Identity?.IsAuthenticated != true)
+            {
+                return Task.FromResult<Organisation?>(null);
+            }
+
+            var org = _defaultUser.Organisations.FirstOrDefault(o => o.Id == _currentOrganisationId)
+                      ?? _defaultUser.Organisations.FirstOrDefault();
+
+            return Task.FromResult(org);
+        }
+
+        public Task<bool> SetCurrentOrganisationAsync(ClaimsPrincipal principal, string organisationId)
+        {
+            if (principal?.Identity?.IsAuthenticated != true)
+            {
+                return Task.FromResult(false);
+            }
+
+            var org = _defaultUser.Organisations.FirstOrDefault(o => o.Id == organisationId);
+            if (org == null)
+            {
+                return Task.FromResult(false);
+            }
+
+            _currentOrganisationId = organisationId;
+            return Task.FromResult(true);
+        }
+
+        public string? GetUserId(ClaimsPrincipal principal)
+        {
+            if (principal?.Identity?.IsAuthenticated != true)
+            {
+                return null;
+            }
+
+            return principal.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                   ?? principal.FindFirst("sub")?.Value
+                   ?? _defaultUser.Sub;
+        }
+
+        public string? GetUserEmail(ClaimsPrincipal principal)
+        {
+            if (principal?.Identity?.IsAuthenticated != true)
+            {
+                return null;
+            }
+
+            return principal.FindFirst(ClaimTypes.Email)?.Value
+                   ?? principal.FindFirst("email")?.Value
+                   ?? _defaultUser.Email;
+        }
+
+        public bool IsAuthenticated(ClaimsPrincipal principal)
+        {
+            return principal?.Identity?.IsAuthenticated == true;
+        }
+
+        public bool HasRole(ClaimsPrincipal principal, string role)
+        {
+            return principal?.IsInRole(role) == true;
+        }
+    }
+
+    public class MockDsiApiService : IDsiClient
+    {
+        private readonly Dictionary<string, UserInfo> _users;
+        private readonly Dictionary<string, Organisation> _organisations;
+
+        public MockDsiApiService()
+        {
+            // Setup default test data
+            _organisations = new Dictionary<string, Organisation>
+            {
+                ["org-123"] = new Organisation
+                {
+                    Id = "org-123",
+                    Name = "Test Organisation",
+                    LegalName = "TEST ORGANISATION LTD",
+                    Urn = "123456",
+                    Ukprn = "10012345",
+                    EstablishmentNumber = "1234",
+                    Category = new Category { Id = "001", Name = "Establishment" },
+                    Type = new Core.Authentication.Type { Id = "34", Name = "Academy Converter" },
+                    Status = new Status { Id = 1, Name = "Open", TagColor = "green" },
+                    Address = "123 Test Street, Test Town, TS1 1TT",
+                    Telephone = "01onal234567890",
+                    Region = new Region { Id = "D", Name = "Yorkshire and the Humber" },
+                    LocalAuthority = new LocalAuthority
+                    {
+                        Id = "LA-123",
+                        Name = "Test Council",
+                        Code = "123"
+                    },
+                    PhaseOfEducation = new PhaseOfEducation { Id = 2, Name = "Primary" },
+                    StatutoryLowAge = 3,
+                    StatutoryHighAge = 11
+                },
+                ["org-456"] = new Organisation
+                {
+                    Id = "org-456",
+                    Name = "Secondary Test School",
+                    LegalName = "SECONDARY TEST SCHOOL",
+                    Urn = "654321",
+                    Ukprn = "10054321",
+                    Category = new Category { Id = "001", Name = "Establishment" },
+                    Type = new Core.Authentication.Type { Id = "34", Name = "Academy Converter" },
+                    Status = new Status { Id = 1, Name = "Open", TagColor = "green" },
+                    PhaseOfEducation = new PhaseOfEducation { Id = 4, Name = "Secondary" },
+                    StatutoryLowAge = 11,
+                    StatutoryHighAge = 16
+                }
+            };
+
+            _users = new Dictionary<string, UserInfo>
+            {
+                ["test-user-123"] = new UserInfo
+                {
+                    Email = "test@example.com",
+                    GivenName = "Test",
+                    FamilyName = "User",
+                    Organisations = new List<Organisation> { _organisations["org-123"] }
+                },
+                ["test-user-456"] = new UserInfo
+                {
+                    Email = "another@example.com",
+                    GivenName = "Another",
+                    FamilyName = "User",
+                    Organisations = new List<Organisation>
+                {
+                    _organisations["org-123"],
+                    _organisations["org-456"]
+                }
+                }
+            };
+        }
+
+        public Task<UserInfo?> GetUserAsync(string userId)
+        {
+            _users.TryGetValue(userId, out var user);
+            return Task.FromResult(user);
+        }
+
+        public Task<UserInfo?> GetUserByEmailAsync(string email)
+        {
+            var user = _users.Values.FirstOrDefault(u =>
+                u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            return Task.FromResult(user);
+        }
+
+        public Task<Organisation?> GetOrganisationAsync(string organisationId)
+        {
+            _organisations.TryGetValue(organisationId, out var org);
+            return Task.FromResult(org);
+        }
+
+        public Task<string> GenerateBearerToken()
+        {
+            // Return a fake token for testing
+            return Task.FromResult("test-bearer-token-12345");
+        }
     }
 }

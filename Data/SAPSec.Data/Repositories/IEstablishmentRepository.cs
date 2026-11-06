@@ -2,7 +2,7 @@
 
 namespace SAPSec.Data.Repositories;
 
-public interface IEstablishmentRepository
+public interface IEstablishmentRepository : IRepository
 {
     Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync();
     Task<IReadOnlyCollection<Establishment>> GetEstablishmentsAsync(IEnumerable<string> urns);

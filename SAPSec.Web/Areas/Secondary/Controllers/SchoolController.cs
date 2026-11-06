@@ -14,7 +14,6 @@ using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
-using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Components;
 using SAPSec.Web.ViewModels.Measures;
@@ -32,7 +31,6 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
-        IRequestSchoolAccessor requestSchoolAccessor,
         IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getSchoolKs4CoreSubjectsUseCase,
         IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
@@ -174,7 +172,7 @@ public class SchoolController(
             similarSchoolsResponse.HasSimilarSchools,
             await IsRiseResourcesEnabledAsync());
 
-        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
+        var schoolDetails = (await getSchoolDetailsUseCase.Execute(new(currentSchool.Urn))).SchoolDetails;
         ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
         ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
         ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);

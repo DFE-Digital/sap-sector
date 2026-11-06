@@ -51,8 +51,8 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         var response = await _sut.Execute(Request("100001"));
 
         response.CurrentSchool.Name.Should().Be("Test School");
-        response.AllResults.Should().BeEmpty();
-        response.ResultsPage.Should().BeEmpty();
+        response.ResultsPage.AllItems.Should().BeEmpty();
+        response.ResultsPage.Items.Should().BeEmpty();
         response.HasSimilarSchools.Should().BeFalse();
     }
 
@@ -83,7 +83,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(
                 "100002",
                 "100003",
@@ -91,7 +91,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
                 "100005",
                 "100006");
 
-        response.ResultsPage.Select(r => r.URN)
+        response.ResultsPage.Items.Select(r => r.URN)
             .Should().BeEquivalentTo(
                 "100002",
                 "100003",
@@ -117,10 +117,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo("100002", "100003");
 
-        response.ResultsPage.Select(r => r.URN)
+        response.ResultsPage.Items.Select(r => r.URN)
             .Should().BeEquivalentTo("100002", "100003");
     }
 
@@ -207,10 +207,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["ur"] = ["UF1", "RLN1"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo("100003", "100004");
 
-        response.ResultsPage.Select(r => r.URN)
+        response.ResultsPage.Items.Select(r => r.URN)
             .Should().BeEquivalentTo("100003", "100004");
     }
 
@@ -247,7 +247,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["yyy"] = ["3", "4"],
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo("100003", "100004");
     }
 
@@ -310,7 +310,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -332,7 +332,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["dist"] = ["100"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo("100002", "100003");
     }
 
@@ -358,7 +358,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["dist"] = ["100"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo("100002");
     }
 
@@ -646,7 +646,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -672,7 +672,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["reg"] = ["1"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -905,7 +905,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -931,7 +931,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["ur"] = ["UN1"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -1162,10 +1162,10 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
 
-        response.ResultsPage.Select(r => r.URN)
+        response.ResultsPage.Items.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -1191,7 +1191,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["poe"] = ["1"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -1504,7 +1504,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [toFilterKey] = toFilterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -1533,7 +1533,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["sciu_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -1562,7 +1562,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["sciu_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo("100002", "100003", "100004", "100005", "100006");
     }
 
@@ -1716,7 +1716,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -1953,7 +1953,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -2176,7 +2176,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -2202,7 +2202,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["sf"] = ["1"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -2417,7 +2417,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -2443,7 +2443,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["ap"] = ["1"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -2691,7 +2691,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -2958,7 +2958,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -2984,7 +2984,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["goe"] = ["1"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -3286,7 +3286,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [toFilterKey] = toFilterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -3319,7 +3319,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["oar_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -3352,7 +3352,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["sciu_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo("100002", "100003", "100004", "100005");
     }
 
@@ -3589,7 +3589,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [toFilterKey] = toFilterValues
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -3622,7 +3622,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["par_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -3655,7 +3655,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["sciu_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo("100002", "100003", "100004", "100005");
     }
 
@@ -3846,7 +3846,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         }));
 
         response.ValidationErrors.Should().BeEmpty();
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -3918,7 +3918,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             [filterKey + "_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -4002,7 +4002,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["per_t"] = ["0.1"]
         }));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -4026,7 +4026,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         }));
 
         response.HasSimilarSchools.Should().BeTrue();
-        response.AllResults.Should().BeEmpty();
+        response.ResultsPage.AllItems.Should().BeEmpty();
     }
     [Fact]
     public async Task SortBy_DefaultsToRwmExpected()
@@ -4053,7 +4053,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+        response.ResultsPage.AllItems.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
                 ("100004", DataWithAvailability.Available("30%")),
                 ("100005", DataWithAvailability.Available("20%")),
@@ -4092,7 +4092,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().Equal("100003", "100004", "100002");
     }
 
@@ -4117,7 +4117,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().Equal("100003", "100002");
     }
 
@@ -4146,7 +4146,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001", sortBy: "XXX"));
 
-        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+        response.ResultsPage.AllItems.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
                 ("100004", DataWithAvailability.Available("30%")),
                 ("100005", DataWithAvailability.Available("20%")),
@@ -4190,7 +4190,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+        response.ResultsPage.AllItems.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
                 ("100004", DataWithAvailability.Available("30%")),
                 ("100005", DataWithAvailability.Available("20%")),
@@ -4234,7 +4234,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+        response.ResultsPage.AllItems.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
                 ("100004", DataWithAvailability.Available("30%")),
                 ("100005", DataWithAvailability.Available("20%")),
@@ -4278,7 +4278,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+        response.ResultsPage.AllItems.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
                 ("100004", DataWithAvailability.Available("30.0")),
                 ("100005", DataWithAvailability.Available("20.0")),
@@ -4322,7 +4322,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+        response.ResultsPage.AllItems.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
                 ("100004", DataWithAvailability.Available("30.0")),
                 ("100005", DataWithAvailability.Available("20.0")),
@@ -4366,7 +4366,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+        response.ResultsPage.AllItems.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
                 ("100004", DataWithAvailability.Available("30%")),
                 ("100005", DataWithAvailability.Available("20%")),
@@ -4410,7 +4410,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+        response.ResultsPage.AllItems.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
                 ("100004", DataWithAvailability.Available("30%")),
                 ("100005", DataWithAvailability.Available("20%")),
@@ -4460,7 +4460,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.AllResults.Select(r => r.URN)
+        response.ResultsPage.AllItems.Select(r => r.URN)
             .Should().BeEquivalentTo(
                 "100002",
                 "100003",
@@ -4474,7 +4474,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
                 "100011",
                 "100012");
 
-        response.ResultsPage.Select(r => r.URN)
+        response.ResultsPage.Items.Select(r => r.URN)
             .Should().BeEquivalentTo(
                 "100002",
                 "100003",
@@ -4533,7 +4533,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         response.ResultsPage.CurrentPage.Should().Be(expectedCurrentPage);
         response.ResultsPage.Count.Should().Be(expectedUrnsOnPage.Length);
 
-        response.ResultsPage.Select(r => r.URN)
+        response.ResultsPage.Items.Select(r => r.URN)
             .Should().Equal(expectedUrnsOnPage);
     }
 
@@ -4585,7 +4585,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         response.ResultsPage.CurrentPage.Should().Be(expectedCurrentPage);
         response.ResultsPage.Count.Should().Be(expectedUrnsOnPage.Length);
 
-        response.ResultsPage.Select(r => r.URN)
+        response.ResultsPage.Items.Select(r => r.URN)
             .Should().Equal(expectedUrnsOnPage);
     }
 
@@ -4636,7 +4636,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         response.ResultsPage.CurrentPage.Should().Be(expectedCurrentPage);
         response.ResultsPage.Count.Should().Be(expectedUrnsOnPage.Length);
 
-        response.ResultsPage.Select(r => r.URN)
+        response.ResultsPage.Items.Select(r => r.URN)
             .Should().Equal(expectedUrnsOnPage);
     }
 
@@ -4694,7 +4694,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         response.ResultsPage.CurrentPage.Should().Be(expectedCurrentPage);
         response.ResultsPage.Count.Should().Be(expectedUrnsOnPage.Length);
 
-        response.ResultsPage.Select(r => r.URN)
+        response.ResultsPage.Items.Select(r => r.URN)
             .Should().Equal(expectedUrnsOnPage);
     }
 
