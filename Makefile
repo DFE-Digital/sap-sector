@@ -1,5 +1,5 @@
 ARM_TEMPLATE_TAG=1.1.10
-RG_TAGS={"Product" : "Teacher services cloud"}
+RG_TAGS={"Product" : "Get School Improvement Insights", "Service Offering" : "Get School Improvement Insights"}
 REGION=UK South
 SERVICE_NAME=get-school-improvement-insights
 SERVICE_SHORT=sapsec
@@ -16,6 +16,9 @@ review: test-cluster
 
 test: test-cluster
 	$(eval include global_config/test.sh)
+
+preapproval: production-cluster
+	$(eval include global_config/preapproval.sh)
 
 production: production-cluster
 	$(if $(or ${SKIP_CONFIRM}, ${CONFIRM_PRODUCTION}), , $(error Missing CONFIRM_PRODUCTION=yes))
