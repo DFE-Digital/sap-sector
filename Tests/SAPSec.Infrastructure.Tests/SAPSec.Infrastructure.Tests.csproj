@@ -37,4 +37,8 @@
     <Using Include="FluentAssertions" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\SAPData\DataMap\datamap.csv" Link="DataMap\datamap.csv" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
