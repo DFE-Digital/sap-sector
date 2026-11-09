@@ -8,7 +8,8 @@ public class DfeUserOptions
     public const string SectionName = "DfeUsers";
 
     /// <summary>
-    /// Names of the DfE Sign-in organisations that DfE staff sign in as (e.g. "Department for Education").
+    /// Email domains that identify DfE staff (e.g. "education.gov.uk"). Matched exactly, so a subdomain such as
+    /// "digital.education.gov.uk" must be listed separately if it should count.
     /// </summary>
-    public string[] OrganisationNames { get; set; } = [];
+    public string[] EmailDomains { get; set; } = [];
 }

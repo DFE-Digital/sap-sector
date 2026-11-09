@@ -18,7 +18,7 @@ public class SchoolUserEligibilityIntegrationTests(InMemoryRepositoryIntegration
     public Task InitializeAsync()
     {
         fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
-        fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
+        fixture.TestUser.Email = TestUserOrganisation.NonDfeEmail;
         fixture.TestUser.Urn = Urn;
         fixture.FeatureFlagService.Override(Flags.EnableFindASchool, false);
         fixture.FeatureFlagService.Override(Flags.EnablePrimarySchools, true);

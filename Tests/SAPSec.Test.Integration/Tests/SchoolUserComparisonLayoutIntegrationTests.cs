@@ -42,7 +42,7 @@ public class SchoolUserComparisonLayoutIntegrationTests(
     {
         var (path, similarSchoolsPath) = SetUp(phase);
         Fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
-        Fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
+        Fixture.TestUser.Email = TestUserOrganisation.NonDfeEmail;
         Fixture.TestUser.Urn = OwnUrn;
 
         var content = await GetAsync(path);
@@ -70,7 +70,7 @@ public class SchoolUserComparisonLayoutIntegrationTests(
     {
         var (path, _) = SetUp(phase);
         Fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
-        Fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
+        Fixture.TestUser.Email = TestUserOrganisation.NonDfeEmail;
         Fixture.TestUser.Urn = OwnUrn;
         Fixture.FeatureFlagService.Override(Flags.EnableFindASchool, true);
 

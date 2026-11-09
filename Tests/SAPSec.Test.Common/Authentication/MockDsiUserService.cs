@@ -9,19 +9,25 @@ public class MockDsiUserService : IUserService
 
     private readonly User _defaultUser;
 
+    // The test sign-in handler adds its own email claim, so a configured test user email has to win over claims
+    // for tests that switch between DfE and non-DfE users.
+    private readonly string? _configuredEmail;
+
     public MockDsiUserService(TestUserOrganisation? testUserOrganisation = null)
     {
+        _configuredEmail = testUserOrganisation?.Email;
         _defaultUser = CreateDefaultUser(
             testUserOrganisation?.CategoryId ?? TestUserOrganisation.DefaultCategoryId,
             testUserOrganisation?.Urn ?? TestUserOrganisation.DefaultUrn,
             testUserOrganisation?.Phase ?? TestUserOrganisation.DefaultPhase,
-            testUserOrganisation?.Name ?? TestUserOrganisation.NonDfeOrganisationName);
+            testUserOrganisation?.Name ?? TestUserOrganisation.DefaultName,
+            testUserOrganisation?.Email ?? TestUserOrganisation.NonDfeEmail);
     }
 
-    private static User CreateDefaultUser(string categoryId, string urn, string phase, string organisationName) => new()
+    private static User CreateDefaultUser(string categoryId, string urn, string phase, string organisationName, string email) => new()
     {
         Sub = "test-user-123",
-        Email = "test@example.com",
+        Email = email,
         GivenName = "Test",
         FamilyName = "User",
         Name = "Test User",
@@ -106,7 +112,8 @@ public class MockDsiUserService : IUserService
             return null;
         }
 
-        return principal.FindFirst(ClaimTypes.Email)?.Value
+        return _configuredEmail
+               ?? principal.FindFirst(ClaimTypes.Email)?.Value
                ?? principal.FindFirst("email")?.Value
                ?? _defaultUser.Email;
     }

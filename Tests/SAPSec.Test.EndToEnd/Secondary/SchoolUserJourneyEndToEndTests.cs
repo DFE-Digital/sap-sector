@@ -28,7 +28,7 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
     public override async Task InitializeAsync()
     {
         _fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
-        _fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
+        _fixture.TestUser.Email = TestUserOrganisation.NonDfeEmail;
         _fixture.TestUser.Urn = OwnSchoolUrn;
         _fixture.TestUser.Phase = "Secondary";
 

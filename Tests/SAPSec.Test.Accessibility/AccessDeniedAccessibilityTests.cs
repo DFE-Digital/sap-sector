@@ -30,7 +30,7 @@ public class AccessDeniedAccessibilityTests(AccessibilityTestsFixture fixture) :
     public async Task GroupLogin_ShowsAccessibleResponsiveAccessDeniedPage(string categoryId, int width)
     {
         Fixture.TestUser.CategoryId = categoryId;
-        Fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
+        Fixture.TestUser.Email = TestUserOrganisation.NonDfeEmail;
         await Page.SetViewportSizeAsync(width, 900);
 
         var response = await Page.GotoAsync(Routes.UserHome);

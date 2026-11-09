@@ -20,7 +20,7 @@ public class FindASchoolHandlerTests
     public async Task DfeUser_WithRestrictionsOn_CanUseFindASchool(string categoryId)
     {
         _testUser.CategoryId = categoryId;
-        _testUser.Name = TestUserOrganisation.DfeOrganisationName;
+        _testUser.Email = TestUserOrganisation.DfeEmail;
 
         var context = await HandleAsync(authenticated: true);
 
@@ -35,7 +35,7 @@ public class FindASchoolHandlerTests
     public async Task NonDfeUser_WithRestrictionsOn_CannotUseFindASchool(string categoryId)
     {
         _testUser.CategoryId = categoryId;
-        _testUser.Name = TestUserOrganisation.NonDfeOrganisationName;
+        _testUser.Email = TestUserOrganisation.NonDfeEmail;
 
         var context = await HandleAsync(authenticated: true);
 
@@ -43,22 +43,23 @@ public class FindASchoolHandlerTests
     }
 
     [Fact]
-    public async Task UserWithDfeEmail_SignedInAsTheirSchool_CannotUseFindASchool()
+    public async Task UserWithDfeEmail_SignedInAsASchool_CanUseFindASchool()
     {
-        // DfE staff are recognised by the organisation they sign in as, not their email address.
+        // DfE staff are recognised by their email address, whatever organisation they sign in as.
         _testUser.CategoryId = OrganisationCategoryIds.Establishment;
         _testUser.Name = "Wetherby High School";
+        _testUser.Email = TestUserOrganisation.DfeEmail;
 
-        var context = await HandleAsync(authenticated: true, email: "jane.smith@education.gov.uk");
+        var context = await HandleAsync(authenticated: true);
 
-        context.HasSucceeded.Should().BeFalse();
+        context.HasSucceeded.Should().BeTrue();
     }
 
     [Fact]
     public async Task NonDfeUser_WithRestrictionsOff_CanUseFindASchool()
     {
         _restrictionsEnabled = false;
-        _testUser.Name = TestUserOrganisation.NonDfeOrganisationName;
+        _testUser.Email = TestUserOrganisation.NonDfeEmail;
 
         var context = await HandleAsync(authenticated: true);
 
@@ -75,12 +76,12 @@ public class FindASchoolHandlerTests
         context.HasSucceeded.Should().BeFalse();
     }
 
-    private async Task<AuthorizationHandlerContext> HandleAsync(bool authenticated, string email = "test@example.com")
+    private async Task<AuthorizationHandlerContext> HandleAsync(bool authenticated)
     {
         var context = new AuthorizationHandlerContext(
             [new FindASchoolRequirement()],
             new ClaimsPrincipal(authenticated
-                ? new ClaimsIdentity([new Claim("sub", "user-1"), new Claim("email", email)], "TestAuth")
+                ? new ClaimsIdentity([new Claim("sub", "user-1")], "TestAuth")
                 : new ClaimsIdentity()),
             null);
 
@@ -88,7 +89,7 @@ public class FindASchoolHandlerTests
         var handler = new FindASchoolHandler(
             userService,
             new FixedFeatureFlagService(enabled: !_restrictionsEnabled),
-            new DfeUserIdentifier(userService, Options.Create(new DfeUserOptions { OrganisationNames = [TestUserOrganisation.DfeOrganisationName] })));
+            new DfeUserIdentifier(userService, Options.Create(new DfeUserOptions { EmailDomains = [TestUserOrganisation.DfeEmailDomain] })));
 
         await handler.HandleAsync(context);
 

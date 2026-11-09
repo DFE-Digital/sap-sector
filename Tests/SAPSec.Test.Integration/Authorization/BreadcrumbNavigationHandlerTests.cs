@@ -14,7 +14,7 @@ public class BreadcrumbNavigationHandlerTests
     private readonly TestUserOrganisation _testUser = new()
     {
         CategoryId = OrganisationCategoryIds.Establishment,
-        Name = TestUserOrganisation.NonDfeOrganisationName
+        Email = TestUserOrganisation.NonDfeEmail
     };
 
     private bool _restrictionsEnabled = true;
@@ -47,7 +47,7 @@ public class BreadcrumbNavigationHandlerTests
     public async Task DfeUser_WithRestrictionsOn_GetsBreadcrumbs()
     {
         _testUser.CategoryId = OrganisationCategoryIds.LocalAuthority;
-        _testUser.Name = TestUserOrganisation.DfeOrganisationName;
+        _testUser.Email = TestUserOrganisation.DfeEmail;
         var context = CreateContext(authenticated: true);
 
         await CreateHandler().HandleAsync(context);
@@ -81,7 +81,7 @@ public class BreadcrumbNavigationHandlerTests
         var userService = new MockDsiUserService(_testUser);
         var dfeUserIdentifier = new DfeUserIdentifier(
             userService,
-            Options.Create(new DfeUserOptions { OrganisationNames = [TestUserOrganisation.DfeOrganisationName] }));
+            Options.Create(new DfeUserOptions { EmailDomains = [TestUserOrganisation.DfeEmailDomain] }));
 
         return new(userService, new FixedFeatureFlagService(enabled: !_restrictionsEnabled), dfeUserIdentifier);
     }

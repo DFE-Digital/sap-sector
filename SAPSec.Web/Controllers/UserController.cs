@@ -73,8 +73,8 @@ public class UserController(
             return RedirectToSchool(org, traceId, userId);
         }
 
-        // DfE Sign-in puts the "Department for Education" organisation in the Local Authority category (002),
-        // so this check must stay above any local authority routing added later.
+        // DfE staff are recognised by email domain. Keep this above any local authority or trust routing added later,
+        // because DfE staff can sign in under organisations in those categories (DSI puts DfE itself in category 002).
         if (await _dfeUserIdentifier.IsDfeUserAsync(User))
         {
             _logger.LogInformation(

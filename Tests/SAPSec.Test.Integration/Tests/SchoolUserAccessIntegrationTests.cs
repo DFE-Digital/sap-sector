@@ -18,7 +18,7 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
     public Task InitializeAsync()
     {
         fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
-        fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
+        fixture.TestUser.Email = TestUserOrganisation.NonDfeEmail;
         fixture.TestUser.Urn = OwnUrn;
         return Task.CompletedTask;
     }
@@ -45,6 +45,17 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
     public async Task FindASchool_AsDfeUser_IsAvailable()
     {
         fixture.TestUser.Reset();
+
+        var response = await fixture.NonRedirectingClient.GetAsync(Routes.FindASchool());
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task FindASchool_AsSchoolUserWithDfeEmail_IsAvailable()
+    {
+        // DfE staff are recognised by email, so signing in for a school does not take Find a school away.
+        fixture.TestUser.Email = TestUserOrganisation.DfeEmail;
 
         var response = await fixture.NonRedirectingClient.GetAsync(Routes.FindASchool());
 
@@ -403,7 +414,7 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
     {
         fixture.TestUser.Reset();
         fixture.TestUser.CategoryId = categoryId;
-        fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
+        fixture.TestUser.Email = TestUserOrganisation.NonDfeEmail;
     }
 
     private static string ServiceNameHref(string content) =>

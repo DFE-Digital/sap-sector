@@ -24,7 +24,7 @@ public class SchoolUserAccessibilityTests(AccessibilityTestsFixture fixture) : A
     {
         await base.InitializeAsync();
         Fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
-        Fixture.TestUser.Name = TestUserOrganisation.NonDfeOrganisationName;
+        Fixture.TestUser.Email = TestUserOrganisation.NonDfeEmail;
     }
 
     public override async Task DisposeAsync()
