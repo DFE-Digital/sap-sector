@@ -1,13 +1,14 @@
 ﻿@using SAPSec.Web.Constants
+@inject SAPSec.Web.Services.IStartPageService StartPage
 @{
   ViewData[ViewDataKeys.Title] = PageTitles.TermsAndConditions;
 }
 
 @section Breadcrumbs {
-    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+    <nav authorize-policy="@SAPSec.Web.Authorization.AuthorizationPolicies.BreadcrumbNavigation" class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
         <ol class="govuk-breadcrumbs__list">
             <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolSearch")">Home</a>
+                <a class="govuk-breadcrumbs__link" href="@(await StartPage.GetStartUrlAsync(User.Identity is { IsAuthenticated: true }))">Home</a>
             </li>
         </ol>
     </nav>

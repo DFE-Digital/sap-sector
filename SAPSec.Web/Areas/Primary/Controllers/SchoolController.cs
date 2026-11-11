@@ -12,6 +12,7 @@ using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
@@ -27,7 +28,7 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 /// </summary>
 [Area("Primary")]
 [Route("school/primary/{urn}")]
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.SchoolAccess)]
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
 public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,

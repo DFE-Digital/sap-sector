@@ -1,4 +1,6 @@
-﻿using Xunit;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SAPSec.Test.Common.Authentication;
+using Xunit;
 
 namespace SAPSec.Test.EndToEnd.Setup;
 
@@ -7,6 +9,9 @@ public class EndToEndTestsFixture : IAsyncLifetime
     private EndToEndTestsWebApplicationFactory? _factory;
 
     public string BaseUrl { get; private set; } = null!;
+
+    public TestUserOrganisation TestUser =>
+        _factory!.BrowserHostServices.GetRequiredService<TestUserOrganisation>();
 
     public Task InitializeAsync()
     {
