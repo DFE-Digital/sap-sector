@@ -58,6 +58,7 @@ WORKDIR /app
 
 # Fix security vulnerabilities in base image
 # - gnupg2/gpgv: Out-of-bounds Write (SNYK-UBUNTU2404-GNUPG2-14849555)
+# - apt/libapt-pkg6.0t64: CVE-2026-109518 (SNYK-UBUNTU2404-APT-22204275), fixed in 2.8.4ubuntu0.1
 # - zlib1g, libpam*: Previously identified vulnerabilities
 # - apt/libapt-pkg6.0t64: upgraded alongside gpgv so apt's dependency on gpgv stays satisfied
 RUN apt-get update && \

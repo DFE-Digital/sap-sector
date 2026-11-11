@@ -14,6 +14,7 @@ public static class DependenciesExtensions
     public static void AddDependencies(this IServiceCollection services)
     {
         services.AddScoped<IRequestSchoolAccessor, RequestSchoolAccessor>();
+        services.AddScoped<SchoolUserAccessService>();
         services.AddScoped<IAllThroughSimilarSchoolsTabUrlBuilder, AllThroughSimilarSchoolsTabUrlBuilder>();
         
         // Formatters
