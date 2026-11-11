@@ -8,12 +8,11 @@ import { staticPageJourney } from './journeys/static-pages.js'
 import { healthCheckJourney } from './journeys/health-check.js'
 import { signInRedirectJourney } from './journeys/sign-in-redirect.js'
 import { schoolSearchJourney } from './journeys/school-search.js'
-import { secondarySchoolJourney, primarySchoolJourney } from './journeys/school-overview.js'
-import { comparePerformanceJourney } from './journeys/compare-performance.js'
+import { secondarySchoolJourney, primarySchoolJourney, allThroughSchoolJourney } from './journeys/school-overview.js'
 import { hasSessionCookie } from './utils/auth.js'
 import { quickTestScenario } from './scenarios/quick-test.js'
 import { baselineScenario } from './scenarios/baseline.js'
-import { peakSurgeScenario } from './scenarios/peak-surge.js'
+import { peakSurgeScenario, hugePeakSurgeScenario } from './scenarios/peak-surge.js'
 import { stressTestScenario, buildStepThresholds, applyStepTag } from './scenarios/stress-test.js'
 import { randomThinkTime } from '../shared/utils/common-helpers.js'
 
@@ -25,6 +24,8 @@ function getSelectedScenario () {
       return { sap_sector_baseline: baselineScenario }
     case 'peak-surge':
       return { sap_sector_peak_surge: peakSurgeScenario }
+    case 'huge-peak-surge':
+      return { sap_sector_huge_peak_surge: hugePeakSurgeScenario }
     case 'stress':
       return { sap_sector_stress: stressTestScenario }
     case 'quick':
@@ -96,15 +97,15 @@ export default function (data) {
       if (journeyChoice < 0.4) {
         // 40% - search for a school
         schoolSearchJourney(environment, config)
-      } else if (journeyChoice < 0.7) {
-        // 30% - view a secondary school's performance pages
+      } else if (journeyChoice < 0.6) {
+        // 20% - view a secondary school's performance pages
         secondarySchoolJourney(environment, config)
-      } else if (journeyChoice < 0.9) {
+      } else if (journeyChoice < 0.8) {
+        // 20% - view an all-through school's performance pages
+        allThroughSchoolJourney(environment, config)
+      }  else {
         // 20% - view a primary school's performance pages
         primarySchoolJourney(environment, config)
-      } else {
-        // 10% - compare performance page
-        comparePerformanceJourney(environment, config)
       }
     })
   } else {

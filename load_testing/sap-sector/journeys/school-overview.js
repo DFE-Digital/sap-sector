@@ -1,11 +1,12 @@
 import http from 'k6/http'
 import { group, sleep } from 'k6'
 import { performanceCheck, contentCheck } from '../utils/checks.js'
-import { randomSecondaryUrn, randomPrimaryUrn } from '../data/school-urns.js'
+import { randomSecondaryUrn, randomPrimaryUrn, randomAllThroughUrn } from '../data/school-urns.js'
 import { authParams } from '../utils/auth.js'
 
 const secondarySubPages = ['ks4-headline-measures', 'attendance', 'view-similar-schools']
 const primarySubPages = ['ks2', 'attendance', 'view-similar-schools']
+const allThroughSubPages = ['ks2', 'ks4-headline-measures', 'attendance', 'view-similar-schools']
 
 // Requires DfE Sign-in. Either run against an app instance started with
 // ASPNETCORE_ENVIRONMENT=LoadTest (see load_testing/README.md), or against a
@@ -44,6 +45,23 @@ export function primarySchoolJourney (environment, config) {
     const subPage = primarySubPages[Math.floor(Math.random() * primarySubPages.length)]
     const subResponse = http.get(`${environment.baseUrl}/school/primary/${urn}/${subPage}`, authParams())
     performanceCheck(subResponse, `Primary school - ${subPage}`, config.expectedResponseTimes.schoolPage)
+
+    sleep(1)
+  })
+}
+
+export function allThroughSchoolJourney (environment, config) {
+  group('SAP Sector: All Through School Journey', function () {
+    const urn = randomAllThroughUrn()
+
+    const overview = http.get(`${environment.baseUrl}/school/all-through/${urn}`, authParams())
+    performanceCheck(overview, 'All through school overview', config.expectedResponseTimes.schoolPage)
+    contentCheck(overview, 'app-overview', 'All through school overview')
+    sleep(1)
+
+    const subPage = allThroughSubPages[Math.floor(Math.random() * allThroughSubPages.length)]
+    const subResponse = http.get(`${environment.baseUrl}/school/all-through/${urn}/${subPage}`, authParams())
+    performanceCheck(subResponse, `All through school - ${subPage}`, config.expectedResponseTimes.schoolPage)
 
     sleep(1)
   })

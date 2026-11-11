@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Features.SimilarSchools.UseCases;
+﻿using SAPSec.Core.Features.SimilarSchools;
 
 public record SimilarSchoolsFilterGroupViewModel(
     string Heading,

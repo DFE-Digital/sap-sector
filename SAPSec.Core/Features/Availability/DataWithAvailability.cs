@@ -1,4 +1,6 @@
-﻿namespace SAPSec.Core.Features.Availability;
+﻿using System.Text.Json.Serialization;
+
+namespace SAPSec.Core.Features.Availability;
 
 /// <summary>
 /// Wraps a value with its availability status.
@@ -8,8 +10,10 @@
 public sealed record DataWithAvailability<T>
 {
     public T? Value { get; }
+
     public DataAvailabilityStatus Availability { get; }
 
+    [JsonConstructor]
     internal DataWithAvailability(T? value, DataAvailabilityStatus availability)
     {
         Value = value;
@@ -19,12 +23,15 @@ public sealed record DataWithAvailability<T>
     #region Query Methods
 
     /// <summary>Returns true if data is available</summary>
+    [JsonIgnore]
     public bool IsAvailable => Availability == DataAvailabilityStatus.Available;
 
     /// <summary>Returns true if data has a usable value (Available or Low quality)</summary>
+    [JsonIgnore]
     public bool HasValue => Availability is DataAvailabilityStatus.Available or DataAvailabilityStatus.Low;
 
     /// <summary>Returns true if data is explicitly marked as not applicable</summary>
+    [JsonIgnore]
     public bool IsNotApplicable => Availability == DataAvailabilityStatus.NotApplicable;
 
     #endregion

@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SAPSec.Core.Caching;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
@@ -10,13 +12,13 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Time;
-using SAPSec.Core.UseCases;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SAPSec.Core;
 
 public static class ServiceKeys
 {
+    public const string RealImplementation = nameof(RealImplementation);
     public const string Primary = nameof(Primary);
     public const string Secondary = nameof(Secondary);
 }
@@ -24,82 +26,44 @@ public static class ServiceKeys
 [ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
-    public static void AddUseCases(this IServiceCollection services)
+    public static void AddUseCases(this IServiceCollection services, IConfiguration configuration)
     {
         // School info
 
-        services.AddSingleton<
-            IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse>,
-            GetSchoolInfoUseCase>();
+        services.AddUseCase<GetSchoolInfoUseCase>(configuration);
 
         // School details
 
-        services.AddSingleton<
-            IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse>,
-            GetSchoolDetailsUseCase>();
-        services.AddKeyedSingleton<
-            IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse>,
-            GetPrimaryComparisonSchoolDetailsUseCase>(ServiceKeys.Primary);
-        services.AddKeyedSingleton<
-            IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse>,
-            GetSecondaryComparisonSchoolDetailsUseCase>(ServiceKeys.Secondary);
+        services.AddUseCase<GetSchoolDetailsUseCase>(configuration);
+        services.AddKeyedUseCase<GetPrimaryComparisonSchoolDetailsUseCase>(ServiceKeys.Primary, configuration);
+        services.AddKeyedUseCase<GetSecondaryComparisonSchoolDetailsUseCase>(ServiceKeys.Secondary, configuration);
 
         // Similar schools
 
-        services.AddSingleton<
-            IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>,
-            FindPrimarySimilarSchoolsUseCase>();
-        services.AddSingleton<
-            IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse>,
-            FindSecondarySimilarSchoolsUseCase>();
-        services.AddSingleton<
-            IUseCase<GetSecondaryComparisonSimilarityCharacteristicsRequest, GetSecondaryComparisonSimilarityCharacteristicsResponse>,
-            GetSecondaryComparisonSimilarityCharacteristicsUseCase>();
-        services.AddSingleton<
-            IUseCase<GetPrimaryComparisonSimilarityCharacteristicsRequest, GetPrimaryComparisonSimilarityCharacteristicsResponse>,
-            GetPrimaryComparisonSimilarityCharacteristicsUseCase>();
-        services.AddSingleton<
-            IUseCase<GetAllThroughSimilarSchoolPhasesRequest, GetAllThroughSimilarSchoolPhasesResponse>,
-            GetAllThroughSimilarSchoolPhasesUseCase>();
+        services.AddUseCase<FindPrimarySimilarSchoolsUseCase>(configuration);
+        services.AddUseCase<FindSecondarySimilarSchoolsUseCase>(configuration);
+        services.AddUseCase<GetSecondaryComparisonSimilarityCharacteristicsUseCase>(configuration);
+        services.AddUseCase<GetPrimaryComparisonSimilarityCharacteristicsUseCase>(configuration);
+        services.AddUseCase<GetAllThroughSimilarSchoolPhasesUseCase>(configuration);
 
         // Measures
 
-        services.AddSingleton<
-            IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse>,
-            GetSchoolKs2PerformanceMeasuresUseCase>();
-        services.AddSingleton<
-            IUseCase<GetComparisonKs2PerformanceMeasuresRequest, GetComparisonKs2PerformanceMeasuresResponse>,
-            GetComparisonKs2PerformanceMeasuresUseCase>();
+        services.AddUseCase<GetSchoolKs2PerformanceMeasuresUseCase>(configuration);
+        services.AddUseCase<GetComparisonKs2PerformanceMeasuresUseCase>(configuration);
 
-        services.AddSingleton<
-            IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse>,
-            GetSchoolKs4HeadlineMeasuresUseCase>();
-        services.AddSingleton<
-            IUseCase<GetComparisonKs4HeadlineMeasuresRequest, GetComparisonKs4HeadlineMeasuresResponse>,
-            GetComparisonKs4HeadlineMeasuresUseCase>();
+        services.AddUseCase<GetSchoolKs4HeadlineMeasuresUseCase>(configuration);
+        services.AddUseCase<GetComparisonKs4HeadlineMeasuresUseCase>(configuration);
 
-        services.AddSingleton<
-            IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse>,
-            GetSchoolKs4CoreSubjectsMeasuresUseCase>();
-        services.AddSingleton<
-            IUseCase<GetComparisonKs4CoreSubjectsMeasuresRequest, GetComparisonKs4CoreSubjectsMeasuresResponse>,
-            GetComparisonKs4CoreSubjectsMeasuresUseCase>();
+        services.AddUseCase<GetSchoolKs4CoreSubjectsMeasuresUseCase>(configuration);
+        services.AddUseCase<GetComparisonKs4CoreSubjectsMeasuresUseCase>(configuration);
 
-        services.AddSingleton<
-            IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse>,
-            GetSchoolAttendanceMeasuresUseCase>();
-        services.AddSingleton<
-            IUseCase<GetPrimaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse>,
-            GetPrimaryComparisonAttendanceMeasuresUseCase>();
-        services.AddSingleton<
-            IUseCase<GetSecondaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse>,
-            GetSecondaryComparisonAttendanceMeasuresUseCase>();
+        services.AddUseCase<GetSchoolAttendanceMeasuresUseCase>(configuration);
+        services.AddUseCase<GetPrimaryComparisonAttendanceMeasuresUseCase>(configuration);
+        services.AddUseCase<GetSecondaryComparisonAttendanceMeasuresUseCase>(configuration);
 
         // RISE Resources
 
-        services.AddSingleton<
-            IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse>,
-            GetRiseResourcesUseCase>();
+        services.AddUseCase<GetRiseResourcesUseCase>(configuration);
 
         // Time
 
