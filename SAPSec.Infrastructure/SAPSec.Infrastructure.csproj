@@ -36,12 +36,10 @@
     <None Remove="Data\Files\Generated\EstablishmentGroupLinks.json" />
     <None Remove="Data\Files\Generated\EstablishmentLinks.json" />
     <None Remove="Data\Files\Generated\EstablishmentPerformance.json" />
-    <None Remove="Data\Files\Generated\EstablishmentSubjectEntries.json" />
     <None Remove="Data\Files\Generated\EstablishmentWorkforce.json" />
     <None Remove="Data\Files\Generated\LAAbsence.json" />
     <None Remove="Data\Files\Generated\LADestinations.json" />
     <None Remove="Data\Files\Generated\LAPerformance.json" />
-    <None Remove="Data\Files\Generated\LASubjectEntries.json" />
     <None Remove="Data\Files\Generated\placeholder.txt" />
     <None Remove="Data\Files\Generated\SimilarSchoolsPrimaryGroupsEntry.json" />
     <None Remove="Data\Files\Generated\SimilarSchoolsPrimaryValuesEntry.json" />
@@ -86,9 +84,6 @@
     <Content Include="Data\Files\Generated\EstablishmentPerformance.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\Files\Generated\EstablishmentSubjectEntries.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Data\Files\Generated\EstablishmentWorkforce.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -99,9 +94,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Files\Generated\LAPerformance.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\Files\Generated\LASubjectEntries.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Files\Generated\placeholder.txt">

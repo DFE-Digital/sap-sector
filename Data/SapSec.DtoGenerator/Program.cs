@@ -22,9 +22,7 @@ public class Program
         [$"{GeneratedSubFolder}\\EnglandDestinations"] = "KS4\\Destinations",
 
         [$"{GeneratedSubFolder}\\EstablishmentPerformance"] = "KS4\\Performance",
-        [$"{GeneratedSubFolder}\\EstablishmentSubjectEntries"] = "KS4\\Performance",
         [$"{GeneratedSubFolder}\\LAPerformance"] = "KS4\\Performance",
-        [$"{GeneratedSubFolder}\\LASubjectEntries"] = "KS4\\Performance",
         [$"{GeneratedSubFolder}\\EnglandPerformance"] = "KS4\\Performance",
 
         [$"{GeneratedSubFolder}\\SimilarSchoolsPrimaryGroupsEntry"] = "SimilarSchools\\Primary",

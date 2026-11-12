@@ -53,7 +53,6 @@ public sealed class GenerateViews
         new("v_establishment", "URN", null, ViewRange.Establishment, "Establishment", "Establishment"),
         new("v_establishment_links", "urn", "URN", ViewRange.Establishment, "Establishment", "EstablishmentLinks"),
         new("v_establishment_group_links", "group_id", "URN", ViewRange.Establishment, "Establishment", "EstablishmentGroupLinks"),
-        new("v_establishment_subject_entries", "school_urn", "URN", ViewRange.Establishment, "KS4_Performance", "EstablishmentSubjectEntries"),
         new("v_establishment_email", "URN", "URN", ViewRange.Establishment, "Email", "EstablishmentEmail"),
 
         new("v_establishment_absence", "Id", "URN", ViewRange.Establishment, "PupilAbsence", "EstablishmentAbsence"),
@@ -71,7 +70,6 @@ public sealed class GenerateViews
         new("v_la_absence", "Id", null, ViewRange.LA, "PupilAbsence", "LAAbsence"),
         new("v_la_destinations", "Id", null, ViewRange.LA, "KS4_Destinations", "LADestinations"),
         new("v_la_performance", "Id", null, ViewRange.LA, "KS4_Performance", "LAPerformance"),
-        new("v_la_subject_entries", "old_la_code", null, ViewRange.LA, "KS4_Performance", "LASubjectEntries"),
         new("v_la_ks2_performance", "Id", null, ViewRange.LA, "KS2_Performance", "LAPerformance")
     };
 
@@ -229,76 +227,6 @@ public sealed class GenerateViews
                 sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
                 WriteSql("04", view.ViewName, sql);
             }
-
-            // 4) Mirror view (EES: SubjectEntries_2 = school / establishment subject entries)
-            else if (view.ViewName.Equals("v_establishment_subject_entries", StringComparison.OrdinalIgnoreCase))
-            {
-                if (!ShouldRebuildView(tableMap, sources, view.ViewName))
-                {
-                    sql = BuildSkippedSql(view.ViewName, "No rebuilt raw tables affect this view.");
-                    WriteSql("04", view.ViewName, sql);
-                    continue;
-                }
-
-                if (!TryResolveManagedDatasetKey(
-                        sources,
-                        tableMap,
-                        sourceOrg: "EES",
-                        type: "KS4_Performance",
-                        subtype: "SubjectEntries_2",
-                        year: "Current",
-                        out var datasetKey))
-                {
-                    sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (EES/KS4_Performance/SubjectEntries_2/Current).");
-                    WriteSql("04", view.ViewName, sql);
-                    continue;
-                }
-
-                if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
-                {
-                    sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    WriteSql("04", view.ViewName, sql);
-                    continue;
-                }
-
-                sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
-                WriteSql("04", view.ViewName, sql);
-            }
-
-            // 5) Mirror view (EES: SubjectEntries = LA subject entries)
-            else if (view.ViewName.Equals("v_la_subject_entries", StringComparison.OrdinalIgnoreCase))
-            {
-                if (!ShouldRebuildView(tableMap, sources, view.ViewName))
-                {
-                    sql = BuildSkippedSql(view.ViewName, "No rebuilt raw tables affect this view.");
-                    WriteSql("04", view.ViewName, sql);
-                    continue;
-                }
-
-                if (!TryResolveManagedDatasetKey(
-                        sources,
-                        tableMap,
-                        sourceOrg: "EES",
-                        type: "KS4_Performance",
-                        subtype: "SubjectEntries",
-                        year: "Current",
-                        out var datasetKey))
-                {
-                    sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (EES/KS4_Performance/SubjectEntries/Current).");
-                    WriteSql("04", view.ViewName, sql);
-                    continue;
-                }
-
-                if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
-                {
-                    sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    WriteSql("04", view.ViewName, sql);
-                    continue;
-                }
-
-                sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
-                WriteSql("04", view.ViewName, sql);
-            }
             // 6) Everything else uses DataMap-driven materialized view generation
             else
             {
@@ -382,52 +310,6 @@ public sealed class GenerateViews
                     to '{modelFile}'
                     with(format text);
                     """.ReplaceLineEndings(" "),
-
-                _ when view.ViewName == "v_la_subject_entries" =>
-                    $"""
-                    \copy (
-                        select json_array(
-                            select row_to_json(r) 
-                            from (
-                                select * 
-                                from {view.ViewName} 
-                                where "{view.IdColumn}" IN (
-                                    select distinct "LAId"
-                                    from v_establishment 
-                                    where "URN" in (
-                                        select "URN" from test_establishments_urns
-                                    )
-                                ) 
-                                and "subject" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])
-                                order by "{view.IdColumn}"
-                            ) r
-                        )
-                    )
-                    to '{modelFile}'
-                    with(format text);
-                    """.ReplaceLineEndings(" "),
-
-
-                _ when view.ViewName == "v_establishment_subject_entries" =>
-                    $"""
-                    \copy (
-                        select json_array(
-                            select row_to_json(r)
-                            from (
-                                select * 
-                                from {view.ViewName} 
-                                where "{view.IdColumn}" in (
-                                    {establishmentFilterSubquery}
-                                ) 
-                                and "subject" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])
-                                order by "{view.IdColumn}"
-                            ) r
-                        )
-                    )
-                    to '{modelFile}'
-                    with(format text);
-                    """.ReplaceLineEndings(" "),
-
 
                 _ when view.Range == ViewRange.Establishment =>
                     $"""
@@ -530,28 +412,6 @@ public sealed class GenerateViews
                 sourceOrg: "GIAS",
                 type: "Academy sponsor and trust",
                 subtype: "Links",
-                year: "Current");
-        }
-
-        if (viewName.Equals("v_establishment_subject_entries", StringComparison.OrdinalIgnoreCase))
-        {
-            return IsManagedSourceRebuilt(
-                tableMap,
-                sources,
-                sourceOrg: "EES",
-                type: "KS4_Performance",
-                subtype: "SubjectEntries_2",
-                year: "Current");
-        }
-
-        if (viewName.Equals("v_la_subject_entries", StringComparison.OrdinalIgnoreCase))
-        {
-            return IsManagedSourceRebuilt(
-                tableMap,
-                sources,
-                sourceOrg: "EES",
-                type: "KS4_Performance",
-                subtype: "SubjectEntries",
                 year: "Current");
         }
 

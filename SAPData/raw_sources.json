@@ -28,25 +28,5 @@
     "Url": "__SECRET_MAT_LINKS_URL__",
     "FileType": "zip",
     "FileName": "grouplinks_edubaseallacademiesandfreeYYYYmmDD"
-  },
-  {
-    "Type": "KS4_Performance",
-    "Subtype": "SubjectEntries",
-    "Year": "Current",
-    "SourceOrg": "EES",
-    "DataSetId": "1ae39901-c621-a274-a84b-393929221b9f",
-    "Url": "",
-    "FileType": "csv",
-    "FileName": "202425_subject_local_authority_pupil_entriesachievements_provisional"
-  },
-  {
-    "Type": "KS4_Performance",
-    "Subtype": "SubjectEntries_2",
-    "Year": "Current",
-    "SourceOrg": "EES",
-    "DataSetId": "1ae39901-b462-df76-b108-640a078d7944",
-    "Url": "",
-    "FileType": "csv",
-    "FileName": "202425_subject_school_all_exam_entriesgrades_final"
   }
 ]

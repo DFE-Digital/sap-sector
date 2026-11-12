@@ -15,6 +15,7 @@
 \ir 04_v_establishment_absence.sql
 \ir 04_v_establishment_destinations.sql
 \ir 04_v_establishment_email.sql
+\ir 04_v_establishment_exclusions.sql
 \ir 04_v_establishment_group_links.sql
 \ir 04_v_establishment_ks2_performance.sql
 \ir 04_v_establishment_links.sql
@@ -40,6 +41,7 @@
 \ir 61_v_establishment_absence.sql
 \ir 61_v_establishment_destinations.sql
 \ir 61_v_establishment_email.sql
+\ir 61_v_establishment_exclusions.sql
 \ir 61_v_establishment_group_links.sql
 \ir 61_v_establishment_ks2_performance.sql
 \ir 61_v_establishment_links.sql
