@@ -28,12 +28,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Data\SapSec.DtoGenerator\SAPSec.DtoGenerator.csproj" />
     <ProjectReference Include="..\SAPSec.Test.Common\SAPSec.Test.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
     <Using Include="FluentAssertions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\SAPData\DataMap\datamap.csv" Link="DataMap\datamap.csv" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
