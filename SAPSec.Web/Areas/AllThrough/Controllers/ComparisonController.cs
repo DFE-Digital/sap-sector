@@ -255,5 +255,4 @@ public class ComparisonController(
         ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.AllThroughSecondary(
             currentSchool,
             comparatorSchool);
-
 }

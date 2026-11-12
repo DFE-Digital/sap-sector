@@ -148,6 +148,42 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     }
 
     [Fact]
+    public async Task EnglishLanguage_ChangePupilCharacteristicFilter()
+    {
+        var section = await GetSection(EnglishLanguageHeaderText);
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
+
+        var table = section.GetByRole(AriaRole.Table);
+        await Expect(table).ToBeVisibleAsync();
+
+        var filter = section.GetByRole(AriaRole.Combobox, new() { Name = "Pupil characteristic" });
+
+        var options = await filter.Locator("option").AllTrimmedTextContentsAsync();
+        options.Should().Equal([
+            "All pupils",
+            "Boys",
+            "Girls",
+            "Disadvantaged pupils",
+            "Non-disadvantaged pupils",
+            "English as an additional language",
+            "Non-mobile pupils"
+        ]);
+
+        await Expect(filter).ToHaveValueAsync("tot");
+
+        var allPupilsValues = await table.GetCells().AllTrimmedTextContentsAsync();
+
+        await filter.SelectOptionAsync(new SelectOptionValue { Label = "Boys" });
+        await table.WaitForDomToStopChanging();
+
+        (await table.GetCells().AllTrimmedTextContentsAsync()).Should().NotEqual(allPupilsValues);
+
+        await Page.ReloadAsync();
+        section = await GetSection(EnglishLanguageHeaderText);
+        await Expect(section.GetByRole(AriaRole.Combobox, new() { Name = "Pupil characteristic" })).ToHaveValueAsync("tot");
+    }
+
+    [Fact]
     public async Task EnglishLiterature_ToggleBetweenYearByYearAndCurrentYearView()
     {
         var section = await GetSection(EnglishLiteratureHeaderText);
