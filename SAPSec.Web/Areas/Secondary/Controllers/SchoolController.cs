@@ -43,6 +43,7 @@ public class SchoolController(
 {
     private const string SharedKs4HeadlineMeasuresView = "~/Areas/Shared/Views/School/Ks4HeadlineMeasures.cshtml";
     private const string SharedKs4CoreSubjectsView = "~/Areas/Shared/Views/School/Ks4CoreSubjects.cshtml";
+    private const string SharedWhatIsASimilarSchoolView = "~/Areas/Shared/Views/School/WhatIsASimilarSchool.cshtml";
 
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
@@ -86,7 +87,7 @@ public class SchoolController(
             Routes.SecondarySchool(response.School.Urn).ViewSimilarSchools,
             similarSchoolsResponse.HasSimilarSchools);
 
-        return View("~/Areas/Shared/Views/School/WhatIsASimilarSchool.cshtml", model);
+        return View(SharedWhatIsASimilarSchoolView, model);
     }
 
     [HttpGet]

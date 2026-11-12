@@ -41,6 +41,7 @@ public class SchoolController(
     : Controller
 {
     private const string SharedKs2PerformanceMeasuresView = "~/Areas/Shared/Views/School/Ks2PerformanceMeasures.cshtml";
+    private const string SharedWhatIsASimilarSchoolView = "~/Areas/Shared/Views/School/WhatIsASimilarSchool.cshtml";
 
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
@@ -131,7 +132,7 @@ public class SchoolController(
             Routes.PrimarySchool(response.School.Urn).ViewSimilarSchools,
             similarSchoolsResponse.HasSimilarSchools);
 
-        return View("~/Areas/Shared/Views/School/WhatIsASimilarSchool.cshtml", model);
+        return View(SharedWhatIsASimilarSchoolView, model);
     }
 
     [HttpGet]
