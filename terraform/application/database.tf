@@ -14,7 +14,7 @@ module "postgres" {
   azure_enable_high_availability = var.enable_postgres_high_availability
   azure_enable_backup_storage    = var.enable_postgres_backup_storage
   azure_maintenance_window       = var.azure_maintenance_window
-  server_version                 = "16"
+  server_version                 = var.postgres_server_version
 }
 
 module "redis-managed-cache" {
