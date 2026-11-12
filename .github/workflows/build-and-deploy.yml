@@ -165,7 +165,7 @@ jobs:
               /p:CoverletOutputFormat=cobertura \
               /p:DeterministicReport=true \
               /p:UseSourceLink=true \
-              /p:Exclude='[*]AspNetCoreGeneratedDocument.*%2c[*]AspNetCore.Views.*' \
+              /p:Exclude='[*]AspNetCoreGeneratedDocument.*%2c[*]AspNetCore.Views.*%2c[SAPSec.Test.Common]*' \
               /p:ExcludeByAttribute='GeneratedCodeAttribute*%2cObsoleteAttribute*%2cExcludeFromCodeCoverage' \
               --verbosity normal
           done
