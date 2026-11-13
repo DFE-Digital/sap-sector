@@ -1,4 +1,5 @@
 using SAPSec.Core.Collections;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
@@ -8,7 +9,8 @@ namespace SAPSec.Core.Features.Measures.Secondary;
 public class GetSchoolKs4CoreSubjectsMeasuresUseCase(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
-    IKs4PerformanceRepository performanceRepository)
+    IKs4PerformanceRepository performanceRepository,
+    IFeatureFlagService featureFlagService)
     : IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse>
 {
     public async Task<GetSchoolKs4CoreSubjectsMeasuresResponse> Execute(GetSchoolKs4CoreSubjectsMeasuresRequest request)
@@ -21,6 +23,7 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCase(
         var (currentSchoolPerformance, similarSchoolsPerformance) = await performance.GetData(request.Urn);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
+        var includePupilCharacteristicFilter = await featureFlagService.IsEnabledAsync(Flags.EnableKs4CoreSubjectsPupilCharacteristics);
 
         return new(
             currentSchoolPerformance.SchoolInfo,
@@ -28,31 +31,38 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCase(
             Ks4CoreSubjects.EnglishLanguage.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.EnglishLiterature.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.Maths.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.CombinedScience.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.Biology.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.Chemistry.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.Physics.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy)
+                filterBy,
+                includePupilCharacteristicFilter)
         );
     }
 }
