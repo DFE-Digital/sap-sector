@@ -103,7 +103,7 @@ public class ComparisonSimilarityPageIntegrationTests(
             new SimilarSchoolsPrimaryValuesEntry
             {
                 URN = "100001",
-                Ks1PriorRwmAverage = "100.4",
+                Ks1PriorRwmAverage = "8.125",
                 PPPerc = "19.44",
                 Polar4QuintilePupils = "1.4",
                 PStability = "90.5",
@@ -116,7 +116,7 @@ public class ComparisonSimilarityPageIntegrationTests(
             new SimilarSchoolsPrimaryValuesEntry
             {
                 URN = "100002",
-                Ks1PriorRwmAverage = "102.6",
+                Ks1PriorRwmAverage = "8.456",
                 PPPerc = "25.44",
                 Polar4QuintilePupils = "2.6",
                 PStability = "85.5",
@@ -135,7 +135,7 @@ public class ComparisonSimilarityPageIntegrationTests(
 
         table!.ShouldHaveRows(
             ["Characteristic", "Test School 1", "Test School 2"],
-            ["Combined average KS1 reading, writing and maths prior attainment", "100", "103"],
+            ["Combined average KS1 reading, writing and maths prior attainment", "8.13", "8.46"],
             ["Total number of pupils", "301", "321"],
             ["Pupil stability rate", "90.5%", "85.5%"],
             ["Eligibility for pupil premium", "19.4%", "25.4%"],
