@@ -1,6 +1,7 @@
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Web.Areas.Shared.ViewModels.Comparison;
 using System.Globalization;
+using SAPSec.Core.Rounding;
 
 namespace SAPSec.Web.Formatters;
 
@@ -14,8 +15,8 @@ public sealed class PrimaryCharacteristicsComparisonFormatter : IPrimaryCharacte
             new()
             {
                 Characteristic = "Combined average KS1 reading, writing and maths prior attainment",
-                CurrentSchoolValue = WholeNumber(characteristicts.Ks1PriorRwmAverage.CurrentSchoolValue),
-                ComparatorSchoolValue = WholeNumber(characteristicts.Ks1PriorRwmAverage.ComparatorSchoolValue)
+                CurrentSchoolValue = Dec2dp(characteristicts.Ks1PriorRwmAverage.CurrentSchoolValue),
+                ComparatorSchoolValue = Dec2dp(characteristicts.Ks1PriorRwmAverage.ComparatorSchoolValue)
             },
             new()
             {
@@ -68,16 +69,15 @@ public sealed class PrimaryCharacteristicsComparisonFormatter : IPrimaryCharacte
         }.AsReadOnly();
     }
 
-    private static string WholeNumber(decimal v) =>
-        Convert.ToInt32(Math.Round(v, MidpointRounding.AwayFromZero))
-            .ToString(CultureInfo.InvariantCulture);
-
     private static string IntN0(decimal v) =>
         Convert.ToInt32(Math.Round(v, MidpointRounding.AwayFromZero))
             .ToString("N0", CultureInfo.GetCultureInfo("en-GB"));
 
     private static string Percent1dp(decimal v) =>
         $"{v.ToString("0.0", CultureInfo.InvariantCulture)}%";
+
+    private static string Dec2dp(decimal v) =>
+        v.ToString("0.00", CultureInfo.InvariantCulture);
 
     private static string Dec3dp(decimal v) =>
         v.ToString("0.000", CultureInfo.InvariantCulture);

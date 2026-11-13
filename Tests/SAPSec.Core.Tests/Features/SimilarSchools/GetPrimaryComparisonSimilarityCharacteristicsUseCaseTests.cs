@@ -96,7 +96,7 @@ public class GetPrimaryComparisonSimilarityCharacteristicsUseCaseTests
     }
 
     [Fact]
-    public async Task Execute_RoundsKs1PriorRwmAverage_ToWholeNumber()
+    public async Task Execute_RoundsKs1PriorRwmAverage_ToTwoDecimalPlaces()
     {
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("100001", "Current School", x => x.Open().Primary()),
@@ -105,15 +105,15 @@ public class GetPrimaryComparisonSimilarityCharacteristicsUseCaseTests
         _similarSchoolsRepo
             .SetupGroups(Build.PrimaryGroup("100001", ["100002"]))
             .SetupValues(
-                Build.PrimaryValues("100001", ks1Prior: "100.4"),
-                Build.PrimaryValues("100002", ks1Prior: "100.6"));
+                Build.PrimaryValues("100001", ks1Prior: "8.428"),
+                Build.PrimaryValues("100002", ks1Prior: "7.445"));
 
         var sut = CreateSut();
 
         var result = await sut.Execute(new GetPrimaryComparisonSimilarityCharacteristicsRequest("100001", "100002"));
 
-        Assert.Equal(100m, result.SimilarityCharacteristics.Ks1PriorRwmAverage.CurrentSchoolValue);
-        Assert.Equal(101m, result.SimilarityCharacteristics.Ks1PriorRwmAverage.ComparatorSchoolValue);
+        Assert.Equal(8.43m, result.SimilarityCharacteristics.Ks1PriorRwmAverage.CurrentSchoolValue);
+        Assert.Equal(7.45m, result.SimilarityCharacteristics.Ks1PriorRwmAverage.ComparatorSchoolValue);
     }
 
     [Fact]

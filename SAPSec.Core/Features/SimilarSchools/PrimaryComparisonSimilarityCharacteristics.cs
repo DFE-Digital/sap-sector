@@ -19,8 +19,8 @@ public record PrimaryComparisonSimilarityCharacteristics
         SimilarSchoolsPrimaryValues comparatorSchoolValues) => new()
         {
             Ks1PriorRwmAverage = new(
-                Round.ToWholeNumber(currentSchoolValues.Ks1PriorRwmAverage),
-                Round.ToWholeNumber(comparatorSchoolValues.Ks1PriorRwmAverage)),
+                Round.ToTwoDecimalPlaces(currentSchoolValues.Ks1PriorRwmAverage),
+                Round.ToTwoDecimalPlaces(comparatorSchoolValues.Ks1PriorRwmAverage)),
             PupilPremiumEligibilityPercentage = new(
                 Round.ToOneDecimalPlace(currentSchoolValues.PupilPremiumEligibilityPercentage),
                 Round.ToOneDecimalPlace(comparatorSchoolValues.PupilPremiumEligibilityPercentage)),
