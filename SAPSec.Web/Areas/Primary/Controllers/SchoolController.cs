@@ -41,6 +41,7 @@ public class SchoolController(
     : Controller
 {
     private const string SharedKs2PerformanceMeasuresView = "~/Areas/Shared/Views/School/Ks2PerformanceMeasures.cshtml";
+    private const string SharedWhatIsASimilarSchoolView = "~/Areas/Shared/Views/School/WhatIsASimilarSchool.cshtml";
 
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
@@ -122,7 +123,16 @@ public class SchoolController(
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
         await PopulateViewData(response.School);
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(response.School.Urn);
+
+        var model = new WhatIsASimilarSchoolViewModel(
+            SchoolInfoViewModel.FromSchoolInfo(response.School),
+            Routes.PrimarySchool(response.School.Urn).Overview,
+            Routes.PrimarySchool(response.School.Urn).ViewSimilarSchools,
+            similarSchoolsResponse.HasSimilarSchools);
+
+        return View(SharedWhatIsASimilarSchoolView, model);
     }
 
     [HttpGet]

@@ -43,12 +43,21 @@ public class EstablishmentPerformanceBuilder(string urn)
     string CombSci49_Sum_Est_Current_Pct = string.Empty;
     string CombSci49_Sum_Est_Previous_Pct = string.Empty;
     string CombSci49_Sum_Est_Previous2_Pct = string.Empty;
+    string CombSci49_Dis_Est_Current_Pct = string.Empty;
+    string CombSci49_Dis_Est_Previous_Pct = string.Empty;
+    string CombSci49_Dis_Est_Previous2_Pct = string.Empty;
     string CombSci59_Sum_Est_Current_Pct = string.Empty;
     string CombSci59_Sum_Est_Previous_Pct = string.Empty;
     string CombSci59_Sum_Est_Previous2_Pct = string.Empty;
+    string CombSci59_Dis_Est_Current_Pct = string.Empty;
+    string CombSci59_Dis_Est_Previous_Pct = string.Empty;
+    string CombSci59_Dis_Est_Previous2_Pct = string.Empty;
     string CombSci79_Sum_Est_Current_Pct = string.Empty;
     string CombSci79_Sum_Est_Previous_Pct = string.Empty;
     string CombSci79_Sum_Est_Previous2_Pct = string.Empty;
+    string CombSci79_Dis_Est_Current_Pct = string.Empty;
+    string CombSci79_Dis_Est_Previous_Pct = string.Empty;
+    string CombSci79_Dis_Est_Previous2_Pct = string.Empty;
     string Bio49_Sum_Est_Current_Pct = string.Empty;
     string Bio49_Sum_Est_Previous_Pct = string.Empty;
     string Bio49_Sum_Est_Previous2_Pct = string.Empty;
@@ -194,6 +203,15 @@ public class EstablishmentPerformanceBuilder(string urn)
         return this;
     }
 
+    public EstablishmentPerformanceBuilder WithCombSci49Disadvantaged(string current, string prev, string prev2)
+    {
+        CombSci49_Dis_Est_Current_Pct = current;
+        CombSci49_Dis_Est_Previous_Pct = prev;
+        CombSci49_Dis_Est_Previous2_Pct = prev2;
+
+        return this;
+    }
+
     public EstablishmentPerformanceBuilder WithCombSci59(string current, string prev, string prev2)
     {
         CombSci59_Sum_Est_Current_Pct = current;
@@ -203,11 +221,29 @@ public class EstablishmentPerformanceBuilder(string urn)
         return this;
     }
 
+    public EstablishmentPerformanceBuilder WithCombSci59Disadvantaged(string current, string prev, string prev2)
+    {
+        CombSci59_Dis_Est_Current_Pct = current;
+        CombSci59_Dis_Est_Previous_Pct = prev;
+        CombSci59_Dis_Est_Previous2_Pct = prev2;
+
+        return this;
+    }
+
     public EstablishmentPerformanceBuilder WithCombSci79(string current, string prev, string prev2)
     {
         CombSci79_Sum_Est_Current_Pct = current;
         CombSci79_Sum_Est_Previous_Pct = prev;
         CombSci79_Sum_Est_Previous2_Pct = prev2;
+
+        return this;
+    }
+
+    public EstablishmentPerformanceBuilder WithCombSci79Disadvantaged(string current, string prev, string prev2)
+    {
+        CombSci79_Dis_Est_Current_Pct = current;
+        CombSci79_Dis_Est_Previous_Pct = prev;
+        CombSci79_Dis_Est_Previous2_Pct = prev2;
 
         return this;
     }
@@ -336,12 +372,21 @@ public class EstablishmentPerformanceBuilder(string urn)
             CombSci49_Sum_Est_Current_Pct = CombSci49_Sum_Est_Current_Pct,
             CombSci49_Sum_Est_Previous_Pct = CombSci49_Sum_Est_Previous_Pct,
             CombSci49_Sum_Est_Previous2_Pct = CombSci49_Sum_Est_Previous2_Pct,
+            CombSci49_Dis_Est_Current_Pct = CombSci49_Dis_Est_Current_Pct,
+            CombSci49_Dis_Est_Previous_Pct = CombSci49_Dis_Est_Previous_Pct,
+            CombSci49_Dis_Est_Previous2_Pct = CombSci49_Dis_Est_Previous2_Pct,
             CombSci59_Sum_Est_Current_Pct = CombSci59_Sum_Est_Current_Pct,
             CombSci59_Sum_Est_Previous_Pct = CombSci59_Sum_Est_Previous_Pct,
             CombSci59_Sum_Est_Previous2_Pct = CombSci59_Sum_Est_Previous2_Pct,
+            CombSci59_Dis_Est_Current_Pct = CombSci59_Dis_Est_Current_Pct,
+            CombSci59_Dis_Est_Previous_Pct = CombSci59_Dis_Est_Previous_Pct,
+            CombSci59_Dis_Est_Previous2_Pct = CombSci59_Dis_Est_Previous2_Pct,
             CombSci79_Sum_Est_Current_Pct = CombSci79_Sum_Est_Current_Pct,
             CombSci79_Sum_Est_Previous_Pct = CombSci79_Sum_Est_Previous_Pct,
             CombSci79_Sum_Est_Previous2_Pct = CombSci79_Sum_Est_Previous2_Pct,
+            CombSci79_Dis_Est_Current_Pct = CombSci79_Dis_Est_Current_Pct,
+            CombSci79_Dis_Est_Previous_Pct = CombSci79_Dis_Est_Previous_Pct,
+            CombSci79_Dis_Est_Previous2_Pct = CombSci79_Dis_Est_Previous2_Pct,
             Bio49_Sum_Est_Current_Pct = Bio49_Sum_Est_Current_Pct,
             Bio49_Sum_Est_Previous_Pct = Bio49_Sum_Est_Previous_Pct,
             Bio49_Sum_Est_Previous2_Pct = Bio49_Sum_Est_Previous2_Pct,
