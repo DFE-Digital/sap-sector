@@ -35,6 +35,19 @@ public class PostgresSchoolSearchIndexReaderTests
         results.Should().ContainSingle().Which.Should().Be((123, "Fake School *Three*"));
     }
 
+    [Theory]
+    [InlineData("school", 1000, 100)]
+    [InlineData("The Academy", 1000, 100)]
+    [InlineData("school", 10, 10)]
+    [InlineData("sch", 1000, 1000)]
+    [InlineData("st marys school", 1000, 1000)]
+    public async Task BroadQuery_IsCappedButPartialsAndSpecificQueriesAreNot(string query, int requested, int expectedLimit)
+    {
+        await Reader().SearchAsync(query, requested);
+
+        _repo.Verify(r => r.SearchEstablishmentsAsync(It.IsAny<string>(), expectedLimit), Times.Once);
+    }
+
     [Fact]
     public async Task Highlights_ExactEarlierToken()
     {

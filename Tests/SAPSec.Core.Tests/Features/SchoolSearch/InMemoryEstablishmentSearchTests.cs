@@ -15,7 +15,8 @@ public class InMemoryEstablishmentSearchTests
         School("1", "St Mary's School", "High Road", "SW1A 1AA"),
         School("2", "Fake School Three", "Mount Lane", "AB1 2CD"),
         School("3", "Saint Peter CofE School", "Park Avenue", "ZZ9 9ZZ"),
-        School("4", "Nursery Only", "", "", phaseId: "1")
+        School("4", "Nursery Only", "", "", phaseId: "1"),
+        School("5", "St Joseph's RC Primary", "Church Street", "XX1 1XX")
     ];
 
     private static IEnumerable<string> Urns(string query)
@@ -33,6 +34,9 @@ public class InMemoryEstablishmentSearchTests
     [InlineData("sw1a1aa", "1")]
     [InlineData("sw1a 1", "1")]
     [InlineData("mt lane", "2")]
+    [InlineData("catholic primary", "5")]
+    [InlineData("roman catholic joseph", "5")]
+    [InlineData("rc joseph", "5")]
     public void Matches(string query, string expectedUrn) => Urns(query).Should().Contain(expectedUrn);
 
     [Fact]

@@ -20,7 +20,12 @@ public class PostgresSchoolSearchIndexReader(IEstablishmentRepository establishm
             return [];
         }
 
-        var hits = await establishmentRepository.SearchEstablishmentsAsync(query, maxResults);
+        // A query made only of very common words ("school") matches nearly every row; cap it to protect the database.
+        var limit = BroadSearchTerms.IsBroadQuery(tokens)
+            ? Math.Min(maxResults, BroadSearchTerms.BroadQueryLimit)
+            : maxResults;
+
+        var hits = await establishmentRepository.SearchEstablishmentsAsync(query, limit);
 
         var results = new List<(int, string)>();
         foreach (var hit in hits)

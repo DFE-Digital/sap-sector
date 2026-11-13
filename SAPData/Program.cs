@@ -250,7 +250,7 @@ internal class Program
         ["st", "saint"],
         ["ss", "saints"],
         ["cofe", "church of england"],
-        ["rm", "roman catholic", "catholic"],
+        ["rc", "rm", "roman catholic", "catholic"],
         ["ave", "aven", "avenue"],
         ["rd", "road"],
         ["ln", "lane"],
