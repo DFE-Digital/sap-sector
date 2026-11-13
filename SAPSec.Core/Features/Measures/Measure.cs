@@ -80,7 +80,13 @@ public enum MeasureDataType
     GradePercentage,
     OverallAbsencePercentage,
     PersistentAbsencePercentage,
-    DestinationsPercentage
+    DestinationsPercentage,
+
+    /// <summary>
+    /// A progress score (e.g. KS2 reading, writing and maths progress) which can be positive or negative
+    /// with no fixed range. Charts use a dynamic axis which always includes 0.
+    /// </summary>
+    ProgressScore
 }
 
 public record MeasureAvailableFilter(

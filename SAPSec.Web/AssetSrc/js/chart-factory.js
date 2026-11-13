@@ -59,7 +59,12 @@ const CHART_CONFIG = {
         },
         layout: {
             leftPadding: 8,
-            mobileLeftPadding: 20
+            mobileLeftPadding: 20,
+            // Diverging (progress score) charts fit the axis tightly to the data, so leave room for value
+            // labels that sit just past a bar near the right-hand edge.
+            divergingRightPadding: 40,
+            // Minimum space between value-axis tick labels when thinning diverging axis ticks.
+            minTickLabelGap: 12
         },
         dataset: {
             borderWidth: 1,
@@ -72,6 +77,8 @@ const CHART_CONFIG = {
         datalabels: {
             anchor: 'end',
             smallValueAlign: 'right',
+            // Negative (diverging) bars grow leftwards from 0, so labels that don't fit inside go to the left.
+            smallNegativeValueAlign: 'left',
             defaultAlign: 'start',
             mobileInsideThresholdRatio: 0.4,
             defaultOffset: 10,
@@ -230,36 +237,61 @@ function isLargeEnoughForInsideLabel(value, ctx) {
         return true;
     }
 
-    return ((value - axisMin) / axisRange) >= CHART_CONFIG.bar.datalabels.mobileInsideThresholdRatio;
+    // Bars start at the axis minimum when it is above 0 (e.g. scaled scores), otherwise at 0.
+    // Measuring from 0 keeps negative (diverging) bars working.
+    const baseline = axisMin > 0 ? axisMin : 0;
+
+    return (Math.abs(value - baseline) / axisRange) >= CHART_CONFIG.bar.datalabels.mobileInsideThresholdRatio;
 }
 
-function getBarLabelAlignment(ctx, axisSuffix, barLabelAlign) {
+function isNegativeBar(ctx) {
+    return ctx.dataset.data[ctx.dataIndex] < 0;
+}
+
+function isBarLabelInside(ctx, axisSuffix, barLabelAlign) {
     if (barLabelAlign) {
-        return barLabelAlign;
+        return barLabelAlign === CHART_CONFIG.bar.datalabels.defaultAlign;
     }
 
     if (isMobileViewport()) {
         return isLargeEnoughForInsideLabel(ctx.dataset.data[ctx.dataIndex], ctx)
-            && canBarFitLabel(ctx, axisSuffix)
-            ? CHART_CONFIG.bar.datalabels.defaultAlign
-            : CHART_CONFIG.bar.datalabels.smallValueAlign;
+            && canBarFitLabel(ctx, axisSuffix);
     }
 
-    return canBarFitLabel(ctx, axisSuffix)
+    return canBarFitLabel(ctx, axisSuffix);
+}
+
+// chartjs-plugin-datalabels treats a horizontal bar's 'end' anchor as its right-hand edge whatever the
+// bar's direction. Negative (diverging) bars grow leftwards from 0, so they anchor at 'start' (the bar's
+// tip) and place the label to the right (inside the bar) or to the left (outside the bar).
+function getBarLabelAnchor(ctx) {
+    return isNegativeBar(ctx) ? 'start' : CHART_CONFIG.bar.datalabels.anchor;
+}
+
+function getBarLabelAlignment(ctx, axisSuffix, barLabelAlign) {
+    const inside = isBarLabelInside(ctx, axisSuffix, barLabelAlign);
+
+    if (isNegativeBar(ctx)) {
+        return inside ? 'right' : CHART_CONFIG.bar.datalabels.smallNegativeValueAlign;
+    }
+
+    if (barLabelAlign) {
+        return barLabelAlign;
+    }
+
+    return inside
         ? CHART_CONFIG.bar.datalabels.defaultAlign
         : CHART_CONFIG.bar.datalabels.smallValueAlign;
 }
 
 function getBarLabelColor(ctx, gdsStyles, axisSuffix, barLabelAlign) {
-    const align = getBarLabelAlignment(ctx, axisSuffix, barLabelAlign);
-    return align === CHART_CONFIG.bar.datalabels.defaultAlign
+    return isBarLabelInside(ctx, axisSuffix, barLabelAlign)
         ? gdsStyles.onBarLabel
         : gdsStyles.text;
 }
 
 function getBarLabelOffset(ctx, axisSuffix, barLabelAlign) {
-    const align = getBarLabelAlignment(ctx, axisSuffix, barLabelAlign);
-    return align === CHART_CONFIG.bar.datalabels.defaultAlign
+    return isBarLabelInside(ctx, axisSuffix, barLabelAlign)
         ? CHART_CONFIG.bar.datalabels.defaultOffset
         : CHART_CONFIG.bar.datalabels.smallValueOffset;
 }
@@ -269,13 +301,58 @@ function buildExplicitTicks(axisMin, axisMax, stepSize) {
         return undefined;
     }
 
+    // Same ticks as stepping from min while value <= max; the small epsilon absorbs float error.
+    const tickCount = Math.floor(((axisMax - axisMin) / stepSize) + 1e-9);
+
     return function (axis) {
         const ticks = [];
-        for (let value = axisMin; value <= axisMax; value += stepSize) {
-            ticks.push({ value });
+        // Calculate each tick from its index rather than repeatedly adding the step, so fractional
+        // steps (e.g. 0.5 for progress scores) don't build up floating point error such as 0.6000000000000001.
+        for (let i = 0; i <= tickCount; i++) {
+            ticks.push({ value: roundTickValue(axisMin + (i * stepSize)) });
         }
         axis.ticks = ticks;
     };
+}
+
+// Progress score axes always cross 0, and 0 is the tick that matters most. Chart.js's autoSkip
+// thins ticks counting from the left edge, which can drop 0 on narrow screens (e.g. -25, -15, -5, 5).
+// Instead, keep every k-th tick counting out from 0, choosing the smallest k whose labels fit.
+function buildZeroAnchoredTicks(axisMin, axisMax, stepSize) {
+    const buildAll = buildExplicitTicks(axisMin, axisMax, stepSize);
+    if (!buildAll) {
+        return undefined;
+    }
+
+    return function (axis) {
+        buildAll(axis);
+        const allTicks = axis.ticks;
+        const width = axis.width || axis.maxWidth;
+        if (!width || allTicks.length <= 2) {
+            return;
+        }
+
+        const ctx = axis.ctx;
+        ctx.save();
+        ctx.font = Chart.helpers.toFont(axis.options.ticks.font).string;
+        const callback = axis.options.ticks.callback;
+        const labelWidth = Math.max(...allTicks.map(t => ctx.measureText(String(callback ? callback(t.value) : t.value)).width));
+        ctx.restore();
+
+        const maxLabels = Math.max(2, Math.floor(width / (labelWidth + CHART_CONFIG.bar.layout.minTickLabelGap)));
+
+        for (let k = 1; k <= allTicks.length; k++) {
+            const kept = allTicks.filter(t => Math.round(t.value / stepSize) % k === 0);
+            if (kept.length <= maxLabels) {
+                axis.ticks = kept;
+                return;
+            }
+        }
+    };
+}
+
+function roundTickValue(value) {
+    return Math.round(value * 1e6) / 1e6;
 }
 
 function getNumericSeriesValues(chartData) {
@@ -325,7 +402,7 @@ function roundUpToStep(value, step) {
     return Math.ceil(value / step) * step;
 }
 
-function getDynamicLineAxisConfig(chartData, axisSuffix) {
+function getDynamicLineAxisConfig(chartData, axisSuffix, includeZero) {
     const values = getNumericSeriesValues(chartData);
     if (!values.length) {
         return null;
@@ -344,6 +421,17 @@ function getDynamicLineAxisConfig(chartData, axisSuffix) {
     if (axisSuffix === '%') {
         min = Math.max(0, min);
         max = Math.min(100, max);
+    }
+
+    // Progress scores: keep 0 on the axis as the baseline, but don't pad past it into an empty
+    // negative (or positive) area when every value is on one side of 0.
+    if (includeZero) {
+        if (rawMin >= 0) {
+            min = 0;
+        }
+        if (rawMax <= 0) {
+            max = 0;
+        }
     }
 
     if (min === max) {
@@ -666,7 +754,7 @@ function dismissVisibleTooltips() {
     });
 }
 
-function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign, dynamicLineAxis, tooltipDecimals) {
+function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign, dynamicLineAxis, tooltipDecimals, diverging) {
     const common = {
         responsive: true,
         maintainAspectRatio: false,
@@ -808,7 +896,7 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                     beginAtZero: true,
                     min: axisMin ?? undefined,
                     max: axisMax ?? undefined,
-                    afterBuildTicks: explicitTicks,
+                    afterBuildTicks: diverging ? buildZeroAnchoredTicks(resolvedAxisMin, resolvedAxisMax, stepSize) : explicitTicks,
                     grid: {
                         display: true,
                         drawBorder: false,
@@ -823,7 +911,9 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                     ticks: {
                         color: gdsStyles.text,
                         font: fonts,
-                        autoSkip: axisAutoSkip,
+                        // Diverging axes thin their own ticks around 0 (see buildZeroAnchoredTicks).
+                        autoSkip: diverging ? false : axisAutoSkip,
+                        ...(diverging ? { maxRotation: 0 } : {}),
                         stepSize: stepSize,
                         count: axisTickCount,
                         callback: (value) => `${value}${axisSuffix}`
@@ -850,7 +940,8 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
             },
             layout: {
                 padding: {
-                    left: getBarChartLeftPadding()
+                    left: getBarChartLeftPadding(),
+                    right: diverging ? CHART_CONFIG.bar.layout.divergingRightPadding : 0
                 }
             },
             animation: false,
@@ -862,7 +953,7 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                     font: fonts
                 },
                 datalabels: {
-                    anchor: CHART_CONFIG.bar.datalabels.anchor,
+                    anchor: getBarLabelAnchor,
                     align: function (ctx) {
                         return getBarLabelAlignment(ctx, axisSuffix, barLabelAlign);
                     },
@@ -1049,8 +1140,9 @@ function initCharts(canvas) {
         }
         const showDataLabels = canvas.dataset.showDatalabels !== "false";
         const showXGrid = canvas.dataset.showXGrid === "true";
+        // parseFloat, not parseInt, so fractional steps (e.g. 0.5 for progress scores) aren't truncated to 0
         const axisStep = canvas.dataset.axisStep
-            ? parseInt(canvas.dataset.axisStep, 10)
+            ? parseFloat(canvas.dataset.axisStep)
             : CHART_CONFIG.defaults.axisStep;
         const axisMin = canvas.dataset.axisMin
             ? parseFloat(canvas.dataset.axisMin)
@@ -1070,8 +1162,10 @@ function initCharts(canvas) {
         const tooltipDecimals = canvas.dataset.tooltipDecimals
             ? parseInt(canvas.dataset.tooltipDecimals, 10)
             : null;
+        const axisIncludeZero = canvas.dataset.axisIncludeZero === "true";
+        const diverging = type === 'bar' && axisIncludeZero;
         const dynamicLineAxis = type === 'line' && isYearByYearLineChart(canvas)
-            ? getDynamicLineAxisConfig(chartData, axisSuffix)
+            ? getDynamicLineAxisConfig(chartData, axisSuffix, axisIncludeZero)
             : null;
 
         const rawColors = canvas.dataset.colors
@@ -1115,7 +1209,8 @@ function initCharts(canvas) {
                 showXGrid,
                 barLabelAlign,
                 dynamicLineAxis,
-                tooltipDecimals),
+                tooltipDecimals,
+                diverging),
             plugins: [
                 ...(showDataLabels ? [ChartDataLabels] : []),
                 noDataBarLabelsPlugin
