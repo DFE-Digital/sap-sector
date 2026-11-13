@@ -62,7 +62,9 @@ const CHART_CONFIG = {
             mobileLeftPadding: 20,
             // Diverging (progress score) charts fit the axis tightly to the data, so leave room for value
             // labels that sit just past a bar near the right-hand edge.
-            divergingRightPadding: 40
+            divergingRightPadding: 40,
+            // Minimum space between value-axis tick labels when thinning diverging axis ticks.
+            minTickLabelGap: 12
         },
         dataset: {
             borderWidth: 1,
@@ -310,6 +312,42 @@ function buildExplicitTicks(axisMin, axisMax, stepSize) {
             ticks.push({ value: roundTickValue(axisMin + (i * stepSize)) });
         }
         axis.ticks = ticks;
+    };
+}
+
+// Progress score axes always cross 0, and 0 is the tick that matters most. Chart.js's autoSkip
+// thins ticks counting from the left edge, which can drop 0 on narrow screens (e.g. -25, -15, -5, 5).
+// Instead, keep every k-th tick counting out from 0, choosing the smallest k whose labels fit.
+function buildZeroAnchoredTicks(axisMin, axisMax, stepSize) {
+    const buildAll = buildExplicitTicks(axisMin, axisMax, stepSize);
+    if (!buildAll) {
+        return undefined;
+    }
+
+    return function (axis) {
+        buildAll(axis);
+        const allTicks = axis.ticks;
+        const width = axis.width || axis.maxWidth;
+        if (!width || allTicks.length <= 2) {
+            return;
+        }
+
+        const ctx = axis.ctx;
+        ctx.save();
+        ctx.font = Chart.helpers.toFont(axis.options.ticks.font).string;
+        const callback = axis.options.ticks.callback;
+        const labelWidth = Math.max(...allTicks.map(t => ctx.measureText(String(callback ? callback(t.value) : t.value)).width));
+        ctx.restore();
+
+        const maxLabels = Math.max(2, Math.floor(width / (labelWidth + CHART_CONFIG.bar.layout.minTickLabelGap)));
+
+        for (let k = 1; k <= allTicks.length; k++) {
+            const kept = allTicks.filter(t => Math.round(t.value / stepSize) % k === 0);
+            if (kept.length <= maxLabels) {
+                axis.ticks = kept;
+                return;
+            }
+        }
     };
 }
 
@@ -858,7 +896,7 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                     beginAtZero: true,
                     min: axisMin ?? undefined,
                     max: axisMax ?? undefined,
-                    afterBuildTicks: explicitTicks,
+                    afterBuildTicks: diverging ? buildZeroAnchoredTicks(resolvedAxisMin, resolvedAxisMax, stepSize) : explicitTicks,
                     grid: {
                         display: true,
                         drawBorder: false,
@@ -873,7 +911,9 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                     ticks: {
                         color: gdsStyles.text,
                         font: fonts,
-                        autoSkip: axisAutoSkip,
+                        // Diverging axes thin their own ticks around 0 (see buildZeroAnchoredTicks).
+                        autoSkip: diverging ? false : axisAutoSkip,
+                        ...(diverging ? { maxRotation: 0 } : {}),
                         stepSize: stepSize,
                         count: axisTickCount,
                         callback: (value) => `${value}${axisSuffix}`
