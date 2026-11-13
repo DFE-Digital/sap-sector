@@ -243,6 +243,71 @@ internal class Program
         return keys;
     }
 
+    // Synonym groups used by school search (replaces the former Lucene synonym map).
+    // Every member of a group expands to all members, so a search for any of them matches the others.
+    private static readonly string[][] SearchSynonymGroups =
+    [
+        ["st", "saint"],
+        ["ss", "saints"],
+        ["cofe", "church of england"],
+        ["rc", "rm", "roman catholic", "catholic"],
+        ["ave", "aven", "avenue"],
+        ["rd", "road"],
+        ["ln", "lane"],
+        ["dr", "drive"],
+        ["mt", "mount"],
+        ["ct", "court"],
+        ["pl", "place"],
+        ["blvd", "boulevard"],
+        ["sq", "square"]
+    ];
+
+    private static void AppendSearchSynonymSql(StringBuilder sql)
+    {
+        sql.AppendLine("-- =========================");
+        sql.AppendLine("-- Search synonyms + normalize_text");
+        sql.AppendLine("-- =========================");
+        sql.AppendLine();
+        sql.AppendLine("CREATE TABLE IF NOT EXISTS public.thesaurus_synonyms (");
+        sql.AppendLine("    word TEXT PRIMARY KEY,");
+        sql.AppendLine("    expansion TEXT NOT NULL");
+        sql.AppendLine(");");
+        sql.AppendLine("TRUNCATE public.thesaurus_synonyms;");
+        sql.AppendLine();
+
+        var rows = new List<string>();
+        foreach (var group in SearchSynonymGroups)
+        {
+            foreach (var word in group)
+            {
+                var expansion = string.Join(' ', new[] { word }.Concat(group.Where(g => g != word)));
+                rows.Add($"('{word}', '{expansion}')");
+            }
+        }
+
+        sql.AppendLine("INSERT INTO public.thesaurus_synonyms (word, expansion) VALUES");
+        sql.AppendLine("    " + string.Join(",\n    ", rows) + ";");
+        sql.AppendLine();
+        sql.AppendLine("-- Lower-cases text and expands each synonym (or multi-word phrase, longest first) to");
+        sql.AppendLine("-- 'word + synonyms' so index and query agree. STABLE because it reads thesaurus_synonyms.");
+        sql.AppendLine("CREATE OR REPLACE FUNCTION public.normalize_text(input_text TEXT)");
+        sql.AppendLine("RETURNS TEXT");
+        sql.AppendLine("LANGUAGE plpgsql");
+        sql.AppendLine("STABLE");
+        sql.AppendLine("AS $$");
+        sql.AppendLine("DECLARE");
+        sql.AppendLine("    result TEXT := lower(coalesce(input_text, ''));");
+        sql.AppendLine("    r RECORD;");
+        sql.AppendLine("BEGIN");
+        sql.AppendLine("    FOR r IN SELECT word, expansion FROM public.thesaurus_synonyms ORDER BY length(word) DESC, word LOOP");
+        sql.AppendLine("        result := regexp_replace(result, '\\m' || r.word || '\\M', r.expansion, 'g');");
+        sql.AppendLine("    END LOOP;");
+        sql.AppendLine("    RETURN result;");
+        sql.AppendLine("END;");
+        sql.AppendLine("$$;");
+        sql.AppendLine();
+    }
+
     private static void WriteCleanupSql(string path, IEnumerable<string> tableNamesToRebuild, bool rebuildAllRawTables)
     {
         var tablesToRebuild = tableNamesToRebuild
@@ -348,6 +413,8 @@ internal class Program
         sql.AppendLine("END;");
         sql.AppendLine("$$;");
         sql.AppendLine();
+        AppendSearchSynonymSql(sql);
+
         sql.AppendLine(@"\echo 'Cleanup complete.'");
 
         File.WriteAllText(path, sql.ToString(), new UTF8Encoding(false));

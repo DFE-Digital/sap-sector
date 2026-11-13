@@ -1,5 +1,6 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
+using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
@@ -47,6 +48,43 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         """;
 
         var result = await conn.QueryAsync<Establishment>(sql, new { urns = urns.ToArray() });
+        return result.ToList();
+    }
+
+    public async Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults)
+    {
+        var tokens = SearchTokeniser.Tokenise(query);
+        if (tokens.Count == 0)
+        {
+            return [];
+        }
+
+        // Tokens contain letters/digits only, so they are safe inside a tsquery.
+        // All but the last token are synonym-normalised and ANDed; the last is a prefix match.
+        var head = string.Join(' ', tokens.Take(tokens.Count - 1));
+        var last = tokens[^1];
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+
+        // Mirrors EstablishmentExtensions.CanIndexForSearch (phase id 2/4/7, or legacy phase name).
+        const string sql = """
+            WITH q AS (
+                SELECT to_tsquery('simple', concat_ws(' & ',
+                    NULLIF(array_to_string(array_remove(regexp_split_to_array(trim(normalize_text(@head)), '\s+'), ''), ' & '), ''),
+                    @last || ':*')) AS tsq
+            )
+            SELECT e."URN", e."EstablishmentName"
+            FROM public.v_establishment e
+            JOIN public.v_establishment_search s ON s."URN" = e."URN"
+            CROSS JOIN q
+            WHERE s."SearchFTS" @@ q.tsq
+              AND (trim(e."PhaseOfEducationId") IN ('2', '4', '7')
+                   OR lower(trim(e."PhaseOfEducationName")) IN ('primary', 'secondary', 'all-through'))
+            ORDER BY ts_rank_cd(s."SearchFTS", q.tsq) DESC, e."EstablishmentName"
+            LIMIT @maxResults;
+        """;
+
+        var result = await conn.QueryAsync<EstablishmentSearchHit>(sql, new { head, last, maxResults });
         return result.ToList();
     }
 

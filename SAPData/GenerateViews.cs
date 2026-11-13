@@ -121,6 +121,9 @@ public sealed class GenerateViews
             insert into test_establishments_urns select jsonb_array_elements_text(string_agg(doc, E' ')::jsonb) from test_establishments_urns_import;
             """);
 
+        // Always (re)built: cheap, and v_establishment's DROP ... CASCADE removes it whenever that view is rebuilt.
+        WriteSql("05", "v_establishment_search", GenerateEstablishmentSearchView());
+
         foreach (var view in Views)
         {
             string sql, jsonSql;
@@ -630,6 +633,32 @@ public sealed class GenerateViews
     // =====================================================
     // ESTABLISHMENT DIMENSION (curated)
     // =====================================================
+
+    // Full text search document per establishment (name + street + postcode), used by school search.
+    // Kept separate from v_establishment so the Establishment DTO / JSON export are unaffected.
+    private static string GenerateEstablishmentSearchView()
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine("-- AUTO-GENERATED MATERIALIZED VIEW: v_establishment_search");
+        sb.AppendLine();
+        sb.AppendLine("DROP MATERIALIZED VIEW IF EXISTS v_establishment_search CASCADE;");
+        sb.AppendLine();
+        sb.AppendLine("CREATE MATERIALIZED VIEW v_establishment_search AS");
+        sb.AppendLine("SELECT");
+        sb.AppendLine("    e.\"URN\",");
+        sb.AppendLine("    to_tsvector('simple', normalize_text(");
+        sb.AppendLine("        coalesce(e.\"EstablishmentName\", '') || ' ' ||");
+        sb.AppendLine("        coalesce(e.\"Street\", '') || ' ' ||");
+        sb.AppendLine("        coalesce(e.\"Postcode\", '') || ' ' ||");
+        sb.AppendLine("        replace(coalesce(e.\"Postcode\", ''), ' ', ''))) AS \"SearchFTS\"");
+        sb.AppendLine("FROM v_establishment e;");
+        sb.AppendLine();
+        sb.AppendLine("CREATE UNIQUE INDEX idx_v_establishment_search_urn ON v_establishment_search (\"URN\");");
+        sb.AppendLine("CREATE INDEX idx_v_establishment_search_fts ON v_establishment_search USING GIN (\"SearchFTS\");");
+
+        return sb.ToString();
+    }
 
     private static string GenerateEstablishmentDimensionView(string? rawTable)
     {
