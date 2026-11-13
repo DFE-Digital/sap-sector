@@ -51,7 +51,8 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCase(
             Ks4CoreSubjects.Biology.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                includePupilCharacteristicFilter),
             Ks4CoreSubjects.Chemistry.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
