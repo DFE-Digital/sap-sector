@@ -49,7 +49,7 @@ public record TopPerformer(
     // so schools are only tied when their displayed values are equal.
     private static int DisplayDecimalPlaces(MeasureDataType dataType) => dataType switch
     {
-        MeasureDataType.Score or MeasureDataType.ScaledScore or MeasureDataType.DestinationsPercentage => 1,
+        MeasureDataType.Score or MeasureDataType.ScaledScore or MeasureDataType.ProgressScore or MeasureDataType.DestinationsPercentage => 1,
         MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
         _ => 0
     };

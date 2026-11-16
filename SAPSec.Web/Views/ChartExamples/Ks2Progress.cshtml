@@ -1,0 +1,58 @@
+@using SAPSec.Web.Constants
+@using SAPSec.Web.ViewModels.ChartExamples
+
+@model Ks2ProgressChartExamplesViewModel
+@{
+    ViewData[ViewDataKeys.Title] = "KS2 progress score chart examples";
+}
+
+<div class="app-school-page" data-testid="ks2-progress-chart-examples">
+    <span class="govuk-caption-xl">Chart examples</span>
+    <h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
+
+    <div class="govuk-warning-text">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+            <span class="govuk-visually-hidden">Warning</span>
+            These are made-up scores for testing chart designs. They are not real school results.
+        </strong>
+    </div>
+
+    <p class="govuk-body">
+        KS2 progress scores can be positive or negative, with no fixed range. Most are between -5 and 5,
+        but we expect scores as low as -25 and as high as 30. Each example below uses the same bar chart,
+        line chart and table as the KS2 performance measures page.
+    </p>
+
+    <p class="govuk-body">Examples:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        @foreach (var example in Model.Examples)
+        {
+            <li><a class="govuk-link" href="#@example.Key-heading">@example.Title</a></li>
+        }
+    </ul>
+
+    <form action="" method="get">
+        @foreach (var example in Model.Examples)
+        {
+            <section class="app-measure-section" aria-labelledby="@example.Key-heading" data-testid="@example.Key-example">
+                <h2 class="govuk-heading-m" id="@example.Key-heading">@example.Title</h2>
+                <p class="govuk-body">@example.Description</p>
+
+                <partial name="Measures/_Measure" model=@example.Measure />
+            </section>
+        }
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
+
+        ChartFactory.initAll();
+        ContentToggle.initAll();
+    </script>
+}
