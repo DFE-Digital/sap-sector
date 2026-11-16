@@ -80,7 +80,7 @@ public class ComparisonController(
     [Route("compare-ks4-core-subjects")]
     public async Task<IActionResult> Ks4CoreSubjects(
     string urn,
-    string comparatorSchoolUrn)
+        string comparatorSchoolUrn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getKs4CoreSubjectsUseCase.Execute(new(urn, comparatorSchoolUrn, filters));

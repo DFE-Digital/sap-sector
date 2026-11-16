@@ -209,7 +209,8 @@ public class ComparisonSchoolDetailsPageIntegrationTests(
             .ShouldLinkTo("View the latest Ofsted report (opens in new tab)", "https://reports.ofsted.gov.uk/provider/21/100002"));
         page.TermShouldExistWithDefinition("Information from other services", el => el.ChildElementsShouldExist("a").Should().SatisfyRespectively(
             a => a.ShouldLinkTo("Financial benchmarking and insights tool (opens in new tab)", "https://financial-benchmarking-and-insights-tool.education.gov.uk/school/100002"),
-            a => a.ShouldLinkTo("Get information about schools (opens in new tab)", "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/100002")));
+            a => a.ShouldLinkTo("Get information about schools (opens in new tab)", "https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/100002"),
+            a => a.ShouldLinkTo("View your education data (opens in new tab)", "https://viewyourdata.education.gov.uk/")));
     }
 
     [Fact]

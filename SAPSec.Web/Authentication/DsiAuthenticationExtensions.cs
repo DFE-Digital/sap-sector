@@ -83,6 +83,10 @@ public static class DsiAuthenticationExtensions
         options.LoginPath = Routes.SignIn;
         options.AccessDeniedPath = Routes.AccessDenied;
 
+        // Keep the auth cookie small - an oversized cookie is rejected by nginx with
+        // "400 Request Header Or Cookie Too Large"
+        options.Events.OnSigningIn = AuthCookieTrimmer.HandleSigningIn;
+
         // Override login redirect for unauthenticated requests
         options.Events.OnRedirectToLogin = context =>
         {
