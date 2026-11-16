@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Data\SAPSec.Data.Common\SAPSec.Data.Common.csproj" />
+    <ProjectReference Include="..\..\Data\SapSec.DtoGenerator\SAPSec.DtoGenerator.csproj" />
     <ProjectReference Include="..\..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
     <ProjectReference Include="..\SAPSec.Test.Common\SAPSec.Test.Common.csproj" />
   </ItemGroup>
