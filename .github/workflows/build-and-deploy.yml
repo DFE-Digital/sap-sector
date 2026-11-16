@@ -96,6 +96,7 @@ jobs:
     # Pinned: ubuntu-latest is Ubuntu 26.04, which Playwright 1.56 has no browsers for
     runs-on: ubuntu-24.04
     permissions:
+      actions: read
       contents: read
       pull-requests: write
 
@@ -164,7 +165,7 @@ jobs:
               /p:CoverletOutputFormat=cobertura \
               /p:DeterministicReport=true \
               /p:UseSourceLink=true \
-              /p:Exclude='[*]AspNetCoreGeneratedDocument.*%2c[*]AspNetCore.Views.*' \
+              /p:Exclude='[*]AspNetCoreGeneratedDocument.*%2c[*]AspNetCore.Views.*%2c[SAPSec.Test.Common]*' \
               /p:ExcludeByAttribute='GeneratedCodeAttribute*%2cObsoleteAttribute*%2cExcludeFromCodeCoverage' \
               --verbosity normal
           done
@@ -198,6 +199,7 @@ jobs:
         if: ${{ github.actor != 'dependabot[bot]'}}
         with:
           filename: "coverage-results/coverage.xml"
+          artifact_download_workflow_names: "Build and Deploy"
           fail_on_negative_difference: true
           only_list_changed_files: true
 
