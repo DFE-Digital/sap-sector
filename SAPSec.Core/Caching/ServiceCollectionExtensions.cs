@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
         where TRealImplementation : class, TInterface
         where TCachedImplementation : class, TInterface
     {
-        var config = configuration.GetSection(nameof(CachingSettings)).Get<CachingSettings>();
+        var config = configuration.GetSection("Caching").Get<CachingSettings>();
 
         if (config is null || !config.EnableCaching || !config.CacheRepositories)
         {
@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
 
     private static void AddUseCase(this IServiceCollection services, Type implementationType, IConfiguration configuration)
     {
-        var config = configuration.GetSection(nameof(CachingSettings)).Get<CachingSettings>();
+        var config = configuration.GetSection("Caching").Get<CachingSettings>();
 
         var interfaceType = GetInterfaceType(implementationType);
 
@@ -51,7 +51,7 @@ public static class ServiceCollectionExtensions
 
     public static void AddKeyedUseCase(this IServiceCollection services, string serviceKey, Type implementationType, IConfiguration configuration)
     {
-        var config = configuration.GetSection(nameof(CachingSettings)).Get<CachingSettings>();
+        var config = configuration.GetSection("Caching").Get<CachingSettings>();
 
         var interfaceType = GetInterfaceType(implementationType);
 
