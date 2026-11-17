@@ -118,8 +118,5 @@ public class Organisation
 
     public List<Service> Services { get; set; } = new();
 
-    public bool IsEstablishment => string.Equals(
-        Category?.Name,
-        "Establishment",
-        StringComparison.OrdinalIgnoreCase);
+    public bool IsEstablishment => Category?.Id == OrganisationCategoryIds.Establishment;
 }
