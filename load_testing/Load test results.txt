@@ -1,0 +1,161 @@
+Load test results
+
+No caching:
+
+     checks...........................: 100.00% ✓ 386      ✗ 0
+     data_received....................: 7.6 MB  261 kB/s
+     data_sent........................: 42 kB   1.5 kB/s
+     group_duration...................: avg=2.46s     min=2.04s  med=2.12s   max=3.18s    p(90)=3.13s    p(95)=3.14s
+     http_req_blocked.................: avg=481.45µs  min=0s     med=0s      max=7.36ms   p(90)=0s       p(95)=4.8ms
+     http_req_connecting..............: avg=95.54µs   min=0s     med=0s      max=1.62ms   p(90)=0s       p(95)=1.1ms
+   ✓ http_req_duration................: avg=45.65ms   min=1.16ms med=42.67ms max=176.81ms p(90)=94.04ms  p(95)=118.37ms
+       { expected_response:true }.....: avg=45.65ms   min=1.16ms med=42.67ms max=176.81ms p(90)=94.04ms  p(95)=118.37ms
+   ✓ http_req_failed..................: 0.00%   ✓ 0        ✗ 110
+     http_req_receiving...............: avg=2.03ms    min=0s     med=143.4µs max=24.09ms  p(90)=8.55ms   p(95)=11ms
+     http_req_sending.................: avg=352.32µs  min=0s     med=438µs   max=927.6µs  p(90)=654.67µs p(95)=693.27µs
+     http_req_tls_handshaking.........: avg=375.49µs  min=0s     med=0s      max=5.89ms   p(90)=0s       p(95)=3.59ms
+     http_req_waiting.................: avg=43.26ms   min=0s     med=41.94ms max=175.74ms p(90)=87.73ms  p(95)=117.44ms
+     http_reqs........................: 110     3.801462/s
+     iteration_duration...............: avg=4.97s     min=3.26s  med=4.95s   max=6.64s    p(90)=6.12s    p(95)=6.34s
+     iterations.......................: 45      1.555144/s
+   ✓ sap_sector_error_rate............: 0.00%   ✓ 0        ✗ 108
+     sap_sector_response_time_trend...: avg=46.312885 min=1.1639 med=43.2599 max=176.8179 p(90)=94.80066 p(95)=118.4540
+     vus..............................: 1       min=1      max=10
+
+Caching repositories only:
+
+     checks...........................: 100.00% ✓ 387      ✗ 0
+     data_received....................: 8.4 MB  306 kB/s
+     data_sent........................: 46 kB   1.7 kB/s
+     group_duration...................: avg=2.57s     min=2.04s  med=2.19s    max=4.03s    p(90)=3.19s     p(95)=3.21s
+     http_req_blocked.................: avg=473.07µs  min=0s     med=0s       max=7.98ms   p(90)=0s        p(95)=4.23ms
+     http_req_connecting..............: avg=65.5µs    min=0s     med=0s       max=1.58ms   p(90)=0s        p(95)=555.91µs
+   ✓ http_req_duration................: avg=72.63ms   min=1.02ms med=44.27ms  max=536.38ms p(90)=174.89ms  p(95)=252.83ms
+       { expected_response:true }.....: avg=72.63ms   min=1.02ms med=44.27ms  max=536.38ms p(90)=174.89ms  p(95)=252.83ms
+   ✓ http_req_failed..................: 0.00%   ✓ 0        ✗ 108
+     http_req_receiving...............: avg=1.66ms    min=0s     med=0s       max=38.12ms  p(90)=3.35ms    p(95)=6.49ms
+     http_req_sending.................: avg=261.54µs  min=0s     med=224.55µs max=1.01ms   p(90)=598.83µs  p(95)=689.28µs
+     http_req_tls_handshaking.........: avg=377.25µs  min=0s     med=0s       max=6.5ms    p(90)=0s        p(95)=3.36ms
+     http_req_waiting.................: avg=70.7ms    min=0s     med=43.92ms  max=532.07ms p(90)=172.83ms  p(95)=249.74ms
+     http_reqs........................: 108     3.926931/s
+     iteration_duration...............: avg=4.97s     min=3.5s   med=4.9s     max=7.07s    p(90)=6.17s     p(95)=6.57s
+     iterations.......................: 44      1.599861/s
+   ✓ sap_sector_error_rate............: 0.00%   ✓ 0        ✗ 108
+     sap_sector_response_time_trend...: avg=72.633362 min=1.0237 med=44.27675 max=536.3892 p(90)=174.89564 p(95)=252.83923
+     vus..............................: 1
+
+     checks...........................: 100.00% ✓ 427      ✗ 0
+     data_received....................: 9.1 MB  302 kB/s
+     data_sent........................: 45 kB   1.5 kB/s
+     group_duration...................: avg=2.56s     min=2.04s   med=2.21s   max=3.26s    p(90)=3.13s     p(95)=3.19s
+     http_req_blocked.................: avg=636.68µs  min=0s      med=0s      max=27.9ms   p(90)=0s        p(95)=4.75ms
+     http_req_connecting..............: avg=94.53µs   min=0s      med=0s      max=2.4ms    p(90)=0s        p(95)=699.38µs
+   ✓ http_req_duration................: avg=51.2ms    min=836.4µs med=46.41ms max=361.88ms p(90)=103.43ms  p(95)=153.72ms
+       { expected_response:true }.....: avg=51.2ms    min=836.4µs med=46.41ms max=361.88ms p(90)=103.43ms  p(95)=153.72ms
+   ✓ http_req_failed..................: 0.00%   ✓ 0        ✗ 119
+     http_req_receiving...............: avg=1.29ms    min=0s      med=0s      max=24.92ms  p(90)=4.09ms    p(95)=6.5ms
+     http_req_sending.................: avg=267.76µs  min=0s      med=270.3µs max=797.4µs  p(90)=582.4µs   p(95)=679.38µs
+     http_req_tls_handshaking.........: avg=524.4µs   min=0s      med=0s      max=24.97ms  p(90)=0s        p(95)=3.77ms
+     http_req_waiting.................: avg=49.64ms   min=121.1µs med=43.87ms max=359.4ms  p(90)=102.48ms  p(95)=151.92ms
+     http_reqs........................: 119     3.966125/s
+     iteration_duration...............: avg=4.72s     min=3.33s   med=4.73s   max=6.86s    p(90)=5.74s     p(95)=6.16s
+     iterations.......................: 47      1.566453/s
+   ✓ sap_sector_error_rate............: 0.00%   ✓ 0        ✗ 119
+     sap_sector_response_time_trend...: avg=51.204536 min=0.8364  med=46.4188 max=361.8832 p(90)=103.43318 p(95)=153.7292
+     vus..............................: 1       min=1      max=10
+
+Caching use cases only:
+
+     checks...........................: 100.00% ✓ 413      ✗ 0
+     data_received....................: 9.0 MB  322 kB/s
+     data_sent........................: 46 kB   1.7 kB/s
+     group_duration...................: avg=2.51s    min=2.01s   med=2.08s   max=3.15s    p(90)=3.13s    p(95)=3.13s
+     http_req_blocked.................: avg=417.94µs min=0s      med=0s      max=9.32ms   p(90)=0s       p(95)=3.48ms
+     http_req_connecting..............: avg=99.29µs  min=0s      med=0s      max=3.16ms   p(90)=0s       p(95)=622.32µs
+   ✓ http_req_duration................: avg=27.93ms  min=1.39ms  med=11.19ms max=126.57ms p(90)=86.3ms   p(95)=95.78ms
+       { expected_response:true }.....: avg=27.93ms  min=1.39ms  med=11.19ms max=126.57ms p(90)=86.3ms   p(95)=95.78ms
+   ✓ http_req_failed..................: 0.00%   ✓ 0        ✗ 115
+     http_req_receiving...............: avg=1.22ms   min=0s      med=152.9µs max=11.98ms  p(90)=4.2ms    p(95)=7.11ms
+     http_req_sending.................: avg=398.19µs min=0s      med=365.7µs max=6.57ms   p(90)=627.9µs  p(95)=682.54µs
+     http_req_tls_handshaking.........: avg=304.65µs min=0s      med=0s      max=6.16ms   p(90)=0s       p(95)=2.59ms
+     http_req_waiting.................: avg=26.3ms   min=232.5µs med=8.19ms  max=121.86ms p(90)=84.83ms  p(95)=94ms
+     http_reqs........................: 115     4.140512/s
+     iteration_duration...............: avg=4.88s    min=3.17s   med=5.03s   max=6.84s    p(90)=6.41s    p(95)=6.67s
+     iterations.......................: 46      1.656205/s
+   ✓ sap_sector_error_rate............: 0.00%   ✓ 0        ✗ 115
+     sap_sector_response_time_trend...: avg=27.93543 min=1.3929  med=11.1931 max=126.5702 p(90)=86.30098 p(95)=95.78601
+     vus..............................: 3       min=2      max=10
+
+     checks...........................: 100.00% ✓ 389      ✗ 0
+     data_received....................: 8.0 MB  273 kB/s
+     data_sent........................: 44 kB   1.5 kB/s
+     group_duration...................: avg=2.37s     min=2s       med=2.03s    max=3.15s    p(90)=3.13s    p(95)=3.14s 
+     http_req_blocked.................: avg=571.97µs  min=0s       med=0s       max=7.69ms   p(90)=0s       p(95)=6.77ms
+     http_req_connecting..............: avg=109.22µs  min=0s       med=0s       max=1.72ms   p(90)=0s       p(95)=1.24ms
+   ✓ http_req_duration................: avg=22.85ms   min=195.89µs med=6.99ms   max=130.61ms p(90)=83.87ms  p(95)=114.41ms
+       { expected_response:true }.....: avg=22.85ms   min=195.89µs med=6.99ms   max=130.61ms p(90)=83.87ms  p(95)=114.41ms
+   ✓ http_req_failed..................: 0.00%   ✓ 0        ✗ 109
+     http_req_receiving...............: avg=1.56ms    min=0s       med=541.29µs max=21.36ms  p(90)=5.25ms   p(95)=6.06ms
+     http_req_sending.................: avg=376.59µs  min=0s       med=470.3µs  max=875.7µs  p(90)=676.92µs p(95)=742.89µs
+     http_req_tls_handshaking.........: avg=441.23µs  min=0s       med=0s       max=5.85ms   p(90)=0s       p(95)=4.99ms
+     http_req_waiting.................: avg=20.91ms   min=0s       med=5.92ms   max=126.27ms p(90)=81.48ms  p(95)=110.07ms
+     http_reqs........................: 109     3.694462/s
+     iteration_duration...............: avg=4.78s     min=3.02s    med=4.82s    max=7.06s    p(90)=5.9s     p(95)=5.98s 
+     iterations.......................: 45      1.525236/s
+   ✓ sap_sector_error_rate............: 0.00%   ✓ 0        ✗ 109
+     sap_sector_response_time_trend...: avg=22.855143 min=0.1959   med=6.9992   max=130.6134 p(90)=83.8742  p(95)=114.4101
+     vus..............................: 1       min=1      max=10
+
+===============================
+
+Peak test - baseline:
+
+     checks...........................: 61.66% ✓ 72111     ✗ 44829
+     data_received....................: 1.5 GB 4.2 MB/s
+     data_sent........................: 17 MB  47 kB/s
+     group_duration...................: avg=1m35s        min=10.28s  med=1m39s      max=2m26s      p(90)=2m5s        p(95)=2m9s
+     http_req_blocked.................: avg=564.56ms     min=0s      med=0s         max=14.6s      p(90)=2.75s       p(95)=4.36s
+     http_req_connecting..............: avg=650.1µs      min=0s      med=0s         max=159.63ms   p(90)=506.2µs     p(95)=1.84ms
+   ✗ http_req_duration................: avg=38.43s       min=604.6µs med=38.42s     max=1m1s       p(90)=1m0s        p(95)=1m0s
+       { expected_response:true }.....: avg=31.12s       min=604.6µs med=33.47s     max=1m0s       p(90)=47.7s       p(95)=52.27s
+   ✗ http_req_failed..................: 25.77% ✓ 8401      ✗ 24194
+     http_req_receiving...............: avg=19.82s       min=0s      med=18.9s      max=56.69s     p(90)=39.65s      p(95)=43.55s
+     http_req_sending.................: avg=428.54µs     min=0s      med=0s         max=647.17ms   p(90)=509.7µs     p(95)=1.1ms
+     http_req_tls_handshaking.........: avg=563.85ms     min=0s      med=0s         max=14.59s     p(90)=2.74s       p(95)=4.36s
+     http_req_waiting.................: avg=18.61s       min=504.7µs med=19.11s     max=42.8s      p(90)=28.38s      p(95)=30.94s
+     http_reqs........................: 32595  91.94271/s
+     iteration_duration...............: avg=1m37s        min=13.1s   med=1m41s      max=2m29s      p(90)=2m8s        p(95)=2m12s
+     iterations.......................: 12175  34.342767/s
+   ✗ sap_sector_error_rate............: 99.05% ✓ 32056     ✗ 307
+     sap_sector_response_time_trend...: avg=38573.332715 min=0.6046  med=38516.1306 max=61181.6514 p(90)=60004.60782 p(95)=60019.8366
+     vus..............................: 57     min=0
+
+running (5m54.5s), 0000/5000 VUs, 12175 complete and 3058 interrupted iterations
+sap_sector_huge_peak_surge ✓ [======================================] 0000/5000 VUs  5m30s
+ERRO[0357] thresholds on metrics 'http_req_duration, http_req_failed, sap_sector_error_rate' have been crossed
+
+Peak test - caching repositories:
+
+     checks...........................: 39.98% ✓ 40025     ✗ 60066
+     data_received....................: 849 MB 2.4 MB/s
+     data_sent........................: 15 MB  41 kB/s
+     group_duration...................: avg=1m52s        min=7.75s  med=1m54s      max=2m57s      p(90)=2m10s      p(95)=2m22s
+     http_req_blocked.................: avg=990.02ms     min=0s     med=0s         max=17.94s     p(90)=4.15s      p(95)=7.51s
+     http_req_connecting..............: avg=1.14ms       min=0s     med=0s         max=302.22ms   p(90)=1.04ms     p(95)=4.22ms
+   ✗ http_req_duration................: avg=44.98s       min=8.97ms med=49.99s     max=1m0s       p(90)=1m0s       p(95)=1m0s
+       { expected_response:true }.....: avg=29.65s       min=8.97ms med=31.76s     max=59.96s     p(90)=45.25s     p(95)=49.74s
+   ✗ http_req_failed..................: 61.60% ✓ 17062     ✗ 10632
+     http_req_receiving...............: avg=10.96s       min=0s     med=8.44s      max=57.72s     p(90)=26.83s     p(95)=32.2s
+     http_req_sending.................: avg=483.59µs     min=0s     med=0s         max=500.12ms   p(90)=516.8µs    p(95)=1.01ms
+     http_req_tls_handshaking.........: avg=988.75ms     min=0s     med=0s         max=17.94s     p(90)=4.15s      p(95)=7.5s
+     http_req_waiting.................: avg=34.01s       min=8.97ms med=34.19s     max=1m0s       p(90)=59.55s     p(95)=1m0s
+     http_reqs........................: 27694  77.088942/s
+     iteration_duration...............: avg=1m54s        min=9.73s  med=1m56s      max=3m0s       p(90)=2m13s      p(95)=2m25s
+     iterations.......................: 10048  27.969585/s
+   ✗ sap_sector_error_rate............: 98.23% ✓ 27138     ✗ 487
+     sap_sector_response_time_trend...: avg=45011.935591 min=8.9771 med=50029.0147 max=60424.7644 p(90)=60004.8948 p(95)=60019.79984
+     vus..............................: 7      min=0       max=5000
+
+running (5m59.2s), 0000/5000 VUs, 10048 complete and 3408 interrupted iterations
+sap_sector_huge_peak_surge ✓ [======================================] 0000/5000 VUs  5m30s
+ERRO[0365] thresholds on metrics 'http_req_duration, http_req_failed, sap_sector_error_rate' have been crossed

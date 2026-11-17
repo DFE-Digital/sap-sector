@@ -1,0 +1,672 @@
+{
+  "metrics": {
+    "group_duration": {
+      "contains": "time",
+      "values": {
+        "avg": 2579.5668155555545,
+        "min": 2041.7613,
+        "med": 2199.5162,
+        "max": 4038.2744,
+        "p(90)": 3196.0127,
+        "p(95)": 3215.9068
+      },
+      "type": "trend"
+    },
+    "vus_max": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "min": 10,
+        "max": 10,
+        "value": 10
+      }
+    },
+    "iteration_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "min": 3503.4427,
+        "med": 4909.81465,
+        "max": 7077.093,
+        "p(90)": 6176.76284,
+        "p(95)": 6576.83663,
+        "avg": 4970.6972113636375
+      }
+    },
+    "iterations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 44,
+        "rate": 1.5998607364861455
+      }
+    },
+    "data_sent": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 45856,
+        "rate": 1667.3457711888339
+      }
+    },
+    "http_req_blocked": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "max": 7.9825,
+        "p(90)": 0,
+        "p(95)": 4.236964999999993,
+        "avg": 0.4730722222222222,
+        "min": 0,
+        "med": 0
+      }
+    },
+    "http_req_connecting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 0.06550185185185187,
+        "min": 0,
+        "med": 0,
+        "max": 1.5877,
+        "p(90)": 0,
+        "p(95)": 0.5559149999999995
+      }
+    },
+    "data_received": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 8426542,
+        "rate": 306393.03841253265
+      }
+    },
+    "checks": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 1,
+        "passes": 387,
+        "fails": 0
+      }
+    },
+    "http_req_failed": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "fails": 108,
+        "rate": 0,
+        "passes": 0
+      },
+      "thresholds": {
+        "rate<0.01": {
+          "ok": true
+        }
+      }
+    },
+    "http_req_waiting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(95)": 249.74537499999988,
+        "avg": 70.70465648148145,
+        "min": 0,
+        "med": 43.922650000000004,
+        "max": 532.0713,
+        "p(90)": 172.83371
+      }
+    },
+    "http_req_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "min": 1.0237,
+        "med": 44.27675,
+        "max": 536.3892,
+        "p(90)": 174.89564,
+        "p(95)": 252.83922999999984,
+        "avg": 72.63336203703705
+      },
+      "thresholds": {
+        "p(95)<3000": {
+          "ok": true
+        }
+      }
+    },
+    "http_req_tls_handshaking": {
+      "contains": "time",
+      "values": {
+        "avg": 0.3772546296296296,
+        "min": 0,
+        "med": 0,
+        "max": 6.5068,
+        "p(90)": 0,
+        "p(95)": 3.362064999999999
+      },
+      "type": "trend"
+    },
+    "vus": {
+      "contains": "default",
+      "values": {
+        "value": 1,
+        "min": 1,
+        "max": 10
+      },
+      "type": "gauge"
+    },
+    "sap_sector_error_rate": {
+      "values": {
+        "rate": 0,
+        "passes": 0,
+        "fails": 108
+      },
+      "thresholds": {
+        "rate<0.01": {
+          "ok": true
+        }
+      },
+      "type": "rate",
+      "contains": "default"
+    },
+    "http_reqs": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 108,
+        "rate": 3.9269308986478113
+      }
+    },
+    "http_req_duration{expected_response:true}": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "min": 1.0237,
+        "med": 44.27675,
+        "max": 536.3892,
+        "p(90)": 174.89564,
+        "p(95)": 252.83922999999984,
+        "avg": 72.63336203703705
+      }
+    },
+    "http_req_sending": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 0.2615472222222223,
+        "min": 0,
+        "med": 0.22455,
+        "max": 1.0137,
+        "p(90)": 0.5988399999999999,
+        "p(95)": 0.6892849999999996
+      }
+    },
+    "http_req_receiving": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "max": 38.121,
+        "p(90)": 3.354599999999999,
+        "p(95)": 6.4967349999999975,
+        "avg": 1.667158333333334,
+        "min": 0,
+        "med": 0
+      }
+    },
+    "sap_sector_response_time_trend": {
+      "type": "trend",
+      "contains": "default",
+      "values": {
+        "med": 44.27675,
+        "max": 536.3892,
+        "p(90)": 174.89564,
+        "p(95)": 252.83922999999984,
+        "avg": 72.63336203703705,
+        "min": 1.0237
+      }
+    }
+  },
+  "setup_data": {
+    "config": {
+      "thresholds": {
+        "http_req_duration": [
+          "p(95)<3000"
+        ],
+        "http_req_failed": [
+          "rate<0.01"
+        ],
+        "sap_sector_error_rate": [
+          "rate<0.01"
+        ]
+      },
+      "expectedResponseTimes": {
+        "schoolPage": 3000,
+        "search": 3000,
+        "staticPage": 2000,
+        "authRedirect": 1500,
+        "health": 1000,
+        "homepage": 2000
+      },
+      "service": "SAP Sector"
+    },
+    "environment": {
+      "baseUrl": "https://localhost:3000",
+      "insecureSkipTLSVerify": true,
+      "name": "loadtest"
+    }
+  },
+  "root_group": {
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": [
+      {
+        "name": "SAP Sector Authenticated User Journey",
+        "path": "::SAP Sector Authenticated User Journey",
+        "id": "6ff6d129b6f66b1715207f4231196bca",
+        "groups": [
+          {
+            "groups": [],
+            "checks": [
+                {
+                  "name": "Find a school - landing: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey::Find a school - landing: status is expected",
+                  "id": "10707d740d7a1c0a542a71267b15842b",
+                  "passes": 18,
+                  "fails": 0
+                },
+                {
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey::Find a school - landing: response time < 3000ms",
+                  "id": "a0fe00b798bc3bcb7d8781a27362394d",
+                  "passes": 18,
+                  "fails": 0,
+                  "name": "Find a school - landing: response time < 3000ms"
+                },
+                {
+                  "name": "Find a school - landing: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey::Find a school - landing: no server errors (5xx)",
+                  "id": "5543401fd98e503b8881d47584e18c39",
+                  "passes": 18,
+                  "fails": 0
+                },
+                {
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey::Find a school landing: contains expected content",
+                  "id": "ff4b938d08d0702e2d8d335b76236a02",
+                  "passes": 18,
+                  "fails": 0,
+                  "name": "Find a school landing: contains expected content"
+                },
+                {
+                  "name": "Find a school - search results: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey::Find a school - search results: status is expected",
+                  "id": "b91e8f86da11c1b24d0235a28aa912d9",
+                  "passes": 18,
+                  "fails": 0
+                },
+                {
+                  "name": "Find a school - search results: response time < 3000ms",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey::Find a school - search results: response time < 3000ms",
+                  "id": "1e3f9daa99e1f05ee8bd7df1a89df028",
+                  "passes": 18,
+                  "fails": 0
+                },
+                {
+                  "id": "486affe6b7ba2511b87d3a3468f23d4c",
+                  "passes": 18,
+                  "fails": 0,
+                  "name": "Find a school - search results: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey::Find a school - search results: no server errors (5xx)"
+                },
+                {
+                  "name": "Find a school results: contains expected content",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey::Find a school results: contains expected content",
+                  "id": "14d1159925195c432840f552942eea56",
+                  "passes": 18,
+                  "fails": 0
+                },
+                {
+                  "id": "b4944cb4eafe488a9e3caf37a390a8f2",
+                  "passes": 18,
+                  "fails": 0,
+                  "name": "Find a school - suggest: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey::Find a school - suggest: status is expected"
+                },
+                {
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey::Find a school - suggest: response time < 3000ms",
+                  "id": "9af6a4178f6219f9ca52d5b10897212f",
+                  "passes": 18,
+                  "fails": 0,
+                  "name": "Find a school - suggest: response time < 3000ms"
+                },
+                {
+                  "id": "a9095b5bc7e68279714c8771ac2c6162",
+                  "passes": 18,
+                  "fails": 0,
+                  "name": "Find a school - suggest: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey::Find a school - suggest: no server errors (5xx)"
+                }
+              ],
+            "name": "SAP Sector: School Search Journey",
+            "path": "::SAP Sector Authenticated User Journey::SAP Sector: School Search Journey",
+            "id": "a87e0e97567771f54a87ea44f23566cd"
+          },
+          {
+            "name": "SAP Sector: Secondary School Journey",
+            "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey",
+            "id": "1e15ae2481b799eb45ecd487c3cfef40",
+            "groups": [],
+            "checks": [
+                {
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school overview: status is expected",
+                  "id": "39879a046a89a94b56a65b98dffc69dc",
+                  "passes": 13,
+                  "fails": 0,
+                  "name": "Secondary school overview: status is expected"
+                },
+                {
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school overview: response time < 3000ms",
+                  "id": "44f5e778af9b465b24f48a97d4b1eadf",
+                  "passes": 13,
+                  "fails": 0,
+                  "name": "Secondary school overview: response time < 3000ms"
+                },
+                {
+                  "id": "afa11b5851134de2e592bde806951b91",
+                  "passes": 13,
+                  "fails": 0,
+                  "name": "Secondary school overview: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school overview: no server errors (5xx)"
+                },
+                {
+                  "name": "Secondary school overview: contains expected content",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school overview: contains expected content",
+                  "id": "efdd9bb387367a580a320ed9a357a3d2",
+                  "passes": 13,
+                  "fails": 0
+                },
+                {
+                  "name": "Secondary school - view-similar-schools: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school - view-similar-schools: status is expected",
+                  "id": "8412d32d3d12c09a2d6e377dd07ad65e",
+                  "passes": 6,
+                  "fails": 0
+                },
+                {
+                  "name": "Secondary school - view-similar-schools: response time < 3000ms",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school - view-similar-schools: response time < 3000ms",
+                  "id": "d19f3729f7a11b1e30e3e08d766333fc",
+                  "passes": 6,
+                  "fails": 0
+                },
+                {
+                  "name": "Secondary school - view-similar-schools: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school - view-similar-schools: no server errors (5xx)",
+                  "id": "333896eeafe7dafbef25e93b9cad7171",
+                  "passes": 6,
+                  "fails": 0
+                },
+                {
+                  "id": "ad852f90d2fe554ae3f1cf1395aaad43",
+                  "passes": 3,
+                  "fails": 0,
+                  "name": "Secondary school - ks4-headline-measures: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school - ks4-headline-measures: status is expected"
+                },
+                {
+                  "fails": 0,
+                  "name": "Secondary school - ks4-headline-measures: response time < 3000ms",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school - ks4-headline-measures: response time < 3000ms",
+                  "id": "5f68b8e0b9a57d23368a2ebdf4a6ade9",
+                  "passes": 3
+                },
+                {
+                  "name": "Secondary school - ks4-headline-measures: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school - ks4-headline-measures: no server errors (5xx)",
+                  "id": "b510ad003325f1e127f4368943701e35",
+                  "passes": 3,
+                  "fails": 0
+                },
+                {
+                  "name": "Secondary school - attendance: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school - attendance: status is expected",
+                  "id": "768c9bc2cd17ae9e22f007f50e8ac6a8",
+                  "passes": 4,
+                  "fails": 0
+                },
+                {
+                  "name": "Secondary school - attendance: response time < 3000ms",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school - attendance: response time < 3000ms",
+                  "id": "3a7fd85812cb72e2978967791505be6b",
+                  "passes": 4,
+                  "fails": 0
+                },
+                {
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Secondary School Journey::Secondary school - attendance: no server errors (5xx)",
+                  "id": "c6a07788aab6fdd4ef7f175eda594f4f",
+                  "passes": 4,
+                  "fails": 0,
+                  "name": "Secondary school - attendance: no server errors (5xx)"
+                }
+              ]
+          },
+          {
+            "name": "SAP Sector: All Through School Journey",
+            "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey",
+            "id": "1b138d95f3765df5361f96a5e1257649",
+            "groups": [],
+            "checks": [
+                {
+                  "fails": 0,
+                  "name": "All through school overview: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school overview: status is expected",
+                  "id": "f423a7505088bd6c250adffe1803b3f0",
+                  "passes": 10
+                },
+                {
+                  "name": "All through school overview: response time < 3000ms",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school overview: response time < 3000ms",
+                  "id": "028b03407e8a23fd5fce935d601d693b",
+                  "passes": 10,
+                  "fails": 0
+                },
+                {
+                  "name": "All through school overview: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school overview: no server errors (5xx)",
+                  "id": "6fe19bee5aa29cf86777aa715fd315b5",
+                  "passes": 10,
+                  "fails": 0
+                },
+                {
+                  "passes": 10,
+                  "fails": 0,
+                  "name": "All through school overview: contains expected content",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school overview: contains expected content",
+                  "id": "9ea171c9e6702d97f28f2a7ccd25eb18"
+                },
+                {
+                  "fails": 0,
+                  "name": "All through school - attendance: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - attendance: status is expected",
+                  "id": "263fb95b5c558622024a0d69412cffca",
+                  "passes": 1
+                },
+                {
+                  "name": "All through school - attendance: response time < 3000ms",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - attendance: response time < 3000ms",
+                  "id": "dd2c1350de46625b314f57de724aca13",
+                  "passes": 1,
+                  "fails": 0
+                },
+                {
+                  "id": "e5f4062b53c1a0fa2b31ee154ef70e39",
+                  "passes": 1,
+                  "fails": 0,
+                  "name": "All through school - attendance: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - attendance: no server errors (5xx)"
+                },
+                {
+                  "name": "All through school - ks4-headline-measures: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - ks4-headline-measures: status is expected",
+                  "id": "70a3f108263dbd08821ef39a8092acba",
+                  "passes": 2,
+                  "fails": 0
+                },
+                {
+                  "name": "All through school - ks4-headline-measures: response time < 3000ms",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - ks4-headline-measures: response time < 3000ms",
+                  "id": "a3fb49e99144ac5829b2f74a75910178",
+                  "passes": 2,
+                  "fails": 0
+                },
+                {
+                  "passes": 2,
+                  "fails": 0,
+                  "name": "All through school - ks4-headline-measures: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - ks4-headline-measures: no server errors (5xx)",
+                  "id": "68e307fc017c60a4f137f4218c0b252a"
+                },
+                {
+                  "name": "All through school - ks2: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - ks2: status is expected",
+                  "id": "3c5d77c27a24890eb7c8e4a02841f5ef",
+                  "passes": 4,
+                  "fails": 0
+                },
+                {
+                  "name": "All through school - ks2: response time < 3000ms",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - ks2: response time < 3000ms",
+                  "id": "0963a900d2fcd6d852f58ae587b0620c",
+                  "passes": 4,
+                  "fails": 0
+                },
+                {
+                  "name": "All through school - ks2: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - ks2: no server errors (5xx)",
+                  "id": "3ae881951c3fb3cb19fd40300f039548",
+                  "passes": 4,
+                  "fails": 0
+                },
+                {
+                  "fails": 0,
+                  "name": "All through school - view-similar-schools: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - view-similar-schools: status is expected",
+                  "id": "069b81cf7339328cec9e809c299edc2e",
+                  "passes": 3
+                },
+                {
+                  "fails": 0,
+                  "name": "All through school - view-similar-schools: response time < 3000ms",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - view-similar-schools: response time < 3000ms",
+                  "id": "ed8ce3875f31889f717f16b468353917",
+                  "passes": 3
+                },
+                {
+                  "name": "All through school - view-similar-schools: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: All Through School Journey::All through school - view-similar-schools: no server errors (5xx)",
+                  "id": "97c2a9d90c448803c4d2a780a03a4a4c",
+                  "passes": 3,
+                  "fails": 0
+                }
+              ]
+          },
+          {
+            "name": "SAP Sector: Primary School Journey",
+            "path": "::SAP Sector Authenticated User Journey::SAP Sector: Primary School Journey",
+            "id": "35aa416fa1e8dd1d5b64565041a64e72",
+            "groups": [],
+            "checks": [
+                {
+                  "passes": 4,
+                  "fails": 0,
+                  "name": "Primary school overview: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Primary School Journey::Primary school overview: status is expected",
+                  "id": "4e83d7bed1ebcdc543ab311d09d96036"
+                },
+                {
+                  "id": "c7037e997672750e37eb2998dc4ff5cb",
+                  "passes": 4,
+                  "fails": 0,
+                  "name": "Primary school overview: response time < 3000ms",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Primary School Journey::Primary school overview: response time < 3000ms"
+                },
+                {
+                  "name": "Primary school overview: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Primary School Journey::Primary school overview: no server errors (5xx)",
+                  "id": "26a39e0782ce20c267bddc2e4d267b36",
+                  "passes": 4,
+                  "fails": 0
+                },
+                {
+                  "fails": 0,
+                  "name": "Primary school overview: contains expected content",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Primary School Journey::Primary school overview: contains expected content",
+                  "id": "f91c642270cf6588d580585e5be19505",
+                  "passes": 4
+                },
+                {
+                  "name": "Primary school - view-similar-schools: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Primary School Journey::Primary school - view-similar-schools: status is expected",
+                  "id": "e96960fe05704c6816bd9499a14f9de2",
+                  "passes": 2,
+                  "fails": 0
+                },
+                {
+                  "name": "Primary school - view-similar-schools: response time < 3000ms",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Primary School Journey::Primary school - view-similar-schools: response time < 3000ms",
+                  "id": "75b3ebde0ee4ad03838322eeb39316ca",
+                  "passes": 2,
+                  "fails": 0
+                },
+                {
+                  "fails": 0,
+                  "name": "Primary school - view-similar-schools: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Primary School Journey::Primary school - view-similar-schools: no server errors (5xx)",
+                  "id": "9884783d1ef5157b1166b46262b48536",
+                  "passes": 2
+                },
+                {
+                  "id": "9ddfeba55ee776b8673eabcd7740f39e",
+                  "passes": 2,
+                  "fails": 0,
+                  "name": "Primary school - ks2: status is expected",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Primary School Journey::Primary school - ks2: status is expected"
+                },
+                {
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Primary School Journey::Primary school - ks2: response time < 3000ms",
+                  "id": "8cef5171a0f6c8cd6c38b655149a2d5f",
+                  "passes": 2,
+                  "fails": 0,
+                  "name": "Primary school - ks2: response time < 3000ms"
+                },
+                {
+                  "passes": 2,
+                  "fails": 0,
+                  "name": "Primary school - ks2: no server errors (5xx)",
+                  "path": "::SAP Sector Authenticated User Journey::SAP Sector: Primary School Journey::Primary school - ks2: no server errors (5xx)",
+                  "id": "f2a51bc657abb1bd1fddcb5f9a5bd86c"
+                }
+              ]
+          }
+        ],
+        "checks": []
+      }
+    ],
+    "checks": []
+  },
+  "options": {
+    "summaryTimeUnit": "",
+    "noColor": false,
+    "summaryTrendStats": [
+      "avg",
+      "min",
+      "med",
+      "max",
+      "p(90)",
+      "p(95)"
+    ]
+  },
+  "state": {
+    "isStdOutTTY": true,
+    "isStdErrTTY": true,
+    "testRunDurationMs": 27502.3938
+  }
+}

@@ -164,6 +164,161 @@ so prefer the plain `stress` run unless you specifically need it.
 > steps. (Do not shorten it with `--duration`: that overrides the scenario
 > entirely and runs a single VU instead.)
 
+## School-journey capacity test (caching before/after)
+
+`sap-sector/school-capacity-test.js` finds how many concurrent requests the
+school performance pages can handle before they stop meeting the SLO, and is
+designed to be run twice - caching off, then caching on - to show the
+improvement.
+
+### What it does
+
+- **Workload:** only the three school journeys from
+  `journeys/school-overview.js` - secondary, primary and all-through - in a
+  strict one-third rotation. Each iteration picks a random school of that type
+  from `data/school-urns.js`, loads its overview, then one random sub-page.
+- **No think time:** the journeys' 1-second pauses are switched off for this
+  test, so each VU always has exactly one request in flight. **The VU count at
+  each step is the number of concurrent requests offered to the app.**
+- **Staircase:** 10 → 25 → 50 → 100 → 150 → 200 → 300 VUs. Each level ramps
+  for 30s then holds for 2 minutes; only the hold is measured. About 18
+  minutes in total.
+- **Pass criteria per level** - overall *and* for each school type:
+  - p95 response time under 3s
+  - under 1% failed requests (anything other than a 200 is a failure)
+  - under 1% overview pages missing their expected content
+- **Redirects are not followed.** An expired session or missing auth shows up
+  as failures, rather than quietly loading (and loading up) DfE Sign-in.
+- **Warm-up and URN check:** before load starts, `setup()` requests every
+  school's overview and every sub-page once. The run aborts, listing the bad
+  URLs, if any of them doesn't return 200 - so you find bad URNs before
+  wasting a run. This also warms the cache when caching is on. It runs for
+  both the cache-off and cache-on runs so they start from the same state.
+- **Safety stop:** the run aborts once more than 5% of requests are failing.
+
+### Running it
+
+1. **Start the app in `LoadTest` mode against Postgres** (as in
+   [Running locally (authenticated pages)](#running-locally-authenticated-pages-search-school-pages-compare)).
+   `LoadTest` mode currently uses the Postgres repositories (check
+   `SAPSec.Web/Program.cs` - there's no JSON-fixture swap any more), so the
+   database must be up and the URNs in `data/school-urns.js` must exist in it.
+   The warm-up will tell you if they don't. Keep everything except caching
+   identical between the two runs: same build, same database, same machine,
+   same connection-pool settings.
+
+2. **Cache-off run.** Start the app with caching disabled:
+
+   ```powershell
+   $env:ASPNETCORE_ENVIRONMENT = "LoadTest"
+   $env:ASPNETCORE_URLS = "https://localhost:5099"
+   $env:CachingConfiguration__EnableCaching = "false"
+   dotnet run --project SAPSec.Web -c Release
+   ```
+
+   Then, in another terminal:
+
+   ```powershell
+   cd load_testing
+   $env:LOADTEST_URL = "https://localhost:5099"
+   npm run test:loadtest:capacity:cache-off
+   ```
+
+3. **Cache-on run.** Stop the app and restart it with caching on (needs a
+   Redis instance, e.g. `docker run -p 6379:6379 redis`):
+
+   ```powershell
+   $env:CachingConfiguration__EnableCaching = "true"
+   $env:CachingConfiguration__CacheRepositories = "true"
+   $env:CachingConfiguration__CacheUseCases = "true"
+   $env:CachingConfiguration__ClearCacheOnStartup = "true"
+   $env:RedisConfiguration__ConnectionString = "localhost"
+   dotnet run --project SAPSec.Web -c Release
+   ```
+
+   ```powershell
+   npm run test:loadtest:capacity:cache-on
+   ```
+
+   `ClearCacheOnStartup` clears **every key** in that Redis instance - only
+   point it at a Redis dedicated to this test.
+
+4. **Compare:**
+
+   ```powershell
+   node analyse.cjs school-capacity-cache-off-summary.json
+   node analyse.cjs school-capacity-cache-on-summary.json
+   ```
+
+Each run writes `school-capacity-<RUN_LABEL>-summary.json` and
+`-report.html`, so the two runs don't overwrite each other.
+
+Against a real environment instead of a local `LoadTest` instance, run the
+script directly with `ENVIRONMENT`/`SESSION_COOKIE` (or `AUTH_OFF=true`) as
+for the other authenticated tests, and coordinate first - see
+[Running against the test environment](#running-against-the-test-environment).
+
+### Options
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `RUN_LABEL` | `run` | Names the output files (`cache-off` / `cache-on` in the npm scripts) |
+| `CAPACITY_STEPS` | `10,25,50,100,150,200,300` | VU levels. Extend if nothing breaches, e.g. `300,400,500,600` |
+| `RAMP_SECONDS` | `30` | Ramp time to each level |
+| `HOLD_SECONDS` | `120` | Measured hold at each level |
+| `WARMUP` | `true` | `false` skips the warm-up - only for a deliberate cold-cache run |
+
+e.g. `k6 run --env ENVIRONMENT=loadtest --env RUN_LABEL=cache-on-high --env CAPACITY_STEPS=300,400,500 sap-sector/school-capacity-test.js`
+
+### Reading the results
+
+`analyse.cjs` prints, for each level: requests, median/p95/max latency,
+failure %, content-failure % (`bad%`), successful requests per second
+(`ok/s`), and ok/BREACH. A second table breaks each level down by school
+type. A level only counts as passing if every school type passes, so the
+"Last level inside SLO" line is the capacity figure to quote, and "First
+level breaching" is the level above it.
+
+Fill in this table from the two runs:
+
+| | Cache off | Cache on |
+|---|---:|---:|
+| Last level inside SLO (concurrent requests) | | |
+| First level breaching | | |
+| Successful req/s at last passing level | | |
+| Busy DB connections at the same level (see below) | | |
+
+**Success** is a higher last-passing level with caching on, with fewer
+database connections in use at the same level.
+
+### Showing that database connections are the limit
+
+k6 sees only HTTP response times - it can't see the database connection
+pool. Watch the pool alongside each run with
+[`dotnet-counters`](https://learn.microsoft.com/dotnet/core/diagnostics/dotnet-counters)
+(Npgsql publishes pool metrics under the `Npgsql` meter):
+
+```powershell
+dotnet tool install --global dotnet-counters   # once
+dotnet-counters collect -n SAPSec.Web --counters Npgsql,Microsoft.AspNetCore.Hosting --format csv -o cache-off-counters.csv
+```
+
+(Use `monitor` instead of `collect` to watch live rather than record.) The
+ones that matter:
+
+- `db.client.connection.count` with `state=used` - busy connections
+- `db.client.connection.max` - pool size (default 100)
+- `db.client.connection.pending_requests` - requests queued waiting for a
+  connection, if reported
+- `http.server.active_requests` - requests in flight in the app
+
+If, at the level where response times break the SLO, **used connections are
+at the max and requests are queuing for a connection**, the connection pool
+is the bottleneck. With caching on, you should see used connections well
+below the max at the same level - and the breaking level move higher. If
+response times break while connections are *not* at the max, the bottleneck
+is somewhere else (app CPU, query time, Redis), and caching may not move it.
+
 ## Authenticated pages against a real environment
 
 For search/school pages/compare performance results against real
@@ -336,6 +491,7 @@ Select via `--env SCENARIO=<name>` (defaults to `quick`). See the
 | `test:loadtest:quick` / `:baseline` / `:peak` / `:stress` | `loadtest` | quick / baseline / peak-surge / stress |
 | `test:loadtest:stress:short` | `loadtest` | stress (currently same as `:stress` - see note above) |
 | `test:loadtest:stress:trace` | `loadtest` | stress, plus a gzipped per-request CSV |
+| `test:loadtest:capacity:cache-off` / `:cache-on` | `loadtest` | [school-journey capacity test](#school-journey-capacity-test-caching-beforeafter) (separate script) |
 | `grafana:login` | - | Grafana Cloud auth |
 
 ## Running in CI
@@ -396,10 +552,11 @@ performance-sensitive enough to justify load-testing every single one.
 ```
 load_testing/
 ├── package.json
-├── analyse.cjs            # reads a stress summary JSON into a per-level staircase table
+├── analyse.cjs            # reads a stress or capacity summary JSON into a per-level table
 ├── .env.example
 ├── sap-sector/
 │   ├── load-test.js       # entry point: scenario selection, journey mix, reporting
+│   ├── school-capacity-test.js  # entry point: school-journey capacity staircase
 │   ├── config/
 │   │   └── environment.js # base URLs and thresholds per ENVIRONMENT (incl. loadtest)
 │   ├── data/
@@ -412,7 +569,7 @@ load_testing/
 │   │   ├── school-search.js         # authenticated (loadtest only)
 │   │   ├── school-overview.js       # authenticated (loadtest only)
 │   │   └── compare-performance.js   # authenticated (loadtest only)
-│   ├── scenarios/          # load shapes (quick/baseline/peak-surge/stress staircase)
+│   ├── scenarios/          # load shapes (quick/baseline/peak-surge/stress staircase, school-capacity staircase)
 │   └── utils/
 │       ├── checks.js       # response time + content assertions, custom metrics
 │       └── auth.js         # SESSION_COOKIE handling for real-environment auth

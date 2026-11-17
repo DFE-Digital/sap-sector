@@ -121,6 +121,8 @@ public class Program
 
         builder.AddDataProtectionServices();
 
+        Console.WriteLine(builder.Environment.EnvironmentName);
+
         if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest")
         {
             builder.Services.AddAuthentication(options =>

@@ -16,9 +16,10 @@ public static class PostgresDependenciesExtensions
         services.AddRepository<IEstablishmentRepository, PostgresEstablishmentRepository, CachedEstablishmentRepository>(configuration);
         services.AddRepository<ISimilarSchoolsPrimaryRepository, PostgresSimilarSchoolsPrimaryRepository, CachedSimilarSchoolsPrimaryRepository>(configuration);
         services.AddRepository<ISimilarSchoolsSecondaryRepository, PostgresSimilarSchoolsSecondaryRepository, CachedSimilarSchoolsSecondaryRepository>(configuration);
+        services.AddRepository<IKs2PerformanceRepository, PostgresKs2PerformanceRepository, CachedKs2PerformanceRepository>(configuration);
         services.AddRepository<IKs4PerformanceRepository, PostgresKs4PerformanceRepository, CachedKs4PerformanceRepository>(configuration);
         services.AddRepository<IKs4DestinationsRepository, PostgresKs4DestinationsRepository, CachedKs4DestinationsRepository>(configuration);
-        services.AddRepository<IKs2PerformanceRepository, PostgresKs2PerformanceRepository, CachedKs2PerformanceRepository>(configuration);
+        services.AddRepository<IAbsenceRepository, PostgresAbsenceRepository, CachedAbsenceRepository>(configuration);
         services.AddRepository<IExclusionsRepository, PostgresExclusionsRepository, CachedExclusionsRepository>(configuration);
         services.AddRepository<IAbsenceRepository, PostgresAbsenceRepository, CachedAbsenceRepository>(configuration);
 
