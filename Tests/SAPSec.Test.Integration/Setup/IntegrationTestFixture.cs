@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Infrastructure.LuceneSearch;
+using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.Common.FeatureFlags;
 using System.Net;
 
@@ -26,6 +27,9 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
 
     public MockFeatureFlagService FeatureFlagService =>
         (MockFeatureFlagService)_factory!.Services.GetRequiredService<IFeatureFlagService>();
+
+    public TestUserOrganisation TestUser =>
+        _factory!.Services.GetRequiredService<TestUserOrganisation>();
 
     public Task InitializeAsync()
     {

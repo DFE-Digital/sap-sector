@@ -3,6 +3,7 @@
 @using SAPSec.Web.ViewModels
 @using SAPSec.Web.ViewModels.Components
 
+@inject SAPSec.Web.Services.IStartPageService StartPage
 @{
     var navigation = ViewData[ViewDataKeys.SchoolNavigation] as SchoolSideNavigationViewModel;
     if (navigation is not null)
@@ -20,10 +21,10 @@
 }
 
 @section Breadcrumbs {
-    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+    <nav authorize-policy="@SAPSec.Web.Authorization.AuthorizationPolicies.BreadcrumbNavigation" class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
         <ol class="govuk-breadcrumbs__list">
             <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="@SAPSec.Web.Constants.Routes.FindASchool()">Home</a>
+                <a class="govuk-breadcrumbs__link" href="@(await StartPage.GetStartUrlAsync(User.Identity is { IsAuthenticated: true }))">Home</a>
             </li>
         </ol>
     </nav>
