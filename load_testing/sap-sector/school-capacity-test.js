@@ -21,7 +21,6 @@ import {
   allThroughSubPages
 } from './journeys/school-overview.js'
 import { secondarySchoolUrns, primarySchoolUrns, allThroughSchoolUrns } from './data/school-urns.js'
-import { authParams, hasSessionCookie } from './utils/auth.js'
 import { schoolCapacityScenario, buildCapacityThresholds, tagIteration, capacityPlan, SCHOOL_TYPES } from './scenarios/school-capacity.js'
 
 const SLO_MS = 3000
@@ -64,10 +63,6 @@ export const options = {
   }
 }
 
-function authenticatedJourneysAvailable (environment) {
-  return environment.name === 'loadtest' || hasSessionCookie() || __ENV.AUTH_OFF === 'true'
-}
-
 // Requests every school's overview and every sub-page once. This warms the
 // app (and the cache, when it is on) and verifies that every URN in the pool
 // works against this database before any load is applied. Run it for both the
@@ -82,7 +77,7 @@ function warmUp (environment) {
     for (const urn of urns) {
       const base = `${environment.baseUrl}/school/${type}/${urn}`
       const urls = [base, ...subPages.map((page) => `${base}/${page}`)]
-      const params = authParams({ tags: { phase: 'warmup' } })
+      const params = { tags: { phase: 'warmup' } }
       const responses = http.batch(urls.map((url) => ['GET', url, null, params]))
 
       responses.forEach((response, i) => {
@@ -108,13 +103,6 @@ function warmUp (environment) {
 export function setup () {
   const environment = getEnvironment()
   const config = getConfig()
-
-  if (!authenticatedJourneysAvailable(environment)) {
-    throw new Error(
-      'The school pages need authentication. Use ENVIRONMENT=loadtest, or set SESSION_COOKIE or AUTH_OFF=true. ' +
-      'See load_testing/README.md.'
-    )
-  }
 
   const plan = capacityPlan()
   console.log(

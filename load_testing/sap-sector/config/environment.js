@@ -8,7 +8,7 @@ const environments = {
     name: 'review'
   },
   test: {
-    baseUrl: 'https://test.get-school-improvement-insights.education.gov.uk',
+    baseUrl: 'https://get-school-improvement-insights-test.test.teacherservices.cloud',
     name: 'test'
   },
   production: {
