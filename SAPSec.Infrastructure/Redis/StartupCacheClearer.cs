@@ -6,7 +6,7 @@ namespace SAPSec.Infrastructure.Redis;
 
 public class StartupCacheClearer(
     ICache cache,
-    IOptions<CachingConfiguration> config)
+    IOptions<CachingSettings> config)
     : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)

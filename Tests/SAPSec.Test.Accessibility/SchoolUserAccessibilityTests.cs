@@ -1,11 +1,11 @@
 using Deque.AxeCore.Playwright;
 using FluentAssertions;
 using SAPSec.Core.Authentication;
-using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.Accessibility.Setup;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
 using Xunit;
+using SAPSec.Web.Authentication;
 
 namespace SAPSec.Test.Accessibility;
 

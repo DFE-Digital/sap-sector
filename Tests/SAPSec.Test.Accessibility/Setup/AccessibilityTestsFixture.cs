@@ -1,7 +1,7 @@
 ﻿using SAPSec.Test.Accessibility.Setup;
 using Microsoft.Extensions.DependencyInjection;
-using SAPSec.Test.Common.Authentication;
 using Xunit;
+using SAPSec.Web.Authentication;
 
 namespace SAPSec.Test.EndToEnd.Setup;
 

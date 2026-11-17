@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
-using SAPSec.Test.Common.Authentication;
+using SAPSec.Web.Authentication;
 using SAPSec.Web.Authorization;
 using System.Security.Claims;
 

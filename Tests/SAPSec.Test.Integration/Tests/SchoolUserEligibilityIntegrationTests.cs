@@ -4,8 +4,8 @@ using FluentAssertions;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Data.Dto;
-using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.Integration.Setup;
+using SAPSec.Web.Authentication;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Test.Integration.Tests;

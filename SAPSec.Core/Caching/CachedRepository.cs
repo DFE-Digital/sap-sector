@@ -7,6 +7,8 @@ namespace SAPSec.Core.Caching;
 public class CachedRepository<TRepository>(ICache cache, TRepository repository)
     where TRepository : class, IRepository
 {
+    protected TRepository Repository => repository;
+
     protected async Task<TReturnValue> CallCachedMethod<TReturnValue>(Expression<Func<TRepository, Task<TReturnValue>>> lambda)
     {
         if (lambda.Body is not MethodCallExpression methodCall)

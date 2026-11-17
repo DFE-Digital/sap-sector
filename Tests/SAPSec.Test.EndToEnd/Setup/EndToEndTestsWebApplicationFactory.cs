@@ -8,8 +8,8 @@ using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Caching;
 using SAPSec.Core.CustomEvents;
 using SAPSec.Infrastructure.Json;
-using SAPSec.Test.Common.Authentication;
 using SAPSec.Web;
+using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Services;
 
@@ -46,7 +46,6 @@ public class EndToEndTestsWebApplicationFactory : WebApplicationFactory<Program>
             })
             .ConfigureServices(services =>
             {
-                services.AddTestDsiDependencies();
                 services.AddJsonDependencies(configuration);
                 services.AddNestedCache<RequestCache, InMemoryCache>();
                 services.AddScoped<ICustomEventService, NoOpCustomEventService>();

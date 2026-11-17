@@ -8,7 +8,7 @@ public class CachedEstablishmentRepository(ICache cache, [FromKeyedServices(Serv
     : CachedRepository<IEstablishmentRepository>(cache, repository), IEstablishmentRepository
 {
     public Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync()
-        => CallCachedMethod(r => r.GetAllEstablishmentsAsync());
+        => Repository.GetAllEstablishmentsAsync();
 
     public Task<Establishment?> GetEstablishmentAsync(string urn)
         => CallCachedMethod(r => r.GetEstablishmentAsync(urn));

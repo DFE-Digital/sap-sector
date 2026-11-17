@@ -31,11 +31,11 @@ public static class DependenciesExtensions
 
     public static void AddCaching(this IServiceCollection services, IConfiguration configuration, Action<IServiceCollection, IConfiguration> configure)
     {
-        var config = configuration.GetSection(nameof(CachingConfiguration)).Get<CachingConfiguration>();
+        var config = configuration.GetSection("Caching").Get<CachingSettings>();
 
         if (config is not null && config.EnableCaching)
         {
-            services.Configure<CachingConfiguration>(configuration.GetSection(nameof(CachingConfiguration)));
+            services.Configure<CachingSettings>(configuration.GetSection("Caching"));
             services.AddSingleton<RequestCache>();
             services.AddSingleton<InMemoryCache>();
             configure(services, configuration);

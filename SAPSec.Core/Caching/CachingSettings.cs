@@ -1,6 +1,6 @@
 namespace SAPSec.Core.Caching;
 
-public class CachingConfiguration
+public class CachingSettings
 {
     public bool EnableCaching { get; set; }
     public bool CacheUseCases { get; set; }
