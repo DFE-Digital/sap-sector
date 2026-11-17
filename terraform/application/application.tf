@@ -18,26 +18,6 @@ data "azurerm_key_vault_secret" "sentry_dsn" {
   key_vault_id = data.azurerm_key_vault.app_key_vault.id
 }
 
-data "azurerm_key_vault_secret" "bypass_authentication" {
-  name         = "BypassAuthentication"
-  key_vault_id = data.azurerm_key_vault.app_key_vault.id
-}
-
-data "azurerm_key_vault_secret" "enable_caching" {
-  name         = "EnableCaching"
-  key_vault_id = data.azurerm_key_vault.app_key_vault.id
-}
-
-data "azurerm_key_vault_secret" "cache_use_cases" {
-  name         = "CacheUseCases"
-  key_vault_id = data.azurerm_key_vault.app_key_vault.id
-}
-
-data "azurerm_key_vault_secret" "cache_repositories" {
-  name         = "CacheRepositories"
-  key_vault_id = data.azurerm_key_vault.app_key_vault.id
-}
-
 module "application_configuration" {
   source = "./vendor/modules/aks//aks/application_configuration"
 
@@ -62,10 +42,6 @@ module "application_configuration" {
     StorageConnectionString                     = "DefaultEndpointsProtocol=https;AccountName=${module.storage.name};AccountKey=${module.storage.primary_access_key}"
     REDIS_CACHE_URL                             = var.deploy_managed_redis ? module.redis-managed-cache[0].url : null
     RedisConfiguration__ConnectionString        = module.redis_managed.connection_string
-    Authentication__BypassAuthentication        = data.azurerm_key_vault_secret.bypass_authentication.value
-    Caching__EnableCaching                      = data.azurerm_key_vault_secret.enable_caching.value
-    Caching__CacheUseCases                      = data.azurerm_key_vault_secret.cache_use_cases.value
-    Caching__CacheRepositories                  = data.azurerm_key_vault_secret.cache_repositories.value
   }, local.federated_auth_secrets)
 }
 
