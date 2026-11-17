@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Controllers;
 
@@ -11,10 +13,13 @@ namespace SAPSec.Web.Controllers;
 public class UserController(
     IUserService userService,
     IFeatureFlagService featureFlagService,
+    IDfeUserIdentifier dfeUserIdentifier,
+    SchoolUserAccessService schoolUserAccessService,
     ILogger<UserController> logger) : Controller
 {
     private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
     private readonly IFeatureFlagService _featureFlagService = featureFlagService ?? throw new ArgumentNullException(nameof(featureFlagService));
+    private readonly IDfeUserIdentifier _dfeUserIdentifier = dfeUserIdentifier ?? throw new ArgumentNullException(nameof(dfeUserIdentifier));
     private readonly ILogger<UserController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet]
@@ -60,7 +65,23 @@ public class UserController(
 
         if (org is { IsEstablishment: true })
         {
+            if (!await schoolUserAccessService.CanAccessAsync(User))
+            {
+                return NotFound();
+            }
+
             return RedirectToSchool(org, traceId, userId);
+        }
+
+        // DfE staff are recognised by email domain. Keep this above any local authority or trust routing added later,
+        // because DfE staff can sign in under organisations in those categories (DSI puts DfE itself in category 002).
+        if (await _dfeUserIdentifier.IsDfeUserAsync(User))
+        {
+            _logger.LogInformation(
+                "Redirecting DfE user from /user/redirect to find-a-school. TraceId: {TraceId}. UserId: {UserId}.",
+                traceId,
+                userId);
+            return Redirect(Routes.FindASchool());
         }
 
         // Further starting pages (e.g. single academy trust, internal DfE users who may have no organisation)

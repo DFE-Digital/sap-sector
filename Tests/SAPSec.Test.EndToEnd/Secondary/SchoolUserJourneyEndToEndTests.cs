@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.Playwright;
 using SAPSec.Core.Authentication;
+using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
 using Xunit;
@@ -20,13 +21,14 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
     private const string ComparatorSchoolUrn = "141617";
     private const string ComparatorSchoolName = "The Hurlingham Academy";
     private const string OtherSchoolUrn = ComparatorSchoolUrn;
-    private const string AccessDeniedHeading = "You do not have access to Compare and connect with similar schools";
+    private const string AccessDeniedHeading = "You do not have access";
 
     private readonly EndToEndTestsFixture _fixture = fixture;
 
     public override async Task InitializeAsync()
     {
         _fixture.TestUser.CategoryId = OrganisationCategoryIds.Establishment;
+        _fixture.TestUser.Email = TestUserOrganisation.NonDfeEmail;
         _fixture.TestUser.Urn = OwnSchoolUrn;
         _fixture.TestUser.Phase = "Secondary";
 
@@ -105,7 +107,7 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
         var response = await Page.GotoAsync(path);
 
         response!.Status.Should().Be(403);
-        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading, Exact = true })).ToBeVisibleAsync();
     }
 
     [Fact]
@@ -114,7 +116,7 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
         var response = await Page.GotoAsync(Routes.SecondarySchool(OtherSchoolUrn).Overview);
 
         response!.Status.Should().Be(403);
-        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading, Exact = true })).ToBeVisibleAsync();
     }
 
     [Fact]
@@ -123,7 +125,7 @@ public class SchoolUserJourneyEndToEndTests(EndToEndTestsFixture fixture)
         var response = await Page.GotoAsync(Routes.SecondarySchool(ComparatorSchoolUrn).ViewSimilarSchools);
 
         response!.Status.Should().Be(403);
-        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = AccessDeniedHeading, Exact = true })).ToBeVisibleAsync();
     }
 
     [Fact]

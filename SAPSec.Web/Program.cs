@@ -146,9 +146,16 @@ public class Program
             options.AddPolicy(
                 AuthorizationPolicies.BreadcrumbNavigation,
                 policy => policy.AddRequirements(new BreadcrumbNavigationRequirement()));
+
+            options.AddPolicy(
+                AuthorizationPolicies.FindASchool,
+                policy => policy.RequireAuthenticatedUser().AddRequirements(new FindASchoolRequirement()));
         });
         builder.Services.AddScoped<IAuthorizationHandler, SchoolAccessHandler>();
         builder.Services.AddScoped<IAuthorizationHandler, BreadcrumbNavigationHandler>();
+        builder.Services.AddScoped<IAuthorizationHandler, FindASchoolHandler>();
+        builder.Services.Configure<DfeUserOptions>(builder.Configuration.GetSection(DfeUserOptions.SectionName));
+        builder.Services.AddScoped<IDfeUserIdentifier, DfeUserIdentifier>();
 
         builder.Services.AddDfeAnalyticsDependencies(builder.Environment);
 

@@ -6,7 +6,8 @@ namespace SAPSec.Web.Authorization;
 
 public class BreadcrumbNavigationHandler(
     IUserService userService,
-    IFeatureFlagService featureFlagService)
+    IFeatureFlagService featureFlagService,
+    IDfeUserIdentifier dfeUserIdentifier)
     : AuthorizationHandler<BreadcrumbNavigationRequirement>
 {
     protected override async Task HandleRequirementAsync(
@@ -20,10 +21,8 @@ public class BreadcrumbNavigationHandler(
             return;
         }
 
-        var org = await userService.GetCurrentOrganisationAsync(context.User);
-
-        // Only school users lose the breadcrumbs so far; other organisation types are handled by their own stories.
-        if (org is not { IsEstablishment: true })
+        // The "Home" breadcrumb leads to "Find a school", which only DfE staff can use.
+        if (await dfeUserIdentifier.IsDfeUserAsync(context.User))
         {
             context.Succeed(requirement);
         }

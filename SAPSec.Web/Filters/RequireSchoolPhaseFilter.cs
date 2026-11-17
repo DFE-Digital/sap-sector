@@ -10,11 +10,18 @@ namespace SAPSec.Web.Filters;
 public sealed class RequireSchoolPhaseFilter(
     IRequestSchoolAccessor requestSchoolAccessor,
     IFeatureFlagService featureFlagService,
+    SchoolUserAccessService schoolUserAccessService,
     ExpectedSchoolPhase expectedPhase,
     string[] routeParameterNames) : IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
+        if (!await schoolUserAccessService.CanAccessAsync(context.HttpContext.User))
+        {
+            context.Result = new NotFoundResult();
+            return;
+        }
+
         foreach (var routeParameterName in routeParameterNames)
         {
             if (!TryGetRouteValue(context, routeParameterName, out var urn))
