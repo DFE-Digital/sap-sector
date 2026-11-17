@@ -61,6 +61,8 @@ jobs:
       AKS_NAMESPACE: ${{ secrets.AKS_NAMESPACE }}
       KONDUIT_APP_NAME: ${{ secrets.KONDUIT_APP_NAME }}
 
+      POSTGRES_VERSION: 18
+
       SERVICE_NAME: get-school-improvement-insights
       SERVICE_SHORT: sapsec
       TF_VARS_PATH: terraform/application/config
@@ -96,11 +98,15 @@ jobs:
       # ==============================
       # 2. Install dependencies
       # ==============================
+      - name: Set up postgres client
+        uses: DFE-Digital/github-actions/install-postgres-client@master
+        with:
+          version: ${{ env.POSTGRES_VERSION }}
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            postgresql-client \
             powershell \
             unzip \
             jq
