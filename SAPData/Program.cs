@@ -243,8 +243,6 @@ internal class Program
         return keys;
     }
 
-    // Synonym groups used by school search (replaces the former Lucene synonym map).
-    // Every member of a group expands to all members, so a search for any of them matches the others.
     private static readonly string[][] SearchSynonymGroups =
     [
         ["st", "saint"],
@@ -268,11 +266,11 @@ internal class Program
         sql.AppendLine("-- Search synonyms + normalize_text");
         sql.AppendLine("-- =========================");
         sql.AppendLine();
-        sql.AppendLine("CREATE TABLE IF NOT EXISTS public.thesaurus_synonyms (");
+        sql.AppendLine("DROP TABLE IF EXISTS public.thesaurus_synonyms;");
+        sql.AppendLine("CREATE TABLE public.thesaurus_synonyms (");
         sql.AppendLine("    word TEXT PRIMARY KEY,");
         sql.AppendLine("    expansion TEXT NOT NULL");
         sql.AppendLine(");");
-        sql.AppendLine("TRUNCATE public.thesaurus_synonyms;");
         sql.AppendLine();
 
         var rows = new List<string>();
@@ -288,8 +286,7 @@ internal class Program
         sql.AppendLine("INSERT INTO public.thesaurus_synonyms (word, expansion) VALUES");
         sql.AppendLine("    " + string.Join(",\n    ", rows) + ";");
         sql.AppendLine();
-        sql.AppendLine("-- Lower-cases text and expands each synonym (or multi-word phrase, longest first) to");
-        sql.AppendLine("-- 'word + synonyms' so index and query agree. STABLE because it reads thesaurus_synonyms.");
+        sql.AppendLine("-- STABLE because it reads thesaurus_synonyms.");
         sql.AppendLine("CREATE OR REPLACE FUNCTION public.normalize_text(input_text TEXT)");
         sql.AppendLine("RETURNS TEXT");
         sql.AppendLine("LANGUAGE plpgsql");

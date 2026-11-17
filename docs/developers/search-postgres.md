@@ -11,9 +11,10 @@ School search is backed by Postgres full text search. See [ADR-017](../adrs/017-
 ## How it works
 
 - The SAPData pipeline builds `v_establishment_search` (`"URN"`, `"SearchFTS"`): a `tsvector` (config `simple`, so no stemming or stop words) over establishment name, street and postcode, with a GIN index.
-- Synonyms (`st`/`saint`, `cofe`/`church of england`, `rd`/`road`, ...) live in `public.thesaurus_synonyms`, seeded from `SearchSynonymGroups` in `SAPData/Program.cs`. `normalize_text()` expands them, and is applied to both the indexed text and the query so they agree.
+- Synonyms (`st`/`saint`, `cofe`/`church of england`, `rc`/`roman catholic`/`catholic`, `rd`/`road`, ...) live in `public.thesaurus_synonyms`, seeded from `SearchSynonymGroups` in `SAPData/Program.cs`. The table is dropped and recreated on every pipeline run. `normalize_text()` expands them, and is applied to both the indexed text and the query so they agree.
 - Queries: every token must match; the last token is a prefix match (typeahead).
 - Only establishments that pass `CanIndexForSearch()` are returned; the phase rule is mirrored in SQL.
+- A query made only of very common words (see `BroadSearchTerms` in `SAPSec.Core`) is capped at 100 results by `PostgresSchoolSearchIndexReader`. Partial words typed in the typeahead are not capped. Edit that list to tune it.
 
 ## Changing search
 

@@ -5,11 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.Features.SchoolSearch;
 
-/// <summary>
-/// LINQ stand-in for the Postgres full text search, used by the JSON and in-memory repositories
-/// (UI / integration / accessibility fixtures that have no database). Postgres is authoritative:
-/// keep the synonym groups in step with SAPData/Program.cs (SearchSynonymGroups).
-/// </summary>
+/// <summary>In-memory stand-in for the Postgres search. Keep the synonym groups in step with SAPData/Program.cs.</summary>
 public static class InMemoryEstablishmentSearch
 {
     private static readonly string[][] SynonymGroups =
@@ -51,7 +47,7 @@ public static class InMemoryEstablishmentSearch
             .ToList();
     }
 
-    // Multi-word synonyms ("church of england") are collapsed to the group's first member ("cofe") so they match as one unit.
+    // Collapse multi-word synonyms so they match as one unit.
     private static List<string> CollapsePhrases(string headText)
     {
         foreach (var group in SynonymGroups)

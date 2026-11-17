@@ -4,10 +4,6 @@ using System.Text.RegularExpressions;
 
 namespace SAPSec.Infrastructure.PostgresSearch;
 
-/// <summary>
-/// School search backed by Postgres full text search (see v_establishment_search in the SAPData pipeline).
-/// Matched words in the establishment name are wrapped in '*' for the front end to render as bold.
-/// </summary>
 public class PostgresSchoolSearchIndexReader(IEstablishmentRepository establishmentRepository) : ISchoolSearchIndexReader
 {
     private static readonly Regex Word = new(@"[\p{L}\p{N}]+", RegexOptions.Compiled);
@@ -20,7 +16,7 @@ public class PostgresSchoolSearchIndexReader(IEstablishmentRepository establishm
             return [];
         }
 
-        // A query made only of very common words ("school") matches nearly every row; cap it to protect the database.
+        // Cap very broad queries such as "school".
         var limit = BroadSearchTerms.IsBroadQuery(tokens)
             ? Math.Min(maxResults, BroadSearchTerms.BroadQueryLimit)
             : maxResults;

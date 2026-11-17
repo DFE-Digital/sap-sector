@@ -59,14 +59,12 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
             return [];
         }
 
-        // Tokens contain letters/digits only, so they are safe inside a tsquery.
-        // All but the last token are synonym-normalised and ANDed; the last is a prefix match.
         var head = string.Join(' ', tokens.Take(tokens.Count - 1));
         var last = tokens[^1];
 
         using var conn = await _factory.Create().OpenConnectionAsync();
 
-        // Mirrors EstablishmentExtensions.CanIndexForSearch (phase id 2/4/7, or legacy phase name).
+        // Same phase rule as CanIndexForSearch.
         const string sql = """
             WITH q AS (
                 SELECT to_tsquery('simple', concat_ws(' & ',

@@ -13,9 +13,5 @@ public interface IEstablishmentRepository
     Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn);
     Task<IReadOnlyCollection<EstablishmentLinks>> GetEstablishmentLinksAsync(string urn);
 
-    /// <summary>
-    /// Full text search over establishment name, street and postcode. All tokens must match; the last
-    /// token is a prefix match (typeahead). Only establishments that can be indexed for search are returned.
-    /// </summary>
     Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults);
 }

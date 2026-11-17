@@ -121,7 +121,6 @@ public sealed class GenerateViews
             insert into test_establishments_urns select jsonb_array_elements_text(string_agg(doc, E' ')::jsonb) from test_establishments_urns_import;
             """);
 
-        // Always (re)built: cheap, and v_establishment's DROP ... CASCADE removes it whenever that view is rebuilt.
         WriteSql("05", "v_establishment_search", GenerateEstablishmentSearchView());
 
         foreach (var view in Views)
@@ -634,8 +633,6 @@ public sealed class GenerateViews
     // ESTABLISHMENT DIMENSION (curated)
     // =====================================================
 
-    // Full text search document per establishment (name + street + postcode), used by school search.
-    // Kept separate from v_establishment so the Establishment DTO / JSON export are unaffected.
     private static string GenerateEstablishmentSearchView()
     {
         var sb = new StringBuilder();

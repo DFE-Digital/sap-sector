@@ -85,11 +85,11 @@ $$;
 -- Search synonyms + normalize_text
 -- =========================
 
-CREATE TABLE IF NOT EXISTS public.thesaurus_synonyms (
+DROP TABLE IF EXISTS public.thesaurus_synonyms;
+CREATE TABLE public.thesaurus_synonyms (
     word TEXT PRIMARY KEY,
     expansion TEXT NOT NULL
 );
-TRUNCATE public.thesaurus_synonyms;
 
 INSERT INTO public.thesaurus_synonyms (word, expansion) VALUES
     ('st', 'st saint'),
@@ -122,8 +122,7 @@ INSERT INTO public.thesaurus_synonyms (word, expansion) VALUES
     ('sq', 'sq square'),
     ('square', 'square sq');
 
--- Lower-cases text and expands each synonym (or multi-word phrase, longest first) to
--- 'word + synonyms' so index and query agree. STABLE because it reads thesaurus_synonyms.
+-- STABLE because it reads thesaurus_synonyms.
 CREATE OR REPLACE FUNCTION public.normalize_text(input_text TEXT)
 RETURNS TEXT
 LANGUAGE plpgsql

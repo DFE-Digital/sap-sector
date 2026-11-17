@@ -6,7 +6,6 @@ public static class SearchTokeniser
 {
     private static readonly Regex NonAlphanumeric = new(@"[^\p{L}\p{N}]+", RegexOptions.Compiled);
 
-    /// <summary>Lower-cases and splits on any non letter/digit character, so output is safe to use in a tsquery.</summary>
     public static IReadOnlyList<string> Tokenise(string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
