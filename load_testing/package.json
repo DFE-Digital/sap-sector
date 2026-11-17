@@ -20,6 +20,8 @@
     "test:loadtest:stress:trace": "k6 run --out csv=results.csv.gz --system-tags=status,method,name,scenario,group,check,error_code,expected_response --env SCENARIO=stress --env ENVIRONMENT=loadtest sap-sector/load-test.js",
     "test:loadtest:capacity:cache-off": "k6 run --env ENVIRONMENT=loadtest --env RUN_LABEL=cache-off sap-sector/school-capacity-test.js",
     "test:loadtest:capacity:cache-on": "k6 run --env ENVIRONMENT=loadtest --env RUN_LABEL=cache-on sap-sector/school-capacity-test.js",
+    "test:test-env:capacity:cache-off": "k6 run --env ENVIRONMENT=test --env RUN_LABEL=cache-off sap-sector/school-capacity-test.js",
+    "test:test-env:capacity:cache-on": "k6 run --env ENVIRONMENT=test --env RUN_LABEL=cache-on sap-sector/school-capacity-test.js",
     "grafana:login": "k6 cloud login --token $K6_CLOUD_API_TOKEN"
   },
   "keywords": ["k6", "load-testing", "sap-sector", "dfe"],
