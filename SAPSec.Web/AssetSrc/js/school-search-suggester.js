@@ -89,7 +89,7 @@
 
     // debounce and/or cancel ongoing suggestions to prevent excessive requests
     let suggesting = false;
-    const source = debounce(
+    const source = window.debounce(
         (query, populateResults) => {
             const trimmedQuery = query.trim();
 
