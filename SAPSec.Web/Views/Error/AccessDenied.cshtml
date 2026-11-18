@@ -1,18 +1,54 @@
 ﻿@using SAPSec.Web.Constants;
+@using SAPSec.Core.FeatureFlags
+@inject IFeatureFlagService FeatureFlagService
 @{
     ViewData[ViewDataKeys.Title] = "Access denied";
 }
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-xl">You do not have access to Compare and connect with similar schools</h1>
+        @if (await FeatureFlagService.IsEnabledAsync(Flags.EnableFindASchool))
+        {
+            <h1 class="govuk-heading-xl">You do not have access to Compare and connect with similar schools</h1>
+            <p class="govuk-body">
+                You must <a href="https://services.signin.education.gov.uk/request-organisation/search" class="govuk-link">assign your DfE Sign-in to an organisation</a> to use this service.
+            </p>
+            <p class="govuk-body">
+                Get more <a href="https://help.signin.education.gov.uk/" class="govuk-link">help with DfE Sign-in</a>
+            </p>
+        }
+        else
+        {
+            <h1 class="govuk-heading-xl">You do not have access</h1>
 
-        <p class="govuk-body">
-            You must <a href="https://services.signin.education.gov.uk/request-organisation/search" class="govuk-link">assign your DfE Sign-in to an organisation</a> to use this service.
-        </p>
+            <p class="govuk-body">
+                You cannot access this page because you either:
+            </p>
 
-        <p class="govuk-body">
-            Get more <a href="https://help.signin.education.gov.uk/" class="govuk-link">help with DfE Sign-in</a>
-        </p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>do not have access to this school’s data</li>
+                <li>are accessing the service as an establishment group, such as a trust</li>
+            </ul>
+
+            <p class="govuk-body">
+                You can only view schools associated with your DfE Sign-in account.
+                If you have access to this school through a different account, sign in with that account instead.
+            </p>
+
+            <p class="govuk-body">
+                <a href="https://services.signin.education.gov.uk/request-organisation/search" class="govuk-link">Request access to an organisation</a>
+            </p>
+
+            <h2 class="govuk-heading-s">Access for establishment groups</h2>
+
+            <p class="govuk-body">We’re introducing the service in phases.</p>
+
+            <p class="govuk-body">
+                You may not be able to view data for establishment groups yet.
+                Access to these will be added as the service develops.
+            </p>
+
+            <p class="govuk-body">Check this service again later for access.</p>
+        }
     </div>
 </div>

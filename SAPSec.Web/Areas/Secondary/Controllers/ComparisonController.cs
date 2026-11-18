@@ -8,6 +8,7 @@ using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.Comparison;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Formatters;
@@ -17,7 +18,7 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 
 [Area("Secondary")]
 [Route("school/secondary/{urn}/view-similar-schools/{comparatorSchoolUrn}")]
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.SchoolAccess)]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary, "urn")]
 [RequireSchoolPhase(ExpectedSchoolPhase.SecondaryComparisonParticipant, "comparatorSchoolUrn")]
 public class ComparisonController(

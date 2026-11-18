@@ -13,6 +13,7 @@ namespace SAPSec.Test.Integration.Setup;
 
 public abstract class IntegrationTestFixture : IAsyncLifetime
 {
+    private static readonly TimeSpan SearchIndexTimeout = TimeSpan.FromSeconds(3);
 
     protected IntegrationTestsWebApplicationFactory? _factory;
 
@@ -24,6 +25,9 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
 
     public MockFeatureFlagService FeatureFlagService =>
         (MockFeatureFlagService)_factory!.Services.GetRequiredService<IFeatureFlagService>();
+
+    public TestUserOrganisation TestUser =>
+        _factory!.Services.GetRequiredService<TestUserOrganisation>();
 
     public Task InitializeAsync()
     {
@@ -65,6 +69,25 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
         }
 
         _browsingContext?.Dispose();
+    }
+
+    public async Task RebuildSearchIndex()
+    {
+        var indexBuilder = _factory!.Services.GetServices<IHostedService>()
+            .OfType<StartupIndexBuilder>()
+            .Single();
+        indexBuilder.IndexBuiltSuccessfully = false;
+        var startTime = DateTime.UtcNow.TimeOfDay;
+        await indexBuilder.StartAsync(CancellationToken.None);
+        while (!indexBuilder.IndexBuiltSuccessfully)
+        {
+            if (DateTime.UtcNow.TimeOfDay - startTime > SearchIndexTimeout)
+            {
+                throw new TimeoutException("Timed out waiting for search index to be rebuilt.");
+            }
+
+            await Task.Delay(100);
+        }
     }
 
     public async Task<IDocument> RequestPageAsync(string path, params HttpStatusCode[] expectedStatusCodes)
