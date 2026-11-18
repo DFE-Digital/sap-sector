@@ -11,6 +11,12 @@ public record MeasureViewModel(
     TableViewModel Table,
     TopPerformersViewModel? TopPerformers)
 {
+    /// <summary>
+    /// The 'Number of pupils' tables. Only set for measures that show them (KS2 progress scores);
+    /// when null the component isn't rendered.
+    /// </summary>
+    public MeasureNumberOfPupilsViewModel? NumberOfPupils { get; init; }
+
     // TODO: Colours should be a CSS concern, this should instead be implemented as a class on the chart element
     // which sets the appropriate CSS variables --chart-color-school etc. (see chart-factory.js)
     private static readonly string[] SchoolCurrentYearColors = ["#ca357c", "#2a1950", "#2a1950", "#2a1950"];
