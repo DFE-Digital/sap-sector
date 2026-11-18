@@ -72,25 +72,6 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
         _browsingContext?.Dispose();
     }
 
-    public async Task RebuildSearchIndex()
-    {
-        var indexBuilder = _factory!.Services.GetServices<IHostedService>()
-            .OfType<StartupIndexBuilder>()
-            .Single();
-        indexBuilder.IndexBuiltSuccessfully = false;
-        var startTime = DateTime.UtcNow.TimeOfDay;
-        await indexBuilder.StartAsync(CancellationToken.None);
-        while (!indexBuilder.IndexBuiltSuccessfully)
-        {
-            if (DateTime.UtcNow.TimeOfDay - startTime > SearchIndexTimeout)
-            {
-                throw new TimeoutException("Timed out waiting for search index to be rebuilt.");
-            }
-
-            await Task.Delay(100);
-        }
-    }
-
     public async Task<IDocument> RequestPageAsync(string path, params HttpStatusCode[] expectedStatusCodes)
     {
         if (!expectedStatusCodes.Any())
