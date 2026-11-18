@@ -47,7 +47,7 @@ public class AccessibilityTestsWebApplicationFactory : WebApplicationFactory<Pro
             .ConfigureServices(services =>
             {
                 services.AddJsonDependencies(configuration);
-                services.AddNestedCache<RequestCache, InMemoryCache>();
+                services.AddNestedCache<HttpRequestCache, InMemoryCache>();
                 services.AddScoped<ICustomEventService, NoOpCustomEventService>();
             });
     }

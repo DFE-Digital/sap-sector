@@ -12,7 +12,7 @@ public class InMemoryRepositoryIntegrationTestsWebApplicationFactory : Integrati
 {
     protected override IServiceCollection ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddNestedCache<RequestCache, InMemoryCache>();
+        services.AddNestedCache<HttpRequestCache, InMemoryCache>();
 
         services.RemoveAll<IEstablishmentRepository>();
         services.RemoveAll<ISimilarSchoolsPrimaryRepository>();

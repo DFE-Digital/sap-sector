@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace SAPSec.Core.Caching;
 
-public class RequestCache(IHttpContextAccessor contextAccessor) : ICache
+public class HttpRequestCache(IHttpContextAccessor contextAccessor) : ICache
 {
     public async Task<TValue> TryGet<TValue>(string key, Func<Task<TValue>> getValue)
     {

@@ -42,7 +42,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddScoped<IDsiClient, MockDsiClient>();
 
                 services.AddJsonDependencies(configuration);
-                services.AddNestedCache<RequestCache, InMemoryCache>();
+                services.AddNestedCache<HttpRequestCache, InMemoryCache>();
             });
     }
 

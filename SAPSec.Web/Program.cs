@@ -124,7 +124,9 @@ public class Program
         builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSection("Authentication"));
         var authenticationConfig = builder.Configuration.GetSection("Authentication").Get<AuthenticationSettings>();
 
-        if (authenticationConfig?.BypassAuthentication is true)
+        if (authenticationConfig?.BypassAuthentication is true
+            // Failsafe: Regardless of the config setting we never want to bypass authentication on production
+            && !IsProductionEnvironment(builder.Environment.EnvironmentName))
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -222,7 +224,7 @@ public class Program
         {
             // If caching is enabled:
             services.AddRedisCache(config);
-            services.AddNestedCache<RequestCache, RedisCache>();
+            services.AddNestedCache<HttpRequestCache, RedisCache>();
             services.AddHostedService<StartupCacheClearer>();
         });
 

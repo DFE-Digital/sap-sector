@@ -36,7 +36,7 @@ public static class DependenciesExtensions
         if (config is not null && config.EnableCaching)
         {
             services.Configure<CachingSettings>(configuration.GetSection("Caching"));
-            services.AddSingleton<RequestCache>();
+            services.AddSingleton<HttpRequestCache>();
             services.AddSingleton<InMemoryCache>();
             configure(services, configuration);
         }
