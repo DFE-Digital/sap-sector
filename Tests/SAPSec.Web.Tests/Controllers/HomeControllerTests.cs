@@ -7,6 +7,7 @@ using Moq;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Web.Controllers;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Tests.Controllers;
@@ -26,7 +27,7 @@ public class HomeControllerTests
         _mockUrlHelper = new();
         Mock<IOptions<DfeSignInSettings>> options = new();
 
-        _controller = new(options.Object, _mockEnvironment.Object, _mockFeatureFlagService.Object)
+        _controller = new(options.Object, _mockEnvironment.Object, _mockFeatureFlagService.Object, new StartPageService(_mockFeatureFlagService.Object))
         {
             Url = _mockUrlHelper.Object
         };
@@ -63,7 +64,7 @@ public class HomeControllerTests
         result.Should().BeOfType<ViewResult>();
         var homeViewModel = (result as ViewResult)!.Model as HomeViewModel;
         homeViewModel.Should().NotBeNull();
-        homeViewModel.StartNowUri.Should().Be("/school-search");
+        homeViewModel.StartNowUri.Should().Be(SAPSec.Web.Constants.Routes.UserHome);
         homeViewModel.EnablePrimarySchools.Should().BeFalse();
     }
 }

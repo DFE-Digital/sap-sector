@@ -1,6 +1,7 @@
 ---
 ASPNETCORE_ENVIRONMENT: "Production"
 FeatureManagement__EnablePrimarySchools: "true"
-FeatureManagement__EnableAllThroughSchools: "false"
+FeatureManagement__EnableAllThroughSchools: "true"
 FeatureManagement__EnableRiseResources: "true"
 FeatureManagement__EnableKs4CoreSubjectsPupilCharacteristics: "true"
+FeatureManagement__EnableFindASchool: "true"
