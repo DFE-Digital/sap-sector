@@ -1,4 +1,4 @@
-FROM nginxinc/nginx-unprivileged:1.29-alpine
+FROM nginx/nginx-unprivileged:1.30.7-alpine3.24
 
 COPY ./maintenance_page/index.html /usr/share/nginx/html/index.html
 COPY ./maintenance_page/nginx.conf /etc/nginx/conf.d/default.conf
