@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace SAPSec.Test.Common.Authentication;
+﻿namespace SAPSec.Web.Authentication;
 
 public static class ConfigurationBuilderExtensions
 {

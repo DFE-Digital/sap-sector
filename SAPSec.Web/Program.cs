@@ -5,12 +5,15 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.FeatureManagement;
 using SAPSec.Core;
+using SAPSec.Core.Authentication;
+using SAPSec.Core.Caching;
 using SAPSec.Core.FeatureFlags;
-using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
+using SAPSec.Infrastructure.Redis;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Authorization;
 using SAPSec.Web.Configuration;
@@ -118,7 +121,12 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests")
+        builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSection("Authentication"));
+        var authenticationConfig = builder.Configuration.GetSection("Authentication").Get<AuthenticationSettings>();
+
+        if (authenticationConfig?.BypassAuthentication is true
+            // Failsafe: Regardless of the config setting we never want to bypass authentication on production
+            && !IsProductionEnvironment(builder.Environment.EnvironmentName))
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -127,6 +135,10 @@ public class Program
                 options.DefaultChallengeScheme = "TestScheme";
             })
             .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
+
+            builder.Services.TryAddSingleton<TestUserOrganisation>();
+            builder.Services.AddScoped<IUserService, MockDsiUserService>();
+            builder.Services.AddScoped<IDsiClient, MockDsiApiService>();
         }
         else
         {
@@ -199,16 +211,22 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-        var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
-
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
         builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
-        builder.Services.AddUseCases();
+        builder.Services.AddUseCases(builder.Configuration);
         builder.Services.AddServices();
-        builder.Services.AddPostgresqlDependencies();
+        builder.Services.AddPostgresqlDependencies(builder.Configuration);
         builder.Services.AddDependencies();
+
+        builder.Services.AddCaching(builder.Configuration, (services, config) =>
+        {
+            // If caching is enabled:
+            services.AddRedisCache(config);
+            services.AddNestedCache<HttpRequestCache, RedisCache>();
+            services.AddHostedService<StartupCacheClearer>();
+        });
 
         // Add custom error handler for NotFoundExceptions
         builder.Services.AddProblemDetails();
@@ -319,4 +337,9 @@ public class Program
                || environmentName.Equals("prod", StringComparison.OrdinalIgnoreCase)
                || environmentName.Equals("pd", StringComparison.OrdinalIgnoreCase);
     }
+}
+
+public class AuthenticationSettings
+{
+    public bool BypassAuthentication { get; set; }
 }

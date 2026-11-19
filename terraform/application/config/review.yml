@@ -4,5 +4,9 @@ FeatureManagement__EnablePrimarySchools: "true"
 FeatureManagement__EnableAllThroughSchools: "true"
 FeatureManagement__EnableRiseResources: "true"
 FeatureManagement__EnableKs4CoreSubjectsPupilCharacteristics: "true"
-FeatureManagement__EnableFindASchool: "false"
+FeatureManagement__EnableFindASchool: "false",
+Caching__EnableCaching: "true",
+Caching__CacheUseCases: "true",
+Caching__CacheRepositories: "false",
+Caching__ClearCacheOnStartup: "false",
 reset_review_db: "true"

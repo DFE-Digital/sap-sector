@@ -1,8 +1,8 @@
 using FluentAssertions;
 using SAPSec.Core.Authentication;
 using SAPSec.Test.Accessibility.Setup;
-using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.EndToEnd.Setup;
+using SAPSec.Web.Authentication;
 using SAPSec.Web.Constants;
 using Xunit;
 

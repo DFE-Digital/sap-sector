@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head> 
+    <meta charset="UTF-8" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" crossorigin="anonymous">
+    <link rel="shortcut icon" href="https://raw.githubusercontent.com/benc-uk/k6-reporter/main/assets/icon.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAP Sector School Capacity - cache-off</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem;
+        color: #2d3748;
+      }
+      
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+      
+      header {
+        background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+        padding: 1.5rem 2rem;
+        color: white;
+      }
+      
+      header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      
+      header h1 svg {
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+      }
+      
+      .content {
+        padding: 1.5rem;
+      }
+      
+      footer { 
+        text-align: center;
+        padding: 1.5rem;
+        color: #718096;
+        font-size: 0.875rem;
+        border-top: 1px solid #e2e8f0;
+        background: #f7fafc;
+      }
+      
+      footer a {
+        text-decoration: none;
+        color: #7c3aed;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      
+      footer a:hover {
+        color: #5b21b6;
+      }
+      
+      /* Status classes */
+      .failed {
+        background: linear-gradient(135deg, #fc8181 0%, #f56565 100%) !important;
+        color: white !important;
+      }     
+      
+      .good {
+        background: linear-gradient(135deg, #68d391 0%, #48bb78 100%) !important;
+        color: white !important;
+      }   
+      
+      td.failed {
+        font-weight: 600;
+        color: #e53e3e;
+      }
+      
+      td.good {
+        font-weight: 600;
+        color: #38a169;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 2rem 0 1rem 0;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #e2e8f0;
+        color: #2d3748;
+      }
+      
+      h4 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 1.5rem 0 1rem 0;
+        color: #4a5568;
+      }
+      
+      /* Metric Cards */
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 0;
+      }
+      
+      .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        border: 1px solid #e2e8f0;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      
+      .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      }
+      
+      .metric-card.primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+      
+      .metric-card.success {
+        background: linear-gradient(135deg, #68d391 0%, #48bb78 100%);
+        color: white;
+      }
+      
+      .metric-card.danger {
+        background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        color: white;
+      }
+      
+      .metric-card.warning {
+        background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);
+        color: white;
+      }
+      
+      .metric-card .icon {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        font-size: 4rem;
+        opacity: 0.15;
+      }
+      
+      .metric-card h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        opacity: 0.9;
+        position: relative;
+        z-index: 2;
+      }
+      
+      .metric-card.primary h4,
+      .metric-card.success h4,
+      .metric-card.danger h4,
+      .metric-card.warning h4 {
+        color: white;
+      }
+      
+      .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        position: relative;
+        z-index: 2;
+      }
+      
+      .metric-subtext {
+        font-size: 0.875rem;
+        opacity: 0.8;
+        margin-top: 0.25rem;
+      }
+      
+      /* Tabs */
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+      }
+      
+      .tabs label {
+        order: 1;
+        display: block;
+        padding: 1rem 2rem;
+        cursor: pointer;
+        color: #718096;
+        background: #f7fafc;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        margin-right: 0.25rem;
+        border: 2px solid transparent;
+        border-bottom: none;
+        font-size: 0.9rem;
+      }
+      
+      .tabs label:hover {
+        background: #edf2f7;
+        color: #4a5568;
+      }
+      
+      .tabs label i {
+        margin-right: 0.5rem;
+      }
+      
+      .tabs .tab {
+        order: 99;
+        flex-grow: 1;
+        width: 100%;
+        display: none;
+        padding: 2rem;
+        background: #ffffff;
+        border-radius: 0 12px 12px 12px;
+        border: 2px solid #e2e8f0;
+        min-height: 400px;
+      }
+      
+      .tabs input[type="radio"] {
+        display: none;
+      }
+      
+      .tabs input[type="radio"]:checked + label {
+        background: #ffffff;
+        color: #7c3aed;
+        border-color: #e2e8f0;
+        border-bottom-color: #ffffff;
+        position: relative;
+        bottom: -2px;
+      }
+      
+      .tabs input[type="radio"]:checked + label + .tab {
+        display: block;
+      }
+      
+      /* Tables */
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 1rem 0;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      
+      thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+      
+      thead th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      
+      tbody tr {
+        background: white;
+        transition: background 0.2s;
+      }
+      
+      tbody tr:nth-child(even) {
+        background: #f7fafc;
+      }
+      
+      tbody tr:hover {
+        background: #edf2f7;
+      }
+      
+      tbody td {
+        padding: 1rem;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 0.9rem;
+      }
+      
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      
+      tbody td:first-child {
+        font-weight: 500;
+      }
+      
+      /* Detail boxes for Other Stats */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin: 1rem 0;
+      }
+      
+      .stat-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        border: 1px solid #e2e8f0;
+        position: relative;
+        overflow: hidden;
+        color: white;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      
+      .stat-box:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      }
+      
+      .stat-box h4 {
+        margin: 0 0 1rem 0;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        opacity: 0.9;
+        color: white;
+        position: relative;
+        z-index: 2;
+      }
+      
+      .stat-box .icon {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        font-size: 4rem;
+        opacity: 0.15;
+      }
+      
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        position: relative;
+        z-index: 2;
+      }
+      
+      .stat-row:last-child {
+        border-bottom: none;
+      }
+      
+      .stat-label {
+        color: white;
+        font-weight: 400;
+        font-size: 0.875rem;
+        opacity: 0.9;
+      }
+      
+      .stat-value {
+        color: white;
+        font-weight: 700;
+        font-size: 1.5rem;
+      }
+      
+      /* Groups and Checks */
+      .group-header {
+        cursor: pointer;
+        user-select: none;
+        padding: 0.75rem 1rem;
+        background: #f7fafc;
+        border-radius: 8px;
+        margin: 1rem 0;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .group-header:hover {
+        background: #edf2f7;
+      }
+      
+      .group-header::before {
+        content: '▼';
+        font-size: 0.75rem;
+        transition: transform 0.2s;
+      }
+      
+      .sub-groups {
+        padding: 0 0 0 2rem;
+        margin-top: 1rem;
+      }
+      
+      .note {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: #edf2f7;
+        border-left: 4px solid #667eea;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #4a5568;
+      }
+      
+      @media (max-width: 768px) {
+        body {
+          padding: 0.5rem;
+        }
+        
+        header {
+          padding: 1.5rem;
+        }
+        
+        header h1 {
+          font-size: 1.5rem;
+        }
+        
+        .content {
+          padding: 1rem;
+        }
+        
+        .metrics-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .tabs label {
+          padding: 0.75rem 1rem;
+          font-size: 0.8rem;
+        }
+        
+        .tabs .tab {
+          padding: 1rem;
+        }
+        
+        .metric-value {
+          font-size: 2rem;
+        }
+      }
+    </style>
+    <script> 
+      function tabClickHandler(e) {
+        let elemSubGroup = e.target.nextElementSibling;
+        if (!elemSubGroup) return;
+        
+        let display = elemSubGroup.style.display;
+        elemSubGroup.style.display = !display || display === "block" ? "none" : "block";
+      }
+    </script>
+  </head>
+
+  <body>
+    <div class="container">
+      <header>
+        <h1>
+          <svg width="50" height="45" viewBox="0 0 50 45" fill="none"><path d="M31.968 34.681a2.007 2.007 0 002.011-2.003c0-1.106-.9-2.003-2.011-2.003a2.007 2.007 0 00-2.012 2.003c0 1.106.9 2.003 2.012 2.003z" fill="white"></path><path d="M39.575 0L27.154 16.883 16.729 9.31 0 45h50L39.575 0zM23.663 37.17l-2.97-4.072v4.072h-2.751V22.038l2.75 1.989v7.66l3.659-5.014 2.086 1.51-3.071 4.21 3.486 4.776h-3.189v.001zm8.305.17c-2.586 0-4.681-2.088-4.681-4.662 0-1.025.332-1.972.896-2.743l4.695-6.435 2.086 1.51-2.239 3.07a4.667 4.667 0 013.924 4.6c0 2.572-2.095 4.66-4.681 4.66z" fill="white"></path></svg>
+          SAP Sector School Capacity - cache-off
+        </h1>
+      </header>
+
+      <div class="content">
+        <!-- Main info boxes -->
+        <div class="metrics-grid">
+          <div class="metric-card primary">
+            <i class="fas fa-globe icon"></i>
+            <h4>Total Requests</h4>
+            <div class="metric-value">
+              44124
+              
+            </div>
+          </div>
+          
+          
+            <div class="metric-card danger">
+              <i class="fas fa-times-circle icon"></i>
+              <h4>Failed Requests</h4>
+              <div class="metric-value">2282</div>
+            </div> 
+            
+          
+          <div class="metric-card danger">
+            <i class="fas fa-exclamation-triangle icon"></i>
+            <h4>Breached Thresholds</h4>
+            <div class="metric-value">27</div>
+          </div>
+          
+          <div class="metric-card danger">
+            <i class="fas fa-eye icon"></i>
+            <h4>Failed Checks</h4>
+            <div class="metric-value">13586</div>
+          </div>
+        </div>
+
+        <!-- Tabs Section -->
+        <div class="tabs">
+          <input type="radio" name="tabs" id="tabone" checked="checked">
+          <label for="tabone"><i class="fas fa-microscope"></i> Detailed Metrics</label>
+          <div class="tab">
+
+            
+              <h4><i class="fas fa-chart-line"></i> Trends & Times</h4>
+              <table class="pure-table pure-table-striped">
+                <thead>
+                  <tr>
+                    <th></th>
+                    
+                      <th>Avg</th>
+                    
+                      <th>Min</th>
+                    
+                      <th>Med</th>
+                    
+                      <th>Max</th>
+                    
+                      <th>P(90)</th>
+                    
+                      <th>P(95)</th>
+                    
+                      <th>P(99)</th>
+                     
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  <tr>
+                    <td><b>group_duration</b></td>
+                    
+                      <td class="">3749.13</td>
+                    
+                      <td class="">57.98</td>
+                    
+                      <td class="">1732.76</td>
+                    
+                      <td class="">49046.00</td>
+                    
+                      <td class="">9171.24</td>
+                    
+                      <td class="">13715.91</td>
+                    
+                      <td class="">28804.77</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_blocked</b></td>
+                    
+                      <td class="">0.28</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">146.54</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_connecting</b></td>
+                    
+                      <td class="">0.12</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">120.21</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration</b></td>
+                    
+                      <td class="">1883.05</td>
+                    
+                      <td class="">23.75</td>
+                    
+                      <td class="">798.44</td>
+                    
+                      <td class="">38731.04</td>
+                    
+                      <td class="">4464.64</td>
+                    
+                      <td class="">6617.78</td>
+                    
+                      <td class="">16621.77</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:all-through,step:vu0010}</b></td>
+                    
+                      <td class="">114.17</td>
+                    
+                      <td class="">24.85</td>
+                    
+                      <td class="">102.89</td>
+                    
+                      <td class="">597.42</td>
+                    
+                      <td class="">191.26</td>
+                    
+                      <td class="good">227.84</td>
+                    
+                      <td class="">292.19</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:all-through,step:vu0025}</b></td>
+                    
+                      <td class="">275.36</td>
+                    
+                      <td class="">31.82</td>
+                    
+                      <td class="">254.78</td>
+                    
+                      <td class="">883.78</td>
+                    
+                      <td class="">457.49</td>
+                    
+                      <td class="good">519.95</td>
+                    
+                      <td class="">633.47</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:all-through,step:vu0050}</b></td>
+                    
+                      <td class="">564.71</td>
+                    
+                      <td class="">32.01</td>
+                    
+                      <td class="">522.97</td>
+                    
+                      <td class="">2074.18</td>
+                    
+                      <td class="">920.96</td>
+                    
+                      <td class="good">1068.57</td>
+                    
+                      <td class="">1362.21</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:all-through,step:vu0100}</b></td>
+                    
+                      <td class="">1312.72</td>
+                    
+                      <td class="">246.89</td>
+                    
+                      <td class="">1031.72</td>
+                    
+                      <td class="">15107.74</td>
+                    
+                      <td class="">2047.75</td>
+                    
+                      <td class="good">2656.11</td>
+                    
+                      <td class="">7813.23</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:all-through,step:vu0150}</b></td>
+                    
+                      <td class="">2028.28</td>
+                    
+                      <td class="">43.36</td>
+                    
+                      <td class="">1476.27</td>
+                    
+                      <td class="">21998.23</td>
+                    
+                      <td class="">3556.49</td>
+                    
+                      <td class="failed">5196.36</td>
+                    
+                      <td class="">11711.44</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:all-through,step:vu0200}</b></td>
+                    
+                      <td class="">5167.29</td>
+                    
+                      <td class="">40.63</td>
+                    
+                      <td class="">3664.67</td>
+                    
+                      <td class="">27709.53</td>
+                    
+                      <td class="">11654.35</td>
+                    
+                      <td class="failed">15764.85</td>
+                    
+                      <td class="">22740.39</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:all-through,step:vu0300}</b></td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="good">0.00</td>
+                    
+                      <td class="">0.00</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:primary,step:vu0010}</b></td>
+                    
+                      <td class="">187.17</td>
+                    
+                      <td class="">45.01</td>
+                    
+                      <td class="">174.00</td>
+                    
+                      <td class="">707.47</td>
+                    
+                      <td class="">294.67</td>
+                    
+                      <td class="good">325.90</td>
+                    
+                      <td class="">398.93</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:primary,step:vu0025}</b></td>
+                    
+                      <td class="">453.21</td>
+                    
+                      <td class="">50.04</td>
+                    
+                      <td class="">441.85</td>
+                    
+                      <td class="">1072.91</td>
+                    
+                      <td class="">653.34</td>
+                    
+                      <td class="good">715.43</td>
+                    
+                      <td class="">857.17</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:primary,step:vu0050}</b></td>
+                    
+                      <td class="">931.23</td>
+                    
+                      <td class="">72.93</td>
+                    
+                      <td class="">899.74</td>
+                    
+                      <td class="">3220.10</td>
+                    
+                      <td class="">1337.84</td>
+                    
+                      <td class="good">1489.89</td>
+                    
+                      <td class="">2020.03</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:primary,step:vu0100}</b></td>
+                    
+                      <td class="">2237.64</td>
+                    
+                      <td class="">493.55</td>
+                    
+                      <td class="">2008.68</td>
+                    
+                      <td class="">12582.01</td>
+                    
+                      <td class="">3003.71</td>
+                    
+                      <td class="failed">3821.04</td>
+                    
+                      <td class="">9888.40</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:primary,step:vu0150}</b></td>
+                    
+                      <td class="">3312.17</td>
+                    
+                      <td class="">39.08</td>
+                    
+                      <td class="">2910.71</td>
+                    
+                      <td class="">15274.01</td>
+                    
+                      <td class="">5249.36</td>
+                    
+                      <td class="failed">6619.13</td>
+                    
+                      <td class="">10687.24</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:primary,step:vu0200}</b></td>
+                    
+                      <td class="">6629.71</td>
+                    
+                      <td class="">37.77</td>
+                    
+                      <td class="">5510.95</td>
+                    
+                      <td class="">26436.39</td>
+                    
+                      <td class="">12507.89</td>
+                    
+                      <td class="failed">16577.90</td>
+                    
+                      <td class="">20824.80</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:primary,step:vu0300}</b></td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="good">0.00</td>
+                    
+                      <td class="">0.00</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:secondary,step:vu0010}</b></td>
+                    
+                      <td class="">221.63</td>
+                    
+                      <td class="">40.93</td>
+                    
+                      <td class="">199.96</td>
+                    
+                      <td class="">919.09</td>
+                    
+                      <td class="">349.58</td>
+                    
+                      <td class="good">413.00</td>
+                    
+                      <td class="">526.37</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:secondary,step:vu0025}</b></td>
+                    
+                      <td class="">566.16</td>
+                    
+                      <td class="">77.43</td>
+                    
+                      <td class="">548.93</td>
+                    
+                      <td class="">2014.38</td>
+                    
+                      <td class="">842.61</td>
+                    
+                      <td class="good">971.37</td>
+                    
+                      <td class="">1137.78</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:secondary,step:vu0050}</b></td>
+                    
+                      <td class="">1181.26</td>
+                    
+                      <td class="">74.52</td>
+                    
+                      <td class="">1103.90</td>
+                    
+                      <td class="">5395.35</td>
+                    
+                      <td class="">1776.26</td>
+                    
+                      <td class="good">2089.12</td>
+                    
+                      <td class="">3169.17</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:secondary,step:vu0100}</b></td>
+                    
+                      <td class="">3202.70</td>
+                    
+                      <td class="">146.18</td>
+                    
+                      <td class="">2648.33</td>
+                    
+                      <td class="">23459.95</td>
+                    
+                      <td class="">4456.30</td>
+                    
+                      <td class="failed">7324.87</td>
+                    
+                      <td class="">17521.38</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:secondary,step:vu0150}</b></td>
+                    
+                      <td class="">5115.91</td>
+                    
+                      <td class="">32.47</td>
+                    
+                      <td class="">4120.41</td>
+                    
+                      <td class="">29618.95</td>
+                    
+                      <td class="">8330.20</td>
+                    
+                      <td class="failed">13708.65</td>
+                    
+                      <td class="">23265.18</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:secondary,step:vu0200}</b></td>
+                    
+                      <td class="">10606.69</td>
+                    
+                      <td class="">40.32</td>
+                    
+                      <td class="">6546.11</td>
+                    
+                      <td class="">38731.04</td>
+                    
+                      <td class="">25869.27</td>
+                    
+                      <td class="failed">29743.80</td>
+                    
+                      <td class="">36664.41</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{schoolType:secondary,step:vu0300}</b></td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="good">0.00</td>
+                    
+                      <td class="">0.00</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{step:vu0010}</b></td>
+                    
+                      <td class="">174.33</td>
+                    
+                      <td class="">24.85</td>
+                    
+                      <td class="">158.76</td>
+                    
+                      <td class="">919.09</td>
+                    
+                      <td class="">298.75</td>
+                    
+                      <td class="good">342.79</td>
+                    
+                      <td class="">462.80</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{step:vu0025}</b></td>
+                    
+                      <td class="">431.57</td>
+                    
+                      <td class="">31.82</td>
+                    
+                      <td class="">407.23</td>
+                    
+                      <td class="">2014.38</td>
+                    
+                      <td class="">699.33</td>
+                    
+                      <td class="good">797.30</td>
+                    
+                      <td class="">1022.27</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{step:vu0050}</b></td>
+                    
+                      <td class="">892.40</td>
+                    
+                      <td class="">32.01</td>
+                    
+                      <td class="">818.07</td>
+                    
+                      <td class="">5395.35</td>
+                    
+                      <td class="">1468.50</td>
+                    
+                      <td class="good">1694.19</td>
+                    
+                      <td class="">2402.28</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{step:vu0100}</b></td>
+                    
+                      <td class="">2251.02</td>
+                    
+                      <td class="">146.18</td>
+                    
+                      <td class="">1856.48</td>
+                    
+                      <td class="">23459.95</td>
+                    
+                      <td class="">3569.25</td>
+                    
+                      <td class="failed">4584.36</td>
+                    
+                      <td class="">11950.27</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{step:vu0150}</b></td>
+                    
+                      <td class="">3485.52</td>
+                    
+                      <td class="">32.47</td>
+                    
+                      <td class="">2763.04</td>
+                    
+                      <td class="">29618.95</td>
+                    
+                      <td class="">6141.86</td>
+                    
+                      <td class="failed">8265.06</td>
+                    
+                      <td class="">16437.27</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{step:vu0200}</b></td>
+                    
+                      <td class="">7466.98</td>
+                    
+                      <td class="">37.77</td>
+                    
+                      <td class="">5326.38</td>
+                    
+                      <td class="">38731.04</td>
+                    
+                      <td class="">16943.50</td>
+                    
+                      <td class="failed">22980.06</td>
+                    
+                      <td class="">32774.52</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_duration{step:vu0300}</b></td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="good">0.00</td>
+                    
+                      <td class="">0.00</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_receiving</b></td>
+                    
+                      <td class="">54.78</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">22.32</td>
+                    
+                      <td class="">2617.64</td>
+                    
+                      <td class="">72.02</td>
+                    
+                      <td class="">120.65</td>
+                    
+                      <td class="">891.17</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_sending</b></td>
+                    
+                      <td class="">0.10</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">30.32</td>
+                    
+                      <td class="">0.51</td>
+                    
+                      <td class="">0.53</td>
+                    
+                      <td class="">0.61</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_tls_handshaking</b></td>
+                    
+                      <td class="">0.15</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">106.98</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                    
+                      <td class="">0.00</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_waiting</b></td>
+                    
+                      <td class="">1828.17</td>
+                    
+                      <td class="">11.28</td>
+                    
+                      <td class="">757.34</td>
+                    
+                      <td class="">38011.58</td>
+                    
+                      <td class="">4356.85</td>
+                    
+                      <td class="">6319.37</td>
+                    
+                      <td class="">16492.60</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>iteration_duration</b></td>
+                    
+                      <td class="">3749.26</td>
+                    
+                      <td class="">57.98</td>
+                    
+                      <td class="">1732.80</td>
+                    
+                      <td class="">49046.00</td>
+                    
+                      <td class="">9171.27</td>
+                    
+                      <td class="">13715.91</td>
+                    
+                      <td class="">28804.77</td>
+                     
+                  </tr>
+                  
+                  <tr>
+                    <td><b>sap_sector_response_time_trend</b></td>
+                    
+                      <td class="">1893.47</td>
+                    
+                      <td class="">23.75</td>
+                    
+                      <td class="">806.51</td>
+                    
+                      <td class="">38731.04</td>
+                    
+                      <td class="">4482.05</td>
+                    
+                      <td class="">6636.44</td>
+                    
+                      <td class="">16729.01</td>
+                     
+                  </tr>
+                  
+                </tbody>
+              </table>
+            
+
+            
+              <h4><i class="fas fa-percent"></i> Rates</h4>
+              <table class="pure-table pure-table-striped">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Rate %</th> 
+                    <th>Pass Count</th>
+                    <th>Fail Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  <tr>
+                    <td><b>http_req_failed</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >5.17%</td>
+                      <td class="">41842.00</td>
+                      <td class="">2282.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:all-through,step:vu0010}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">2288.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:all-through,step:vu0025}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">2318.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:all-through,step:vu0050}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">2248.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:all-through,step:vu0100}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >1.72%</td>
+                      <td class="">1771.00</td>
+                      <td class="">31.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:all-through,step:vu0150}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >4.67%</td>
+                      <td class="">1632.00</td>
+                      <td class="">80.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:all-through,step:vu0200}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >27.54%</td>
+                      <td class="">826.00</td>
+                      <td class="">314.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:all-through,step:vu0300}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">0.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:primary,step:vu0010}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">2288.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:primary,step:vu0025}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">2316.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:primary,step:vu0050}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">2248.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:primary,step:vu0100}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >2.27%</td>
+                      <td class="">1763.00</td>
+                      <td class="">41.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:primary,step:vu0150}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >6.32%</td>
+                      <td class="">1602.00</td>
+                      <td class="">108.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:primary,step:vu0200}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >35.35%</td>
+                      <td class="">737.00</td>
+                      <td class="">403.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:primary,step:vu0300}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">0.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:secondary,step:vu0010}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">2290.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:secondary,step:vu0025}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">2318.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:secondary,step:vu0050}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">2248.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:secondary,step:vu0100}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >3.39%</td>
+                      <td class="">1741.00</td>
+                      <td class="">61.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:secondary,step:vu0150}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >9.00%</td>
+                      <td class="">1558.00</td>
+                      <td class="">154.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:secondary,step:vu0200}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >59.17%</td>
+                      <td class="">465.00</td>
+                      <td class="">674.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{schoolType:secondary,step:vu0300}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">0.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{step:vu0010}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">6866.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{step:vu0025}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">6952.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{step:vu0050}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">6744.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{step:vu0100}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >2.46%</td>
+                      <td class="">5275.00</td>
+                      <td class="">133.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{step:vu0150}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >6.66%</td>
+                      <td class="">4792.00</td>
+                      <td class="">342.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{step:vu0200}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >40.68%</td>
+                      <td class="">2028.00</td>
+                      <td class="">1391.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>http_req_failed{step:vu0300}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">0.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>sap_sector_content_failed</b></td>
+                    
+                      <td
+                        class=""
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >5.26%</td>
+                      <td class="">20860.00</td>
+                      <td class="">1159.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>sap_sector_content_failed{step:vu0010}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">3433.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>sap_sector_content_failed{step:vu0025}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">3476.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>sap_sector_content_failed{step:vu0050}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">3372.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>sap_sector_content_failed{step:vu0100}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >2.77%</td>
+                      <td class="">2629.00</td>
+                      <td class="">75.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>sap_sector_content_failed{step:vu0150}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >6.54%</td>
+                      <td class="">2399.00</td>
+                      <td class="">168.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>sap_sector_content_failed{step:vu0200}</b></td>
+                    
+                      <td
+                        class="failed"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >40.50%</td>
+                      <td class="">1018.00</td>
+                      <td class="">693.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>sap_sector_content_failed{step:vu0300}</b></td>
+                    
+                      <td
+                        class="good"
+                        title="Failure rate (for *_failed metrics; aligns with Fail Count)"
+                      >0.00%</td>
+                      <td class="">0.00</td>
+                      <td class="">0.00</td>
+                  </tr>
+                  
+                  <tr>
+                    <td><b>sap_sector_error_rate</b></td>
+                    
+                      <td
+                        class=""
+                        title="Success rate (aligns with Pass Count)"
+                      >19.11%</td>
+                      <td class="">8384.00</td>
+                      <td class="">35485.00</td>
+                  </tr>
+                  
+                </tbody>
+              </table>
+            
+
+            
+
+            
+        
+          </div> 
+          <!-- ---- end tab ---- -->
+
+          <input type="radio" name="tabs" id="tabtwo">
+          <label for="tabtwo"><i class="fas fa-chart-pie"></i> Test Run Details</label>
+          <div class="tab">
+            <div class="stats-grid">
+              
+                <div class="stat-box">
+                  <h4>Checks</h4>
+                  <i class="fas fa-eye icon"></i>
+                  <div class="stat-row">
+                    <span class="stat-label">Passed</span>
+                    <span class="stat-value">140040</span>
+                  </div>
+                  <div class="stat-row">
+                    <span class="stat-label">Failed</span>
+                    <span class="stat-value">13586</span>
+                  </div>
+                </div>
+              
+
+              
+                <div class="stat-box">
+                  <h4>Iterations</h4>
+                  <i class="fas fa-redo icon"></i>
+                  <div class="stat-row">
+                    <span class="stat-label">Total</span>
+                    <span class="stat-value">21850</span>
+                  </div>
+                  <div class="stat-row">
+                    <span class="stat-label">Rate</span>
+                    <span class="stat-value">23.35/s</span>
+                  </div>
+                </div>
+              
+
+              <div class="stat-box">
+                <h4>Virtual Users</h4>
+                <i class="fas fa-user icon"></i>
+                <div class="stat-row">
+                  <span class="stat-label">Min</span>
+                  <span class="stat-value">0</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Max</span>
+                  <span class="stat-value">291</span>
+                </div>
+              </div>
+
+              <div class="stat-box">
+                <h4>Requests</h4>
+                <i class="fas fa-globe icon"></i>
+                <div class="stat-row">
+                  <span class="stat-label">Total</span>
+                  <span class="stat-value">
+                    44124
+                    
+                  </span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Rate</span>
+                  <span class="stat-value">
+                    47.15/s
+                    
+                  </span>
+                </div>
+              </div>
+
+              <div class="stat-box">
+                <h4>Data Received</h4>
+                <i class="fas fa-cloud-download-alt icon"></i>
+                <div class="stat-row">
+                  <span class="stat-label">Total</span>
+                  <span class="stat-value">2169.18 MB</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Rate</span>
+                  <span class="stat-value">2.32 mB/s</span>
+                </div>
+              </div>
+
+              <div class="stat-box">
+                <h4>Data Sent</h4>
+                <i class="fas fa-cloud-upload-alt icon"></i>
+                <div class="stat-row">
+                  <span class="stat-label">Total</span>
+                  <span class="stat-value">8.99 MB</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Rate</span>
+                  <span class="stat-value">0.01 mB/s</span>
+                </div>
+              </div>
+            </div>
+          </div>  
+          <!-- ---- end tab ---- -->     
+
+          <input type="radio" name="tabs" id="tabthree">
+          <label for="tabthree"><i class="fas fa-square-check"></i> Checks & Groups</label>
+          <div class="tab">
+            
+
+            
+              
+              <h2 class="group-header" onclick="tabClickHandler(event)">Group - SAP Sector: Secondary School Journey</h2>
+              <div>
+                
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Check Name</th>
+                        <th>Passes</th>
+                        <th>Failures</th>
+                        <th>% Pass</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school overview: status is expected</td>
+                          <td class="">6830</td>
+                          <td class="failed">507</td>
+                          <td class="failed">93.09</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school overview: response time &lt; 3000ms</td>
+                          <td class="">5023</td>
+                          <td class="failed">2314</td>
+                          <td class="failed">68.46</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school overview: no server errors (5xx)</td>
+                          <td class="">6830</td>
+                          <td class="failed">507</td>
+                          <td class="failed">93.09</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school overview: contains expected content</td>
+                          <td class="">6830</td>
+                          <td class="failed">507</td>
+                          <td class="failed">93.09</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school - view-similar-schools: status is expected</td>
+                          <td class="">2291</td>
+                          <td class="failed">156</td>
+                          <td class="failed">93.62</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school - view-similar-schools: response time &lt; 3000ms</td>
+                          <td class="">2133</td>
+                          <td class="failed">314</td>
+                          <td class="failed">87.17</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school - view-similar-schools: no server errors (5xx)</td>
+                          <td class="">2291</td>
+                          <td class="failed">156</td>
+                          <td class="failed">93.62</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school - attendance: status is expected</td>
+                          <td class="">2232</td>
+                          <td class="failed">164</td>
+                          <td class="failed">93.16</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school - attendance: response time &lt; 3000ms</td>
+                          <td class="">2057</td>
+                          <td class="failed">339</td>
+                          <td class="failed">85.85</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school - attendance: no server errors (5xx)</td>
+                          <td class="">2232</td>
+                          <td class="failed">164</td>
+                          <td class="failed">93.16</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school - ks4-headline-measures: status is expected</td>
+                          <td class="">2172</td>
+                          <td class="failed">256</td>
+                          <td class="failed">89.46</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school - ks4-headline-measures: response time &lt; 3000ms</td>
+                          <td class="">1432</td>
+                          <td class="failed">996</td>
+                          <td class="failed">58.98</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Secondary school - ks4-headline-measures: no server errors (5xx)</td>
+                          <td class="">2172</td>
+                          <td class="failed">256</td>
+                          <td class="failed">89.46</td>
+                        </tr>
+                      
+                    </tbody>
+                  </table>
+                
+                
+              </div>
+            
+            
+              
+              <h2 class="group-header" onclick="tabClickHandler(event)">Group - SAP Sector: Primary School Journey</h2>
+              <div>
+                
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Check Name</th>
+                        <th>Passes</th>
+                        <th>Failures</th>
+                        <th>% Pass</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school overview: status is expected</td>
+                          <td class="">6977</td>
+                          <td class="failed">363</td>
+                          <td class="failed">95.05</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school overview: response time &lt; 3000ms</td>
+                          <td class="">6010</td>
+                          <td class="failed">1330</td>
+                          <td class="failed">81.88</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school overview: no server errors (5xx)</td>
+                          <td class="">6977</td>
+                          <td class="failed">363</td>
+                          <td class="failed">95.05</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school overview: contains expected content</td>
+                          <td class="">6977</td>
+                          <td class="failed">363</td>
+                          <td class="failed">95.05</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school - view-similar-schools: status is expected</td>
+                          <td class="">2285</td>
+                          <td class="failed">70</td>
+                          <td class="failed">97.03</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school - view-similar-schools: response time &lt; 3000ms</td>
+                          <td class="">2163</td>
+                          <td class="failed">192</td>
+                          <td class="failed">91.85</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school - view-similar-schools: no server errors (5xx)</td>
+                          <td class="">2285</td>
+                          <td class="failed">70</td>
+                          <td class="failed">97.03</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school - attendance: status is expected</td>
+                          <td class="">2358</td>
+                          <td class="failed">126</td>
+                          <td class="failed">94.93</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school - attendance: response time &lt; 3000ms</td>
+                          <td class="">1998</td>
+                          <td class="failed">486</td>
+                          <td class="failed">80.43</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school - attendance: no server errors (5xx)</td>
+                          <td class="">2358</td>
+                          <td class="failed">126</td>
+                          <td class="failed">94.93</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school - ks2: status is expected</td>
+                          <td class="">2326</td>
+                          <td class="failed">121</td>
+                          <td class="failed">95.06</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school - ks2: response time &lt; 3000ms</td>
+                          <td class="">1801</td>
+                          <td class="failed">646</td>
+                          <td class="failed">73.60</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">Primary school - ks2: no server errors (5xx)</td>
+                          <td class="">2326</td>
+                          <td class="failed">121</td>
+                          <td class="failed">95.06</td>
+                        </tr>
+                      
+                    </tbody>
+                  </table>
+                
+                
+              </div>
+            
+            
+              
+              <h2 class="group-header" onclick="tabClickHandler(event)">Group - SAP Sector: All Through School Journey</h2>
+              <div>
+                
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Check Name</th>
+                        <th>Passes</th>
+                        <th>Failures</th>
+                        <th>% Pass</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school overview: status is expected</td>
+                          <td class="">7053</td>
+                          <td class="failed">289</td>
+                          <td class="failed">96.06</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school overview: response time &lt; 3000ms</td>
+                          <td class="">6893</td>
+                          <td class="failed">449</td>
+                          <td class="failed">93.88</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school overview: no server errors (5xx)</td>
+                          <td class="">7053</td>
+                          <td class="failed">289</td>
+                          <td class="failed">96.06</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school overview: contains expected content</td>
+                          <td class="">7053</td>
+                          <td class="failed">289</td>
+                          <td class="failed">96.06</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - ks2: status is expected</td>
+                          <td class="">1754</td>
+                          <td class="failed">47</td>
+                          <td class="failed">97.39</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - ks2: response time &lt; 3000ms</td>
+                          <td class="">1658</td>
+                          <td class="failed">143</td>
+                          <td class="failed">92.06</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - ks2: no server errors (5xx)</td>
+                          <td class="">1754</td>
+                          <td class="failed">47</td>
+                          <td class="failed">97.39</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - attendance: status is expected</td>
+                          <td class="">1797</td>
+                          <td class="failed">47</td>
+                          <td class="failed">97.45</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - attendance: response time &lt; 3000ms</td>
+                          <td class="">1734</td>
+                          <td class="failed">110</td>
+                          <td class="failed">94.03</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - attendance: no server errors (5xx)</td>
+                          <td class="">1797</td>
+                          <td class="failed">47</td>
+                          <td class="failed">97.45</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - ks4-headline-measures: status is expected</td>
+                          <td class="">1786</td>
+                          <td class="failed">87</td>
+                          <td class="failed">95.36</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - ks4-headline-measures: response time &lt; 3000ms</td>
+                          <td class="">1484</td>
+                          <td class="failed">389</td>
+                          <td class="failed">79.23</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - ks4-headline-measures: no server errors (5xx)</td>
+                          <td class="">1786</td>
+                          <td class="failed">87</td>
+                          <td class="failed">95.36</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - view-similar-schools: status is expected</td>
+                          <td class="">1726</td>
+                          <td class="failed">49</td>
+                          <td class="failed">97.24</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - view-similar-schools: response time &lt; 3000ms</td>
+                          <td class="">1620</td>
+                          <td class="failed">155</td>
+                          <td class="failed">91.27</td>
+                        </tr>
+                      
+                        <tr class="checkDetails">
+                          <td width="50%">All through school - view-similar-schools: no server errors (5xx)</td>
+                          <td class="">1726</td>
+                          <td class="failed">49</td>
+                          <td class="failed">97.24</td>
+                        </tr>
+                      
+                    </tbody>
+                  </table>
+                
+                
+              </div>
+            
+            
+
+            <h2>Other Checks</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>Check Name</th>
+                  <th>Passes</th>
+                  <th>Failures</th>
+                  <th>% Pass</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+              </tbody>
+            </table>     
+          </div> 
+          <!-- ---- end tab ---- -->
+        </div>
+      </div>
+      
+      <footer>K6 Reporter v3.0.4 - Ben Coleman 2025 · <a href="https://github.com/benc-uk/k6-reporter">GitHub</a></footer>
+    </div>
+  </body>
+</html>

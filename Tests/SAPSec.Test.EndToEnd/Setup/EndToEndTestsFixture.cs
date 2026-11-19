@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SAPSec.Test.Common.Authentication;
+using SAPSec.Web.Authentication;
 using Xunit;
 
 namespace SAPSec.Test.EndToEnd.Setup;

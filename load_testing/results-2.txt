@@ -1,0 +1,907 @@
+(No caching)
+
+$ npm run test:loadtest:capacity:cache-off
+
+> sap-sector-load-tests@1.0.0 test:loadtest:capacity:cache-off
+> k6 run --env ENVIRONMENT=loadtest --env RUN_LABEL=cache-off sap-sector/school-capacity-test.js
+
+
+         /\      Grafana   /‾‾/
+    /\  /  \     |\  __   /  /
+   /  \/    \    | |/ /  /   ‾‾\
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/
+
+
+     execution: local
+        script: sap-sector/school-capacity-test.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 300 max VUs, 18m30s max duration (incl. graceful stop):
+              * sap_sector_school_capacity: Up to 300 looping VUs for 18m0s over 15 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0001] School capacity test - loadtest: https://localhost:3000
+  Run label: cache-off
+  VU steps: 10, 25, 50, 100, 150, 200, 300 (ramp 30s, hold 120s)
+  Approx. duration: 18 min plus warm-up  source=console
+INFO[0015] Warm-up complete: 255 pages returned 200.     source=console
+INFO[1098] [k6-reporter v3.0.4] Generating HTML summary report, with theme: default  source=console
+     █ SAP Sector: Secondary School Journey
+
+       ✓ Secondary school overview: status is expected
+       ✗ Secondary school overview: response time < 3000ms
+        ↳  65% — ✓ 4431 / ✗ 2384
+       ✓ Secondary school overview: no server errors (5xx)
+       ✓ Secondary school overview: contains expected content
+       ✓ Secondary school - ks4-headline-measures: status is expected
+       ✗ Secondary school - ks4-headline-measures: response time < 3000ms
+        ↳  64% — ✓ 1461 / ✗ 804
+       ✓ Secondary school - ks4-headline-measures: no server errors (5xx)
+       ✓ Secondary school - view-similar-schools: status is expected
+       ✗ Secondary school - view-similar-schools: response time < 3000ms
+        ↳  63% — ✓ 1445 / ✗ 823
+       ✓ Secondary school - view-similar-schools: no server errors (5xx)
+       ✓ Secondary school - attendance: status is expected
+       ✗ Secondary school - attendance: response time < 3000ms
+        ↳  66% — ✓ 1521 / ✗ 761
+       ✓ Secondary school - attendance: no server errors (5xx)
+
+     █ SAP Sector: Primary School Journey
+
+       ✓ Primary school overview: status is expected
+       ✗ Primary school overview: response time < 3000ms
+        ↳  70% — ✓ 4792 / ✗ 2023
+       ✓ Primary school overview: no server errors (5xx)
+       ✓ Primary school overview: contains expected content
+       ✓ Primary school - ks2: status is expected
+       ✗ Primary school - ks2: response time < 3000ms
+        ↳  69% — ✓ 1590 / ✗ 682
+       ✓ Primary school - ks2: no server errors (5xx)
+       ✓ Primary school - attendance: status is expected
+       ✗ Primary school - attendance: response time < 3000ms
+        ↳  69% — ✓ 1576 / ✗ 677
+       ✓ Primary school - attendance: no server errors (5xx)
+       ✓ Primary school - view-similar-schools: status is expected
+       ✗ Primary school - view-similar-schools: response time < 3000ms
+        ↳  68% — ✓ 1574 / ✗ 716
+       ✓ Primary school - view-similar-schools: no server errors (5xx)
+
+     █ SAP Sector: All Through School Journey
+
+       ✓ All through school overview: status is expected
+       ✗ All through school overview: response time < 3000ms
+        ↳  66% — ✓ 4500 / ✗ 2315
+       ✓ All through school overview: no server errors (5xx)
+       ✓ All through school overview: contains expected content
+       ✓ All through school - attendance: status is expected
+       ✗ All through school - attendance: response time < 3000ms
+        ↳  65% — ✓ 1120 / ✗ 593
+       ✓ All through school - attendance: no server errors (5xx)
+       ✓ All through school - view-similar-schools: status is expected
+       ✗ All through school - view-similar-schools: response time < 3000ms
+        ↳  68% — ✓ 1170 / ✗ 536
+       ✓ All through school - view-similar-schools: no server errors (5xx)
+       ✓ All through school - ks4-headline-measures: status is expected
+       ✗ All through school - ks4-headline-measures: response time < 3000ms
+        ↳  61% — ✓ 1038 / ✗ 638
+       ✓ All through school - ks4-headline-measures: no server errors (5xx)
+       ✓ All through school - ks2: status is expected
+       ✗ All through school - ks2: response time < 3000ms
+        ↳  67% — ✓ 1155 / ✗ 565
+       ✓ All through school - ks2: no server errors (5xx)
+
+     checks.....................................: 90.55% ✓ 129598    ✗ 13517
+     data_received..............................: 2.1 GB 1.9 MB/s
+     data_sent..................................: 6.6 MB 6.0 kB/s
+     group_duration.............................: avg=6.23s       min=20.29ms  med=1.88s    max=1m10s      p(90)=18.23s     p(95)=25.08s       p(99)=38.09s
+     http_req_blocked...........................: avg=2.69ms      min=0s       med=0s       max=2.42s      p(90)=0s         p(95)=0s           p(99)=0s
+     http_req_connecting........................: avg=30.7µs      min=0s       med=0s       max=145.73ms   p(90)=0s         p(95)=0s           p(99)=0s
+     http_req_duration..........................: avg=3.09s       min=3.06ms   med=811.01ms max=47.28s     p(90)=9.19s      p(95)=12.7s        p(99)=20.42s
+       { expected_response:true }...............: avg=3.09s       min=3.06ms   med=811.01ms max=47.28s     p(90)=9.19s      p(95)=12.7s        p(99)=20.42s
+     ✓ { schoolType:all-through,step:vu0010 }...: avg=90.13ms     min=6.6ms    med=80.33ms  max=309.74ms   p(90)=155.24ms   p(95)=181.93ms     p(99)=243.59ms
+     ✓ { schoolType:all-through,step:vu0025 }...: avg=542.68ms    min=35.51ms  med=436.15ms max=3.9s       p(90)=990.81ms   p(95)=1.27s        p(99)=1.96s
+     ✗ { schoolType:all-through,step:vu0050 }...: avg=2.42s       min=31.99ms  med=2.02s    max=12.08s     p(90)=4.66s      p(95)=5.71s        p(99)=7.53s
+     ✗ { schoolType:all-through,step:vu0100 }...: avg=4.17s       min=34.06ms  med=3.55s    max=19.54s     p(90)=8.33s      p(95)=10.01s       p(99)=12.63s
+     ✗ { schoolType:all-through,step:vu0150 }...: avg=5.94s       min=28.15ms  med=5.25s    max=26.93s     p(90)=11.23s     p(95)=13.76s       p(99)=17.01s
+     ✗ { schoolType:all-through,step:vu0200 }...: avg=8.6s        min=40.13ms  med=7.58s    max=31.29s     p(90)=17.81s     p(95)=20.98s       p(99)=26.71s
+     ✗ { schoolType:all-through,step:vu0300 }...: avg=11.96s      min=338.38ms med=10.27s   max=40.4s      p(90)=22.88s     p(95)=27.26s       p(99)=34.55s
+     ✓ { schoolType:primary,step:vu0010 }.......: avg=116.28ms    min=35.21ms  med=109.68ms max=343.28ms   p(90)=167.01ms   p(95)=186.79ms     p(99)=235.17ms
+     ✓ { schoolType:primary,step:vu0025 }.......: avg=544.42ms    min=101.3ms  med=458.59ms max=2.63s      p(90)=905.98ms   p(95)=1.14s        p(99)=2.01s
+     ✗ { schoolType:primary,step:vu0050 }.......: avg=1.84s       min=101.34ms med=1.53s    max=7.41s      p(90)=3.47s      p(95)=4.03s        p(99)=5.55s
+     ✗ { schoolType:primary,step:vu0100 }.......: avg=3.21s       min=91.4ms   med=2.76s    max=11.36s     p(90)=5.89s      p(95)=6.69s        p(99)=8.34s
+     ✗ { schoolType:primary,step:vu0150 }.......: avg=4.21s       min=98.7ms   med=3.43s    max=17.38s     p(90)=7.52s      p(95)=8.68s        p(99)=10.94s
+     ✗ { schoolType:primary,step:vu0200 }.......: avg=6.14s       min=52.78ms  med=4.78s    max=21.2s      p(90)=11.57s     p(95)=13.13s       p(99)=16.59s
+     ✗ { schoolType:primary,step:vu0300 }.......: avg=8.82s       min=311.09ms med=7.22s    max=24.95s     p(90)=15.16s     p(95)=17.97s       p(99)=21.99s
+     ✓ { schoolType:secondary,step:vu0010 }.....: avg=132.68ms    min=37.71ms  med=125.42ms max=405.54ms   p(90)=194.64ms   p(95)=222.25ms     p(99)=276.38ms
+     ✓ { schoolType:secondary,step:vu0025 }.....: avg=604.31ms    min=105.06ms med=510.03ms max=3.16s      p(90)=1.02s      p(95)=1.29s        p(99)=1.93s
+     ✗ { schoolType:secondary,step:vu0050 }.....: avg=2.35s       min=125.16ms med=2.13s    max=8.48s      p(90)=4s         p(95)=5.11s        p(99)=6.63s
+     ✗ { schoolType:secondary,step:vu0100 }.....: avg=4.05s       min=77.78ms  med=4.02s    max=15.13s     p(90)=6.88s      p(95)=8.05s        p(99)=10.35s
+     ✗ { schoolType:secondary,step:vu0150 }.....: avg=5.16s       min=83.89ms  med=4.87s    max=21.41s     p(90)=9.04s      p(95)=10.34s       p(99)=14.25s
+     ✗ { schoolType:secondary,step:vu0200 }.....: avg=7.93s       min=85.28ms  med=7.85s    max=35.19s     p(90)=13.34s     p(95)=16.06s       p(99)=23.11s
+     ✗ { schoolType:secondary,step:vu0300 }.....: avg=11.13s      min=454.95ms med=10.79s   max=47.28s     p(90)=18.62s     p(95)=21.1s        p(99)=30.19s
+     ✓ { step:vu0010 }..........................: avg=113.03ms    min=6.6ms    med=107.46ms max=405.54ms   p(90)=175.78ms   p(95)=199.74ms     p(99)=256.43ms
+     ✓ { step:vu0025 }..........................: avg=563.8ms     min=35.51ms  med=473.89ms max=3.9s       p(90)=980.54ms   p(95)=1.24s        p(99)=1.96s
+     ✗ { step:vu0050 }..........................: avg=2.2s        min=31.99ms  med=1.89s    max=12.08s     p(90)=4.09s      p(95)=4.98s        p(99)=6.79s
+     ✗ { step:vu0100 }..........................: avg=3.81s       min=34.06ms  med=3.4s     max=19.54s     p(90)=6.94s      p(95)=8.29s        p(99)=11.37s
+     ✗ { step:vu0150 }..........................: avg=5.1s        min=28.15ms  med=4.3s     max=26.93s     p(90)=9.28s      p(95)=11.12s       p(99)=15.03s
+     ✗ { step:vu0200 }..........................: avg=7.56s       min=40.13ms  med=6.89s    max=35.19s     p(90)=13.98s     p(95)=17.45s       p(99)=23.7s
+     ✗ { step:vu0300 }..........................: avg=10.64s      min=311.09ms med=9.49s    max=47.28s     p(90)=18.92s     p(95)=22.53s       p(99)=31.08s
+   ✓ http_req_failed............................: 0.00%  ✓ 0         ✗ 41145
+     ✓ { schoolType:all-through,step:vu0010 }...: 0.00%  ✓ 0         ✗ 3510
+     ✓ { schoolType:all-through,step:vu0025 }...: 0.00%  ✓ 0         ✗ 1792
+     ✓ { schoolType:all-through,step:vu0050 }...: 0.00%  ✓ 0         ✗ 906
+     ✓ { schoolType:all-through,step:vu0100 }...: 0.00%  ✓ 0         ✗ 1026
+     ✓ { schoolType:all-through,step:vu0150 }...: 0.00%  ✓ 0         ✗ 1180
+     ✓ { schoolType:all-through,step:vu0200 }...: 0.00%  ✓ 0         ✗ 1086
+     ✓ { schoolType:all-through,step:vu0300 }...: 0.00%  ✓ 0         ✗ 1082
+     ✓ { schoolType:primary,step:vu0010 }.......: 0.00%  ✓ 0         ✗ 3510
+     ✓ { schoolType:primary,step:vu0025 }.......: 0.00%  ✓ 0         ✗ 1794
+     ✓ { schoolType:primary,step:vu0050 }.......: 0.00%  ✓ 0         ✗ 908
+     ✓ { schoolType:primary,step:vu0100 }.......: 0.00%  ✓ 0         ✗ 1028
+     ✓ { schoolType:primary,step:vu0150 }.......: 0.00%  ✓ 0         ✗ 1180
+     ✓ { schoolType:primary,step:vu0200 }.......: 0.00%  ✓ 0         ✗ 1088
+     ✓ { schoolType:primary,step:vu0300 }.......: 0.00%  ✓ 0         ✗ 1082
+     ✓ { schoolType:secondary,step:vu0010 }.....: 0.00%  ✓ 0         ✗ 3510
+     ✓ { schoolType:secondary,step:vu0025 }.....: 0.00%  ✓ 0         ✗ 1792
+     ✓ { schoolType:secondary,step:vu0050 }.....: 0.00%  ✓ 0         ✗ 906
+     ✓ { schoolType:secondary,step:vu0100 }.....: 0.00%  ✓ 0         ✗ 1026
+     ✓ { schoolType:secondary,step:vu0150 }.....: 0.00%  ✓ 0         ✗ 1180
+     ✓ { schoolType:secondary,step:vu0200 }.....: 0.00%  ✓ 0         ✗ 1088
+     ✓ { schoolType:secondary,step:vu0300 }.....: 0.00%  ✓ 0         ✗ 1080
+     ✓ { step:vu0010 }..........................: 0.00%  ✓ 0         ✗ 10530
+     ✓ { step:vu0025 }..........................: 0.00%  ✓ 0         ✗ 5378
+     ✓ { step:vu0050 }..........................: 0.00%  ✓ 0         ✗ 2720
+     ✓ { step:vu0100 }..........................: 0.00%  ✓ 0         ✗ 3080
+     ✓ { step:vu0150 }..........................: 0.00%  ✓ 0         ✗ 3540
+     ✓ { step:vu0200 }..........................: 0.00%  ✓ 0         ✗ 3262
+     ✓ { step:vu0300 }..........................: 0.00%  ✓ 0         ✗ 3244
+     http_req_receiving.........................: avg=153.07ms    min=0s       med=2.3ms    max=5.16s      p(90)=422.95ms   p(95)=1.02s        p(99)=2.4s
+     http_req_sending...........................: avg=215.41µs    min=0s       med=0s       max=396.21ms   p(90)=527.69µs   p(95)=607.9µs      p(99)=3.21ms
+     http_req_tls_handshaking...................: avg=2.65ms      min=0s       med=0s       max=2.42s      p(90)=0s         p(95)=0s           p(99)=0s
+     http_req_waiting...........................: avg=2.94s       min=530.69µs med=756.93ms max=47.18s     p(90)=8.78s      p(95)=12.05s       p(99)=19.55s
+     http_reqs..................................: 41145  37.499357/s
+     iteration_duration.........................: avg=6.23s       min=20.62ms  med=1.88s    max=1m10s      p(90)=18.23s     p(95)=25.08s       p(99)=38.09s
+     iterations.................................: 20445  18.633476/s
+     sap_sector_content_failed..................: 0.00%  ✓ 0         ✗ 20445
+     ✓ { step:vu0010 }..........................: 0.00%  ✓ 0         ✗ 5265
+     ✓ { step:vu0025 }..........................: 0.00%  ✓ 0         ✗ 2689
+     ✓ { step:vu0050 }..........................: 0.00%  ✓ 0         ✗ 1360
+     ✓ { step:vu0100 }..........................: 0.00%  ✓ 0         ✗ 1540
+     ✓ { step:vu0150 }..........................: 0.00%  ✓ 0         ✗ 1770
+     ✓ { step:vu0200 }..........................: 0.00%  ✓ 0         ✗ 1631
+     ✓ { step:vu0300 }..........................: 0.00%  ✓ 0         ✗ 1622
+     sap_sector_error_rate......................: 33.05% ✓ 13517     ✗ 27373
+     sap_sector_response_time_trend.............: avg=3113.076865 min=3.06     med=837.2382 max=47286.5931 p(90)=9223.86595 p(95)=12730.140915 p(99)=20480.784631
+     vus........................................: 5      min=0       max=300
+
+running (18m17.2s), 000/300 VUs, 20445 complete and 0 interrupted iterations
+sap_sector_school_capacity ✓ [======================================] 000/300 VUs  18m0s
+ERRO[1099] thresholds on metrics 'http_req_duration{schoolType:all-through,step:vu0050}, http_req_duration{schoolType:all-through,step:vu0100}, http_req_duration{schoolType:all-through,step:vu0150}, http_req_duration{schoolType:all-through,step:vu0200}, http_req_duration{schoolType:all-through,step:vu0300}, http_req_duration{schoolType:primary,step:vu0050}, http_req_duration{schoolType:primary,step:vu0100}, http_req_duration{schoolType:primary,step:vu0150}, http_req_duration{schoolType:primary,step:vu0200}, http_req_duration{schoolType:primary,step:vu0300}, http_req_duration{schoolType:secondary,step:vu0050}, http_req_duration{schoolType:secondary,step:vu0100}, http_req_duration{schoolType:secondary,step:vu0150}, http_req_duration{schoolType:secondary,step:vu0200}, http_req_duration{schoolType:secondary,step:vu0300}, http_req_duration{step:vu0050}, http_req_duration{step:vu0100}, http_req_duration{step:vu0150}, http_req_duration{step:vu0200}, http_req_duration{step:vu0300}' have been crossed
+
+---
+
+(Caching use cases)
+
+$ npm run test:loadtest:capacity:cache-on
+
+> sap-sector-load-tests@1.0.0 test:loadtest:capacity:cache-on
+> k6 run --env ENVIRONMENT=loadtest --env RUN_LABEL=cache-on sap-sector/school-capacity-test.js
+
+
+         /\      Grafana   /‾‾/
+    /\  /  \     |\  __   /  /
+   /  \/    \    | |/ /  /   ‾‾\
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/
+
+
+     execution: local
+        script: sap-sector/school-capacity-test.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 300 max VUs, 18m30s max duration (incl. graceful stop):
+              * sap_sector_school_capacity: Up to 300 looping VUs for 18m0s over 15 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0000] School capacity test - loadtest: https://localhost:3000
+  Run label: cache-on
+  VU steps: 10, 25, 50, 100, 150, 200, 300 (ramp 30s, hold 120s)
+  Approx. duration: 18 min plus warm-up  source=console
+INFO[0007] Warm-up complete: 255 pages returned 200.     source=console
+INFO[1087] [k6-reporter v3.0.4] Generating HTML summary report, with theme: default  source=console
+     █ SAP Sector: Secondary School Journey
+
+       ✓ Secondary school overview: status is expected
+       ✗ Secondary school overview: response time < 3000ms
+        ↳  99% — ✓ 51155 / ✗ 393
+       ✓ Secondary school overview: no server errors (5xx)
+       ✓ Secondary school overview: contains expected content
+       ✓ Secondary school - ks4-headline-measures: status is expected
+       ✗ Secondary school - ks4-headline-measures: response time < 3000ms
+        ↳  99% — ✓ 16914 / ✗ 164
+       ✓ Secondary school - ks4-headline-measures: no server errors (5xx)
+       ✓ Secondary school - view-similar-schools: status is expected
+       ✗ Secondary school - view-similar-schools: response time < 3000ms
+        ↳  98% — ✓ 17158 / ✗ 198
+       ✓ Secondary school - view-similar-schools: no server errors (5xx)
+       ✓ Secondary school - attendance: status is expected
+       ✗ Secondary school - attendance: response time < 3000ms
+        ↳  99% — ✓ 16956 / ✗ 158
+       ✓ Secondary school - attendance: no server errors (5xx)
+
+     █ SAP Sector: Primary School Journey
+
+       ✓ Primary school overview: status is expected
+       ✗ Primary school overview: response time < 3000ms
+        ↳  99% — ✓ 51156 / ✗ 392
+       ✓ Primary school overview: no server errors (5xx)
+       ✓ Primary school overview: contains expected content
+       ✓ Primary school - view-similar-schools: status is expected
+       ✗ Primary school - view-similar-schools: response time < 3000ms
+        ↳  98% — ✓ 16974 / ✗ 201
+       ✓ Primary school - view-similar-schools: no server errors (5xx)
+       ✓ Primary school - ks2: status is expected
+       ✗ Primary school - ks2: response time < 3000ms
+        ↳  98% — ✓ 16928 / ✗ 210
+       ✓ Primary school - ks2: no server errors (5xx)
+       ✓ Primary school - attendance: status is expected
+       ✗ Primary school - attendance: response time < 3000ms
+        ↳  99% — ✓ 17089 / ✗ 146
+       ✓ Primary school - attendance: no server errors (5xx)
+
+     █ SAP Sector: All Through School Journey
+
+       ✓ All through school overview: status is expected
+       ✗ All through school overview: response time < 3000ms
+        ↳  99% — ✓ 51135 / ✗ 413
+       ✓ All through school overview: no server errors (5xx)
+       ✓ All through school overview: contains expected content
+       ✓ All through school - view-similar-schools: status is expected
+       ✗ All through school - view-similar-schools: response time < 3000ms
+        ↳  98% — ✓ 12861 / ✗ 150
+       ✓ All through school - view-similar-schools: no server errors (5xx)
+       ✓ All through school - attendance: status is expected
+       ✗ All through school - attendance: response time < 3000ms
+        ↳  99% — ✓ 12739 / ✗ 107
+       ✓ All through school - attendance: no server errors (5xx)
+       ✓ All through school - ks4-headline-measures: status is expected
+       ✗ All through school - ks4-headline-measures: response time < 3000ms
+        ↳  98% — ✓ 12610 / ✗ 145
+       ✓ All through school - ks4-headline-measures: no server errors (5xx)
+       ✓ All through school - ks2: status is expected
+       ✗ All through school - ks2: response time < 3000ms
+        ↳  98% — ✓ 12790 / ✗ 146
+       ✓ All through school - ks2: no server errors (5xx)
+
+     checks.....................................: 99.73% ✓ 1079685    ✗ 2823
+     data_received..............................: 15 GB  14 MB/s
+     data_sent..................................: 47 MB  44 kB/s
+     group_duration.............................: avg=811.02ms   min=1.73ms  med=305.97ms max=10.74s    p(90)=2.37s     p(95)=3.23s     p(99)=5.09s
+     http_req_blocked...........................: avg=215.77µs   min=0s      med=0s       max=1.72s     p(90)=0s        p(95)=0s        p(99)=0s
+     http_req_connecting........................: avg=1.25µs     min=0s      med=0s       max=18.66ms   p(90)=0s        p(95)=0s        p(99)=0s
+     http_req_duration..........................: avg=404.48ms   min=0s      med=86.91ms  max=8.47s     p(90)=1.23s     p(95)=1.74s     p(99)=2.93s
+       { expected_response:true }...............: avg=404.48ms   min=0s      med=86.91ms  max=8.47s     p(90)=1.23s     p(95)=1.74s     p(99)=2.93s
+     ✓ { schoolType:all-through,step:vu0010 }...: avg=21.35ms    min=0s      med=6.87ms   max=829.81ms  p(90)=19.71ms   p(95)=76.49ms   p(99)=392.96ms
+     ✓ { schoolType:all-through,step:vu0025 }...: avg=76.97ms    min=0s      med=21.08ms  max=2.26s     p(90)=232.81ms  p(95)=409.09ms  p(99)=710.67ms
+     ✓ { schoolType:all-through,step:vu0050 }...: avg=155.69ms   min=0s      med=48.84ms  max=1.58s     p(90)=445.82ms  p(95)=585.51ms  p(99)=819.27ms
+     ✓ { schoolType:all-through,step:vu0100 }...: avg=337.02ms   min=2.18ms  med=218.76ms max=2.51s     p(90)=819.67ms  p(95)=995.58ms  p(99)=1.41s
+     ✓ { schoolType:all-through,step:vu0150 }...: avg=635.16ms   min=0s      med=572.03ms max=3.25s     p(90)=1.26s     p(95)=1.5s      p(99)=1.92s
+     ✓ { schoolType:all-through,step:vu0200 }...: avg=1.11s      min=6.48ms  med=918.42ms max=7.43s     p(90)=2.22s     p(95)=2.95s     p(99)=5.14s
+     ✗ { schoolType:all-through,step:vu0300 }...: avg=1.49s      min=29.88ms med=1.4s     max=7.79s     p(90)=2.64s     p(95)=3.09s     p(99)=4.08s
+     ✓ { schoolType:primary,step:vu0010 }.......: avg=21.99ms    min=0s      med=7ms      max=831.84ms  p(90)=20.55ms   p(95)=85.58ms   p(99)=407.58ms
+     ✓ { schoolType:primary,step:vu0025 }.......: avg=77.02ms    min=0s      med=21.35ms  max=2.23s     p(90)=233.88ms  p(95)=409.18ms  p(99)=710.11ms
+     ✓ { schoolType:primary,step:vu0050 }.......: avg=156.15ms   min=0s      med=48.93ms  max=1.5s      p(90)=446.58ms  p(95)=590.73ms  p(99)=826.63ms
+     ✓ { schoolType:primary,step:vu0100 }.......: avg=339.51ms   min=2.54ms  med=219.53ms max=2.47s     p(90)=822.78ms  p(95)=998.42ms  p(99)=1.41s
+     ✓ { schoolType:primary,step:vu0150 }.......: avg=636.81ms   min=1.06ms  med=572.46ms max=2.75s     p(90)=1.26s     p(95)=1.5s      p(99)=1.95s
+     ✓ { schoolType:primary,step:vu0200 }.......: avg=1.13s      min=7.6ms   med=936.42ms max=8.47s     p(90)=2.25s     p(95)=2.95s     p(99)=5.02s
+     ✗ { schoolType:primary,step:vu0300 }.......: avg=1.48s      min=27.35ms med=1.4s     max=6.57s     p(90)=2.63s     p(95)=3.1s      p(99)=3.97s
+     ✓ { schoolType:secondary,step:vu0010 }.....: avg=21.75ms    min=0s      med=6.79ms   max=830.37ms  p(90)=19.72ms   p(95)=86.49ms   p(99)=393.89ms
+     ✓ { schoolType:secondary,step:vu0025 }.....: avg=76.79ms    min=0s      med=21.16ms  max=2.23s     p(90)=232.73ms  p(95)=415.64ms  p(99)=710.29ms
+     ✓ { schoolType:secondary,step:vu0050 }.....: avg=154.83ms   min=0s      med=47.8ms   max=1.5s      p(90)=447.02ms  p(95)=583.16ms  p(99)=831.56ms
+     ✓ { schoolType:secondary,step:vu0100 }.....: avg=334.92ms   min=3.62ms  med=215.4ms  max=2.57s     p(90)=819.4ms   p(95)=983.51ms  p(99)=1.38s
+     ✓ { schoolType:secondary,step:vu0150 }.....: avg=621.98ms   min=745.6µs med=561.99ms max=3.16s     p(90)=1.22s     p(95)=1.46s     p(99)=1.87s
+     ✓ { schoolType:secondary,step:vu0200 }.....: avg=1.12s      min=5.53ms  med=921.8ms  max=7.95s     p(90)=2.24s     p(95)=2.95s     p(99)=4.87s
+     ✗ { schoolType:secondary,step:vu0300 }.....: avg=1.46s      min=20.88ms med=1.38s    max=7.02s     p(90)=2.63s     p(95)=3.02s     p(99)=3.93s
+     ✓ { step:vu0010 }..........................: avg=21.7ms     min=0s      med=6.88ms   max=831.84ms  p(90)=19.95ms   p(95)=84.18ms   p(99)=394.78ms
+     ✓ { step:vu0025 }..........................: avg=76.93ms    min=0s      med=21.19ms  max=2.26s     p(90)=232.89ms  p(95)=412.09ms  p(99)=710.36ms
+     ✓ { step:vu0050 }..........................: avg=155.56ms   min=0s      med=48.46ms  max=1.58s     p(90)=446.45ms  p(95)=586.87ms  p(99)=826.88ms
+     ✓ { step:vu0100 }..........................: avg=337.15ms   min=2.18ms  med=218.11ms max=2.57s     p(90)=820.69ms  p(95)=994.28ms  p(99)=1.4s
+     ✓ { step:vu0150 }..........................: avg=631.32ms   min=0s      med=569.03ms max=3.25s     p(90)=1.25s     p(95)=1.49s     p(99)=1.91s
+     ✓ { step:vu0200 }..........................: avg=1.12s      min=5.53ms  med=925.36ms max=8.47s     p(90)=2.23s     p(95)=2.95s     p(99)=5s
+     ✗ { step:vu0300 }..........................: avg=1.48s      min=20.88ms med=1.4s     max=7.79s     p(90)=2.64s     p(95)=3.07s     p(99)=4.02s
+   ✓ http_req_failed............................: 0.00%  ✓ 0          ✗ 309543
+     ✓ { schoolType:all-through,step:vu0010 }...: 0.00%  ✓ 0          ✗ 17894
+     ✓ { schoolType:all-through,step:vu0025 }...: 0.00%  ✓ 0          ✗ 12850
+     ✓ { schoolType:all-through,step:vu0050 }...: 0.00%  ✓ 0          ✗ 12838
+     ✓ { schoolType:all-through,step:vu0100 }...: 0.00%  ✓ 0          ✗ 11874
+     ✓ { schoolType:all-through,step:vu0150 }...: 0.00%  ✓ 0          ✗ 9538
+     ✓ { schoolType:all-through,step:vu0200 }...: 0.00%  ✓ 0          ✗ 7290
+     ✓ { schoolType:all-through,step:vu0300 }...: 0.00%  ✓ 0          ✗ 8114
+     ✓ { schoolType:primary,step:vu0010 }.......: 0.00%  ✓ 0          ✗ 17894
+     ✓ { schoolType:primary,step:vu0025 }.......: 0.00%  ✓ 0          ✗ 12850
+     ✓ { schoolType:primary,step:vu0050 }.......: 0.00%  ✓ 0          ✗ 12838
+     ✓ { schoolType:primary,step:vu0100 }.......: 0.00%  ✓ 0          ✗ 11874
+     ✓ { schoolType:primary,step:vu0150 }.......: 0.00%  ✓ 0          ✗ 9536
+     ✓ { schoolType:primary,step:vu0200 }.......: 0.00%  ✓ 0          ✗ 7290
+     ✓ { schoolType:primary,step:vu0300 }.......: 0.00%  ✓ 0          ✗ 8114
+     ✓ { schoolType:secondary,step:vu0010 }.....: 0.00%  ✓ 0          ✗ 17894
+     ✓ { schoolType:secondary,step:vu0025 }.....: 0.00%  ✓ 0          ✗ 12852
+     ✓ { schoolType:secondary,step:vu0050 }.....: 0.00%  ✓ 0          ✗ 12838
+     ✓ { schoolType:secondary,step:vu0100 }.....: 0.00%  ✓ 0          ✗ 11876
+     ✓ { schoolType:secondary,step:vu0150 }.....: 0.00%  ✓ 0          ✗ 9536
+     ✓ { schoolType:secondary,step:vu0200 }.....: 0.00%  ✓ 0          ✗ 7292
+     ✓ { schoolType:secondary,step:vu0300 }.....: 0.00%  ✓ 0          ✗ 8114
+     ✓ { step:vu0010 }..........................: 0.00%  ✓ 0          ✗ 53682
+     ✓ { step:vu0025 }..........................: 0.00%  ✓ 0          ✗ 38552
+     ✓ { step:vu0050 }..........................: 0.00%  ✓ 0          ✗ 38514
+     ✓ { step:vu0100 }..........................: 0.00%  ✓ 0          ✗ 35624
+     ✓ { step:vu0150 }..........................: 0.00%  ✓ 0          ✗ 28610
+     ✓ { step:vu0200 }..........................: 0.00%  ✓ 0          ✗ 21872
+     ✓ { step:vu0300 }..........................: 0.00%  ✓ 0          ✗ 24342
+     http_req_receiving.........................: avg=46.25ms    min=0s      med=2.89ms   max=2.5s      p(90)=92.3ms    p(95)=304.72ms  p(99)=761.56ms
+     http_req_sending...........................: avg=136.97µs   min=0s      med=0s       max=177.81ms  p(90)=506.49µs  p(95)=531.9µs   p(99)=2.92ms
+     http_req_tls_handshaking...................: avg=213.36µs   min=0s      med=0s       max=1.72s     p(90)=0s        p(95)=0s        p(99)=0s
+     http_req_waiting...........................: avg=358.09ms   min=0s      med=61ms     max=8.44s     p(90)=1.09s     p(95)=1.57s     p(99)=2.65s
+     http_reqs..................................: 309543 284.966086/s
+     iteration_duration.........................: avg=811.23ms   min=3.15ms  med=306.11ms max=10.74s    p(90)=2.37s     p(95)=3.23s     p(99)=5.09s
+     iterations.................................: 154644 142.365666/s
+     sap_sector_content_failed..................: 0.00%  ✓ 0          ✗ 154644
+     ✓ { step:vu0010 }..........................: 0.00%  ✓ 0          ✗ 26841
+     ✓ { step:vu0025 }..........................: 0.00%  ✓ 0          ✗ 19276
+     ✓ { step:vu0050 }..........................: 0.00%  ✓ 0          ✗ 19257
+     ✓ { step:vu0100 }..........................: 0.00%  ✓ 0          ✗ 17812
+     ✓ { step:vu0150 }..........................: 0.00%  ✓ 0          ✗ 14305
+     ✓ { step:vu0200 }..........................: 0.00%  ✓ 0          ✗ 10936
+     ✓ { step:vu0300 }..........................: 0.00%  ✓ 0          ✗ 12171
+     sap_sector_error_rate......................: 0.91%  ✓ 2823       ✗ 306465
+     sap_sector_response_time_trend.............: avg=404.750925 min=0       med=87.15365 max=8478.3899 p(90)=1236.5312 p(95)=1745.1316 p(99)=2934.051335
+     vus........................................: 8      min=0        max=300
+
+running (18m06.2s), 000/300 VUs, 154644 complete and 0 interrupted iterations
+sap_sector_school_capacity ✓ [======================================] 000/300 VUs  18m0s
+ERRO[1087] thresholds on metrics 'http_req_duration{schoolType:all-through,step:vu0300}, http_req_duration{schoolType:primary,step:vu0300}, http_req_duration{schoolType:secondary,step:vu0300}, http_req_duration{step:vu0300}' have been crossed
+
+---
+
+(Caching repositories)
+
+$ npm run test:loadtest:capacity:cache-on
+
+> sap-sector-load-tests@1.0.0 test:loadtest:capacity:cache-on
+> k6 run --env ENVIRONMENT=loadtest --env RUN_LABEL=cache-on sap-sector/school-capacity-test.js
+
+
+         /\      Grafana   /‾‾/
+    /\  /  \     |\  __   /  /
+   /  \/    \    | |/ /  /   ‾‾\
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/
+
+
+     execution: local
+        script: sap-sector/school-capacity-test.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 300 max VUs, 18m30s max duration (incl. graceful stop):
+              * sap_sector_school_capacity: Up to 300 looping VUs for 18m0s over 15 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0000] School capacity test - loadtest: https://localhost:3000
+  Run label: cache-on
+  VU steps: 10, 25, 50, 100, 150, 200, 300 (ramp 30s, hold 120s)
+  Approx. duration: 18 min plus warm-up  source=console
+INFO[0013] Warm-up complete: 255 pages returned 200.     source=console
+INFO[1094] [k6-reporter v3.0.4] Generating HTML summary report, with theme: default  source=console
+     █ SAP Sector: Secondary School Journey
+
+       ✓ Secondary school overview: status is expected
+       ✗ Secondary school overview: response time < 3000ms
+        ↳  57% — ✓ 3880 / ✗ 2902
+       ✓ Secondary school overview: no server errors (5xx)
+       ✓ Secondary school overview: contains expected content
+       ✓ Secondary school - view-similar-schools: status is expected
+       ✗ Secondary school - view-similar-schools: response time < 3000ms
+        ↳  57% — ✓ 1276 / ✗ 955
+       ✓ Secondary school - view-similar-schools: no server errors (5xx)
+       ✓ Secondary school - ks4-headline-measures: status is expected
+       ✗ Secondary school - ks4-headline-measures: response time < 3000ms
+        ↳  50% — ✓ 1153 / ✗ 1116
+       ✓ Secondary school - ks4-headline-measures: no server errors (5xx)
+       ✓ Secondary school - attendance: status is expected
+       ✗ Secondary school - attendance: response time < 3000ms
+        ↳  55% — ✓ 1277 / ✗ 1005
+       ✓ Secondary school - attendance: no server errors (5xx)
+
+     █ SAP Sector: Primary School Journey
+
+       ✓ Primary school overview: status is expected
+       ✗ Primary school overview: response time < 3000ms
+        ↳  64% — ✓ 4390 / ✗ 2392
+       ✓ Primary school overview: no server errors (5xx)
+       ✓ Primary school overview: contains expected content
+       ✓ Primary school - view-similar-schools: status is expected
+       ✗ Primary school - view-similar-schools: response time < 3000ms
+        ↳  65% — ✓ 1501 / ✗ 794
+       ✓ Primary school - view-similar-schools: no server errors (5xx)
+       ✓ Primary school - attendance: status is expected
+       ✗ Primary school - attendance: response time < 3000ms
+        ↳  61% — ✓ 1390 / ✗ 867
+       ✓ Primary school - attendance: no server errors (5xx)
+       ✓ Primary school - ks2: status is expected
+       ✗ Primary school - ks2: response time < 3000ms
+        ↳  59% — ✓ 1331 / ✗ 899
+       ✓ Primary school - ks2: no server errors (5xx)
+
+     █ SAP Sector: All Through School Journey
+
+       ✓ All through school overview: status is expected
+       ✗ All through school overview: response time < 3000ms
+        ↳  63% — ✓ 4281 / ✗ 2500
+       ✓ All through school overview: no server errors (5xx)
+       ✓ All through school overview: contains expected content
+       ✓ All through school - ks2: status is expected
+       ✗ All through school - ks2: response time < 3000ms
+        ↳  56% — ✓ 953 / ✗ 732
+       ✓ All through school - ks2: no server errors (5xx)
+       ✓ All through school - view-similar-schools: status is expected
+       ✗ All through school - view-similar-schools: response time < 3000ms
+        ↳  60% — ✓ 1027 / ✗ 670
+       ✓ All through school - view-similar-schools: no server errors (5xx)
+       ✓ All through school - ks4-headline-measures: status is expected
+       ✗ All through school - ks4-headline-measures: response time < 3000ms
+        ↳  55% — ✓ 961 / ✗ 763
+       ✓ All through school - ks4-headline-measures: no server errors (5xx)
+       ✓ All through school - attendance: status is expected
+       ✗ All through school - attendance: response time < 3000ms
+        ↳  59% — ✓ 1004 / ✗ 671
+       ✓ All through school - attendance: no server errors (5xx)
+
+     checks.....................................: 88.57% ✓ 126149    ✗ 16266
+     data_received..............................: 2.1 GB 1.9 MB/s
+     data_sent..................................: 5.8 MB 5.3 kB/s
+     group_duration.............................: avg=6.22s       min=11.65ms  med=4.8s       max=47.2s      p(90)=14.73s     p(95)=18.51s      p(99)=26.21s
+     http_req_blocked...........................: avg=1.29ms      min=0s       med=0s         max=1.44s      p(90)=0s         p(95)=0s          p(99)=0s
+     http_req_connecting........................: avg=39.14µs     min=0s       med=0s         max=63.02ms    p(90)=0s         p(95)=0s          p(99)=0s
+     http_req_duration..........................: avg=3.09s       min=2.54ms   med=2.14s      max=31.86s     p(90)=7.48s      p(95)=9.84s       p(99)=15.16s
+       { expected_response:true }...............: avg=3.09s       min=2.54ms   med=2.14s      max=31.86s     p(90)=7.48s      p(95)=9.84s       p(99)=15.16s
+     ✓ { schoolType:all-through,step:vu0010 }...: avg=117.11ms    min=4.12ms   med=105.9ms    max=620.39ms   p(90)=200.27ms   p(95)=236.84ms    p(99)=342.64ms
+     ✓ { schoolType:all-through,step:vu0025 }...: avg=1.15s       min=62.62ms  med=891.01ms   max=3.89s      p(90)=2.31s      p(95)=2.94s       p(99)=3.71s
+     ✗ { schoolType:all-through,step:vu0050 }...: avg=2.34s       min=43.93ms  med=2.05s      max=8.7s       p(90)=4.63s      p(95)=5.38s       p(99)=6.56s
+     ✗ { schoolType:all-through,step:vu0100 }...: avg=2.65s       min=97.65ms  med=2.43s      max=10.99s     p(90)=4.65s      p(95)=5.2s        p(99)=7s
+     ✗ { schoolType:all-through,step:vu0150 }...: avg=3.79s       min=104.95ms med=3.52s      max=13.61s     p(90)=6.73s      p(95)=7.6s        p(99)=9.91s
+     ✗ { schoolType:all-through,step:vu0200 }...: avg=4.93s       min=89.26ms  med=4.67s      max=17.4s      p(90)=8.51s      p(95)=9.79s       p(99)=11.99s
+     ✗ { schoolType:all-through,step:vu0300 }...: avg=7.5s        min=95.58ms  med=6.84s      max=26.25s     p(90)=13.1s      p(95)=15.36s      p(99)=19.91s
+     ✓ { schoolType:primary,step:vu0010 }.......: avg=141.03ms    min=50.4ms   med=131.89ms   max=484.16ms   p(90)=204.34ms   p(95)=233.04ms    p(99)=302.93ms
+     ✓ { schoolType:primary,step:vu0025 }.......: avg=1.19s       min=173.09ms med=949.93ms   max=4.24s      p(90)=2.23s      p(95)=2.72s       p(99)=3.74s
+     ✗ { schoolType:primary,step:vu0050 }.......: avg=1.9s        min=219.91ms med=1.69s      max=6.19s      p(90)=3.39s      p(95)=3.85s       p(99)=4.93s
+     ✗ { schoolType:primary,step:vu0100 }.......: avg=2.34s       min=210.38ms med=2.11s      max=9.62s      p(90)=4.05s      p(95)=4.77s       p(99)=6.61s
+     ✗ { schoolType:primary,step:vu0150 }.......: avg=3.45s       min=252.49ms med=3.16s      max=15.17s     p(90)=5.94s      p(95)=6.87s       p(99)=8.79s
+     ✗ { schoolType:primary,step:vu0200 }.......: avg=4.94s       min=241.92ms med=4.57s      max=16.5s      p(90)=8.65s      p(95)=9.99s       p(99)=12.54s
+     ✗ { schoolType:primary,step:vu0300 }.......: avg=7.83s       min=235.1ms  med=7.14s      max=31.86s     p(90)=13.78s     p(95)=16.39s      p(99)=23.4s
+     ✓ { schoolType:secondary,step:vu0010 }.....: avg=188.21ms    min=75.76ms  med=174.99ms   max=585.57ms   p(90)=277.91ms   p(95)=316.73ms    p(99)=386.62ms
+     ✗ { schoolType:secondary,step:vu0025 }.....: avg=1.44s       min=199.67ms med=1.23s      max=5.15s      p(90)=2.66s      p(95)=3.15s       p(99)=3.95s
+     ✗ { schoolType:secondary,step:vu0050 }.....: avg=2.46s       min=437.59ms med=2.21s      max=7.93s      p(90)=4.07s      p(95)=4.91s       p(99)=6.35s
+     ✗ { schoolType:secondary,step:vu0100 }.....: avg=2.91s       min=168.37ms med=2.69s      max=10.69s     p(90)=4.78s      p(95)=5.41s       p(99)=7.63s
+     ✗ { schoolType:secondary,step:vu0150 }.....: avg=3.92s       min=241.21ms med=3.65s      max=16.04s     p(90)=6.41s      p(95)=7.45s       p(99)=9.61s
+     ✗ { schoolType:secondary,step:vu0200 }.....: avg=5.53s       min=162.98ms med=5.23s      max=15.64s     p(90)=9.23s      p(95)=10.55s      p(99)=12.58s
+     ✗ { schoolType:secondary,step:vu0300 }.....: avg=8.84s       min=227.54ms med=7.96s      max=30.15s     p(90)=15.02s     p(95)=17.19s      p(99)=23.12s
+     ✓ { step:vu0010 }..........................: avg=148.77ms    min=4.12ms   med=139.23ms   max=620.39ms   p(90)=236.15ms   p(95)=275.6ms     p(99)=355.51ms
+     ✓ { step:vu0025 }..........................: avg=1.26s       min=62.62ms  med=1.03s      max=5.15s      p(90)=2.39s      p(95)=2.99s       p(99)=3.78s
+     ✗ { step:vu0050 }..........................: avg=2.23s       min=43.93ms  med=2s         max=8.7s       p(90)=3.99s      p(95)=4.9s        p(99)=6.29s
+     ✗ { step:vu0100 }..........................: avg=2.63s       min=97.65ms  med=2.41s      max=10.99s     p(90)=4.56s      p(95)=5.19s       p(99)=7.13s
+     ✗ { step:vu0150 }..........................: avg=3.72s       min=104.95ms med=3.46s      max=16.04s     p(90)=6.4s       p(95)=7.37s       p(99)=9.68s
+     ✗ { step:vu0200 }..........................: avg=5.13s       min=89.26ms  med=4.85s      max=17.4s      p(90)=8.82s      p(95)=10.08s      p(99)=12.5s
+     ✗ { step:vu0300 }..........................: avg=8.05s       min=95.58ms  med=7.31s      max=31.86s     p(90)=14.16s     p(95)=16.39s      p(99)=22.55s
+   ✓ http_req_failed............................: 0.00%  ✓ 0         ✗ 40945
+     ✓ { schoolType:all-through,step:vu0010 }...: 0.00%  ✓ 0         ✗ 2672
+     ✓ { schoolType:all-through,step:vu0025 }...: 0.00%  ✓ 0         ✗ 798
+     ✓ { schoolType:all-through,step:vu0050 }...: 0.00%  ✓ 0         ✗ 874
+     ✓ { schoolType:all-through,step:vu0100 }...: 0.00%  ✓ 0         ✗ 1524
+     ✓ { schoolType:all-through,step:vu0150 }...: 0.00%  ✓ 0         ✗ 1628
+     ✓ { schoolType:all-through,step:vu0200 }...: 0.00%  ✓ 0         ✗ 1550
+     ✓ { schoolType:all-through,step:vu0300 }...: 0.00%  ✓ 0         ✗ 1470
+     ✓ { schoolType:primary,step:vu0010 }.......: 0.00%  ✓ 0         ✗ 2672
+     ✓ { schoolType:primary,step:vu0025 }.......: 0.00%  ✓ 0         ✗ 798
+     ✓ { schoolType:primary,step:vu0050 }.......: 0.00%  ✓ 0         ✗ 874
+     ✓ { schoolType:primary,step:vu0100 }.......: 0.00%  ✓ 0         ✗ 1522
+     ✓ { schoolType:primary,step:vu0150 }.......: 0.00%  ✓ 0         ✗ 1630
+     ✓ { schoolType:primary,step:vu0200 }.......: 0.00%  ✓ 0         ✗ 1550
+     ✓ { schoolType:primary,step:vu0300 }.......: 0.00%  ✓ 0         ✗ 1470
+     ✓ { schoolType:secondary,step:vu0010 }.....: 0.00%  ✓ 0         ✗ 2670
+     ✓ { schoolType:secondary,step:vu0025 }.....: 0.00%  ✓ 0         ✗ 800
+     ✓ { schoolType:secondary,step:vu0050 }.....: 0.00%  ✓ 0         ✗ 876
+     ✓ { schoolType:secondary,step:vu0100 }.....: 0.00%  ✓ 0         ✗ 1522
+     ✓ { schoolType:secondary,step:vu0150 }.....: 0.00%  ✓ 0         ✗ 1628
+     ✓ { schoolType:secondary,step:vu0200 }.....: 0.00%  ✓ 0         ✗ 1552
+     ✓ { schoolType:secondary,step:vu0300 }.....: 0.00%  ✓ 0         ✗ 1468
+     ✓ { step:vu0010 }..........................: 0.00%  ✓ 0         ✗ 8014
+     ✓ { step:vu0025 }..........................: 0.00%  ✓ 0         ✗ 2396
+     ✓ { step:vu0050 }..........................: 0.00%  ✓ 0         ✗ 2624
+     ✓ { step:vu0100 }..........................: 0.00%  ✓ 0         ✗ 4568
+     ✓ { step:vu0150 }..........................: 0.00%  ✓ 0         ✗ 4886
+     ✓ { step:vu0200 }..........................: 0.00%  ✓ 0         ✗ 4652
+     ✓ { step:vu0300 }..........................: 0.00%  ✓ 0         ✗ 4408
+     http_req_receiving.........................: avg=46.14ms     min=0s       med=509.6µs    max=2.78s      p(90)=93.13ms    p(95)=222.92ms    p(99)=877.71ms
+     http_req_sending...........................: avg=251.67µs    min=0s       med=0s         max=157.87ms   p(90)=0s         p(95)=602.81µs    p(99)=6.63ms
+     http_req_tls_handshaking...................: avg=1.24ms      min=0s       med=0s         max=1.43s      p(90)=0s         p(95)=0s          p(99)=0s
+     http_req_waiting...........................: avg=3.04s       min=526.2µs  med=2.11s      max=31.86s     p(90)=7.38s      p(95)=9.71s       p(99)=14.99s
+     http_reqs..................................: 40945  37.457307/s
+     iteration_duration.........................: avg=6.22s       min=12.15ms  med=4.8s       max=47.2s      p(90)=14.73s     p(95)=18.51s      p(99)=26.21s
+     iterations.................................: 20345  18.612014/s
+     sap_sector_content_failed..................: 0.00%  ✓ 0         ✗ 20345
+     ✓ { step:vu0010 }..........................: 0.00%  ✓ 0         ✗ 4007
+     ✓ { step:vu0025 }..........................: 0.00%  ✓ 0         ✗ 1198
+     ✓ { step:vu0050 }..........................: 0.00%  ✓ 0         ✗ 1312
+     ✓ { step:vu0100 }..........................: 0.00%  ✓ 0         ✗ 2284
+     ✓ { step:vu0150 }..........................: 0.00%  ✓ 0         ✗ 2443
+     ✓ { step:vu0200 }..........................: 0.00%  ✓ 0         ✗ 2326
+     ✓ { step:vu0300 }..........................: 0.00%  ✓ 0         ✗ 2204
+     sap_sector_error_rate......................: 39.97% ✓ 16266     ✗ 24424
+     sap_sector_response_time_trend.............: avg=3110.114447 min=2.542    med=2169.12895 max=31869.3749 p(90)=7512.02269 p(95)=9878.801555 p(99)=15169.924664
+     vus........................................: 11     min=0       max=300
+
+running (18m13.1s), 000/300 VUs, 20345 complete and 0 interrupted iterations
+sap_sector_school_capacity ✓ [======================================] 000/300 VUs  18m0s
+ERRO[1094] thresholds on metrics 'http_req_duration{schoolType:all-through,step:vu0050}, http_req_duration{schoolType:all-through,step:vu0100}, http_req_duration{schoolType:all-through,step:vu0150}, http_req_duration{schoolType:all-through,step:vu0200}, http_req_duration{schoolType:all-through,step:vu0300}, http_req_duration{schoolType:primary,step:vu0050}, http_req_duration{schoolType:primary,step:vu0100}, http_req_duration{schoolType:primary,step:vu0150}, http_req_duration{schoolType:primary,step:vu0200}, http_req_duration{schoolType:primary,step:vu0300}, http_req_duration{schoolType:secondary,step:vu0025}, http_req_duration{schoolType:secondary,step:vu0050}, http_req_duration{schoolType:secondary,step:vu0100}, http_req_duration{schoolType:secondary,step:vu0150}, http_req_duration{schoolType:secondary,step:vu0200}, http_req_duration{schoolType:secondary,step:vu0300}, http_req_duration{step:vu0050}, http_req_duration{step:vu0100}, http_req_duration{step:vu0150}, http_req_duration{step:vu0200}, http_req_duration{step:vu0300}' have been crossed
+
+---
+
+(Caching use cases)
+
+$ npm run test:loadtest:capacity:cache-on
+
+> sap-sector-load-tests@1.0.0 test:loadtest:capacity:cache-on
+> k6 run --env ENVIRONMENT=loadtest --env RUN_LABEL=cache-on sap-sector/school-capacity-test.js
+
+
+         /\      Grafana   /‾‾/
+    /\  /  \     |\  __   /  /
+   /  \/    \    | |/ /  /   ‾‾\
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/
+
+
+     execution: local
+        script: sap-sector/school-capacity-test.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 300 max VUs, 18m30s max duration (incl. graceful stop):
+              * sap_sector_school_capacity: Up to 300 looping VUs for 18m0s over 15 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0000] School capacity test - loadtest: https://localhost:3000
+  Run label: cache-on
+  VU steps: 10, 25, 50, 100, 150, 200, 300 (ramp 30s, hold 120s)
+  Approx. duration: 18 min plus warm-up  source=console
+INFO[0002] Warm-up complete: 255 pages returned 200.     source=console
+INFO[1083] [k6-reporter v3.0.4] Generating HTML summary report, with theme: default  source=console
+     █ SAP Sector: Secondary School Journey
+
+       ✓ Secondary school overview: status is expected
+       ✗ Secondary school overview: response time < 3000ms
+        ↳  99% — ✓ 90394 / ✗ 45
+       ✓ Secondary school overview: no server errors (5xx)
+       ✓ Secondary school overview: contains expected content
+       ✓ Secondary school - attendance: status is expected
+       ✗ Secondary school - attendance: response time < 3000ms
+        ↳  99% — ✓ 30172 / ✗ 13
+       ✓ Secondary school - attendance: no server errors (5xx)
+       ✓ Secondary school - ks4-headline-measures: status is expected
+       ✗ Secondary school - ks4-headline-measures: response time < 3000ms
+        ↳  99% — ✓ 30068 / ✗ 34
+       ✓ Secondary school - ks4-headline-measures: no server errors (5xx)
+       ✓ Secondary school - view-similar-schools: status is expected
+       ✗ Secondary school - view-similar-schools: response time < 3000ms
+        ↳  99% — ✓ 30103 / ✗ 49
+       ✓ Secondary school - view-similar-schools: no server errors (5xx)
+
+     █ SAP Sector: Primary School Journey
+
+       ✓ Primary school overview: status is expected
+       ✗ Primary school overview: response time < 3000ms
+        ↳  99% — ✓ 90385 / ✗ 53
+       ✓ Primary school overview: no server errors (5xx)
+       ✓ Primary school overview: contains expected content
+       ✓ Primary school - view-similar-schools: status is expected
+       ✗ Primary school - view-similar-schools: response time < 3000ms
+        ↳  99% — ✓ 30580 / ✗ 46
+       ✓ Primary school - view-similar-schools: no server errors (5xx)
+       ✓ Primary school - ks2: status is expected
+       ✗ Primary school - ks2: response time < 3000ms
+        ↳  99% — ✓ 29841 / ✗ 60
+       ✓ Primary school - ks2: no server errors (5xx)
+       ✓ Primary school - attendance: status is expected
+       ✗ Primary school - attendance: response time < 3000ms
+        ↳  99% — ✓ 29895 / ✗ 16
+       ✓ Primary school - attendance: no server errors (5xx)
+
+     █ SAP Sector: All Through School Journey
+
+       ✓ All through school overview: status is expected
+       ✗ All through school overview: response time < 3000ms
+        ↳  99% — ✓ 90391 / ✗ 47
+       ✓ All through school overview: no server errors (5xx)
+       ✓ All through school overview: contains expected content
+       ✓ All through school - attendance: status is expected
+       ✗ All through school - attendance: response time < 3000ms
+        ↳  99% — ✓ 22463 / ✗ 19
+       ✓ All through school - attendance: no server errors (5xx)
+       ✓ All through school - view-similar-schools: status is expected
+       ✗ All through school - view-similar-schools: response time < 3000ms
+        ↳  99% — ✓ 22579 / ✗ 43
+       ✓ All through school - view-similar-schools: no server errors (5xx)
+       ✓ All through school - ks2: status is expected
+       ✗ All through school - ks2: response time < 3000ms
+        ↳  99% — ✓ 22601 / ✗ 33
+       ✓ All through school - ks2: no server errors (5xx)
+       ✓ All through school - ks4-headline-measures: status is expected
+       ✗ All through school - ks4-headline-measures: response time < 3000ms
+        ↳  99% — ✓ 22678 / ✗ 22
+       ✓ All through school - ks4-headline-measures: no server errors (5xx)
+
+     checks.....................................: 99.97% ✓ 1898725    ✗ 480
+     data_received..............................: 26 GB  24 MB/s
+     data_sent..................................: 93 MB  86 kB/s
+     group_duration.............................: avg=462.47ms   min=3.84ms  med=297.87ms  max=8.89s     p(90)=1.15s     p(95)=1.5s       p(99)=2.21s
+     http_req_blocked...........................: avg=62.17µs    min=0s      med=0s        max=654.33ms  p(90)=0s        p(95)=0s         p(99)=0s
+     http_req_connecting........................: avg=1.38µs     min=0s      med=0s        max=42.63ms   p(90)=0s        p(95)=0s         p(99)=0s
+     http_req_duration..........................: avg=230.52ms   min=1.01ms  med=119.59ms  max=6.29s     p(90)=594.77ms  p(95)=815.72ms   p(99)=1.33s
+       { expected_response:true }...............: avg=230.52ms   min=1.01ms  med=119.59ms  max=6.29s     p(90)=594.77ms  p(95)=815.72ms   p(99)=1.33s
+     ✓ { schoolType:all-through,step:vu0010 }...: avg=13.31ms    min=1.59ms  med=8.47ms    max=402.57ms  p(90)=16.96ms   p(95)=30.33ms    p(99)=141.81ms
+     ✓ { schoolType:all-through,step:vu0025 }...: avg=54.64ms    min=2.13ms  med=29.15ms   max=1.29s     p(90)=127.1ms   p(95)=197.6ms    p(99)=399.48ms
+     ✓ { schoolType:all-through,step:vu0050 }...: avg=112.83ms   min=6.54ms  med=70.61ms   max=965.07ms  p(90)=245.21ms  p(95)=318.25ms   p(99)=491.07ms
+     ✓ { schoolType:all-through,step:vu0100 }...: avg=202.81ms   min=23.66ms med=158.41ms  max=1.25s     p(90)=405.24ms  p(95)=507.73ms   p(99)=705.62ms
+     ✓ { schoolType:all-through,step:vu0150 }...: avg=283.67ms   min=16.87ms med=243.6ms   max=1.4s      p(90)=523.84ms  p(95)=630.26ms   p(99)=920.37ms
+     ✓ { schoolType:all-through,step:vu0200 }...: avg=411.2ms    min=37.4ms  med=369.46ms  max=1.44s     p(90)=706.8ms   p(95)=825.92ms   p(99)=1.01s
+     ✓ { schoolType:all-through,step:vu0300 }...: avg=801.21ms   min=60.22ms med=719.95ms  max=6.22s     p(90)=1.29s     p(95)=1.53s      p(99)=2.1s
+     ✓ { schoolType:primary,step:vu0010 }.......: avg=13.5ms     min=1.01ms  med=8.6ms     max=407.21ms  p(90)=17.08ms   p(95)=30.24ms    p(99)=142.19ms
+     ✓ { schoolType:primary,step:vu0025 }.......: avg=54.38ms    min=4.12ms  med=29.23ms   max=1.29s     p(90)=124.47ms  p(95)=197.28ms   p(99)=390.68ms
+     ✓ { schoolType:primary,step:vu0050 }.......: avg=113.47ms   min=9.88ms  med=71.45ms   max=1.13s     p(90)=248.91ms  p(95)=320.87ms   p(99)=488.02ms
+     ✓ { schoolType:primary,step:vu0100 }.......: avg=205.05ms   min=22.61ms med=159.28ms  max=1.23s     p(90)=416.88ms  p(95)=518.89ms   p(99)=717.12ms
+     ✓ { schoolType:primary,step:vu0150 }.......: avg=285.77ms   min=21.72ms med=244.08ms  max=1.41s     p(90)=531.05ms  p(95)=641.91ms   p(99)=949.23ms
+     ✓ { schoolType:primary,step:vu0200 }.......: avg=411.58ms   min=38.4ms  med=368.07ms  max=1.63s     p(90)=708.73ms  p(95)=834.05ms   p(99)=1.02s
+     ✓ { schoolType:primary,step:vu0300 }.......: avg=803.07ms   min=65.81ms med=722.73ms  max=6.29s     p(90)=1.31s     p(95)=1.56s      p(99)=2.29s
+     ✓ { schoolType:secondary,step:vu0010 }.....: avg=13.28ms    min=1.86ms  med=8.4ms     max=496.23ms  p(90)=16.69ms   p(95)=30.07ms    p(99)=141.07ms
+     ✓ { schoolType:secondary,step:vu0025 }.....: avg=53.31ms    min=3.07ms  med=28.55ms   max=1.3s      p(90)=120.17ms  p(95)=195.54ms   p(99)=387.38ms
+     ✓ { schoolType:secondary,step:vu0050 }.....: avg=110.03ms   min=7.54ms  med=67.57ms   max=980.49ms  p(90)=243.17ms  p(95)=313.05ms   p(99)=491.01ms
+     ✓ { schoolType:secondary,step:vu0100 }.....: avg=195.65ms   min=28.92ms med=149.86ms  max=984.7ms   p(90)=387.69ms  p(95)=498.63ms   p(99)=696.47ms
+     ✓ { schoolType:secondary,step:vu0150 }.....: avg=273.2ms    min=16.87ms med=234.18ms  max=1.4s      p(90)=507.12ms  p(95)=617.38ms   p(99)=895.29ms
+     ✓ { schoolType:secondary,step:vu0200 }.....: avg=394.7ms    min=43.73ms med=353.86ms  max=1.62s     p(90)=686.25ms  p(95)=791.38ms   p(99)=990.26ms
+     ✓ { schoolType:secondary,step:vu0300 }.....: avg=764.94ms   min=61.27ms med=686.17ms  max=6.22s     p(90)=1.25s     p(95)=1.46s      p(99)=2.12s
+     ✓ { step:vu0010 }..........................: avg=13.36ms    min=1.01ms  med=8.49ms    max=496.23ms  p(90)=16.91ms   p(95)=30.23ms    p(99)=141.82ms
+     ✓ { step:vu0025 }..........................: avg=54.11ms    min=2.13ms  med=28.95ms   max=1.3s      p(90)=123.36ms  p(95)=196.9ms    p(99)=391.91ms
+     ✓ { step:vu0050 }..........................: avg=112.11ms   min=6.54ms  med=69.79ms   max=1.13s     p(90)=245.97ms  p(95)=317.94ms   p(99)=489.99ms
+     ✓ { step:vu0100 }..........................: avg=201.17ms   min=22.61ms med=156.01ms  max=1.25s     p(90)=404.94ms  p(95)=508.31ms   p(99)=708.32ms
+     ✓ { step:vu0150 }..........................: avg=280.88ms   min=16.87ms med=240.73ms  max=1.41s     p(90)=519ms     p(95)=628.67ms   p(99)=923.88ms
+     ✓ { step:vu0200 }..........................: avg=405.83ms   min=37.4ms  med=363.79ms  max=1.63s     p(90)=700.82ms  p(95)=816.85ms   p(99)=1.01s
+     ✓ { step:vu0300 }..........................: avg=789.74ms   min=60.22ms med=709.07ms  max=6.29s     p(90)=1.28s     p(95)=1.52s      p(99)=2.18s
+   ✓ http_req_failed............................: 0.00%  ✓ 0          ✗ 542885
+     ✓ { schoolType:all-through,step:vu0010 }...: 0.00%  ✓ 0          ✗ 28780
+     ✓ { schoolType:all-through,step:vu0025 }...: 0.00%  ✓ 0          ✗ 18266
+     ✓ { schoolType:all-through,step:vu0050 }...: 0.00%  ✓ 0          ✗ 17690
+     ✓ { schoolType:all-through,step:vu0100 }...: 0.00%  ✓ 0          ✗ 19736
+     ✓ { schoolType:all-through,step:vu0150 }...: 0.00%  ✓ 0          ✗ 21312
+     ✓ { schoolType:all-through,step:vu0200 }...: 0.00%  ✓ 0          ✗ 19694
+     ✓ { schoolType:all-through,step:vu0300 }...: 0.00%  ✓ 0          ✗ 15514
+     ✓ { schoolType:primary,step:vu0010 }.......: 0.00%  ✓ 0          ✗ 28780
+     ✓ { schoolType:primary,step:vu0025 }.......: 0.00%  ✓ 0          ✗ 18264
+     ✓ { schoolType:primary,step:vu0050 }.......: 0.00%  ✓ 0          ✗ 17690
+     ✓ { schoolType:primary,step:vu0100 }.......: 0.00%  ✓ 0          ✗ 19734
+     ✓ { schoolType:primary,step:vu0150 }.......: 0.00%  ✓ 0          ✗ 21312
+     ✓ { schoolType:primary,step:vu0200 }.......: 0.00%  ✓ 0          ✗ 19694
+     ✓ { schoolType:primary,step:vu0300 }.......: 0.00%  ✓ 0          ✗ 15516
+     ✓ { schoolType:secondary,step:vu0010 }.....: 0.00%  ✓ 0          ✗ 28780
+     ✓ { schoolType:secondary,step:vu0025 }.....: 0.00%  ✓ 0          ✗ 18266
+     ✓ { schoolType:secondary,step:vu0050 }.....: 0.00%  ✓ 0          ✗ 17690
+     ✓ { schoolType:secondary,step:vu0100 }.....: 0.00%  ✓ 0          ✗ 19734
+     ✓ { schoolType:secondary,step:vu0150 }.....: 0.00%  ✓ 0          ✗ 21312
+     ✓ { schoolType:secondary,step:vu0200 }.....: 0.00%  ✓ 0          ✗ 19694
+     ✓ { schoolType:secondary,step:vu0300 }.....: 0.00%  ✓ 0          ✗ 15516
+     ✓ { step:vu0010 }..........................: 0.00%  ✓ 0          ✗ 86340
+     ✓ { step:vu0025 }..........................: 0.00%  ✓ 0          ✗ 54796
+     ✓ { step:vu0050 }..........................: 0.00%  ✓ 0          ✗ 53070
+     ✓ { step:vu0100 }..........................: 0.00%  ✓ 0          ✗ 59204
+     ✓ { step:vu0150 }..........................: 0.00%  ✓ 0          ✗ 63936
+     ✓ { step:vu0200 }..........................: 0.00%  ✓ 0          ✗ 59082
+     ✓ { step:vu0300 }..........................: 0.00%  ✓ 0          ✗ 46546
+     http_req_receiving.........................: avg=96.09ms    min=0s      med=26.74ms   max=4.6s      p(90)=280.3ms   p(95)=435.32ms   p(99)=819.08ms
+     http_req_sending...........................: avg=139.58µs   min=0s      med=0s        max=203.79ms  p(90)=516.5µs   p(95)=1ms        p(99)=1.43ms
+     http_req_tls_handshaking...................: avg=60.1µs     min=0s      med=0s        max=650.68ms  p(90)=0s        p(95)=0s         p(99)=0s
+     http_req_waiting...........................: avg=134.28ms   min=0s      med=59.78ms   max=3.69s     p(90)=352.46ms  p(95)=492.36ms   p(99)=830.18ms
+     http_reqs..................................: 542885 501.783461/s
+     iteration_duration.........................: avg=462.68ms   min=3.84ms  med=298.14ms  max=8.89s     p(90)=1.15s     p(95)=1.5s       p(99)=2.21s
+     iterations.................................: 271315 250.773883/s
+     sap_sector_content_failed..................: 0.00%  ✓ 0          ✗ 271315
+     ✓ { step:vu0010 }..........................: 0.00%  ✓ 0          ✗ 43170
+     ✓ { step:vu0025 }..........................: 0.00%  ✓ 0          ✗ 27398
+     ✓ { step:vu0050 }..........................: 0.00%  ✓ 0          ✗ 26535
+     ✓ { step:vu0100 }..........................: 0.00%  ✓ 0          ✗ 29602
+     ✓ { step:vu0150 }..........................: 0.00%  ✓ 0          ✗ 31968
+     ✓ { step:vu0200 }..........................: 0.00%  ✓ 0          ✗ 29541
+     ✓ { step:vu0300 }..........................: 0.00%  ✓ 0          ✗ 23273
+     sap_sector_error_rate......................: 0.08%  ✓ 480        ✗ 542150
+     sap_sector_response_time_trend.............: avg=230.620178 min=1.0102  med=119.71465 max=6293.5688 p(90)=594.86476 p(95)=815.829455 p(99)=1332.364951
+     vus........................................: 11     min=0        max=300
+
+running (18m01.9s), 000/300 VUs, 271315 complete and 0 interrupted iterations
+sap_sector_school_capacity ✓ [======================================] 000/300 VUs  18m0s
+
+---
+
+(Caching repositories)
+
+$ npm run test:loadtest:capacity:cache-on
+
+> sap-sector-load-tests@1.0.0 test:loadtest:capacity:cache-on
+> k6 run --env ENVIRONMENT=loadtest --env RUN_LABEL=cache-on sap-sector/school-capacity-test.js
+
+
+         /\      Grafana   /‾‾/
+    /\  /  \     |\  __   /  /
+   /  \/    \    | |/ /  /   ‾‾\
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/
+
+
+     execution: local
+        script: sap-sector/school-capacity-test.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 300 max VUs, 18m30s max duration (incl. graceful stop):
+              * sap_sector_school_capacity: Up to 300 looping VUs for 18m0s over 15 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+INFO[0000] School capacity test - loadtest: https://localhost:3000
+  Run label: cache-on
+  VU steps: 10, 25, 50, 100, 150, 200, 300 (ramp 30s, hold 120s)
+  Approx. duration: 18 min plus warm-up  source=console
+INFO[0014] Warm-up complete: 255 pages returned 200.     source=console
+INFO[1095] [k6-reporter v3.0.4] Generating HTML summary report, with theme: default  source=console
+     █ SAP Sector: Secondary School Journey
+
+       ✓ Secondary school overview: status is expected
+       ✗ Secondary school overview: response time < 3000ms
+        ↳  61% — ✓ 4241 / ✗ 2641
+       ✓ Secondary school overview: no server errors (5xx)
+       ✓ Secondary school overview: contains expected content
+       ✓ Secondary school - view-similar-schools: status is expected
+       ✗ Secondary school - view-similar-schools: response time < 3000ms
+        ↳  54% — ✓ 1238 / ✗ 1023
+       ✓ Secondary school - view-similar-schools: no server errors (5xx)
+       ✓ Secondary school - attendance: status is expected
+       ✗ Secondary school - attendance: response time < 3000ms
+        ↳  59% — ✓ 1405 / ✗ 955
+       ✓ Secondary school - attendance: no server errors (5xx)
+       ✓ Secondary school - ks4-headline-measures: status is expected
+       ✗ Secondary school - ks4-headline-measures: response time < 3000ms
+        ↳  53% — ✓ 1205 / ✗ 1056
+       ✓ Secondary school - ks4-headline-measures: no server errors (5xx)
+
+     █ SAP Sector: Primary School Journey
+
+       ✓ Primary school overview: status is expected
+       ✗ Primary school overview: response time < 3000ms
+        ↳  63% — ✓ 4374 / ✗ 2508
+       ✓ Primary school overview: no server errors (5xx)
+       ✓ Primary school overview: contains expected content
+       ✓ Primary school - ks2: status is expected
+       ✗ Primary school - ks2: response time < 3000ms
+        ↳  52% — ✓ 1231 / ✗ 1125
+       ✓ Primary school - ks2: no server errors (5xx)
+       ✓ Primary school - attendance: status is expected
+       ✗ Primary school - attendance: response time < 3000ms
+        ↳  61% — ✓ 1364 / ✗ 861
+       ✓ Primary school - attendance: no server errors (5xx)
+       ✓ Primary school - view-similar-schools: status is expected
+       ✗ Primary school - view-similar-schools: response time < 3000ms
+        ↳  55% — ✓ 1279 / ✗ 1022
+       ✓ Primary school - view-similar-schools: no server errors (5xx)
+
+     █ SAP Sector: All Through School Journey
+
+       ✓ All through school overview: status is expected
+       ✗ All through school overview: response time < 3000ms
+        ↳  68% — ✓ 4710 / ✗ 2171
+       ✓ All through school overview: no server errors (5xx)
+       ✓ All through school overview: contains expected content
+       ✓ All through school - attendance: status is expected
+       ✗ All through school - attendance: response time < 3000ms
+        ↳  63% — ✓ 1086 / ✗ 624
+       ✓ All through school - attendance: no server errors (5xx)
+       ✓ All through school - ks2: status is expected
+       ✗ All through school - ks2: response time < 3000ms
+        ↳  54% — ✓ 970 / ✗ 803
+       ✓ All through school - ks2: no server errors (5xx)
+       ✓ All through school - view-similar-schools: status is expected
+       ✗ All through school - view-similar-schools: response time < 3000ms
+        ↳  55% — ✓ 942 / ✗ 756
+       ✓ All through school - view-similar-schools: no server errors (5xx)
+       ✓ All through school - ks4-headline-measures: status is expected
+       ✗ All through school - ks4-headline-measures: response time < 3000ms
+        ↳  55% — ✓ 941 / ✗ 759
+       ✓ All through school - ks4-headline-measures: no server errors (5xx)
+
+     checks.....................................: 88.71% ✓ 128211    ✗ 16304
+     data_received..............................: 2.1 GB 1.9 MB/s
+     data_sent..................................: 7.4 MB 6.8 kB/s
+     group_duration.............................: avg=6.14s       min=14.44ms  med=4.18s      max=30.41s     p(90)=15.12s     p(95)=17.85s     p(99)=22.08s
+     http_req_blocked...........................: avg=3.57ms      min=0s       med=0s         max=2.64s      p(90)=0s         p(95)=0s         p(99)=0s
+     http_req_connecting........................: avg=54.67µs     min=0s       med=0s         max=94.87ms    p(90)=0s         p(95)=0s         p(99)=0s
+     http_req_duration..........................: avg=3.04s       min=2.61ms   med=1.88s      max=20.41s     p(90)=7.77s      p(95)=9.45s      p(99)=13.06s
+       { expected_response:true }...............: avg=3.04s       min=2.61ms   med=1.88s      max=20.41s     p(90)=7.77s      p(95)=9.45s      p(99)=13.06s
+     ✓ { schoolType:all-through,step:vu0010 }...: avg=164.45ms    min=10.7ms   med=133.79ms   max=1.36s      p(90)=292.58ms   p(95)=374.37ms   p(99)=674.42ms
+     ✓ { schoolType:all-through,step:vu0025 }...: avg=557.82ms    min=51ms     med=477.04ms   max=2.8s       p(90)=961.51ms   p(95)=1.19s      p(99)=1.93s
+     ✓ { schoolType:all-through,step:vu0050 }...: avg=1.16s       min=74.74ms  med=1.09s      max=3.76s      p(90)=1.87s      p(95)=2.21s      p(99)=2.71s
+     ✗ { schoolType:all-through,step:vu0100 }...: avg=2.78s       min=148.55ms med=2.55s      max=9.37s      p(90)=4.58s      p(95)=5.15s      p(99)=6.41s
+     ✗ { schoolType:all-through,step:vu0150 }...: avg=3.78s       min=555.3ms  med=3.42s      max=11.38s     p(90)=6.05s      p(95)=6.93s      p(99)=8.74s
+     ✗ { schoolType:all-through,step:vu0200 }...: avg=5.73s       min=752.25ms med=5.38s      max=19.32s     p(90)=9.09s      p(95)=10.34s     p(99)=12.72s
+     ✗ { schoolType:all-through,step:vu0300 }...: avg=7.64s       min=1.7s     med=7s         max=20.41s     p(90)=12.12s     p(95)=13.68s     p(99)=16.07s
+     ✓ { schoolType:primary,step:vu0010 }.......: avg=184.83ms    min=48.91ms  med=161.09ms   max=1.03s      p(90)=292.14ms   p(95)=366.59ms   p(99)=616.83ms
+     ✓ { schoolType:primary,step:vu0025 }.......: avg=633.79ms    min=77.83ms  med=554.49ms   max=2.98s      p(90)=1.04s      p(95)=1.22s      p(99)=1.8s
+     ✓ { schoolType:primary,step:vu0050 }.......: avg=1.31s       min=160.16ms med=1.22s      max=4.26s      p(90)=2.07s      p(95)=2.35s      p(99)=2.94s
+     ✗ { schoolType:primary,step:vu0100 }.......: avg=3.06s       min=536.82ms med=2.85s      max=8.63s      p(90)=4.89s      p(95)=5.46s      p(99)=6.68s
+     ✗ { schoolType:primary,step:vu0150 }.......: avg=4.15s       min=422.24ms med=3.84s      max=10.12s     p(90)=6.4s       p(95)=7.3s       p(99)=8.83s
+     ✗ { schoolType:primary,step:vu0200 }.......: avg=6.32s       min=813.11ms med=6.26s      max=18.53s     p(90)=9.69s      p(95)=11.17s     p(99)=13.44s
+     ✗ { schoolType:primary,step:vu0300 }.......: avg=8.31s       min=2.25s    med=7.9s       max=19.7s      p(90)=12.49s     p(95)=13.94s     p(99)=16.07s
+     ✓ { schoolType:secondary,step:vu0010 }.....: avg=243.83ms    min=62.57ms  med=215.91ms   max=1.41s      p(90)=376.86ms   p(95)=464.71ms   p(99)=778.56ms
+     ✓ { schoolType:secondary,step:vu0025 }.....: avg=728.49ms    min=127.22ms med=654.12ms   max=3.56s      p(90)=1.16s      p(95)=1.39s      p(99)=2.04s
+     ✓ { schoolType:secondary,step:vu0050 }.....: avg=1.45s       min=258.71ms med=1.39s      max=4.25s      p(90)=2.16s      p(95)=2.47s      p(99)=3.07s
+     ✗ { schoolType:secondary,step:vu0100 }.....: avg=3.21s       min=699.86ms med=2.99s      max=8.46s      p(90)=5.07s      p(95)=5.62s      p(99)=6.86s
+     ✗ { schoolType:secondary,step:vu0150 }.....: avg=4.27s       min=663.27ms med=4.03s      max=11.81s     p(90)=6.3s       p(95)=7.29s      p(99)=8.91s
+     ✗ { schoolType:secondary,step:vu0200 }.....: avg=6.35s       min=1.08s    med=6.22s      max=17.47s     p(90)=9.52s      p(95)=10.81s     p(99)=13.39s
+     ✗ { schoolType:secondary,step:vu0300 }.....: avg=8.43s       min=1.87s    med=8.11s      max=18.26s     p(90)=12.44s     p(95)=13.71s     p(99)=15.73s
+     ✓ { step:vu0010 }..........................: avg=197.71ms    min=10.7ms   med=169.73ms   max=1.41s      p(90)=329.21ms   p(95)=412.93ms   p(99)=711.94ms
+     ✓ { step:vu0025 }..........................: avg=640.07ms    min=51ms     med=563.77ms   max=3.56s      p(90)=1.06s      p(95)=1.28s      p(99)=1.96s
+     ✓ { step:vu0050 }..........................: avg=1.31s       min=74.74ms  med=1.24s      max=4.26s      p(90)=2.07s      p(95)=2.34s      p(99)=2.94s
+     ✗ { step:vu0100 }..........................: avg=3.01s       min=148.55ms med=2.82s      max=9.37s      p(90)=4.87s      p(95)=5.46s      p(99)=6.75s
+     ✗ { step:vu0150 }..........................: avg=4.06s       min=422.24ms med=3.77s      max=11.81s     p(90)=6.24s      p(95)=7.18s      p(99)=8.77s
+     ✗ { step:vu0200 }..........................: avg=6.13s       min=752.25ms med=5.99s      max=19.32s     p(90)=9.42s      p(95)=10.8s      p(99)=13.38s
+     ✗ { step:vu0300 }..........................: avg=8.12s       min=1.7s     med=7.72s      max=20.41s     p(90)=12.4s      p(95)=13.75s     p(99)=16.07s
+   ✓ http_req_failed............................: 0.00%  ✓ 0         ✗ 41545
+     ✓ { schoolType:all-through,step:vu0010 }...: 0.00%  ✓ 0         ✗ 2014
+     ✓ { schoolType:all-through,step:vu0025 }...: 0.00%  ✓ 0         ✗ 1564
+     ✓ { schoolType:all-through,step:vu0050 }...: 0.00%  ✓ 0         ✗ 1512
+     ✓ { schoolType:all-through,step:vu0100 }...: 0.00%  ✓ 0         ✗ 1320
+     ✓ { schoolType:all-through,step:vu0150 }...: 0.00%  ✓ 0         ✗ 1446
+     ✓ { schoolType:all-through,step:vu0200 }...: 0.00%  ✓ 0         ✗ 1322
+     ✓ { schoolType:all-through,step:vu0300 }...: 0.00%  ✓ 0         ✗ 1486
+     ✓ { schoolType:primary,step:vu0010 }.......: 0.00%  ✓ 0         ✗ 2016
+     ✓ { schoolType:primary,step:vu0025 }.......: 0.00%  ✓ 0         ✗ 1564
+     ✓ { schoolType:primary,step:vu0050 }.......: 0.00%  ✓ 0         ✗ 1510
+     ✓ { schoolType:primary,step:vu0100 }.......: 0.00%  ✓ 0         ✗ 1320
+     ✓ { schoolType:primary,step:vu0150 }.......: 0.00%  ✓ 0         ✗ 1446
+     ✓ { schoolType:primary,step:vu0200 }.......: 0.00%  ✓ 0         ✗ 1324
+     ✓ { schoolType:primary,step:vu0300 }.......: 0.00%  ✓ 0         ✗ 1484
+     ✓ { schoolType:secondary,step:vu0010 }.....: 0.00%  ✓ 0         ✗ 2016
+     ✓ { schoolType:secondary,step:vu0025 }.....: 0.00%  ✓ 0         ✗ 1566
+     ✓ { schoolType:secondary,step:vu0050 }.....: 0.00%  ✓ 0         ✗ 1510
+     ✓ { schoolType:secondary,step:vu0100 }.....: 0.00%  ✓ 0         ✗ 1320
+     ✓ { schoolType:secondary,step:vu0150 }.....: 0.00%  ✓ 0         ✗ 1448
+     ✓ { schoolType:secondary,step:vu0200 }.....: 0.00%  ✓ 0         ✗ 1324
+     ✓ { schoolType:secondary,step:vu0300 }.....: 0.00%  ✓ 0         ✗ 1486
+     ✓ { step:vu0010 }..........................: 0.00%  ✓ 0         ✗ 6046
+     ✓ { step:vu0025 }..........................: 0.00%  ✓ 0         ✗ 4694
+     ✓ { step:vu0050 }..........................: 0.00%  ✓ 0         ✗ 4532
+     ✓ { step:vu0100 }..........................: 0.00%  ✓ 0         ✗ 3960
+     ✓ { step:vu0150 }..........................: 0.00%  ✓ 0         ✗ 4340
+     ✓ { step:vu0200 }..........................: 0.00%  ✓ 0         ✗ 3970
+     ✓ { step:vu0300 }..........................: 0.00%  ✓ 0         ✗ 4456
+     http_req_receiving.........................: avg=725.55ms    min=0s       med=116.59ms   max=11.83s     p(90)=2.27s      p(95)=3.3s       p(99)=5.7s
+     http_req_sending...........................: avg=243.59µs    min=0s       med=0s         max=393.85ms   p(90)=998.6µs    p(95)=1.01ms     p(99)=2.02ms
+     http_req_tls_handshaking...................: avg=3.5ms       min=0s       med=0s         max=2.64s      p(90)=0s         p(95)=0s         p(99)=0s
+     http_req_waiting...........................: avg=2.32s       min=2.61ms   med=1.51s      max=15.38s     p(90)=5.82s      p(95)=7.13s      p(99)=9.64s
+     http_reqs..................................: 41545  37.96878/s
+     iteration_duration.........................: avg=6.14s       min=14.44ms  med=4.18s      max=30.41s     p(90)=15.12s     p(95)=17.85s     p(99)=22.08s
+     iterations.................................: 20645  18.867865/s
+     sap_sector_content_failed..................: 0.00%  ✓ 0         ✗ 20645
+     ✓ { step:vu0010 }..........................: 0.00%  ✓ 0         ✗ 3023
+     ✓ { step:vu0025 }..........................: 0.00%  ✓ 0         ✗ 2347
+     ✓ { step:vu0050 }..........................: 0.00%  ✓ 0         ✗ 2266
+     ✓ { step:vu0100 }..........................: 0.00%  ✓ 0         ✗ 1980
+     ✓ { step:vu0150 }..........................: 0.00%  ✓ 0         ✗ 2170
+     ✓ { step:vu0200 }..........................: 0.00%  ✓ 0         ✗ 1985
+     ✓ { step:vu0300 }..........................: 0.00%  ✓ 0         ✗ 2228
+     sap_sector_error_rate......................: 39.48% ✓ 16304     ✗ 24986
+     sap_sector_response_time_trend.............: avg=3065.704202 min=2.6161   med=1923.21555 max=20414.8309 p(90)=7787.31557 p(95)=9466.52068 p(99)=13068.349815
+     vus........................................: 16     min=0       max=300
+
+running (18m14.2s), 000/300 VUs, 20645 complete and 0 interrupted iterations
+sap_sector_school_capacity ✓ [======================================] 000/300 VUs  18m0s
+ERRO[1095] thresholds on metrics 'http_req_duration{schoolType:all-through,step:vu0100}, http_req_duration{schoolType:all-through,step:vu0150}, http_req_duration{schoolType:all-through,step:vu0200}, http_req_duration{schoolType:all-through,step:vu0300}, http_req_duration{schoolType:primary,step:vu0100}, http_req_duration{schoolType:primary,step:vu0150}, http_req_duration{schoolType:primary,step:vu0200}, http_req_duration{schoolType:primary,step:vu0300}, http_req_duration{schoolType:secondary,step:vu0100}, http_req_duration{schoolType:secondary,step:vu0150}, http_req_duration{schoolType:secondary,step:vu0200}, http_req_duration{schoolType:secondary,step:vu0300}, http_req_duration{step:vu0100}, http_req_duration{step:vu0150}, http_req_duration{step:vu0200}, http_req_duration{step:vu0300}' have been crossed
+

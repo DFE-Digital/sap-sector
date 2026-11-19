@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SAPSec.Core.Caching;
 using SAPSec.Data.Repositories;
 using SAPSec.Test.Common.InMemory;
 
@@ -33,10 +34,12 @@ public class InMemoryRepositoryIntegrationTestFixture : IntegrationTestFixture
     public InMemoryRiseResourcesRepository RiseResourcesRepository =>
         (InMemoryRiseResourcesRepository)_factory.Services.GetRequiredService<IRiseResourcesRepository>();
 
+    public ICache Cache => _factory.Services.GetRequiredService<ICache>();
+
     protected override IntegrationTestsWebApplicationFactory CreateWebApplicationFactory() =>
         new InMemoryRepositoryIntegrationTestsWebApplicationFactory();
 
-    public void ClearDownRepositories()
+    public override async Task ClearDown()
     {
         EstablishmentRepository.ClearDown();
         SimilarSchoolsSecondaryRepository.ClearDown();
@@ -47,12 +50,6 @@ public class InMemoryRepositoryIntegrationTestFixture : IntegrationTestFixture
         AbsenceRepository.ClearDown();
         ExclusionsRepository.ClearDown();
         RiseResourcesRepository.ClearDown();
-    }
-
-    public override async Task DisposeAsync()
-    {
-        ClearDownRepositories();
-
-        await base.DisposeAsync();
+        await Cache.Clear();
     }
 }

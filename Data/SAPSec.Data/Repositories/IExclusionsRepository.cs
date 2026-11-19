@@ -1,5 +1,5 @@
 namespace SAPSec.Data.Repositories;
 
-public interface IExclusionsRepository : IMeasureDataRepository<ExclusionsData>
+public interface IExclusionsRepository : IMeasureDataRepository<ExclusionsData>, IRepository
 {
 }

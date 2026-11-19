@@ -2,13 +2,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolDetails.School;
+using SAPSec.Core.UseCases;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Filters;
 
 public sealed class RequireSchoolPhaseFilter(
-    IRequestSchoolAccessor requestSchoolAccessor,
+    IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
     IFeatureFlagService featureFlagService,
     SchoolUserAccessService schoolUserAccessService,
     ExpectedSchoolPhase expectedPhase,
@@ -30,7 +32,7 @@ public sealed class RequireSchoolPhaseFilter(
                 return;
             }
 
-            var school = await requestSchoolAccessor.GetAsync(context.HttpContext, urn);
+            var school = (await getSchoolDetailsUseCase.Execute(new(urn))).SchoolDetails;
             if (!MatchesExpectedPhase(school, expectedPhase))
             {
                 if (school.IsAllThroughSchool()
