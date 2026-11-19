@@ -94,7 +94,7 @@
             const trimmedQuery = query.trim();
 
             if (suggesting) {
-                abortController.abort("Query updated");
+                abortController.abort();
                 abortController = new AbortController();
             }
 
