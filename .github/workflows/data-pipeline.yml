@@ -10,6 +10,7 @@ on:
         type: choice
         options:
         - test
+        - preapproval
         - production
       review-app-number:
         description: Pull request number of the review app (optional, this will run against the target environment to generate a backup file for that review app to use, and then restore the target DB from backup)
@@ -40,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target_env: ${{ fromJson(github.event_name == 'schedule' && '["test","production"]' || format('["{0}"]', inputs.environment || 'test')) }}
+        target_env: ${{ fromJson(github.event_name == 'schedule' && '["test","preapproval","production"]' || format('["{0}"]', inputs.environment || 'test')) }}
     environment: ${{ matrix.target_env }}
 
     env:
