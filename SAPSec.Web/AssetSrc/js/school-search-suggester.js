@@ -129,7 +129,7 @@
                     suggesting = false;
                 });
         },
-        2000
+        300
     );
 
     const inputElement = document.getElementById(inputElementId);

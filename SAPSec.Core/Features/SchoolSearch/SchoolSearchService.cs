@@ -14,15 +14,17 @@ public class SchoolSearchService(
     IFeatureFlagService _featureFlagService,
     ICurrentTimeProvider timeProvider) : ISchoolSearchService
 {
-    private const int MaxResults = 1000;
-    private const int MaxSuggestions = 10;
+    private const int MaxSearchResults = 1000;
+    private const int MaxSuggestionResults = 100;
+    private const int MaxSearchSuggestions = 10;
+
     private static readonly Regex Numeric = new Regex(@"^\d+$", RegexOptions.Compiled);
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
-        => await SearchInternalAsync(query, MaxResults, includeCoordinates: true);
+        => await SearchInternalAsync(query, MaxSearchResults, includeCoordinates: true);
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
-        => await SearchInternalAsync(queryPart, MaxSuggestions, includeCoordinates: false);
+        => await SearchInternalAsync(queryPart, MaxSuggestionResults, includeCoordinates: false);
 
     public async Task<Establishment?> SearchByNumberAsync(string schoolNumber)
     {
@@ -84,6 +86,6 @@ public class SchoolSearchService(
             results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, latLong));
         }
 
-        return results.OrderBy(r => r.EstablishmentName).ToList();
+        return results.Take(MaxSearchSuggestions).OrderBy(r => r.EstablishmentName).ToList();
     }
 }
