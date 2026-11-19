@@ -1,0 +1,75 @@
+@using SAPSec.Web.Constants
+@using SAPSec.Web.Controllers
+@model Ks2ProgressNumberOfPupilsExampleViewModel
+@{
+    ViewData[ViewDataKeys.Title] = "KS2 progress scores: number of pupils (example)";
+    var schoolPageLink = ComponentExamplesController.Ks2ProgressNumberOfPupilsPath;
+    var comparisonPageLink = $"{ComponentExamplesController.Ks2ProgressNumberOfPupilsPath}?page=comparison";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <span class="govuk-caption-l">Component example</span>
+        <h1 class="govuk-heading-xl">KS2 progress scores: number of pupils</h1>
+
+        <div class="govuk-warning-text">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+                <span class="govuk-visually-hidden">Warning</span>
+                This page uses placeholder data. It shows the number of pupils component until the KS2 progress scores section is built.
+            </strong>
+        </div>
+
+        <nav aria-label="Example pages">
+            <ul class="govuk-list">
+                <li>
+                    @if (Model.IsComparison)
+                    {
+                        <a class="govuk-link" href="@schoolPageLink" data-testid="school-page-example-link">KS2 performance measures page example</a>
+                    }
+                    else
+                    {
+                        <span aria-current="page">KS2 performance measures page example</span>
+                    }
+                </li>
+                <li>
+                    @if (Model.IsComparison)
+                    {
+                        <span aria-current="page">Comparing to › KS2 performance measures page example</span>
+                    }
+                    else
+                    {
+                        <a class="govuk-link" href="@comparisonPageLink" data-testid="comparison-page-example-link">Comparing to › KS2 performance measures page example</a>
+                    }
+                </li>
+            </ul>
+        </nav>
+
+        <form action="" method="get">
+            @if (Model.IsComparison)
+            {
+                <input type="hidden" name="page" value="comparison" data-measure-filter-target-id="@Model.Measure.MeasureInfo.HtmlPrefix" />
+            }
+
+            <section class="app-measure-section" aria-labelledby="ks2-progress-heading">
+                <h2 class="govuk-heading-m" id="ks2-progress-heading" data-testid="ks2-progress-heading">@Model.Measure.MeasureInfo.Name</h2>
+
+                <partial name="Measures/_Measure" model=@Model.Measure />
+            </section>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as MeasureFilters from '/js/measure-filters.js'
+        import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
+
+        MeasureFilters.initAll();
+        ChartFactory.initAll();
+        ContentToggle.initAll();
+    </script>
+}

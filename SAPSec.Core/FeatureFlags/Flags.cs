@@ -7,4 +7,5 @@ public static class Flags
     public const string EnableRiseResources = "EnableRiseResources";
     public const string EnableKs4CoreSubjectsPupilCharacteristics = "EnableKs4CoreSubjectsPupilCharacteristics";
     public const string EnableFindASchool = "EnableFindASchool";
+    public const string EnableKs2ProgressNumberOfPupils = "EnableKs2ProgressNumberOfPupils";
 }
