@@ -8,6 +8,7 @@ public class NpgsqlDataSourceFactoryTests
 {
     [Theory]
     [InlineData(null, 100)]
+    [InlineData("200", 200)]
     [InlineData("300", 300)]
     public void Create_AppliesConfiguredPoolSize_AndReusesDataSource(string? poolSize, int expected)
     {

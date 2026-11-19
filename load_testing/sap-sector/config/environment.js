@@ -8,7 +8,7 @@ const environments = {
     name: 'review'
   },
   test: {
-    baseUrl: 'https://test.get-school-improvement-insights.education.gov.uk',
+    baseUrl: __ENV.TEST_URL || 'https://test.get-school-improvement-insights.education.gov.uk',
     name: 'test'
   },
   production: {
@@ -18,7 +18,7 @@ const environments = {
   loadtest: {
     // An app instance you run yourself with ASPNETCORE_ENVIRONMENT=LoadTest -
     // NEVER a shared review/test/production deployment. See load_testing/README.md.
-    baseUrl: __ENV.LOADTEST_URL || 'https://localhost:3000',
+    baseUrl: __ENV.LOADTEST_URL || 'https://localhost:5099',
     name: 'loadtest',
     insecureSkipTLSVerify: true // local ASP.NET Core dev certificate
   }

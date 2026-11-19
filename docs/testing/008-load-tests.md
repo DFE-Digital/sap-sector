@@ -14,27 +14,101 @@ The application now reads `Database:MaxPoolSize` (default 100) and optionally
 timeout is preserved). The singleton `NpgsqlDataSourceFactory` lazily creates
 and reuses one data source, so repositories share its connection pool.
 
-Terraform's test configuration supplies a pool size of 300 per replica and a
-60-second connection timeout without modifying the vendored connection string.
-With two replicas, this allows 600 connections against Test's reported limit
-of 856; account for extra replicas, rolling deployments and other services
-when monitoring actual usage. Production retains the default pool of 100
-until its database limit is confirmed.
+Test, Review and Production default to 100 connections per app replica.
+Terraform supports temporary 200 or 300 overrides in Test and Review.
+Normal deployments use DfE Sign-in and retain the configured driver timeout.
 
-For this temporary test run, Terraform also sets
-`LoadTesting__BypassAuthentication=true`. The application honours this flag
-only in the `Test` ASP.NET environment, using automatic test authentication
-while retaining real Postgres repositories. Remove or disable that Terraform
-setting after testing and redeploy.
+To reproduce the historical synthetic authentication setup on a restricted
+Test deployment, explicitly set the Terraform input
+`load_testing_bypass_authentication` to `true`. This enables test
+authentication, disables DfE Analytics and sets a 60-second connection
+timeout while retaining real Postgres repositories. The flag defaults to
+false and is applied only to Test. Restore it to false after the run.
 
-The increased-pool stress run has **not yet been performed**. All measured
-ceilings and operating targets below remain from the original pool-100 run.
-From `load_testing`, run `k6 run -e ENVIRONMENT=test -e AUTH_OFF=true -e SCENARIO=stress sap-sector/load-test.js`.
-This targets the configured test URL. Capture `pg_stat_activity`, database connection metrics,
-pod restart/liveness events and replica counts; analyse the summary with
-`analyse.cjs` before replacing the measured ceiling and operating targets.
-Local real-Postgres pool-100/pool-300 saturation checks and production sizing
-also remain outstanding.
+For a temporary deployment override in PowerShell, set
+`$env:TF_VAR_load_testing_bypass_authentication = 'true'` for the Test
+deployment. To restore DfE Sign-in, set it to `'false'` (or remove the
+override) and redeploy. If a tfvars file sets the input, change it there
+instead because tfvars takes precedence. Restart or roll out all pods if
+they still have the old ConfigMap environment variables. Verify that a
+signed-out request to `/find-a-school` redirects to sign-in after restoration.
+The corresponding application setting is `LoadTesting__BypassAuthentication`.
+The workflow's `auth-bypassed` input and k6's `AUTH_OFF` flag just select the
+authenticated journeys. They do not change server authentication.
+
+A 300-connection stress run was reported complete. Its results are pending
+verification: the existing local k6 summary does not identify the deployed
+pool size, so its figures cannot be attributed to that run. The 200-connection
+local smoke run reached 10 virtual users and returned a p95 of 319 ms over
+104 requests. Ten primary school requests returned HTTP 404 (9.6% failed).
+The smoke run did not measure pool saturation. The historical ceilings and
+operating targets below still refer to the pool-100 baseline.
+
+### Compare 200 and 300 connections per replica
+
+1. Deploy the same app build to Test for both runs. Set the Terraform input
+   `load_testing_database_max_pool_size` to `200` or `300` in
+   `terraform/application/config/test.tfvars.json`, or supply it via
+   `TF_VAR_load_testing_database_max_pool_size` if the file does not set it.
+   The default is 100. At two replicas the respective caps are 400 and 600
+   against Test's previously observed database limit of 856. Recheck that
+   limit and leave capacity for rolling deployments and other consumers.
+2. After each rollout, verify the pool size on all ready pods. Keep the
+   database tier, replica count, connection timeout, target URL, and k6
+   scenario the same for both runs. Use the same Test origin if bypassing
+   Front Door rate limits as in the historical benchmark.
+3. Run each size from a separate output directory. The PowerShell example
+   below assumes synthetic authentication was explicitly enabled on Test.
+   With normal DfE Sign-in, omit `-e AUTH_OFF=true` and use a dedicated test
+   account's session as described in the [k6 guide](../../load_testing/README.md#authenticated-pages-against-a-real-environment).
+
+   ```powershell
+   $pool = 200
+   $testOrigin = 'https://<direct-test-origin>'
+   $script = (Resolve-Path 'load_testing/sap-sector/load-test.js').Path
+   $analyse = (Resolve-Path 'load_testing/analyse.cjs').Path
+   $output = Join-Path ([System.IO.Path]::GetTempPath()) ("sap-sector-pool-$pool-" + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+   New-Item -ItemType Directory -Path $output | Out-Null
+   Push-Location $output
+   try {
+       k6 run -e ENVIRONMENT=test -e "TEST_URL=$testOrigin" -e AUTH_OFF=true -e SCENARIO=stress $script
+       $k6ExitCode = $LASTEXITCODE
+       if (Test-Path sap-sector-load-test-summary.json) {
+           node $analyse sap-sector-load-test-summary.json
+       }
+       Write-Output "k6 exit code: $k6ExitCode. Reports: $output"
+   } finally {
+       Pop-Location
+   }
+   ```
+
+4. Record the UTC run window, confirmed pool setting, app commit, per-step
+   p95 and failures, peak PostgreSQL connections (`pg_stat_activity` and
+   Azure metrics), replica counts, and pod restarts. Restore the intended
+   Test pool setting and disable the temporary auth bypass after both runs.
+
+| Pool per replica | Shared Test stress run | Last step within SLO | First step outside SLO | Peak DB connections |
+|---|---|---|---|---|
+| 200 | Pending | Pending | Pending | Pending |
+| 300 | Completed, report attribution pending | Pending | Pending | Pending |
+
+### Use a Review app for comparison
+
+Use a dedicated PR Review app and set the same Terraform pool input for
+each deployment. A change to the shared Review tfvars can affect other PR
+deployments, so pass the override only to the dedicated deployment.
+For anonymous smoke coverage run `k6 run -e ENVIRONMENT=review -e PR_NUMBER=<number> -e SCENARIO=quick load_testing/sap-sector/load-test.js`
+from the repo root. For authenticated journeys, use the dedicated test
+account's session for that Review URL and leave `AUTH_OFF` unset. For a
+custom Review origin, supply `REVIEW_URL` instead of `PR_NUMBER`.
+
+Start with a smoke run and confirm the database is seeded with the schools
+used by k6. Before running stress, check the Review database's actual
+`max_connections` and deployment replica count. Budget connections for
+other consumers and rolling updates. Review uses different database
+infrastructure from Test, so use its results to compare pool sizes within
+the same Review app and use Test for production sizing. Keep Production
+on its normal configuration and use smoke coverage there.
 
 Results available for service assessment (raised by Robert Rees).
 
@@ -186,10 +260,10 @@ hardware.
 with the pool at 100 per replica. Raising the pool size should raise the
 ceiling further, so these figures are conservative.
 
-**Implemented configuration, awaiting retest.** Npgsql `Maximum Pool Size`
+**Configurable application pool.** Npgsql `Maximum Pool Size`
 is now read from `Database:MaxPoolSize` by
 `SAPSec.Infrastructure/Postgres/NpgsqlDataSourceFactory.cs`, defaulting to 100.
-Terraform supplies 300 for test; deployment and measurement are still pending.
+Terraform defaults to 100 for Test and Review. See the comparison above for run status.
 PgBouncer - built into Azure Flexible Server - is a tidier longer-term
 option that multiplexes many app connections onto few database ones, letting
 the app pool generously without each connection pinning a database backend.

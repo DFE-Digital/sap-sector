@@ -14,7 +14,8 @@
       "commandName": "Project",
       "launchBrowser": false,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "LoadTest"
+        "ASPNETCORE_ENVIRONMENT": "LoadTest",
+        "IS_LOCAL_DEVELOPMENT": "true"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:5099"

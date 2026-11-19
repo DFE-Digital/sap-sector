@@ -27,11 +27,12 @@ export function hasSessionCookie () {
 
 export function authParams (extraParams = {}) {
   if (!hasSessionCookie()) {
-    return extraParams
+    return { ...extraParams, redirects: 0 }
   }
 
   return {
     ...extraParams,
+    redirects: 0,
     headers: {
       ...(extraParams.headers || {}),
       Cookie: `${COOKIE_NAME}=${__ENV.SESSION_COOKIE}`

@@ -167,7 +167,7 @@ public static class DsiAuthenticationExtensions
         };
     }
 
-    private static void RegisterServices(IServiceCollection services)
+    internal static void RegisterServices(IServiceCollection services)
     {
         services.AddHttpContextAccessor();
         services.AddScoped<IUserService, UserService>();

@@ -123,6 +123,7 @@ public class Program
 
         if (bypassTestAuthentication || builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest")
         {
+            DsiAuthenticationExtensions.RegisterServices(builder.Services);
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = "TestScheme";
@@ -160,7 +161,7 @@ public class Program
         builder.Services.Configure<DfeUserOptions>(builder.Configuration.GetSection(DfeUserOptions.SectionName));
         builder.Services.AddScoped<IDfeUserIdentifier, DfeUserIdentifier>();
 
-        builder.Services.AddDfeAnalyticsDependencies(builder.Environment);
+        builder.Services.AddDfeAnalyticsDependencies(builder.Environment, bypassTestAuthentication);
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -293,7 +294,7 @@ public class Program
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
-        app.UseAnalytics(app.Environment);
+        app.UseAnalytics(app.Environment, bypassTestAuthentication);
 
         app.UseMiddleware<HostUrlBannerMiddleware>();
 
