@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.Text;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Authentication;
 
@@ -148,7 +149,8 @@ public static class DsiAuthenticationHandler
         }
         else if (user.Organisations.Count > 1)
         {
-            context.Properties!.RedirectUri = Routes.FindASchool();
+            var startPage = context.HttpContext.RequestServices.GetRequiredService<IStartPageService>();
+            context.Properties!.RedirectUri = await startPage.GetStartUrlAsync();
         }
     }
 
