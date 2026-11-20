@@ -32,7 +32,12 @@ module "application_configuration" {
   config_variables = merge({
     ENVIRONMENT_NAME = var.environment
     PGSSLMODE        = local.postgres_ssl_mode
-  }, local.federated_auth_configmap)
+  }, local.federated_auth_configmap, contains(["test", "review"], var.config) ? {
+    Database__MaxPoolSize = tostring(var.load_testing_database_max_pool_size)
+  } : {}, var.config == "test" && var.load_testing_bypass_authentication ? {
+    Database__ConnectionTimeoutSeconds = "60"
+    LoadTesting__BypassAuthentication  = "true"
+  } : {})
   secret_variables = merge({
     DATABASE_URL                                = module.postgres.url
     ConnectionStrings__PostgresConnectionString = module.postgres.dotnet_connection_string

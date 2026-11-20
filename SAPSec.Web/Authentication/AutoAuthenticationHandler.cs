@@ -11,17 +11,21 @@ namespace SAPSec.Web.Authentication;
 public class AutoAuthenticationHandler(
     IOptionsMonitor<AuthenticationSchemeOptions> options,
     ILoggerFactory logger,
-    UrlEncoder encoder) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
+    UrlEncoder encoder,
+    IWebHostEnvironment environment) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        var isLoadTest = environment.IsEnvironment("Test") || environment.IsEnvironment("LoadTest");
         var claims = new[]
         {
             new Claim(ClaimTypes.Name, "UI Test User"),
             new Claim(ClaimTypes.NameIdentifier, "ui-test-user-123"),
             new Claim("sub", "ui-test-user-123"),
-            new Claim("email", "uitest@example.com"),
-            new Claim("organisation", "ui-test-org-123"),
+            new Claim("email", isLoadTest ? "synthetic-load-test@education.gov.uk" : "uitest@example.com"),
+            new Claim("organisation", isLoadTest
+                ? """[{"id":"ui-test-org-123","name":"UI Test Organisation"}]"""
+                : "ui-test-org-123"),
             new Claim("organisation:name", "UI Test Organisation")
         };
 
