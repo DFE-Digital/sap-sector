@@ -26,6 +26,18 @@ on:
         required: false
         type: boolean
         default: true
+      load-test-pool-size:
+        description: "Database connections per app replica for Test or Review"
+        type: choice
+        default: '100'
+        options:
+          - '100'
+          - '200'
+          - '300'
+      load-test-auth-bypass:
+        description: "Enable synthetic authentication on a restricted Test deployment"
+        type: boolean
+        default: false
   push:
     branches:
       - main
@@ -642,6 +654,9 @@ jobs:
       - name: Deploy app to ${{ inputs.environment }}
         id: deploy_manual
         uses: DFE-Digital/github-actions/deploy-to-aks@master
+        env:
+          TF_VAR_load_testing_database_max_pool_size: ${{ inputs['load-test-pool-size'] || '100' }}
+          TF_VAR_load_testing_bypass_authentication: ${{ inputs.environment == 'test' && inputs['load-test-auth-bypass'] && 'true' || 'false' }}
         with:
           azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
           azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}

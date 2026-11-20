@@ -36,6 +36,12 @@ The corresponding application setting is `LoadTesting__BypassAuthentication`.
 The workflow's `auth-bypassed` input and k6's `AUTH_OFF` flag just select the
 authenticated journeys. They do not change server authentication.
 
+In the **Build and Deploy** manual workflow, select the branch containing
+these changes, choose `test`, and supply an image tag built from that branch.
+Set `load-test-pool-size` to the desired size and select
+`load-test-auth-bypass` only for a restricted Test run. To restore the
+normal deployment, choose 100 and clear the bypass checkbox.
+
 A 300-connection stress run was reported complete. Its results are pending
 verification: the existing local k6 summary does not identify the deployed
 pool size, so its figures cannot be attributed to that run. The 200-connection
