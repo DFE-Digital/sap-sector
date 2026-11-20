@@ -243,6 +243,68 @@ internal class Program
         return keys;
     }
 
+    private static readonly string[][] SearchSynonymGroups =
+    [
+        ["st", "saint"],
+        ["ss", "saints"],
+        ["cofe", "church of england"],
+        ["rc", "rm", "roman catholic", "catholic"],
+        ["ave", "aven", "avenue"],
+        ["rd", "road"],
+        ["ln", "lane"],
+        ["dr", "drive"],
+        ["mt", "mount"],
+        ["ct", "court"],
+        ["pl", "place"],
+        ["blvd", "boulevard"],
+        ["sq", "square"]
+    ];
+
+    private static void AppendSearchSynonymSql(StringBuilder sql)
+    {
+        sql.AppendLine("-- =========================");
+        sql.AppendLine("-- Search synonyms + normalize_text");
+        sql.AppendLine("-- =========================");
+        sql.AppendLine();
+        sql.AppendLine("DROP TABLE IF EXISTS public.thesaurus_synonyms;");
+        sql.AppendLine("CREATE TABLE public.thesaurus_synonyms (");
+        sql.AppendLine("    word TEXT PRIMARY KEY,");
+        sql.AppendLine("    expansion TEXT NOT NULL");
+        sql.AppendLine(");");
+        sql.AppendLine();
+
+        var rows = new List<string>();
+        foreach (var group in SearchSynonymGroups)
+        {
+            foreach (var word in group)
+            {
+                var expansion = string.Join(' ', new[] { word }.Concat(group.Where(g => g != word)));
+                rows.Add($"('{word}', '{expansion}')");
+            }
+        }
+
+        sql.AppendLine("INSERT INTO public.thesaurus_synonyms (word, expansion) VALUES");
+        sql.AppendLine("    " + string.Join(",\n    ", rows) + ";");
+        sql.AppendLine();
+        sql.AppendLine("-- STABLE because it reads thesaurus_synonyms.");
+        sql.AppendLine("CREATE OR REPLACE FUNCTION public.normalize_text(input_text TEXT)");
+        sql.AppendLine("RETURNS TEXT");
+        sql.AppendLine("LANGUAGE plpgsql");
+        sql.AppendLine("STABLE");
+        sql.AppendLine("AS $$");
+        sql.AppendLine("DECLARE");
+        sql.AppendLine("    result TEXT := lower(coalesce(input_text, ''));");
+        sql.AppendLine("    r RECORD;");
+        sql.AppendLine("BEGIN");
+        sql.AppendLine("    FOR r IN SELECT word, expansion FROM public.thesaurus_synonyms ORDER BY length(word) DESC, word LOOP");
+        sql.AppendLine("        result := regexp_replace(result, '\\m' || r.word || '\\M', r.expansion, 'g');");
+        sql.AppendLine("    END LOOP;");
+        sql.AppendLine("    RETURN result;");
+        sql.AppendLine("END;");
+        sql.AppendLine("$$;");
+        sql.AppendLine();
+    }
+
     private static void WriteCleanupSql(string path, IEnumerable<string> tableNamesToRebuild, bool rebuildAllRawTables)
     {
         var tablesToRebuild = tableNamesToRebuild
@@ -348,6 +410,8 @@ internal class Program
         sql.AppendLine("END;");
         sql.AppendLine("$$;");
         sql.AppendLine();
+        AppendSearchSynonymSql(sql);
+
         sql.AppendLine(@"\echo 'Cleanup complete.'");
 
         File.WriteAllText(path, sql.ToString(), new UTF8Encoding(false));

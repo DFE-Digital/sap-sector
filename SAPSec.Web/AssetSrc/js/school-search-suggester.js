@@ -89,12 +89,12 @@
 
     // debounce and/or cancel ongoing suggestions to prevent excessive requests
     let suggesting = false;
-    const source = debounce(
+    const source = window.debounce(
         (query, populateResults) => {
             const trimmedQuery = query.trim();
 
             if (suggesting) {
-                abortController.abort("Query updated");
+                abortController.abort();
                 abortController = new AbortController();
             }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
@@ -36,6 +37,13 @@ public class JsonEstablishmentRepository : IEstablishmentRepository
         var establishments = await _establishmentFile.ReadAllAsync();
 
         return establishments.Where(e => urns.Contains(e.URN)).ToList().AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults)
+    {
+        var establishments = await _establishmentFile.ReadAllAsync();
+
+        return InMemoryEstablishmentSearch.Search(establishments, query, maxResults);
     }
 
     public async Task<Establishment?> GetEstablishmentAsync(string urn)

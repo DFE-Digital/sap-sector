@@ -120,7 +120,7 @@ cd SAPData
 dotnet run
 ```
 
-This generates the SQL scripts used to create/populate tables and views.
+This generates the SQL scripts used to create/populate tables and views, including the search synonym table, the `normalize_text()` function and the `v_establishment_search` view. School search does not work until these have been run (step 5).
 
 ### 5) Run all SQL scripts via psql
 
@@ -181,10 +181,13 @@ npm install
 dotnet run
 ```
 
-### Search index not initialised
+### Search returns an error (`function normalize_text(text) does not exist`)
 
-* Required CSV file is missing
-* Verify CSV path/configuration and rerun
+School search uses Postgres full text search built by the SAPData pipeline, so the pipeline output must be in your local database.
+
+* Regenerate the SQL with `dotnet run` in `SAPData`, then run `run_all.sql` in `psql` (steps 4 and 5 above)
+* Check `v_establishment_search` exists: `\d v_establishment_search`
+* No extensions are needed, because full text search is built into Postgres
 
 ### Schools not displayed
 
