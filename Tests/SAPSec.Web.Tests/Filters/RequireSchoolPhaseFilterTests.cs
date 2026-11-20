@@ -11,6 +11,7 @@ using SAPSec.Data.Repositories;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
@@ -363,7 +364,7 @@ public class RequireSchoolPhaseFilterTests
             _requestSchoolAccessorMock.Object,
             _featureFlagServiceMock.Object,
             new SchoolUserAccessService(
-                Mock.Of<IUserService>(), _featureFlagServiceMock.Object,
+                Mock.Of<IUserService>(), _featureFlagServiceMock.Object, Mock.Of<IDfeUserIdentifier>(),
                 Mock.Of<IEstablishmentRepository>(), Mock.Of<ICurrentTimeProvider>()),
             expectedSchoolPhase,
             routeParameterNames ?? routeValues.Select(x => x.Key).ToArray());
