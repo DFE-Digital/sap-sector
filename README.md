@@ -96,7 +96,7 @@ The application uses the GOV.UK Design System and DfE Frontend for a consistent,
 | Frontend | GOV.UK Frontend 5.x, DfE Frontend 2.x, `GovUk.Frontend.AspNetCore`, Sass + Gulp |
 | Charts & maps | Chart.js, Leaflet + MarkerCluster, accessible-autocomplete |
 | Data access | PostgreSQL via Dapper + Npgsql |
-| Search | Lucene.NET 4.8 |
+| Search | PostgreSQL full text search |
 | Auth | DfE Sign-in (OpenID Connect) |
 | Feature flags | `Microsoft.FeatureManagement` |
 | Logging & monitoring | Serilog (compact JSON), Sentry, Logit, DfE Analytics (BigQuery) |
@@ -127,7 +127,7 @@ sap-sector/
 │   ├── gulpfile.cjs · package.json   # Frontend build
 │   └── Program.cs                    # Application entry point
 ├── SAPSec.Core/                      # Domain models, use cases, rules, mappers, interfaces
-├── SAPSec.Infrastructure/            # Postgres repositories, Lucene search, JSON loaders
+├── SAPSec.Infrastructure/            # Postgres repositories and search, JSON loaders
 ├── Data/
 │   ├── SAPSec.Data/                  # DTOs and repositories shared with the data tooling
 │   ├── SAPSec.Data.Common/           # Data-map primitives
@@ -138,7 +138,7 @@ sap-sector/
 │   ├── Hashes/ · Scripts/ · Sql/     # Change detection, helpers and generated SQL
 ├── Tests/
 │   ├── SAPSec.Core.Tests/            # Unit tests — features, mappers, rules, services
-│   ├── SAPSec.Infrastructure.Tests/  # Repository and Lucene tests
+│   ├── SAPSec.Infrastructure.Tests/  # Repository and search tests
 │   ├── SAPSec.Test.Common/           # Shared builders, fixtures, Playwright helpers
 │   ├── SAPSec.Test.Integration/      # In-process HTTP/integration tests
 │   ├── SAPSec.Test.EndToEnd/         # Playwright end-to-end journeys
@@ -324,7 +324,7 @@ Authentication uses OpenID Connect against DSI (`SAPSec.Web/Authentication/`). A
 
 ### Search
 
-School search is backed by **Lucene.NET**, registered through `AddLuceneDependencies()` and exposed behind interfaces so controllers never depend on Lucene directly. PostgreSQL remains the authoritative source of structured data; the Lucene index is derived, which means schema changes may require an index rebuild. See [`docs/developers/search-lucene.md`](docs/developers/search-lucene.md).
+School search is backed by **PostgreSQL full text search**: the SAPData pipeline builds `v_establishment_search`, `IEstablishmentRepository.SearchEstablishmentsAsync` queries it, and `PostgresSchoolSearchIndexReader` exposes it behind `ISchoolSearchIndexReader`. See [`docs/developers/search-postgres.md`](docs/developers/search-postgres.md) and [ADR-017](docs/adrs/017-fts-in-postgres.md).
 
 ### Feature flags
 

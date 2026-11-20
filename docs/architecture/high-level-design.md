@@ -542,7 +542,7 @@ The `/healthcheck` endpoint currently reports only that the application is runni
 - `maintenance_page/README.md`
 - `docs/developers/project-structure.md`
 - `docs/developers/authentication.md`
-- `docs/developers/search-lucene.md`
+- `docs/developers/search-postgres.md`
 - `docs/developers/testing.md`
 
 ### Workflow references

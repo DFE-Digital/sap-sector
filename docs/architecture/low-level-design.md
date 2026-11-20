@@ -118,7 +118,7 @@ PhaseOfEducationValues.IsPrimaryOrAllThrough(phaseOfEducationName)
     : Routes.SecondarySchool(urn).Overview // /school/secondary/{urn}
 ```
 
-The Lucene index stores `urn`, `establishmentName`, `street` and `postcode`. The last query token uses `PrefixQuery` for typeahead, and middle tokens use `TermQuery` (MUST). Phrase and exact-name boosts are applied. Primary schools are always indexed regardless of the feature flag, because `CanIndexForSearch()` is flag-unaware. See `docs/developers/search-lucene.md` for the full detail.
+The Lucene index stores `urn`, `establishmentName`, `street` and `postcode`. The last query token uses `PrefixQuery` for typeahead, and middle tokens use `TermQuery` (MUST). Phrase and exact-name boosts are applied. Primary schools are always indexed regardless of the feature flag, because `CanIndexForSearch()` is flag-unaware. See `docs/developers/search-postgres.md` for how search now works.
 
 ---
 
