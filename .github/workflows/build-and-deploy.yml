@@ -12,10 +12,11 @@ on:
         options:
           - review
           - test
+          - preapproval
           - production
       docker-image-tag:
         description: "Docker image tag to deploy (optional)"
-        required: true
+        required: false
         type: string
       pull-request-number:
         description: "Pull request number (required for review environment)"
@@ -41,7 +42,7 @@ env:
 jobs:
   build:
     name: Build
-    if: ${{ github.event_name != 'workflow_dispatch' }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.docker-image-tag == '' }}
     env:
       DOCKER_REPOSITORY: ghcr.io/dfe-digital/sap-sector
       MAINTENANCE_DOCKER_REPOSITORY: ghcr.io/dfe-digital/sap-sector-maintenance
@@ -497,6 +498,95 @@ jobs:
           echo "Review DB restore failed after $max_attempts attempts."
           exit 2
 
+  # ---------------------------
+  # PREAPPROVAL DEPLOYMENT CHECK (AUTO-DEPLOY on MAIN IS GATED)
+  # ---------------------------
+  check-preapproval:
+    name: Check preapproval environment owner
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: read
+    outputs:
+      deploy_preapproval: ${{ steps.check.outputs.deploy_preapproval }}
+      environments: ${{ steps.matrix.outputs.environments }}
+
+    steps:
+      - name: Check preapproval deployment owner
+        id: check
+        uses: actions/github-script@v8
+        with:
+          script: |
+            // If the latest successful preapproval deployment has not come from main,
+            // we want to leave it alone (unless the deployment branch no longer exists)
+
+            const { owner, repo } = context.repo;
+            const environmentName = "preapproval";
+            const deployments = await github.rest.repos.listDeployments({ owner, repo, environment: environmentName, per_page: 20 });
+
+            // If there are no deployments, we can safely deploy to preapproval
+            if (deployments.data.length === 0) {
+              core.setOutput("deploy_preapproval", true);
+              return;
+            }
+
+            // If there are deployments, we find the latest successful one
+            let latestSuccessfulDeployment = null;
+            for (const deployment of deployments.data) {
+              const statuses = await github.rest.repos.listDeploymentStatuses({ owner, repo, deployment_id: deployment.id, per_page: 1 });
+              const latestStatus = statuses.data[0];
+              core.info(`Deployment ${deployment.id} ref=${deployment.ref} status=${latestStatus?.state}`);
+              if (latestStatus?.state === "success") {
+                latestSuccessfulDeployment = deployment;
+                break;
+              }
+            }
+
+            // If we didn't find a successful deployment, we can safely deploy to preapproval
+            if (!latestSuccessfulDeployment) {
+              core.info("No successful preapproval deployments found, allowing deployment");
+              core.setOutput("deploy_preapproval", true);
+              return;
+            }
+
+            // If we did find a successful deployment, deploy to preapproval only if
+            //   - it was from main; or
+            //   - the branch no longer exists
+            const deployedRef = latestSuccessfulDeployment.ref;
+            core.info(`Latest successful preapproval deployment ref: ${deployedRef}`);
+            let deployPreapproval = true;
+            if (deployedRef === "main") {
+              core.info("Latest successful deployment was from main, allowing deployment");
+            } else {
+              let branchExists = true;
+              try {
+                await github.rest.repos.getBranch({ owner, repo, branch: deployedRef });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                branchExists = false;
+              }
+              if (branchExists) {
+                deployPreapproval = false;
+                core.info(`Preapproval environment is in use by existing branch '${deployedRef}'`);
+              } else {
+                core.info(`Branch '${deployedRef}' no longer exists, allowing deployment`);
+              }
+            }
+
+            core.setOutput("deploy_preapproval", deployPreapproval);
+            core.notice(deployPreapproval ? "Preapproval deployment allowed" : "Preapproval deployment blocked: environment in use by existing branch");
+
+      - name: Build environment matrix
+        id: matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.check.outputs.deploy_preapproval }}" = "true" ]; then
+            echo 'environments=["test","preapproval","production"]' >> "$GITHUB_OUTPUT"
+          else
+            echo 'environments=["test","production"]' >> "$GITHUB_OUTPUT"
+          fi
 
   deploy:
     name: Deploy
@@ -504,7 +594,7 @@ jobs:
     environment:
       name: ${{ matrix.environment }}
       url: ${{ steps.deploy_app.outputs.environment_url }}
-    needs: [build, test]
+    needs: [build, test, check-preapproval]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -513,7 +603,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        environment: [test, production]
+        environment: ${{ fromJSON(needs.check-preapproval.outputs.environments) }}
     env:
       AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
       AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
@@ -605,7 +695,11 @@ jobs:
     concurrency:
       group: deploy_manual_${{ inputs.environment }}_${{ inputs.pull-request-number || github.run_id }}
       cancel-in-progress: true
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ !cancelled()
+      && github.event_name == 'workflow_dispatch'
+      && (needs.build.result == 'success' || needs.build.result == 'skipped')
+      }}
+    needs: [build]
     environment:
       name: ${{ inputs.environment }}
       url: ${{ steps.deploy_manual.outputs.environment_url }}
@@ -648,7 +742,7 @@ jobs:
           azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           environment: ${{ inputs.environment }}
           pr-number: ${{ inputs.pull-request-number }}
-          sha: ${{ inputs.docker-image-tag }}
+          sha: ${{ inputs.docker-image-tag || needs.build.outputs.docker-image-tag }}
           terraform-base: ${{ env.TERRAFORM_BASE }}
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
           teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
@@ -697,7 +791,7 @@ jobs:
       - name: Deploy maintenance service to ${{ inputs.environment }}
         if: ${{ inputs.environment != 'review' }}
         env:
-          MAINTENANCE_IMAGE_TAG: ${{ inputs.docker-image-tag }}
+          MAINTENANCE_IMAGE_TAG: ${{ inputs.docker-image-tag || needs.build.outputs.maintenance-image-tag }}
         shell: bash
         run: |
           set -euo pipefail
@@ -967,7 +1061,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        domain_environment: [test, production]
+        domain_environment: [test, preapproval, production]
     environment:
       name: production
     permissions:
