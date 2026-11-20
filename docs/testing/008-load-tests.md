@@ -42,13 +42,10 @@ Set `load-test-pool-size` to the desired size and select
 `load-test-auth-bypass` only for a restricted Test run. To restore the
 normal deployment, choose 100 and clear the bypass checkbox.
 
-A 300-connection stress run was reported complete. Its results are pending
-verification: the existing local k6 summary does not identify the deployed
-pool size, so its figures cannot be attributed to that run. The 200-connection
-local smoke run reached 10 virtual users and returned a p95 of 319 ms over
-104 requests. Ten primary school requests returned HTTP 404 (9.6% failed).
-The smoke run did not measure pool saturation. The historical ceilings and
-operating targets below still refer to the pool-100 baseline.
+The Test stress runs at 200 and 300 connections per replica both met the
+latency and HTTP failure targets through 100 virtual users. The historical
+100-connection results below are retained for context. Their proposed
+operating targets need reassessment in light of the newer runs.
 
 ### Compare 200 and 300 connections per replica
 
@@ -95,8 +92,78 @@ operating targets below still refer to the pool-100 baseline.
 
 | Pool per replica | Shared Test stress run | Last step within SLO | First step outside SLO | Peak DB connections |
 |---|---|---|---|---|
-| 200 | Pending | Pending | Pending | Pending |
-| 300 | Completed, report attribution pending | Pending | Pending | Pending |
+| 200 | 20 November 2026 rerun | 100 VUs | 150 VUs (latency) | Not captured |
+| 300 | 20 November 2026 run | 100 VUs | 150 VUs (latency) | Not captured |
+
+### Test stress rerun with a 200-connection pool · 20 November 2026
+
+The run targeted the direct Test origin at
+`get-school-improvement-insights-test.test.teacherservices.cloud` with a
+confirmed pool cap of **200 per replica**.
+It completed the 650-user hold and stopped at 758 active virtual users
+during the ramp to 850, when the overall HTTP failure rate reached 5.021%
+and crossed k6's 5% abort threshold.
+
+| Virtual users | Hold window (elapsed) | Hold observed | Requests | Approx. requests/sec | Change | p95 | Failed requests |
+|---:|---|---:|---:|---:|---:|---:|---:|
+| 50 | 0:30–2:00 | 90 s | 1,821 | 20.2 | — | 1,355 ms | 0 (0.00%) |
+| 100 | 2:30–4:00 | 90 s | 3,787 | 42.1 | +108.0% | 843 ms | 0 (0.00%) |
+| 150 | 4:30–6:00 | 90 s | 3,690 | 41.0 | −2.6% | 5,204 ms | 0 (0.00%) |
+| 250 | 6:30–8:00 | 90 s | 3,409 | 37.9 | −7.6% | 14,888 ms | 1 (0.03%) |
+| 450 | 8:30–10:00 | 90 s | 1,785 | 19.8 | −47.6% | 60,004 ms | 705 (39.50%) |
+| 650 | 10:30–12:00 | 90 s | 2,357 | 26.2 | +32.0% | 46,429 ms | 144 (6.11%) |
+
+Throughput is the number of requests tagged to each hold divided by its
+90-second duration. Requests from a journey that crosses a stage boundary
+keep the tag from the start of that journey.
+
+Across ramps and holds, k6 recorded **23,483 requests at 31.9 requests/sec**,
+with an overall p95 of **40.2 seconds**. The console logged **1,118 request
+failures without an HTTP response**, mostly timeouts, and **61 HTTP 500
+responses**. No HTTP 400 or 404 responses were logged. Peak database
+connections were not captured, so the cause of the timeouts remains
+unconfirmed.
+
+The rerun passed both targets at 50 and 100 users. At 150 users, p95
+exceeded 3 seconds even though no requests failed. At 450 users, failures
+exceeded the 1% target. The run did not measure recovery.
+
+Generate the per-hold results from the saved k6 summary with:
+
+```powershell
+node load_testing/analyse.cjs "<report-directory>/sap-sector-load-test-summary.json"
+```
+
+### Test stress run with a 300-connection pool · 20 November 2026
+
+The run used the same direct Test origin with a pool cap of **300 per
+replica**. It reached the 850-user hold and stopped about 52 seconds into
+that hold when k6's overall HTTP failure rate crossed the 5% abort threshold.
+
+| Virtual users | Hold window (elapsed) | Hold observed | Requests | Approx. requests/sec | Change | p95 | Failed requests |
+|---:|---|---:|---:|---:|---:|---:|---:|
+| 50 | 0:30–2:00 | 90 s | 2,025 | 22.5 | — | 355 ms | 0 (0.00%) |
+| 100 | 2:30–4:00 | 90 s | 3,817 | 42.4 | +88.5% | 786 ms | 0 (0.00%) |
+| 150 | 4:30–6:00 | 90 s | 3,762 | 41.8 | −1.4% | 5,719 ms | 0 (0.00%) |
+| 250 | 6:30–8:00 | 90 s | 3,714 | 41.3 | −1.3% | 16,850 ms | 4 (0.11%) |
+| 450 | 8:30–10:00 | 90 s | 3,126 | 34.7 | −15.8% | 60,002 ms | 359 (11.48%) |
+| 650 | 10:30–12:00 | 90 s | 2,381 | 26.5 | −23.8% | 60,002 ms | 583 (24.49%) |
+| 850 | 12:30–13:22 | ~52 s (partial) | 1,335 | 25.9 | −2.3% | 36,913 ms | 469 (35.13%) |
+
+K6 recorded **28,416 requests at 35.4 requests/sec**, an overall p95 of
+**51.5 seconds**, and **2,035 failed requests (7.16%)**. The console logged
+1,275 request timeouts, 2 HTTP/2 stream errors without a response, and
+758 HTTP errors (710 HTTP 502, 41 HTTP 500, and 7 HTTP 504). No HTTP 400
+or 404 responses were logged. Peak database connections and recovery
+were not measured.
+
+Both pool sizes met the SLO through **100 virtual users** and first
+breached it on latency at **150**. At 450 users, the 300 pool handled more
+requests per second and had fewer failures. At 650 users, it handled
+roughly the same throughput but had more failures. These runs do not
+show a consistent capacity improvement from raising the pool to 300.
+Use ingress, pod and database metrics to investigate the timeouts and
+502s before selecting a larger pool.
 
 ### Use a Review app for comparison
 
@@ -116,7 +183,7 @@ infrastructure from Test, so use its results to compare pool sizes within
 the same Review app and use Test for production sizing. Keep Production
 on its normal configuration and use smoke coverage there.
 
-Results available for service assessment (raised by Robert Rees).
+## Historical baseline with a 100-connection pool
 
 Two staircase runs against the deployed `test` environment with real
 authentication bypassed and a real database:
@@ -129,10 +196,10 @@ authentication bypassed and a real database:
    production-representative and are the ones cited below - see
    [Production-tier stress result](#production-tier-stress-result).
 
-The service stays healthy to ~150 concurrent users, degrades gradually
-(slower but no errors) up to ~850, and starts failing around ~1,001. The
-binding constraint is the application's PostgreSQL connection pool, not the
-database or the app's CPU/memory - see
+In the historical production-tier run, the service met the latency target
+through 150 concurrent users. Latency climbed through 850 users, and
+failures became significant at 1,001. Infra identified the application's
+PostgreSQL connection pool as a constraint in that run. See
 [Why it breaks: connection pool](#why-it-breaks-connection-pool).
 
 The operating targets below are proposed starting points, not yet signed
@@ -262,9 +329,9 @@ database had over 650 connections spare when the service began failing. The
 constraint is an application configuration value (the pool cap), not database
 hardware.
 
-**Consequence for the numbers below:** the ~1,001-user ceiling was measured
-with the pool at 100 per replica. Raising the pool size should raise the
-ceiling further, so these figures are conservative.
+The historical run first saw significant failures at about 1,001 users
+with a pool of 100 per replica. The later 200 and 300 runs failed earlier,
+so this historical result does not establish a capacity floor.
 
 **Configurable application pool.** Npgsql `Maximum Pool Size`
 is now read from `Database:MaxPoolSize` by
@@ -287,15 +354,15 @@ assumed mean session length and peak-window concentration:
 - Normal day: ~45 concurrent users.
 - Busy day: ~220 concurrent users.
 
-Both sit inside the tested envelope - a normal day well within guaranteed
-load, a busy publication day within the no-error range. **These conversions
-depend on session length and how concentrated a peak is; the analytics team
-should firm both up.**
+The normal-day estimate is within the range that met both targets in the
+recent runs. The busy-day estimate is above the first measured latency
+breach. Both estimates depend on session length and how concentrated
+traffic is.
 
-## Operating targets (proposed - needs sign-off)
+## Historical operating targets (require reassessment)
 
-Per Robert Rees' service assessment ask, four targets. Measured on the
-production-spec database run above.
+These proposals came from the historical production-tier run and are
+retained as context. Neither recent run met both targets at 150 users.
 
 | Target | Proposed value | Basis |
 |---|---|---|
@@ -306,13 +373,9 @@ production-spec database run above.
 
 ## Open actions
 
-1. **Deploy the configured Npgsql connection pool size** and re-run
-   to confirm the ceiling moves up. Set `Maximum Pool Size` explicitly - it
-   currently sits at 100 per replica (confirmed by infra) - keeping
-   `2 replicas × pool size` within the database's `max_connections`; consider
-   PgBouncer for the longer term. This is the single highest-value change -
-   it's the current binding constraint. Change one thing at a time: pool
-   first, re-run, then reassess.
+1. **Investigate the timeouts and HTTP 502s** using ingress, pod, and
+   PostgreSQL metrics. Keep the pool default at 100 until the evidence
+   supports a different setting.
 2. **Confirm the pod restart mechanism and memory limit.** Exit Code 137 at
    ~18:16 suggests a possible OOM kill separate from the earlier liveness
    failures. Confirm with infra whether the pods hit their configured memory
@@ -324,18 +387,18 @@ production-spec database run above.
    under 856 with headroom for the maintenance pod and the co-located
    `sap-public` service. Confirm the production tier's value before applying
    there.
-3. **Revert any temporary auth-bypass build of `test`** back to a normal
-   build once testing is done - it disables real authentication for anyone
-   using the shared environment while deployed that way.
-4. **Revert the `test` database** to its normal tier if the production-spec
+4. **Restore normal Test settings after the run.** Redeploy with a pool
+   of 100 and the bypass disabled. Verify a signed-out request to
+   `/find-a-school` redirects to DfE Sign-in.
+5. **Revert the `test` database** to its normal tier if the production-spec
    scaling was temporary.
-5. Confirm whether an HPA is configured (pods scaled during the run) with the
+6. Confirm whether an HPA is configured (pods scaled during the run) with the
    platform team, and reconcile this doc with the main README.
-6. Confirm the actual WAF rate-limit window/duration with whoever owns the
+7. Confirm the actual WAF rate-limit window/duration with whoever owns the
    `domains` Terraform module.
-7. Firm up the analytics-to-concurrent conversion (session length, peak
+8. Firm up the analytics-to-concurrent conversion (session length, peak
    concentration) with the analytics team.
-8. Get the four operating target numbers - and the fast-vs-working decision
+9. Get the four operating target numbers - and the fast-vs-working decision
    for target peak - signed off by the service owner.
 
 ## How to run it
