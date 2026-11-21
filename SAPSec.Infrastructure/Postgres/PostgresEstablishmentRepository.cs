@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
+using System.Diagnostics;
 
 namespace SAPSec.Infrastructure.Postgres;
 
@@ -62,7 +63,12 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         var head = string.Join(' ', tokens.Take(tokens.Count - 1));
         var last = tokens[^1];
 
+        var sw = Stopwatch.StartNew();
+
         using var conn = await _factory.Create().OpenConnectionAsync();
+
+        var connectMs = sw.ElapsedMilliseconds;
+
 
         // Same phase rule as CanIndexForSearch.
         const string sql = """
@@ -82,8 +88,15 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
             LIMIT @maxResults;
         """;
 
-        var result = await conn.QueryAsync<EstablishmentSearchHit>(sql, new { head, last, maxResults });
-        return result.ToList();
+        var result = (await conn.QueryAsync<EstablishmentSearchHit>(sql, new { head, last, maxResults })).ToList();
+
+        sw.Stop();
+
+        _logger.LogInformation(
+            "SearchEstablishments '{Query}' returned {Count} hits in {ElapsedMs} ms (connect {ConnectMs} ms)",
+            query, result.Count, sw.ElapsedMilliseconds, connectMs);
+
+         return result;
     }
 
     public async Task<Establishment?> GetEstablishmentAsync(string urn)
