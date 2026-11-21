@@ -7,6 +7,7 @@ namespace SAPSec.Web.Authorization;
 public class SchoolAccessHandler(
     IUserService userService,
     IFeatureFlagService featureFlagService,
+    IDfeUserIdentifier dfeUserIdentifier,
     ILogger<SchoolAccessHandler> logger)
     : AuthorizationHandler<SchoolAccessRequirement>
 {
@@ -19,7 +20,9 @@ public class SchoolAccessHandler(
             return;
         }
 
-        if (await featureFlagService.IsEnabledAsync(Flags.EnableFindASchool))
+        // DfE staff can open any school they can find, even when the organisation they signed in as is a school.
+        if (await featureFlagService.IsEnabledAsync(Flags.EnableFindASchool)
+            || await dfeUserIdentifier.IsDfeUserAsync(context.User))
         {
             context.Succeed(requirement);
             return;
