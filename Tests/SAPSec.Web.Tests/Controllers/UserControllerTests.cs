@@ -35,7 +35,7 @@ public class UserControllerTests
                 EstablishmentStatusId = "1"
             });
         var schoolUserAccessService = new SchoolUserAccessService(
-            _userService.Object, _featureFlagService.Object,
+            _userService.Object, _featureFlagService.Object, _dfeUserIdentifier.Object,
             establishmentRepository.Object, Mock.Of<ICurrentTimeProvider>());
         _controller = new UserController(_userService.Object, _featureFlagService.Object,
             _dfeUserIdentifier.Object, schoolUserAccessService, _logger.Object);
