@@ -1,0 +1,34 @@
+@using SAPSec.Web.ViewModels.Measures
+@model MeasureViewModel
+
+@* KS2 progress scores (behind EnableKs2ProgressMeasures). Replaces _Ks2ProgressRWMInfo when the flag is on. *@
+<section class="app-measure-section" aria-labelledby="progress-rwm-heading">
+    <h2 class="govuk-heading-m" id="progress-rwm-heading" data-testid="progress-rwm-heading">@Model.MeasureInfo.Name</h2>
+
+    @* TODO: confirm the wording against the approved design before release. *@
+    <details class="govuk-details app-measure-details" data-module="govuk-details" data-testid="progress-rwm-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Information about progress scores</span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                Progress scores show how much progress pupils at this school made in reading, writing and maths
+                between the end of key stage 1 and the end of key stage 2, compared with pupils across England who
+                had similar results at the end of key stage 1.
+            </p>
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                A score of 0 means pupils made, on average, similar progress to pupils with similar prior attainment
+                nationally. A positive score means they made more progress and a negative score means they made less.
+                Most schools have scores between -5 and +5.
+            </p>
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                Read the
+                <a href="https://www.gov.uk/government/publications/primary-school-accountability" class="govuk-link" target="_blank" rel="noopener noreferrer" data-testid="progress-rwm-technical-guidance-link">Technical guidance (opens in new tab)</a>
+                for how progress scores are calculated. The data comes from
+                <a href="https://explore-education-statistics.service.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer" data-testid="progress-rwm-ees-link">Explore education statistics (opens in new tab)</a>.
+            </p>
+        </div>
+    </details>
+
+    <partial name="Measures/_Measure" model=@Model />
+</section>

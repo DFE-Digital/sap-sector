@@ -84,6 +84,19 @@ public class SchoolController(
             AchievedHigherStandardGps = MeasureViewModel.FromAllThroughPrimaryMeasure(response.AchievedHigherStandardGps, response.School, response.SimilarSchoolsCount > 0)
         };
 
+        if (await featureFlagService.IsEnabledAsync(Flags.EnableKs2ProgressMeasures))
+        {
+            var progressScores = MeasureViewModel.FromAllThroughPrimaryMeasure(response.ProgressScores, response.School, response.SimilarSchoolsCount > 0);
+
+            if (await featureFlagService.IsEnabledAsync(Flags.EnableKs2ProgressNumberOfPupils))
+            {
+                progressScores = Ks2ProgressScoresViewModel.WithNumberOfPupils(
+                    progressScores, response.ProgressScores, response.School, response.ProgressPupilNumbers);
+            }
+
+            model.ProgressScores = progressScores;
+        }
+
         return View(SharedKs2PerformanceMeasuresView, model);
     }
 

@@ -603,7 +603,41 @@ public class EstablishmentPerformanceBuilder(string urn)
 
         return this;
     }
-    public EstablishmentPerformance Build() =>
+    // KS2 progress measures. Set by property name because the data classes are generated from the data map.
+    private readonly List<(string Property, string Value)> _progressValues = [];
+
+    /// <summary>Progress score for all pupils. <paramref name="subject"/> is Reading, Writing or Maths.</summary>
+    public EstablishmentPerformanceBuilder WithProgress(string subject, string current, string prev = "", string prev2 = "") =>
+        WithYears($"{subject}Progress_Tot_Cohort_Est", current, prev, prev2);
+
+    public EstablishmentPerformanceBuilder WithEligiblePupils(string current, string prev = "", string prev2 = "") =>
+        WithYears("EligiblePupils_Tot_Cohort_Est", current, prev, prev2);
+
+    /// <summary>Proportion of pupils included in the progress measure. <paramref name="subject"/> is Reading, Writing or Maths.</summary>
+    public EstablishmentPerformanceBuilder WithProgressIncluded(string subject, string current, string prev = "", string prev2 = "") =>
+        WithYears($"{subject}Included_Tot_Cohort_Est", current, prev, prev2);
+
+    private EstablishmentPerformanceBuilder WithYears(string prefix, string current, string prev, string prev2)
+    {
+        _progressValues.Add(($"{prefix}_Current_Num", current));
+        _progressValues.Add(($"{prefix}_Previous_Num", prev));
+        _progressValues.Add(($"{prefix}_Previous2_Num", prev2));
+        return this;
+    }
+
+    public EstablishmentPerformance Build()
+    {
+        var result = BuildCore();
+        foreach (var (property, value) in _progressValues)
+        {
+            (typeof(EstablishmentPerformance).GetProperty(property)
+                ?? throw new InvalidOperationException($"EstablishmentPerformance has no property {property}"))
+                .SetValue(result, value);
+        }
+        return result;
+    }
+
+    private EstablishmentPerformance BuildCore() =>
         new()
         {
             Id = urn,
