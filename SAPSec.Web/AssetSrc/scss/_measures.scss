@@ -93,12 +93,12 @@ $app-measure-color-track: #f3f2f1;
   .app-width-container .app-comparison-pages .govuk-back-link {
     padding-left: 14px;
     margin-left: 0;
-    color: #1d70b8;
+    color: #0b0c0c;
   }
 
   .app-width-container .app-comparison-pages .govuk-back-link:visited,
   .app-width-container .app-comparison-pages .govuk-back-link:hover {
-    color: #1d70b8;
+    color: #0b0c0c;
   }
 }
 
@@ -330,4 +330,31 @@ $app-measure-color-track: #f3f2f1;
   --chart-color-similar-schools: #2a1950;
   --chart-color-local-authority: #5694ca;
   --chart-color-england: #4b9b7d;
+}
+
+// 'Number of pupils' details component (KS2 progress scores)
+.app-number-of-pupils {
+  margin-top: 20px;
+  margin-bottom: 0;
+
+  .govuk-details__text {
+    padding-right: 0;
+  }
+
+  .app-number-of-pupils__row-label {
+    font-weight: $govuk-font-weight-regular;
+  }
+}
+
+// Scrolls horizontally on mobile and tablet; focusable so keyboard users can scroll it.
+.app-number-of-pupils__table-wrapper {
+  overflow-x: auto;
+
+  &:focus {
+    outline: $govuk-focus-width solid $govuk-focus-colour;
+  }
+
+  .govuk-table {
+    min-width: 640px;
+  }
 }

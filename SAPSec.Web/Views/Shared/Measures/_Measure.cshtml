@@ -10,20 +10,36 @@
             <content-toggle>
                 <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)" aria-label="@($"{SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)} bar graph")" active="true">
                     <partial name="Measures/_CurrentYearChart" model=@Model.CurrentYear />
+                    @if (Model.NumberOfPupils is not null)
+                    {
+                        <partial name="Measures/_NumberOfPupils" model=@Model.NumberOfPupils.CurrentYear />
+                    }
                 </toggle-content>
                 <toggle-content id="year-by-year" name="Year by year" aria-label="Year by year line graph">
                     <partial name="Measures/_YearByYearChart" model=@Model.YearByYear />
+                    @if (Model.NumberOfPupils is not null)
+                    {
+                        <partial name="Measures/_NumberOfPupils" model=@Model.NumberOfPupils.YearByYear />
+                    }
                 </toggle-content>
             </content-toggle>
         </tab-content>
 
         <tab-content id="table-view" name="Table" aria-label="Table of data">
             <partial name="Measures/_Table" model=@Model.Table />
+            @if (Model.NumberOfPupils is not null)
+            {
+                <partial name="Measures/_NumberOfPupils" model=@Model.NumberOfPupils.Table />
+            }
         </tab-content>
         @if (Model.TopPerformers is not null)
         {
             <tab-content id="top-performers" name="Top performers" aria-label="Top performing similar schools">
                 <partial name="Measures/_TopPerformers" model=@Model.TopPerformers />
+                @if (Model.NumberOfPupils?.TopPerformers is not null)
+                {
+                    <partial name="Measures/_NumberOfPupils" model=@Model.NumberOfPupils.TopPerformers />
+                }
             </tab-content>
         }
     </tabbed-view>
