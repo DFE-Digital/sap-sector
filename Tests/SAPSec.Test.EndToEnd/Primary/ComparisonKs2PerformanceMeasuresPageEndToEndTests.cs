@@ -41,7 +41,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
         await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Overview);
         await Page.GetByRole(AriaRole.Link, new() { Name = "View similar schools", Exact = true }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).ViewSimilarSchools);
-        await NavigateTo($"{Routes.PrimarySchool(CurrentSchoolUrn).ViewSimilarSchools}?page=4");
+        await NavigateTo($"{Routes.PrimarySchool(CurrentSchoolUrn).ViewSimilarSchools}?page=3");
         await Page.GetByRole(AriaRole.Link, new() { Name = ComparatorSchoolName, Exact = true }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).Similarity);
         await Page.GetByRole(AriaRole.Link, new() { Name = "KS2", Exact = true }).ClickAsync();
