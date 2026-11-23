@@ -88,15 +88,41 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
             LIMIT @maxResults;
         """;
 
-        var result = (await conn.QueryAsync<EstablishmentSearchHit>(sql, new { head, last, maxResults })).ToList();
+        var candidateLimit = Math.Max(maxResults * 5, 100);
+
+        //const string sql = """
+        //    WITH q AS (
+        //        SELECT to_tsquery('simple', concat_ws(' & ',
+        //            NULLIF(array_to_string(array_remove(regexp_split_to_array(trim(normalize_text(@head)), '\s+'), ''), ' & '), ''),
+        //            @last || ':*')) AS tsq
+        //    ),
+        //    candidates AS MATERIALIZED (
+        //    SELECT e."URN", e."EstablishmentName", s."SearchFTS", q.tsq
+        //    FROM public.v_establishment e
+        //    JOIN public.v_establishment_search s ON s."URN" = e."URN"
+        //    CROSS JOIN q
+        //    WHERE s."SearchFTS" @@ q.tsq
+        //      AND (trim(e."PhaseOfEducationId") IN ('2', '4', '7')
+        //           OR lower(trim(e."PhaseOfEducationName")) IN ('primary', 'secondary', 'all-through'))
+        //    LIMIT @candidateLimit
+        //)
+        //SELECT "URN", "EstablishmentName"
+        //FROM candidates
+        //ORDER BY ts_rank_cd("SearchFTS", tsq) DESC, "EstablishmentName"
+        //LIMIT @maxResults;
+        //""";
+
+        var result = (await conn.QueryAsync<EstablishmentSearchHit>(sql, new { head, last, maxResults, candidateLimit })).ToList();
 
         sw.Stop();
 
-        _logger.LogInformation(
-            "SearchEstablishments '{Query}' returned {Count} hits in {ElapsedMs} ms (connect {ConnectMs} ms)",
-            query, result.Count, sw.ElapsedMilliseconds, connectMs);
+        //_logger.LogInformation(
+        //    "SearchEstablishments '{Query}' returned {Count} hits in {ElapsedMs} ms (connect {ConnectMs} ms)",
+        //    query, result.Count, sw.ElapsedMilliseconds, connectMs);
 
-         return result;
+        Console.WriteLine($"SearchEstablishments '{query}' returned {result.Count} hits in {sw.ElapsedMilliseconds} ms (connect {connectMs} ms)");
+
+        return result;
     }
 
     public async Task<Establishment?> GetEstablishmentAsync(string urn)
