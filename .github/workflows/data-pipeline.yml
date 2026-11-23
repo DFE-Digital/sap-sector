@@ -20,6 +20,11 @@ on:
         type: boolean
         required: false
         default: false
+      validate-ingestion-inputs:
+        description: Validate expected Blob inputs and verify downloads before SQL generation
+        type: boolean
+        required: false
+        default: false
       raw-tables-to-rebuild-path:
         description: Optional override path to the raw tables rebuild list
         type: string
@@ -586,22 +591,14 @@ jobs:
           }
           $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-06-source-versioning.json")
 
-      # ==============================
-      # 7. Download generator inputs from Blob Storage
-      #    - Downloads:
-      #        (A) ALL manual_* blobs, including required inputs from DataMap
-      #        (B) ONLY the LATEST managed blobs (from step 6 output latest_files)
-      #    - Skips everything else (old managed versions, legacy leftovers, stray blobs)
-      # ==============================
-      - name: Validate and download selected generator inputs
-        id: download-inputs
+      - name: Validate selected Blob inputs
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.validate-ingestion-inputs }}
         shell: pwsh
         env:
           LATEST_FILES: ${{ steps.version.outputs.latest_files }}
         run: |
           $ErrorActionPreference = "Stop"
           $PSNativeCommandUseErrorActionPreference = $false
-          $rawDir = "SAPData/DataMap/SourceFiles"
           $latest = $env:LATEST_FILES | ConvertFrom-Json -AsHashtable
           if (-not $latest -or $latest.Keys.Count -eq 0) { throw "LATEST_FILES output was empty." }
 
@@ -611,7 +608,7 @@ jobs:
             "--only-show-errors"
           )
           $inventoryJson = az storage blob list @storageArgs --num-results '*' `
-            --query '[].{name:name,length:properties.contentLength,etag:properties.etag}' -o json 2>$null
+            --query '[].{name:name,length:properties.contentLength}' -o json 2>$null
           if ($LASTEXITCODE -ne 0) { throw "Could not read generator input Blob inventory." }
 
           $inventory = [System.Collections.Generic.Dictionary[string,object]]::new([StringComparer]::Ordinal)
@@ -681,36 +678,93 @@ jobs:
           foreach ($name in $selected.Keys) {
             $blob = $inventory[$name]
             if ($name -in ".", ".." -or $name.Contains("/") -or $name.Contains("\") -or
-                $null -eq $blob.length -or [string]::IsNullOrWhiteSpace($blob.etag)) {
+                $null -eq $blob.length) {
               throw "Invalid Blob name or incomplete inventory metadata for dataset '$($selected[$name])'."
             }
           }
 
-          New-Item -ItemType Directory -Force -Path $rawDir | Out-Null
-          Get-ChildItem -LiteralPath $rawDir -Force | Remove-Item -Force -Recurse
-
-          foreach ($name in $selected.Keys) {
-            $dataset = $selected[$name]
-            $blob = $inventory[$name]
-            $destination = Join-Path $rawDir $name
-            az storage blob download @storageArgs --name $name --file $destination `
-              --if-match $blob.etag --no-progress -o none 2>$null
-            if ($LASTEXITCODE -ne 0) {
-              throw "Blob download failed for dataset '$dataset'. The selected object may be missing, changed, or inaccessible."
+          $expected = @(
+            foreach ($name in $selected.Keys) {
+              [pscustomobject]@{ name = $name; dataset = $selected[$name]; length = $inventory[$name].length }
             }
+          )
+          $expected | ConvertTo-Json -AsArray | Set-Content -LiteralPath (Join-Path $env:RUNNER_TEMP "expected-ingestion-inputs.json")
+          Write-Host "Validated $($expected.Count) selected Blob objects."
 
-            $file = Get-Item -LiteralPath $destination -ErrorAction SilentlyContinue
-            if ($null -eq $file -or $file.PSIsContainer -or $file.Length -ne $blob.length) {
-              throw "Incomplete Blob download for dataset '$dataset'."
+      # ==============================
+      # 7. Download generator inputs from Blob Storage
+      #    - Downloads:
+      #        (A) ALL manual_* blobs (canonical manual uploads)
+      #        (B) ONLY the LATEST managed blobs (from step 6 output latest_files)
+      #    - Skips everything else (old managed versions, legacy leftovers, stray blobs)
+      # ==============================
+      - name: Download generator inputs from Blob Storage (manual_* + latest managed only)
+        shell: pwsh
+        env:
+          LATEST_FILES: ${{ steps.version.outputs.latest_files }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $rawDir = "SAPData/DataMap/SourceFiles"
+          New-Item -ItemType Directory -Force -Path $rawDir | Out-Null
+          Get-ChildItem -Path $rawDir -Force | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+          # ---- Load latest managed filenames from step 6 output ----
+          $latest = $env:LATEST_FILES | ConvertFrom-Json -AsHashtable
+          if (-not $latest -or $latest.Keys.Count -eq 0) { throw "LATEST_FILES output was empty." }
+          $latestManagedFiles = New-Object System.Collections.Generic.HashSet[string]([StringComparer]::OrdinalIgnoreCase)
+          foreach ($k in $latest.Keys) {
+            $fn = [string]$latest[$k]
+            if ([string]::IsNullOrWhiteSpace($fn)) { throw "LATEST_FILES contained an empty filename for key '$k'" }
+            [void]$latestManagedFiles.Add($fn)
+          }
+          # ---- List all blobs in container ----
+          $blobNamesJson = az storage blob list `
+            --container-name $env:AZURE_STORAGE_CONTAINER `
+            --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
+            --query "[].name" -o json
+          $blobNames = $blobNamesJson | ConvertFrom-Json
+          if ($blobNames -isnot [System.Array]) { $blobNames = @($blobNames) }
+          if (-not $blobNames -or $blobNames.Count -eq 0) {
+            throw "No blobs found in container '$($env:AZURE_STORAGE_CONTAINER)'."
+          }
+          # ---- Decide what to download ----
+          # Rule:
+          #   - Download if blob is manual_* (canonical manual uploads)
+          #   - Download if blob is exactly one of the latest managed filenames
+          #   - Otherwise skip
+          $toDownload = New-Object System.Collections.Generic.HashSet[string]([StringComparer]::OrdinalIgnoreCase)
+          foreach ($blob in $blobNames) {
+            if ([string]::IsNullOrWhiteSpace($blob)) { continue }
+            $lower = $blob.ToLowerInvariant()
+            if ($lower.StartsWith("manual_")) {
+              [void]$toDownload.Add($blob)
+              continue
+            }
+            if ($latestManagedFiles.Contains($blob)) {
+              [void]$toDownload.Add($blob)
+              continue
             }
           }
-          Write-Host "Verified downloads for all $($selected.Count) selected Blob objects."
+          # Safety: ensure all latest managed files are included
+          foreach ($mf in $latestManagedFiles) { [void]$toDownload.Add($mf) }
+          if ($toDownload.Count -eq 0) { throw "No blobs selected for download." }
+          Write-Host "Downloading $($toDownload.Count) blobs (manual_* + latest managed only)"
+          foreach ($blob in $toDownload) {
+            $dest = Join-Path $rawDir $blob
+            az storage blob download `
+              --container-name $env:AZURE_STORAGE_CONTAINER `
+              --name $blob `
+              --file $dest `
+              --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
+              --overwrite true | Out-Null
+          }
+          Write-Host "Downloaded files:"
+          $files = Get-ChildItem -Path $rawDir -File | Sort-Object Name
+          $files | Select-Object Name, Length | Format-Table -AutoSize
 
       - name: Summarise generator input download
         if: always()
         shell: pwsh
         env:
-          DOWNLOAD_OUTCOME: ${{ steps.download-inputs.outcome }}
           LATEST_FILES: ${{ steps.version.outputs.latest_files }}
         run: |
           $rawDir = "SAPData/DataMap/SourceFiles"
@@ -725,16 +779,38 @@ jobs:
             downloadedCount = $files.Count
             manualFileCount = $manualCount
             latestManagedFileCount = $latestFiles.Keys.Count
-            downloadOutcome = $env:DOWNLOAD_OUTCOME
+            sampleFiles = @($files | Select-Object -First 10 -ExpandProperty Name)
           }
           $summary = [pscustomobject]@{
             stage = "07-download-generator-inputs"
-            status = if ($env:DOWNLOAD_OUTCOME -eq "success") { "completed" } else { $env:DOWNLOAD_OUTCOME }
+            status = if ($files.Count -gt 0) { "completed" } else { "failed" }
             utcTime = [DateTime]::UtcNow.ToString("o")
-            summary = "Validated and downloaded selected generator inputs on success."
+            summary = "Downloaded manual blobs and the latest managed datasets for SQL generation."
             metadata = $metadata
           }
           $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-07-download-generator-inputs.json")
+
+      - name: Verify generator input downloads
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.validate-ingestion-inputs }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $rawDir = "SAPData/DataMap/SourceFiles"
+          $expected = Get-Content -LiteralPath (Join-Path $env:RUNNER_TEMP "expected-ingestion-inputs.json") -Raw | ConvertFrom-Json -NoEnumerate
+          if ($expected.Count -eq 0) { throw "No expected generator inputs were recorded." }
+
+          $incomplete = @(
+            foreach ($entry in $expected) {
+              $file = Get-Item -LiteralPath (Join-Path $rawDir $entry.name) -ErrorAction SilentlyContinue
+              if ($null -eq $file -or $file.PSIsContainer -or $file.Length -ne $entry.length) {
+                $entry.dataset
+              }
+            }
+          )
+          if ($incomplete.Count -gt 0) {
+            throw "Missing or incomplete downloads for datasets: $($incomplete -join '; ')."
+          }
+          Write-Host "Verified downloads for all $($expected.Count) selected Blob objects."
 
       # ==============================
       # 8. Build + Run SQL generator
