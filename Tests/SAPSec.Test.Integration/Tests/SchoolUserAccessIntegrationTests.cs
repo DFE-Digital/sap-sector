@@ -210,6 +210,19 @@ public class SchoolUserAccessIntegrationTests(JsonRepositoryIntegrationTestFixtu
     }
 
     [Fact]
+    public async Task AnotherSchool_AsSchoolUserWithDfeEmail_IsAvailable()
+    {
+        // A DfE user who signed in for a school can open the schools they find through Find a school.
+        fixture.TestUser.Email = TestUserOrganisation.DfeEmail;
+
+        var overview = await fixture.NonRedirectingClient.GetAsync(Routes.SecondarySchool(OtherUrn).Overview);
+        var similarSchools = await fixture.NonRedirectingClient.GetAsync(Routes.SecondarySchool(OtherUrn).ViewSimilarSchools);
+
+        overview.StatusCode.Should().Be(HttpStatusCode.OK);
+        similarSchools.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
     public async Task AnotherSchoolsSimilarSchoolsList_ReturnsAccessDenied()
     {
         // e.g. reached School B through a comparison, then tries to open School B's own similar-schools list.

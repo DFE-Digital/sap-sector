@@ -4,18 +4,21 @@ using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Time;
 using SAPSec.Data.Repositories;
+using SAPSec.Web.Authorization;
 
 namespace SAPSec.Web.Services;
 
 public class SchoolUserAccessService(
     IUserService userService,
     IFeatureFlagService featureFlagService,
+    IDfeUserIdentifier dfeUserIdentifier,
     IEstablishmentRepository establishmentRepository,
     ICurrentTimeProvider timeProvider)
 {
     public async Task<bool> CanAccessAsync(ClaimsPrincipal user)
     {
-        if (await featureFlagService.IsEnabledAsync(Flags.EnableFindASchool))
+        if (await featureFlagService.IsEnabledAsync(Flags.EnableFindASchool)
+            || await dfeUserIdentifier.IsDfeUserAsync(user))
         {
             return true;
         }
