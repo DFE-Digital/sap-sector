@@ -111,7 +111,7 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
     {
         await Page.GotoAsync(HomePagePath);
 
-        var reportProblemLink = Page.Locator("a.govuk-footer__link[href='mailto:schoolinsights.support@education.gov.uk']");
+        var reportProblemLink = Page.Locator($"a.govuk-footer__link[href='mailto:{LayoutConstants.SupportEmail}']");
         var giveFeedbackLink = Page.Locator("a.govuk-footer__link[href='https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-QBBClDaMHtAsZDhksQEJa5UQUZHRzRSV1RMMTg2TElGV1ZYNENPTk9SRCQlQCN0PWcu']");
 
         (await reportProblemLink.IsVisibleAsync()).Should().BeTrue();

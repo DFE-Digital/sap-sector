@@ -6,3 +6,4 @@ FeatureManagement__EnableRiseResources: "true"
 FeatureManagement__EnableKs4CoreSubjectsPupilCharacteristics: "true"
 FeatureManagement__EnableFindASchool: "true"
 reset_review_db: "true"
+
