@@ -2,7 +2,7 @@
 
 namespace SAPSec.Test.Integration.Setup;
 
-[Collection("InMemoryRepositoryIntegrationTestsCollection")]
+[Collection(nameof(InMemoryRepositoryIntegrationTestsCollection))]
 public abstract class InMemoryRepositoryIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : IAsyncLifetime

@@ -1,14 +1,11 @@
 ﻿using GovUk.Frontend.AspNetCore;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.FeatureManagement;
 using SAPSec.Core;
-using SAPSec.Core.Authentication;
 using SAPSec.Core.Caching;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Infrastructure.LuceneSearch;
@@ -121,29 +118,7 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        builder.Services.Configure<AuthenticationSettings>(builder.Configuration.GetSection("Authentication"));
-        var authenticationConfig = builder.Configuration.GetSection("Authentication").Get<AuthenticationSettings>();
-
-        if (authenticationConfig?.BypassAuthentication is true
-            // Failsafe: Regardless of the config setting we never want to bypass authentication on production
-            && !IsProductionEnvironment(builder.Environment.EnvironmentName))
-        {
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = "TestScheme";
-                options.DefaultAuthenticateScheme = "TestScheme";
-                options.DefaultChallengeScheme = "TestScheme";
-            })
-            .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
-
-            builder.Services.TryAddSingleton<TestUserOrganisation>();
-            builder.Services.AddScoped<IUserService, MockDsiUserService>();
-            builder.Services.AddScoped<IDsiClient, MockDsiApiService>();
-        }
-        else
-        {
-            builder.Services.AddDsiAuthentication(builder.Configuration);
-        }
+        builder.Services.AddAuthentication(builder.Configuration, builder.Environment);
 
         builder.Services.AddAuthorization(options =>
         {
@@ -225,7 +200,6 @@ public class Program
             // If caching is enabled:
             services.AddRedisCache(config);
             services.AddNestedCache<HttpRequestCache, RedisCache>();
-            services.AddHostedService<StartupCacheClearer>();
         });
 
         // Add custom error handler for NotFoundExceptions
@@ -234,13 +208,11 @@ public class Program
 
         var app = builder.Build();
 
-        var isDevelopment = app.Environment.IsDevelopment();
-
         // Set up error handling
         // Note: The order of these lines is important!
         // 1. Status code pages (used by later exception handlers)
         app.UseStatusCodePagesWithReExecute("/error/{0}");
-        if (isDevelopment)
+        if (app.Environment.IsDevelopment())
         {
             // 2a. Developer exception page
             // Note: Comes first otherwise it will absorb NotFoundExceptions too which we don't want
@@ -258,12 +230,12 @@ public class Program
             app.UseExceptionHandler("/error/500");
         }
 
-        if (!isDevelopment)
+        if (!app.Environment.IsDevelopment())
         {
             app.UseHsts();
         }
         app.UseForwardedHeaders();
-        app.UseMiddleware<SecurityHeadersMiddleware>(app.Environment);
+        app.UseMiddleware<SecurityHeadersMiddleware>();
         app.UseHttpsRedirection();
 
         var provider = new FileExtensionContentTypeProvider
@@ -337,9 +309,4 @@ public class Program
                || environmentName.Equals("prod", StringComparison.OrdinalIgnoreCase)
                || environmentName.Equals("pd", StringComparison.OrdinalIgnoreCase);
     }
-}
-
-public class AuthenticationSettings
-{
-    public bool BypassAuthentication { get; set; }
 }

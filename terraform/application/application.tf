@@ -41,7 +41,7 @@ module "application_configuration" {
     SENTRY_DSN                                  = data.azurerm_key_vault_secret.sentry_dsn.value
     StorageConnectionString                     = "DefaultEndpointsProtocol=https;AccountName=${module.storage.name};AccountKey=${module.storage.primary_access_key}"
     REDIS_CACHE_URL                             = var.deploy_managed_redis ? module.redis-managed-cache[0].url : null
-    RedisConfiguration__ConnectionString        = var.deploy_managed_redis ? module.redis-managed-cache[0].connection_string : null
+    Redis__ConnectionString                     = var.deploy_managed_redis ? module.redis-managed-cache[0].connection_string : null
   }, local.federated_auth_secrets)
 }
 

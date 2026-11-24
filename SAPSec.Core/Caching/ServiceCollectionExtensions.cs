@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
@@ -7,21 +8,25 @@ namespace SAPSec.Core.Caching;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddRepository<TInterface, TRealImplementation, TCachedImplementation>(this IServiceCollection services, IConfiguration configuration)
-        where TInterface : class, IRepository
-        where TRealImplementation : class, TInterface
-        where TCachedImplementation : class, TInterface
+    public static void AddCaching(this IServiceCollection services, IConfiguration configuration, Action<IServiceCollection, IConfiguration> configure)
     {
-        var config = configuration.GetSection("Caching").Get<CachingSettings>();
+        var config = configuration.GetSection(CachingSettings.SectionName).Get<CachingSettings>();
 
-        if (config is null || !config.EnableCaching || !config.CacheRepositories)
+        if (config is not null && config.EnableUseCaseCaching)
         {
-            services.AddSingleton<TInterface, TRealImplementation>();
-            return;
+            services.Configure<CachingSettings>(configuration.GetSection(CachingSettings.SectionName));
+            services.AddSingleton<HttpRequestCache>();
+            services.AddSingleton<InMemoryCache>();
+            configure(services, configuration);
         }
+    }
 
-        services.AddKeyedSingleton<TInterface, TRealImplementation>(ServiceKeys.RealImplementation);
-        services.AddSingleton<TInterface, TCachedImplementation>();
+    public static void AddNestedCache<TOuterCache, TInnerCache>(this IServiceCollection services)
+        where TOuterCache : class, ICache
+        where TInnerCache : class, ICache
+    {
+        services.RemoveAll<ICache>();
+        services.AddSingleton<ICache, NestedCache<TOuterCache, TInnerCache>>();
     }
 
     public static void AddUseCase<TImplementation>(this IServiceCollection services, IConfiguration configuration)
@@ -30,11 +35,11 @@ public static class ServiceCollectionExtensions
 
     private static void AddUseCase(this IServiceCollection services, Type implementationType, IConfiguration configuration)
     {
-        var config = configuration.GetSection("Caching").Get<CachingSettings>();
+        var config = configuration.GetSection(CachingSettings.SectionName).Get<CachingSettings>();
 
         var interfaceType = GetInterfaceType(implementationType);
 
-        if (config is null || !config.EnableCaching || !config.CacheUseCases)
+        if (config is null || !config.EnableUseCaseCaching)
         {
             services.AddSingleton(interfaceType, implementationType);
             return;
@@ -51,11 +56,11 @@ public static class ServiceCollectionExtensions
 
     public static void AddKeyedUseCase(this IServiceCollection services, string serviceKey, Type implementationType, IConfiguration configuration)
     {
-        var config = configuration.GetSection("Caching").Get<CachingSettings>();
+        var config = configuration.GetSection(CachingSettings.SectionName).Get<CachingSettings>();
 
         var interfaceType = GetInterfaceType(implementationType);
 
-        if (config is null || !config.EnableCaching || !config.CacheUseCases)
+        if (config is null || !config.EnableUseCaseCaching)
         {
             services.AddKeyedSingleton(interfaceType, serviceKey, implementationType);
             return;

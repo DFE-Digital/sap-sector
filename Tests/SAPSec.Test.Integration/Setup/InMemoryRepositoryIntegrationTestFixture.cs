@@ -8,33 +8,33 @@ namespace SAPSec.Test.Integration.Setup;
 public class InMemoryRepositoryIntegrationTestFixture : IntegrationTestFixture
 {
     public InMemoryEstablishmentRepository EstablishmentRepository =>
-        (InMemoryEstablishmentRepository)_factory.Services.GetRequiredService<IEstablishmentRepository>();
+        (InMemoryEstablishmentRepository)_factory!.Services.GetRequiredService<IEstablishmentRepository>();
 
     public InMemorySimilarSchoolsSecondaryRepository SimilarSchoolsSecondaryRepository =>
-        (InMemorySimilarSchoolsSecondaryRepository)_factory.Services.GetRequiredService<ISimilarSchoolsSecondaryRepository>();
+        (InMemorySimilarSchoolsSecondaryRepository)_factory!.Services.GetRequiredService<ISimilarSchoolsSecondaryRepository>();
 
     public InMemorySimilarSchoolsPrimaryRepository SimilarSchoolsPrimaryRepository =>
-        (InMemorySimilarSchoolsPrimaryRepository)_factory.Services.GetRequiredService<ISimilarSchoolsPrimaryRepository>();
+        (InMemorySimilarSchoolsPrimaryRepository)_factory!.Services.GetRequiredService<ISimilarSchoolsPrimaryRepository>();
 
     public InMemoryKs2PerformanceRepository Ks2PerformanceRepository =>
-        (InMemoryKs2PerformanceRepository)_factory.Services.GetRequiredService<IKs2PerformanceRepository>();
+        (InMemoryKs2PerformanceRepository)_factory!.Services.GetRequiredService<IKs2PerformanceRepository>();
 
     public InMemoryKs4PerformanceRepository Ks4PerformanceRepository =>
-        (InMemoryKs4PerformanceRepository)_factory.Services.GetRequiredService<IKs4PerformanceRepository>();
+        (InMemoryKs4PerformanceRepository)_factory!.Services.GetRequiredService<IKs4PerformanceRepository>();
 
     public InMemoryKs4DestinationsRepository Ks4DestinationsRepository =>
-        (InMemoryKs4DestinationsRepository)_factory.Services.GetRequiredService<IKs4DestinationsRepository>();
+        (InMemoryKs4DestinationsRepository)_factory!.Services.GetRequiredService<IKs4DestinationsRepository>();
 
     public InMemoryAbsenceRepository AbsenceRepository =>
-        (InMemoryAbsenceRepository)_factory.Services.GetRequiredService<IAbsenceRepository>();
+        (InMemoryAbsenceRepository)_factory!.Services.GetRequiredService<IAbsenceRepository>();
 
     public InMemoryExclusionsRepository ExclusionsRepository =>
-        (InMemoryExclusionsRepository)_factory.Services.GetRequiredService<IExclusionsRepository>();
+        (InMemoryExclusionsRepository)_factory!.Services.GetRequiredService<IExclusionsRepository>();
 
     public InMemoryRiseResourcesRepository RiseResourcesRepository =>
-        (InMemoryRiseResourcesRepository)_factory.Services.GetRequiredService<IRiseResourcesRepository>();
+        (InMemoryRiseResourcesRepository)_factory!.Services.GetRequiredService<IRiseResourcesRepository>();
 
-    public ICache Cache => _factory.Services.GetRequiredService<ICache>();
+    public InMemoryCache Cache => (InMemoryCache)_factory!.Services.GetRequiredService<ICache>();
 
     protected override IntegrationTestsWebApplicationFactory CreateWebApplicationFactory() =>
         new InMemoryRepositoryIntegrationTestsWebApplicationFactory();

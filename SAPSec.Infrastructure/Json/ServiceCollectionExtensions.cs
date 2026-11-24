@@ -52,14 +52,14 @@ public static class ServiceCollectionExtensions
         services.AddJsonFile<EnglandAbsence>(JsonDataSource.Generated);
         services.AddJsonFile<EstablishmentExclusions>(JsonDataSource.Generated);
 
-        services.AddRepository<IEstablishmentRepository, JsonEstablishmentRepository, CachedEstablishmentRepository>(configuration);
-        services.AddRepository<ISimilarSchoolsPrimaryRepository, JsonSimilarSchoolsPrimaryRepository, CachedSimilarSchoolsPrimaryRepository>(configuration);
-        services.AddRepository<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository, CachedSimilarSchoolsSecondaryRepository>(configuration);
-        services.AddRepository<IKs2PerformanceRepository, JsonKs2PerformanceRepository, CachedKs2PerformanceRepository>(configuration);
-        services.AddRepository<IKs4PerformanceRepository, JsonKs4PerformanceRepository, CachedKs4PerformanceRepository>(configuration);
-        services.AddRepository<IKs4DestinationsRepository, JsonKs4DestinationsRepository, CachedKs4DestinationsRepository>(configuration);
-        services.AddRepository<IAbsenceRepository, JsonAbsenceRepository, CachedAbsenceRepository>(configuration);
-        services.AddRepository<IExclusionsRepository, JsonExclusionsRepository, CachedExclusionsRepository>(configuration);
+        services.AddSingleton<IEstablishmentRepository, JsonEstablishmentRepository>();
+        services.AddSingleton<ISimilarSchoolsPrimaryRepository, JsonSimilarSchoolsPrimaryRepository>();
+        services.AddSingleton<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
+        services.AddSingleton<IKs2PerformanceRepository, JsonKs2PerformanceRepository>();
+        services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
+        services.AddSingleton<IKs4DestinationsRepository, JsonKs4DestinationsRepository>();
+        services.AddSingleton<IAbsenceRepository, JsonAbsenceRepository>();
+        services.AddSingleton<IExclusionsRepository, JsonExclusionsRepository>();
 
         return services;
     }

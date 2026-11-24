@@ -5,7 +5,7 @@ namespace SAPSec.Test.Integration.Setup;
 
 public class JsonRepositoryIntegrationTestFixture : IntegrationTestFixture
 {
-    public ICache Cache => _factory.Services.GetRequiredService<ICache>();
+    public ICache Cache =>  _factory!.Services.GetRequiredService<ICache>();
 
     protected override IntegrationTestsWebApplicationFactory CreateWebApplicationFactory() =>
         new JsonRepositoryIntegrationTestsWebApplicationFactory();

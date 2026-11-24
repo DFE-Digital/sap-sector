@@ -7,7 +7,7 @@ public static class ServiceCollectionExtensions
 {
     public static void AddRedisCache(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<RedisConfiguration>(configuration.GetSection(nameof(RedisConfiguration)));
+        services.Configure<RedisSettings>(configuration.GetSection(RedisSettings.SectionName));
         services.AddSingleton<RedisCache>();
     }
 }

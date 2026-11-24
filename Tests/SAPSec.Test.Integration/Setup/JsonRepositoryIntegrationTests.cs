@@ -2,7 +2,7 @@
 
 namespace SAPSec.Test.Integration.Setup;
 
-[Collection("JsonRepositoryIntegrationTestsCollection")]
+[Collection(nameof(JsonRepositoryIntegrationTestsCollection))]
 public abstract class JsonRepositoryIntegrationTests(
     JsonRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : IAsyncLifetime

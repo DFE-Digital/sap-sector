@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace SAPSec.Infrastructure.Redis;
 
-public class RedisCache(IOptions<RedisConfiguration> config, ILogger<RedisCache> logger) : ICache, IDisposable
+public class RedisCache(IOptions<RedisSettings> config, ILogger<RedisCache> logger) : ICache, IDisposable
 {
     private ConnectionMultiplexer _conn = ConnectionMultiplexer.Connect(config.Value.ConnectionString);
 

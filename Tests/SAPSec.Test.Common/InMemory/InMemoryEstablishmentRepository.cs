@@ -37,6 +37,15 @@ public class InMemoryEstablishmentRepository : IEstablishmentRepository
         return this;
     }
 
+    public void VerifyEstablishment(string urn, Action<Establishment> assert)
+    {
+        var establishment = _establishments.FirstOrDefault(i => i.URN == urn);
+        if (establishment == null)
+            throw new InvalidOperationException($"Establishment with URN {urn} not found.");
+
+        assert(establishment);
+    }
+
     public Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync()
         => Task.FromResult((IReadOnlyCollection<Establishment>)_establishments);
 

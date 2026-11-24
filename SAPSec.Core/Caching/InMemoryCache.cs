@@ -35,4 +35,16 @@ public class InMemoryCache : ICache
 
         return Task.CompletedTask;
     }
+
+    public List<TValue> GetAllValues<TValue>(string keyPrefix = "") => 
+        _store
+            .Where(kvp => kvp.Key.StartsWith(keyPrefix))
+            .Select(kvp => JsonSerializer.Deserialize<TValue>(kvp.Value ?? "null"))
+            .OfType<TValue>()
+            .ToList();
+
+    public List<string> GetAllKeys(string keyPrefix = "") => 
+        _store.Keys
+            .Where(k => k.StartsWith(keyPrefix))
+            .ToList();
 }

@@ -27,15 +27,15 @@ which can't be scripted end-to-end - a login step can't complete an MFA
 challenge automatically. Two ways to exercise these pages instead:
 
 - **`loadtest`-mode instance** (see [How the `LoadTest` mode works](#how-the-loadtest-mode-works)):
-  an app instance you run yourself with a test auth bypass and JSON-backed
-  fixture data. No login of any kind needed. Only works on an instance you
-  start yourself, never a shared deployment.
+  an app instance you run yourself with a test auth bypass, reading from a
+  Postgres database you point it at. No login of any kind needed. Only works
+  on an instance you start yourself, never a shared deployment.
 - **Session-cookie reuse against a real environment** (see
   [Authenticated pages against a real environment](#authenticated-pages-against-a-real-environment)):
   sign in once, manually, through a real browser as a dedicated test/service
   account (completing MFA as normal), then replay that session across the
   load test. Works against `test` or a review app with real data - useful
-  when you need results from real infrastructure, not just the JSON fixture.
+  when you need results from real infrastructure, not just the local `LoadTest` instance.
 
 > **Note on the production-tier results.** The valid breaking-point results in
 > [docs/testing/008-load-tests.md](../docs/testing/008-load-tests.md) were
@@ -105,6 +105,10 @@ npm run test:stress
    $env:ASPNETCORE_URLS = "https://localhost:5099"
    dotnet run --project SAPSec.Web
    ```
+
+   The app reads its data from Postgres, so set
+   `ConnectionStrings__PostgresConnectionString` to a database that contains
+   the URNs in `data/school-urns.js`. The warm-up will fail if they're missing.
 
 2. **Run the load test** against it:
 
@@ -193,15 +197,14 @@ improvement.
   school's overview and every sub-page once. The run aborts, listing the bad
   URLs, if any of them doesn't return 200 - so you find bad URNs before
   wasting a run. This also warms the cache when caching is on. It runs for
-  both the cache-off and cache-on runs so they start from the same state.
+  both the cache-off and cache-usecases runs so they start from the same state.
 - **Safety stop:** the run aborts once more than 5% of requests are failing.
 
 ### Running it
 
 1. **Start the app in `LoadTest` mode against Postgres** (as in
    [Running locally (authenticated pages)](#running-locally-authenticated-pages-search-school-pages-compare)).
-   `LoadTest` mode currently uses the Postgres repositories (check
-   `SAPSec.Web/Program.cs` - there's no JSON-fixture swap any more), so the
+   `LoadTest` mode uses the Postgres repositories, so the
    database must be up and the URNs in `data/school-urns.js` must exist in it.
    The warm-up will tell you if they don't. Keep everything except caching
    identical between the two runs: same build, same database, same machine,
@@ -212,7 +215,7 @@ improvement.
    ```powershell
    $env:ASPNETCORE_ENVIRONMENT = "LoadTest"
    $env:ASPNETCORE_URLS = "https://localhost:5099"
-   $env:CachingConfiguration__EnableCaching = "false"
+   $env:Caching__EnableUseCaseCaching = "false"
    dotnet run --project SAPSec.Web -c Release
    ```
 
@@ -224,30 +227,24 @@ improvement.
    npm run test:loadtest:capacity:cache-off
    ```
 
-3. **Cache-on run.** Stop the app and restart it with caching on (needs a
+3. **Cache-on run** (`test:loadtest:capacity:cache-usecases`). Stop the app and restart it with caching on (needs a
    Redis instance, e.g. `docker run -p 6379:6379 redis`):
 
    ```powershell
-   $env:CachingConfiguration__EnableCaching = "true"
-   $env:CachingConfiguration__CacheRepositories = "true"
-   $env:CachingConfiguration__CacheUseCases = "true"
-   $env:CachingConfiguration__ClearCacheOnStartup = "true"
-   $env:RedisConfiguration__ConnectionString = "localhost"
+   $env:Caching__EnableUseCaseCaching = "true"
+   $env:Redis__ConnectionString = "localhost"
    dotnet run --project SAPSec.Web -c Release
    ```
 
    ```powershell
-   npm run test:loadtest:capacity:cache-on
+   npm run test:loadtest:capacity:cache-usecases
    ```
-
-   `ClearCacheOnStartup` clears **every key** in that Redis instance - only
-   point it at a Redis dedicated to this test.
 
 4. **Compare:**
 
    ```powershell
    node analyse.cjs school-capacity-cache-off-summary.json
-   node analyse.cjs school-capacity-cache-on-summary.json
+   node analyse.cjs school-capacity-cache-usecases-summary.json
    ```
 
 Each run writes `school-capacity-<RUN_LABEL>-summary.json` and
@@ -262,7 +259,7 @@ for the other authenticated tests, and coordinate first - see
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `RUN_LABEL` | `run` | Names the output files (`cache-off` / `cache-on` in the npm scripts) |
+| `RUN_LABEL` | `run` | Names the output files (`cache-off` / `cache-usecases` in the npm scripts) |
 | `CAPACITY_STEPS` | `10,25,50,100,150,200,300` | VU levels. Extend if nothing breaches, e.g. `300,400,500,600` |
 | `RAMP_SECONDS` | `30` | Ramp time to each level |
 | `HOLD_SECONDS` | `120` | Measured hold at each level |
@@ -323,7 +320,7 @@ is somewhere else (app CPU, query time, Redis), and caching may not move it.
 
 For search/school pages/compare performance results against real
 infrastructure (real Postgres data, real 2-pod capacity, the actual WAF) -
-not the `LoadTest` mode's JSON fixture - reuse a real DfE Sign-in session
+not the local `LoadTest` instance - reuse a real DfE Sign-in session
 instead of bypassing auth:
 
 1. **Get a dedicated test/service DSI account first**, if one doesn't
@@ -362,7 +359,7 @@ run as long as requests keep flowing - but it will eventually expire and
 need refreshing (repeat steps 2-4) for a later run.
 
 **The URN pools in `sap-sector/data/school-urns.js` were only verified
-against `LoadTest` mode's JSON fixture data.** Against a real environment
+against the `LoadTest` mode's old JSON fixture data.** Against a real environment
 those URNs may not exist, may 404, or may belong to different schools -
 re-verify (or replace with known-good real URNs) before trusting results
 from a real-environment authenticated run.
@@ -428,23 +425,19 @@ k6 run --env SCENARIO=quick --env ENVIRONMENT=production sap-sector/load-test.js
 
 ## How the `LoadTest` mode works
 
-Two small, additive changes to `SAPSec.Web` make the `LoadTest` environment
-name behave like the app's existing `UITests`/`IntegrationTests`/
-`EndToEndTests`/`AccessibilityTests` environments, which were already used by
-the UI/E2E/integration test suites to bypass real auth:
+The `LoadTest` environment is configuration-driven rather than code-driven:
 
-- [`Program.cs`](../SAPSec.Web/Program.cs) - added `"LoadTest"` to the
-  environment-name check that swaps DfE Sign-in for `AutoAuthenticationHandler`
-  (auto-authenticates every request as a fake test user, no login needed), and
-  added a guarded block that calls `AddJsonDependencies()` after
-  `AddPostgresqlDependencies()` when `EnvironmentName == "LoadTest"` - this
-  swaps the Postgres-backed repositories for the same JSON-file-backed ones
-  (`SAPSec.Infrastructure/Data/Files/Generated/*.json`, ~1,924 real-looking
-  DfE-style establishment records) already used by the integration test suite.
-  **Every other environment name is untouched and keeps using Postgres.**
+- [`Program.cs`](../SAPSec.Web/Program.cs) - when `Authentication:BypassAuthentication`
+  is `true`, DfE Sign-in is replaced with `AutoAuthenticationHandler`
+  (auto-authenticates every request as a fake test user, no login needed) and
+  the mock DSI user/API services are registered. The app still uses the
+  Postgres-backed repositories (`AddPostgresqlDependencies()`), so the data
+  comes from the database named by `ConnectionStrings__PostgresConnectionString`.
+  The bypass is ignored in production.
 - [`appsettings.LoadTest.json`](../SAPSec.Web/appsettings.LoadTest.json) -
-  turns on the `EnablePrimarySchools` feature flag, matching the other test
-  environments' overlay files (it's off by default in `appsettings.json`).
+  sets `Authentication:BypassAuthentication` to `true` and turns on the
+  `EnablePrimarySchools` and `EnableAllThroughSchools` feature flags. The
+  default `appsettings.json` has `BypassAuthentication` set to `false`.
 - [`DfeAnalyticsExtensions.cs`](../SAPSec.Web/Extensions/DfeAnalyticsExtensions.cs) -
   added `"LoadTest"` to the environments that skip sending events to real
   Google Analytics/Clarity, so load-test traffic doesn't pollute production
@@ -452,21 +445,23 @@ the UI/E2E/integration test suites to bypass real auth:
 
 **This must never be the normal state of a shared review/test/production
 deployment** - `LoadTest` disables real DfE Sign-in authentication entirely.
-It's only safe because it's a distinct, explicit environment name that has to
-be deliberately opted into; nothing sets it by default. (The production-tier
+It's only safe because the bypass has to be deliberately opted into via the
+`LoadTest` environment name (which sets `BypassAuthentication`); nothing sets
+it by default. (The production-tier
 results were produced by deploying it to `test` temporarily and deliberately,
 then reverting - see 008-load-tests.md.)
 
 ### Known-good test data
 
-The JSON fixture doesn't have full data for every URN, so
 [`sap-sector/data/school-urns.js`](sap-sector/data/school-urns.js) contains
-URN pools individually verified (via `curl`, against a running `LoadTest`
-instance) to return 200 from their overview and sub-pages: 30 secondary
-school URNs and 28 primary school URNs, drawn from
-`SAPSec.Infrastructure/Data/Files/TestEstablishmentUrns.json`. Search query
-terms (`School`, `High`, `Primary`, `Academy`) and suggest prefixes were
-verified the same way to return real results.
+URN pools that were individually verified (via `curl`) to return 200 from their
+overview and sub-pages: 30 secondary school URNs and 28 primary school URNs,
+drawn from `SAPSec.Infrastructure/Data/Files/TestEstablishmentUrns.json`. Those
+checks were made against the JSON fixture data that `LoadTest` mode used before
+it moved to Postgres, so they should be re-verified against the database your
+`LoadTest` instance now uses. Search query terms (`School`, `High`, `Primary`,
+`Academy`) and suggest prefixes were verified the same way and should be
+re-checked too.
 
 ## Test scenarios
 
@@ -475,6 +470,8 @@ verified the same way to return real results.
 | `quick` | 10 | Smoke test |
 | `baseline` | 10 | Normal operations |
 | `peak-surge` | 50 | Surge event (e.g. results day) |
+| `peak-surge` | 50 | Surge event (e.g. results day) |
+| `huge-peak-surge` | 5,000 (ramps 2,000 → 5,000, 3m hold) | Large surge against `loadtest` |
 | `stress` | up to 2,400 (staircase, 90s hold per step) | Breaking-point identification |
 
 Select via `--env SCENARIO=<name>` (defaults to `quick`). See the
@@ -491,7 +488,9 @@ Select via `--env SCENARIO=<name>` (defaults to `quick`). See the
 | `test:loadtest:quick` / `:baseline` / `:peak` / `:stress` | `loadtest` | quick / baseline / peak-surge / stress |
 | `test:loadtest:stress:short` | `loadtest` | stress (currently same as `:stress` - see note above) |
 | `test:loadtest:stress:trace` | `loadtest` | stress, plus a gzipped per-request CSV |
-| `test:loadtest:capacity:cache-off` / `:cache-on` | `loadtest` | [school-journey capacity test](#school-journey-capacity-test-caching-beforeafter) (separate script) |
+| `test:loadtest:huge-peak` | `loadtest` | huge-peak-surge |
+| `test:loadtest:capacity:cache-off` / `:cache-usecases` / `:cache-repositories` | `loadtest` | [school-journey capacity test](#school-journey-capacity-test-caching-beforeafter) (separate script) |
+| `test:test-env:capacity:cache-off` / `:cache-usecases` / `:cache-repositories` | `test` | same capacity test against `test` |
 | `grafana:login` | - | Grafana Cloud auth |
 
 ## Running in CI
@@ -539,13 +538,14 @@ performance-sensitive enough to justify load-testing every single one.
   real issue. Expect cleaner numbers against a review app, `test`, or a
   production-mode Docker build.
 - **Authenticated pages**, verified against a local `LoadTest`-mode instance
-  (`quick` scenario, 10 VUs): all checks passed, 0% error rate, across all
-  four journeys (search, secondary school, primary school, compare
-  performance) - see [How the `LoadTest` mode works](#how-the-loadtest-mode-works).
-- Docker wasn't available in the environment this was built in, so a
-  Postgres-backed local run (real DB instead of the JSON fixture) hasn't been
-  verified locally - only the JSON-backed `LoadTest` mode has. The
-  production-tier `test` runs did exercise the real Postgres path.
+  when it still ran on the JSON fixture (`quick` scenario, 10 VUs): all checks
+  passed, 0% error rate, across all four journeys (search, secondary school,
+  primary school, compare performance). That run predates the switch to
+  Postgres, so re-run it - see
+  [How the `LoadTest` mode works](#how-the-loadtest-mode-works).
+- `LoadTest` mode now reads from Postgres, and that local setup hasn't been
+  re-verified yet. The production-tier `test` runs did exercise the real
+  Postgres path.
 
 ## Structure
 
