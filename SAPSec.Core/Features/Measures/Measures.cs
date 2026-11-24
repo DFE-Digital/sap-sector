@@ -261,6 +261,34 @@ public static class Measures
                 }
             }
         }
+
+        public static class Ks2Progress
+        {
+            public const string Key = "progress";
+            public const string Name = "Progress scores in reading, writing and maths";
+
+            public static class Filters
+            {
+                public static class Subject
+                {
+                    public const string Key = $"{Ks2Progress.Key}-subject";
+                    public const string Name = "Subject";
+
+                    public static class Values
+                    {
+                        public const string Reading = "r";
+                        public const string Writing = "w";
+                        public const string Maths = "m";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(Reading, "Reading"),
+                            new(Writing, "Writing"),
+                            new(Maths, "Maths"),
+                        ];
+                    }
+                }
+            }
+        }
     }
 
     public static class Secondary

@@ -27,6 +27,12 @@ public class GetComparisonKs2PerformanceMeasuresUseCase(
         return new(
             currentSchoolData.SchoolInfo,
             comparatorSchoolData.SchoolInfo,
+            Ks2ProgressScores.ForSchoolComparison(
+                currentSchoolData,
+                comparatorSchoolData,
+                filterBy),
+            Ks2ProgressScores.PupilNumbers(currentSchoolData.SchoolInfo.Urn, currentSchoolData.Data, filterBy),
+            Ks2ProgressScores.PupilNumbers(comparatorSchoolData.SchoolInfo.Urn, comparatorSchoolData.Data, filterBy),
             Ks2PerformanceMeasures.MeetingExpectedStandardRwm.ForSchoolComparison(
                 currentSchoolData,
                 comparatorSchoolData,
@@ -62,6 +68,9 @@ public record GetComparisonKs2PerformanceMeasuresRequest(
 public record GetComparisonKs2PerformanceMeasuresResponse(
     SchoolInfo.SchoolInfo CurrentSchool,
     SchoolInfo.SchoolInfo ComparatorSchool,
+    Measure ProgressScores,
+    SchoolPupilNumbers CurrentSchoolProgressPupilNumbers,
+    SchoolPupilNumbers ComparatorSchoolProgressPupilNumbers,
     Measure MeetingExpectedStandardRwm,
     Measure AchievedHigherStandardRwm,
     Measure AverageScaledScoreReading,

@@ -112,8 +112,5 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
         services.AddSingleton<ISchoolClosureEligibilityService, SchoolClosureEligibilityService>();
         services.AddSingleton<ISchoolPredecessorRelationshipService, SchoolPredecessorRelationshipService>();
-
-        // Placeholder until the KS2 progress measures are switched on in the data map.
-        services.AddSingleton<IKs2ProgressPupilNumbersProvider, PlaceholderKs2ProgressPupilNumbersProvider>();
     }
 }
