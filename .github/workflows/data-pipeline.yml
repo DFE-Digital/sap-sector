@@ -1508,6 +1508,40 @@ jobs:
           }
           $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-12-review-restore.json")
 
+                # ==============================
+      # 13. Flush the Redis cache so the app serves the newly loaded data
+      # ==============================
+      - name: Flush ${{ env.DEPLOY_ENV }} Redis cache
+        id: flush_redis
+        shell: bash
+        run: |
+          set -euo pipefail
+          tf_vars_file="${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json"
+          if [ "$(jq -r '.deploy_managed_redis // false' "${tf_vars_file}")" != "true" ]; then
+            echo "No managed Redis configured for ${DEPLOY_ENV}; nothing to flush."
+            exit 0
+          fi
+
+          # The az redisenterprise commands come from a CLI extension; install it without prompting.
+          az config set extension.use_dynamic_install=yes_without_prompt
+
+          redis_name="$(az redisenterprise list \
+            --resource-group "${RESOURCE_GROUP_NAME}" \
+            --query "[?ends_with(name, '-managed-redis-cache')].name | [0]" -o tsv)"
+          if [ -z "${redis_name}" ]; then
+            echo "::error::No managed Redis cache found in ${RESOURCE_GROUP_NAME}"
+            exit 1
+          fi
+
+          echo "Flushing ${redis_name}"
+          az redisenterprise database flush \
+            --cluster-name "${redis_name}" \
+            --resource-group "${RESOURCE_GROUP_NAME}"
+          if [ $? -ne 0 ]; then
+            echo "::error::Failed to flush Redis cache ${redis_name}"
+            exit 1
+          fi
+          echo "Successfully flushed Redis cache ${redis_name}"
       - name: Capture failure diagnostics
         if: failure()
         shell: bash
