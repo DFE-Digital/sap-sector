@@ -13,6 +13,7 @@ using SAPSec.Infrastructure.Postgres;
 using SAPSec.Infrastructure.Redis;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Authorization;
+using SAPSec.Web.Caching;
 using SAPSec.Web.Configuration;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
@@ -198,6 +199,7 @@ public class Program
         builder.Services.AddCaching(builder.Configuration, (services, config) =>
         {
             // If caching is enabled:
+            services.AddSingleton<HttpRequestCache>();
             services.AddRedisCache(config);
             services.AddNestedCache<HttpRequestCache, RedisCache>();
         });

@@ -26,7 +26,7 @@ public record ComparisonLayoutModel(
             Routes.PrimarySchool(currentSchoolInfo.Urn).WhatIsASimilarSchool,
             [
                 new("Similarity", Routes.PrimarySchool(currentSchoolInfo.Urn).Comparison(comparatorSchoolInfo.Urn).Similarity, ["Index", "Similarity"]),
-                new("KS2", Routes.PrimarySchool(currentSchoolInfo.Urn).Comparison(comparatorSchoolInfo.Urn).Ks2, ["Ks2PerformanceMeasures"]),
+                new("KS2", Routes.PrimarySchool(currentSchoolInfo.Urn).Comparison(comparatorSchoolInfo.Urn).KS2, ["Ks2PerformanceMeasures"]),
                 new("Attendance", Routes.PrimarySchool(currentSchoolInfo.Urn).Comparison(comparatorSchoolInfo.Urn).Attendance, ["Attendance"]),
                 new("School details", Routes.PrimarySchool(currentSchoolInfo.Urn).Comparison(comparatorSchoolInfo.Urn).SchoolDetails, ["SchoolDetails"])
             ]);
@@ -53,7 +53,7 @@ public record ComparisonLayoutModel(
             Routes.AllThroughSchool(currentSchoolInfo.Urn).WhatIsASimilarSchool,
             [
                 new("Similarity", Routes.AllThroughSchool(currentSchoolInfo.Urn).PrimaryComparison(comparatorSchoolInfo.Urn).Similarity, ["PrimarySimilarity"]),
-                new("KS2", Routes.AllThroughSchool(currentSchoolInfo.Urn).PrimaryComparison(comparatorSchoolInfo.Urn).Ks2, ["PrimaryKs2PerformanceMeasures"]),
+                new("KS2", Routes.AllThroughSchool(currentSchoolInfo.Urn).PrimaryComparison(comparatorSchoolInfo.Urn).KS2, ["PrimaryKs2PerformanceMeasures"]),
                 new("Attendance", Routes.AllThroughSchool(currentSchoolInfo.Urn).PrimaryComparison(comparatorSchoolInfo.Urn).Attendance, ["PrimaryAttendance"]),
                 new("School details", Routes.AllThroughSchool(currentSchoolInfo.Urn).PrimaryComparison(comparatorSchoolInfo.Urn).SchoolDetails, ["PrimarySchoolDetails"])
             ]);

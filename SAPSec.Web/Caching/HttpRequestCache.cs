@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Http;
 
-namespace SAPSec.Core.Caching;
+using SAPSec.Core.Caching;
+
+namespace SAPSec.Web.Caching;
 
 public class HttpRequestCache(IHttpContextAccessor contextAccessor) : ICache
 {

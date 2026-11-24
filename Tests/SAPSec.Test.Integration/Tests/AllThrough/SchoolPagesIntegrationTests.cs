@@ -590,7 +590,7 @@ public class SchoolPagesIntegrationTests(
             .Select(l => l.GetAttribute("href"))
             .Should().Equal(
                 Routes.AllThroughSchool(Urn).PrimaryComparison("100002").Similarity,
-                Routes.AllThroughSchool(Urn).PrimaryComparison("100002").Ks2,
+                Routes.AllThroughSchool(Urn).PrimaryComparison("100002").KS2,
                 Routes.AllThroughSchool(Urn).PrimaryComparison("100002").Attendance,
                 Routes.AllThroughSchool(Urn).PrimaryComparison("100002").SchoolDetails);
     }

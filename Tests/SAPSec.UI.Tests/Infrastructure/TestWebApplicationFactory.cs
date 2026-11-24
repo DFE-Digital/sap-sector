@@ -11,6 +11,7 @@ using SAPSec.Core.Caching;
 using SAPSec.Infrastructure.Json;
 using SAPSec.UI.Tests.TestData;
 using SAPSec.Web;
+using SAPSec.Web.Caching;
 using SAPSec.Web.Extensions;
 
 namespace SAPSec.UI.Tests.Deprecated.Infrastructure;

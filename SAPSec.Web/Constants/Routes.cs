@@ -65,19 +65,20 @@ public static class Routes
         public string ViewSimilarSchools => $"{_basePath}/view-similar-schools";
         public string SchoolDetails => $"{_basePath}/school-details";
         public string WhatIsASimilarSchool => $"{_basePath}/what-is-a-similar-school";
-        public PrimaryComparison Comparison(string similarSchoolUrn) => new PrimaryComparison(_basePath, similarSchoolUrn);
-
-        public class PrimaryComparison(string basePath, string similarSchoolUrn)
-        {
-            private string _basePath = $"{basePath}/view-similar-schools/{similarSchoolUrn}";
-
-            public string BasePath => _basePath;
-            public string Similarity => $"{_basePath}/compare-similarity";
-            public string Ks2 => $"{_basePath}/compare-ks2";
-            public string Attendance => $"{_basePath}/compare-attendance";
-            public string SchoolDetails => $"{_basePath}/compare-school-details";
-        }
+        public PrimaryComparison Comparison(string similarSchoolUrn) => new PrimaryComparison($"{_basePath}/view-similar-schools", similarSchoolUrn);
     }
+
+    public class PrimaryComparison(string basePath, string similarSchoolUrn)
+    {
+        private string _basePath = $"{basePath}/{similarSchoolUrn}";
+
+        public string BasePath => _basePath;
+        public string Similarity => $"{_basePath}/compare-similarity";
+        public string KS2 => $"{_basePath}/compare-ks2";
+        public string Attendance => $"{_basePath}/compare-attendance";
+        public string SchoolDetails => $"{_basePath}/compare-school-details";
+    }
+
 
     public class Secondary(string urn)
     {
@@ -92,21 +93,21 @@ public static class Routes
         public string ViewSimilarSchools => $"{_basePath}/view-similar-schools";
         public string SchoolDetails => $"{_basePath}/school-details";
         public string WhatIsASimilarSchool => $"{_basePath}/what-is-a-similar-school";
-        public SecondaryComparison Comparison(string similarSchoolUrn) => new(_basePath, similarSchoolUrn);
-
-        public class SecondaryComparison(string basePath, string similarSchoolUrn)
-        {
-            private string _basePath => $"{basePath}/view-similar-schools/{similarSchoolUrn}";
-
-            public string BasePath => _basePath;
-            public string Similarity => $"{_basePath}/compare-similarity";
-            public string KS4HeadlineMeasures => $"{_basePath}/compare-ks4-headline-measures";
-            public string KS4CoreSubjects => $"{_basePath}/compare-ks4-core-subjects";
-            public string Attendance => $"{_basePath}/compare-attendance";
-            public string AttendanceData => $"{_basePath}/attendance-data";
-            public string SchoolDetails => $"{_basePath}/compare-school-details";
-        }
+        public SecondaryComparison Comparison(string similarSchoolUrn) => new($"{_basePath}/view-similar-schools", similarSchoolUrn);
     }
+
+    public class SecondaryComparison(string basePath, string similarSchoolUrn)
+    {
+        private string _basePath => $"{basePath}/{similarSchoolUrn}";
+
+        public string BasePath => _basePath;
+        public string Similarity => $"{_basePath}/compare-similarity";
+        public string KS4HeadlineMeasures => $"{_basePath}/compare-ks4-headline-measures";
+        public string KS4CoreSubjects => $"{_basePath}/compare-ks4-core-subjects";
+        public string Attendance => $"{_basePath}/compare-attendance";
+        public string SchoolDetails => $"{_basePath}/compare-school-details";
+    }
+
 
     public class AllThrough(string urn)
     {
@@ -121,31 +122,7 @@ public static class Routes
         public string ViewSimilarSchools => $"{_basePath}/view-similar-schools";
         public string SchoolDetails => $"{_basePath}/school-details";
         public string WhatIsASimilarSchool => $"{_basePath}/what-is-a-similar-school";
-        public AllThroughPrimaryComparison PrimaryComparison(string similarSchoolUrn) => new(_basePath, similarSchoolUrn);
-        public AllThroughSecondaryComparison SecondaryComparison(string similarSchoolUrn) => new(_basePath, similarSchoolUrn);
-
-        public class AllThroughPrimaryComparison(string basePath, string similarSchoolUrn)
-        {
-            private string _basePath => $"{basePath}/view-similar-schools/primary/{similarSchoolUrn}";
-
-            public string BasePath => _basePath;
-            public string Similarity => $"{_basePath}/compare-similarity";
-            public string Ks2 => $"{_basePath}/compare-ks2";
-            public string Attendance => $"{_basePath}/compare-attendance";
-            public string SchoolDetails => $"{_basePath}/compare-school-details";
-        }
-
-        public class AllThroughSecondaryComparison(string basePath, string similarSchoolUrn)
-        {
-            private string _basePath => $"{basePath}/view-similar-schools/secondary/{similarSchoolUrn}";
-
-            public string BasePath => _basePath;
-            public string Similarity => $"{_basePath}/compare-similarity";
-            public string KS4HeadlineMeasures => $"{_basePath}/compare-ks4-headline-measures";
-            public string KS4CoreSubjects => $"{_basePath}/compare-ks4-core-subjects";
-            public string Attendance => $"{_basePath}/compare-attendance";
-            public string AttendanceData => $"{_basePath}/attendance-data";
-            public string SchoolDetails => $"{_basePath}/compare-school-details";
-        }
+        public PrimaryComparison PrimaryComparison(string similarSchoolUrn) => new($"{_basePath}/view-similar-schools/primary", similarSchoolUrn);
+        public SecondaryComparison SecondaryComparison(string similarSchoolUrn) => new($"{_basePath}/view-similar-schools/secondary", similarSchoolUrn);
     }
 }

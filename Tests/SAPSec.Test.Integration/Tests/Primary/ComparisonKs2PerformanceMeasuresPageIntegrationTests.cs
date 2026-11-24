@@ -31,7 +31,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
 
         await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2, HttpStatusCode.NotFound);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2, HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
 
         await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2, HttpStatusCode.NotFound);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2, HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", []));
 
         await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2, HttpStatusCode.NotFound);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2, HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var tabHeading = page.QuerySelector("h2.govuk-heading-l");
         tabHeading.Should().NotBeNull();
@@ -96,7 +96,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var heading = page.ElementWithTestIdShouldExist("expected-rwm-heading");
         heading.TrimmedTextContent().Should().Be("Meeting expected standard in reading, writing and maths");
@@ -119,7 +119,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var tabs = page.ElementWithTestIdShouldExist("expected-rwm-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -143,7 +143,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithRwmExpected(current: "61", prev: "60", prev2: "59")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-rwm-table-view-table");
 
@@ -172,7 +172,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithRwmExpected(current: "60.5", prev: "60.4", prev2: "59.3")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-rwm-table-view-table");
 
@@ -194,7 +194,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("expected-rwm-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -226,7 +226,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("expected-rwm-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
@@ -248,7 +248,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var filter = page.ElementWithTestIdShouldExist("expected-rwm-subject-filter");
         filter.ChildTrimmedTextContent().Should().Equal(["Reading, writing and maths", "Reading", "Writing", "Maths"]);
@@ -285,7 +285,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
                 .WithRwmExpectedMaths(current: "54", prev: "53", prev2: "52")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("expected-rwm-subject-filter");
         filter.SelectOption(filterOption);
@@ -313,7 +313,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var heading = page.ElementWithTestIdShouldExist("higher-rwm-heading");
         heading.TrimmedTextContent().Should().Be("Achieved a higher standard in reading, writing and maths");
@@ -336,7 +336,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var tabs = page.ElementWithTestIdShouldExist("higher-rwm-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -360,7 +360,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithRwmHigher(current: "21", prev: "20", prev2: "19")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-rwm-table-view-table");
 
@@ -389,7 +389,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithRwmHigher(current: "20.5", prev: "20.4", prev2: "19.3")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-rwm-table-view-table");
 
@@ -411,7 +411,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("higher-rwm-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -443,7 +443,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("higher-rwm-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
@@ -465,7 +465,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var filter = page.ElementWithTestIdShouldExist("higher-rwm-subject-filter");
         filter.ChildTrimmedTextContent().Should().Equal(["Reading, writing and maths", "Reading", "Writing", "Maths"]);
@@ -502,7 +502,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
                 .WithRwmHigherMaths(current: "14", prev: "13", prev2: "12")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("higher-rwm-subject-filter");
         filter.SelectOption(filterOption);
@@ -530,7 +530,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var heading = page.ElementWithTestIdShouldExist("reading-score-heading");
         heading.TrimmedTextContent().Should().Be("Average scaled score in reading");
@@ -553,7 +553,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var tabs = page.ElementWithTestIdShouldExist("higher-rwm-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -577,7 +577,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.4", prev: "106.6", prev2: "105.8")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-table-view-table");
 
@@ -606,7 +606,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.42", prev: "106.59", prev2: "105.82")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-table-view-table");
 
@@ -628,7 +628,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("reading-score-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -660,7 +660,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("reading-score-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
@@ -682,7 +682,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var heading = page.ElementWithTestIdShouldExist("maths-score-heading");
         heading.TrimmedTextContent().Should().Be("Average scaled score in maths");
@@ -705,7 +705,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var tabs = page.ElementWithTestIdShouldExist("reading-score-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -729,7 +729,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithMathsScaledScore(current: "108.4", prev: "107.6", prev2: "106.8")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-score-table-view-table");
 
@@ -758,7 +758,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithMathsScaledScore(current: "108.37", prev: "107.61", prev2: "106.79")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-score-table-view-table");
 
@@ -780,7 +780,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("maths-score-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -812,7 +812,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("maths-score-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
@@ -834,7 +834,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var heading = page.ElementWithTestIdShouldExist("expected-gps-heading");
         heading.TrimmedTextContent().Should().Be("Meeting expected standard in grammar, punctuation and spelling");
@@ -860,7 +860,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var tabs = page.ElementWithTestIdShouldExist("maths-score-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -884,7 +884,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithGpsExpected(current: "69", prev: "68", prev2: "67")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-gps-table-view-table");
 
@@ -913,7 +913,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithGpsExpected(current: "69.0", prev: "67.5", prev2: "67.1")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-gps-table-view-table");
 
@@ -935,7 +935,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("expected-gps-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -967,7 +967,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("expected-gps-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
@@ -989,7 +989,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var heading = page.ElementWithTestIdShouldExist("higher-gps-heading");
         heading.TrimmedTextContent().Should().Be("Achieved a higher standard in grammar, punctuation and spelling");
@@ -1015,7 +1015,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var tabs = page.ElementWithTestIdShouldExist("expected-gps-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -1039,7 +1039,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithGpsHigher(current: "15", prev: "14", prev2: "13")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-gps-table-view-table");
 
@@ -1068,7 +1068,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.Ks2Performance.England(x => x.WithGpsHigher(current: "15.1", prev: "13.6", prev2: "13.2")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-gps-table-view-table");
 
@@ -1090,7 +1090,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("higher-gps-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -1122,7 +1122,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").KS2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("higher-gps-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")

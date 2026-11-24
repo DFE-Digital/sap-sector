@@ -51,7 +51,7 @@ public static class Build
 
     public static SimilarSchoolsPrimaryValuesEntry PrimaryValues(
             string urn,
-            string ks1Prior,
+            string ks1Prior = "0",
             string pp = "0",
             string eal = "0",
             string polar4Quintile = "0",

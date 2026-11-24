@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SAPSec.Core.Caching;
 using SAPSec.Infrastructure.Json;
+using SAPSec.Web.Caching;
 using SAPSec.Web.Extensions;
 
 namespace SAPSec.Test.Integration.Setup;

@@ -15,7 +15,6 @@ public static class ServiceCollectionExtensions
         if (config is not null && config.EnableUseCaseCaching)
         {
             services.Configure<CachingSettings>(configuration.GetSection(CachingSettings.SectionName));
-            services.AddSingleton<HttpRequestCache>();
             services.AddSingleton<InMemoryCache>();
             configure(services, configuration);
         }

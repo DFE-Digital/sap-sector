@@ -10,6 +10,7 @@ using SAPSec.Core.CustomEvents;
 using SAPSec.Infrastructure.Json;
 using SAPSec.Web;
 using SAPSec.Web.Authentication;
+using SAPSec.Web.Caching;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Services;
 

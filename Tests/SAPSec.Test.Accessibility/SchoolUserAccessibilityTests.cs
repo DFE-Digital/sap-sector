@@ -42,7 +42,7 @@ public class SchoolUserAccessibilityTests(AccessibilityTestsFixture fixture) : A
                  {
                      primary.Overview, primary.KS2, primary.Attendance, primary.ViewSimilarSchools,
                      primary.SchoolDetails, primary.WhatIsASimilarSchool, primary.RiseResources,
-                     primary.Comparison("101230").Similarity, primary.Comparison("101230").Ks2,
+                     primary.Comparison("101230").Similarity, primary.Comparison("101230").KS2,
                      primary.Comparison("101230").Attendance, primary.Comparison("101230").SchoolDetails
                  })
         {
