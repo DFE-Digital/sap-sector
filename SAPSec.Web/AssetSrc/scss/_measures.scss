@@ -139,7 +139,8 @@ $app-measure-color-track: #f3f2f1;
       width: 7rem;
     }
 
-    .govuk-table__body .govuk-table__row:last-of-type {
+    // Not the 'Number of pupils' table: each school is its own tbody, so every row keeps its border.
+    &:not(.app-number-of-pupils__table) .govuk-table__body .govuk-table__row:last-of-type {
       .govuk-table__cell, .govuk-table__header {
         border-bottom: none;
       }
