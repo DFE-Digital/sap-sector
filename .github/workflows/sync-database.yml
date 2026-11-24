@@ -10,6 +10,7 @@ on:
         type: choice
         options:
         - test
+        - preapproval
         - production
       target-environment:
         description: Target environment to restore
@@ -18,6 +19,7 @@ on:
         type: choice
         options:
         - test
+        - preapproval
         - production
       exclude-tables:
         description: Tables to exclude from backup (space-separated list, optional)
