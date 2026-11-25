@@ -2,12 +2,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SAPSec.Core.UseCases;
-using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Caching;
 
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Adds caching based on <see cref="CachingSettings"/> defined in <paramref name="configuration"/>. If use case caching is turned on,
+    /// <paramref name="configure"/> is called to further configure caching behaviour as required.
+    /// </summary>
+    /// <param name="services">The service collection</param>
+    /// <param name="configuration">Configuration to find <see cref="CachingSettings"/> settings</param>
+    /// <param name="configure">Further configuration as needed if caching is enabled</param>
     public static void AddCaching(this IServiceCollection services, IConfiguration configuration, Action<IServiceCollection, IConfiguration> configure)
     {
         var config = configuration.GetSection(CachingSettings.SectionName).Get<CachingSettings>();
@@ -17,12 +23,20 @@ public static class ServiceCollectionExtensions
             services.Configure<CachingSettings>(configuration.GetSection(CachingSettings.SectionName));
             services.AddSingleton<InMemoryCache>();
             configure(services, configuration);
-        } else
+        }
+        else
         {
             services.AddSingleton<ICache, PassThroughCache>();
         }
     }
 
+    /// <summary>
+    /// Adds a <see cref="NestedCache{TOuterCache, TInnerCache}"/> implementation of <see cref="ICache"/>, removing all
+    /// previous implementations
+    /// </summary>
+    /// <typeparam name="TOuterCache">The outer cache</typeparam>
+    /// <typeparam name="TInnerCache">The inner cache</typeparam>
+    /// <param name="services">The service collection</param>
     public static void AddNestedCache<TOuterCache, TInnerCache>(this IServiceCollection services)
         where TOuterCache : class, ICache
         where TInnerCache : class, ICache
@@ -31,6 +45,13 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ICache, NestedCache<TOuterCache, TInnerCache>>();
     }
 
+    /// <summary>
+    /// Adds a specific implementation of <see cref="IUseCase{TRequest, TResponse}"/>, wrapping it with <see cref="CachedUseCase{TRequest, TResponse}"/> if
+    /// use case caching is enabled in <see cref="CachingSettings"/> defined within <paramref name="configuration"/>.
+    /// </summary>
+    /// <typeparam name="TImplementation">Use case implementation type</typeparam>
+    /// <param name="services">The service collection</param>
+    /// <param name="configuration">Configuration to find <see cref="CachingSettings"/> settings</param>
     public static void AddUseCase<TImplementation>(this IServiceCollection services, IConfiguration configuration)
         where TImplementation : class
         => services.AddUseCase(typeof(TImplementation), configuration);
@@ -52,11 +73,19 @@ public static class ServiceCollectionExtensions
             sp.GetCachedUseCase(interfaceType, ServiceKeys.RealImplementation));
     }
 
+    /// <summary>
+    /// Adds a specific keyed implementation of <see cref="IUseCase{TRequest, TResponse}"/>, wrapping it with <see cref="CachedUseCase{TRequest, TResponse}"/> if
+    /// use case caching is enabled in <see cref="CachingSettings"/> defined within <paramref name="configuration"/>.
+    /// </summary>
+    /// <typeparam name="TImplementation">Use case implementation type</typeparam>
+    /// <param name="services">The service collection</param>
+    /// <param name="serviceKey">The service key</param>
+    /// <param name="configuration">Configuration to find <see cref="CachingSettings"/> settings</param>
     public static void AddKeyedUseCase<TImplementation>(this IServiceCollection services, string serviceKey, IConfiguration configuration)
         where TImplementation : class
         => services.AddKeyedUseCase(serviceKey, typeof(TImplementation), configuration);
 
-    public static void AddKeyedUseCase(this IServiceCollection services, string serviceKey, Type implementationType, IConfiguration configuration)
+    private static void AddKeyedUseCase(this IServiceCollection services, string serviceKey, Type implementationType, IConfiguration configuration)
     {
         var config = configuration.GetSection(CachingSettings.SectionName).Get<CachingSettings>();
 

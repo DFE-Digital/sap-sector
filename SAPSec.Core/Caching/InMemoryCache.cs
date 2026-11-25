@@ -2,6 +2,13 @@ using System.Text.Json;
 
 namespace SAPSec.Core.Caching;
 
+/// <summary>
+/// In-memory implementation of <see cref="ICache"/> - intended for use in automated tests but could also be used on Test or Production
+/// to replace Redis cache if needed. 
+/// Note: this deliberately serializes and deserializes cache values as although this is slower and uses more memory, we want to
+/// surface any deserialization issues with use case responses in automated tests during development, before hitting the Redis cache
+/// on Test or Production
+/// </summary>
 public class InMemoryCache : ICache
 {
     private Dictionary<string, string?> _store = new();
@@ -36,14 +43,14 @@ public class InMemoryCache : ICache
         return Task.CompletedTask;
     }
 
-    public List<TValue> GetAllValues<TValue>(string keyPrefix = "") => 
+    public List<TValue> GetAllValues<TValue>(string keyPrefix = "") =>
         _store
             .Where(kvp => kvp.Key.StartsWith(keyPrefix))
             .Select(kvp => JsonSerializer.Deserialize<TValue>(kvp.Value ?? "null"))
             .OfType<TValue>()
             .ToList();
 
-    public List<string> GetAllKeys(string keyPrefix = "") => 
+    public List<string> GetAllKeys(string keyPrefix = "") =>
         _store.Keys
             .Where(k => k.StartsWith(keyPrefix))
             .ToList();
