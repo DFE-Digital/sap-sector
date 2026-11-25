@@ -68,6 +68,10 @@
   padding-top: 0px;
 }
 
+.govuk-footer__link[href^="mailto:"] {
+  overflow-wrap: anywhere;
+}
+
 .govuk-header__container {
   display: flex;
   align-items: center;

@@ -164,6 +164,36 @@ Implemented in `.github/workflows/`.
 - Health checks gate every deployment, with up to five retries before the deploy is failed
 - Terraform changes are validated by `validate-infrastructure.yml`
 
+## Dependency and vulnerability management
+
+- Dependabot alerts and Dependabot security updates are enabled on the repository, raising
+  pull requests for vulnerable dependencies
+- Snyk scans dependencies and the container image during the image build in
+  `build-and-deploy.yml`, and can stop a vulnerable image progressing
+- GitHub CodeQL and secret scanning run against the repository
+- Dependency updates go through the same pull request review, checks and test deployment as
+  any other change
+- Alerts are picked up during the sprint as they are raised, not held for a review point.
+  Some are caught when a pull request changes packages, others appear later when new
+  advisories are published against packages already in use
+- All open Dependabot and security alerts are also reviewed at every sprint review
+
+### Remediation targets
+
+| Severity | Target to remediate or mitigate |
+| -------- | ------------------------------- |
+| Critical | 7 days                          |
+| High     | 14 days                         |
+| Medium   | 30 days                         |
+| Low      | Planned into the backlog        |
+
+- Critical and high alerts are handled outside the sprint cycle and do not wait for sprint
+  review
+- Where a fix cannot be applied within target, for example because no patched version exists,
+  the reason and any mitigation are recorded on the alert or pull request and the tech lead is
+  informed
+- The tech lead owns triage of vulnerability alerts
+
 ## Logging and monitoring
 
 - Serilog provides structured logging, configured per environment

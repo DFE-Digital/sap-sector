@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Web.Authentication;
@@ -17,7 +18,8 @@ public class SchoolAccessHandlerTests
     private readonly TestUserOrganisation _testUser = new()
     {
         CategoryId = OrganisationCategoryIds.Establishment,
-        Urn = OwnUrn
+        Urn = OwnUrn,
+        Email = TestUserOrganisation.NonDfeEmail
     };
 
     private bool _restrictionsEnabled = true;
@@ -84,6 +86,21 @@ public class SchoolAccessHandlerTests
         context.HasSucceeded.Should().BeTrue();
     }
 
+    [Theory]
+    [InlineData(OrganisationCategoryIds.Establishment)]
+    [InlineData(OrganisationCategoryIds.LocalAuthority)]
+    public async Task DfeUser_WithRestrictionsOn_CanOpenAnySchool(string categoryId)
+    {
+        // DfE staff are recognised by email, so signing in for a school does not limit them to that school.
+        _testUser.CategoryId = categoryId;
+        _testUser.Email = TestUserOrganisation.DfeEmail;
+        var context = CreateContext(HttpContextWithUrn("108088"));
+
+        await CreateHandler().HandleAsync(context);
+
+        context.HasSucceeded.Should().BeTrue();
+    }
+
     [Fact]
     public async Task WhenUserIsNotAuthenticated_DoesNotSucceed()
     {
@@ -95,8 +112,16 @@ public class SchoolAccessHandlerTests
         context.HasSucceeded.Should().BeFalse();
     }
 
-    private SchoolAccessHandler CreateHandler() =>
-        new(new MockDsiUserService(_testUser), new FixedFeatureFlagService(enabled: !_restrictionsEnabled), NullLogger<SchoolAccessHandler>.Instance);
+    private SchoolAccessHandler CreateHandler()
+    {
+        var userService = new MockDsiUserService(_testUser);
+
+        return new(
+            userService,
+            new FixedFeatureFlagService(enabled: !_restrictionsEnabled),
+            new DfeUserIdentifier(userService, Options.Create(new DfeUserOptions { EmailDomains = [TestUserOrganisation.DfeEmailDomain] })),
+            NullLogger<SchoolAccessHandler>.Instance);
+    }
 
     private sealed class FixedFeatureFlagService(bool enabled) : IFeatureFlagService
     {

@@ -146,9 +146,9 @@ public class SchoolPagesIntegrationTests(
                 "Compare data from previous academic years",
                 "If you expected to see similar schools");
         page.QuerySelector(".app-overview__lead").Should().BeNull();
-        var supportLink = page.QuerySelector(".app-overview a[href='mailto:schoolinsights.support@education.gov.uk']");
+        var supportLink = page.QuerySelector($".app-overview a[href='mailto:{LayoutConstants.SupportEmail}']");
         supportLink.Should().NotBeNull();
-        supportLink!.TextContent.Trim().Should().Be("schoolinsights.support@education.gov.uk");
+        supportLink!.TextContent.Trim().Should().Be(LayoutConstants.SupportEmail);
     }
 
     [Fact]
