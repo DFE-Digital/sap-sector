@@ -11,6 +11,9 @@ internal static class Round
     public static decimal ToOneDecimalPlace(decimal value) =>
         decimal.Round(value, 1, MidpointRounding.AwayFromZero);
 
+    public static decimal ToTwoDecimalPlaces(decimal value) =>
+        decimal.Round(value, 2, MidpointRounding.AwayFromZero);
+
     public static decimal ToThreeDecimalPlaces(decimal value) =>
         decimal.Round(value, 3, MidpointRounding.AwayFromZero);
 }
