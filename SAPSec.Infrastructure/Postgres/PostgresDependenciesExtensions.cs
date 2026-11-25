@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SAPSec.Core.Caching;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Postgres;
@@ -21,7 +20,6 @@ public static class PostgresDependenciesExtensions
         services.AddSingleton<IKs4DestinationsRepository, PostgresKs4DestinationsRepository>();
         services.AddSingleton<IAbsenceRepository, PostgresAbsenceRepository>();
         services.AddSingleton<IExclusionsRepository, PostgresExclusionsRepository>();
-        services.AddSingleton<IAbsenceRepository, PostgresAbsenceRepository>();
 
         return services;
     }
