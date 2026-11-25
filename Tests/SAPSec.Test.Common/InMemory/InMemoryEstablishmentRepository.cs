@@ -1,4 +1,5 @@
-﻿using SAPSec.Data.Dto;
+﻿using SAPSec.Core.Features.SchoolSearch;
+using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Test.Common.InMemory;
@@ -48,6 +49,9 @@ public class InMemoryEstablishmentRepository : IEstablishmentRepository
 
     public Task<IReadOnlyCollection<Establishment>> GetEstablishmentsAsync(IEnumerable<string> urns)
         => Task.FromResult((IReadOnlyCollection<Establishment>)_establishments.Where(x => urns.Contains(x.URN)).ToList());
+
+    public Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults)
+        => Task.FromResult(InMemoryEstablishmentSearch.Search(_establishments, query, maxResults));
 
     public Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn)
         => Task.FromResult(_establishmentEmails.FirstOrDefault(i => i.URN == urn));
