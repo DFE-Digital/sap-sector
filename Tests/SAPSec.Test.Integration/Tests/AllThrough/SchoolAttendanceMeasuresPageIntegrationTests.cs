@@ -12,8 +12,6 @@ using Xunit.Abstractions;
 
 namespace SAPSec.Test.Integration.Tests.AllThrough;
 
-[Collection("InMemoryRepositoryIntegrationTestsCollection1")]
-
 public class SchoolAttendanceMeasuresPageIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)

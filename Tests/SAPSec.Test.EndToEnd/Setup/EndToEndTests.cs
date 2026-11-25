@@ -65,4 +65,10 @@ public abstract class EndToEndTests : PageTest
         response.Status.Should().Be(200);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
     }
+
+    public override async Task DisposeAsync()   
+    {
+        await _fixture.ClearDown();
+        await base.DisposeAsync();
+    }
 }
