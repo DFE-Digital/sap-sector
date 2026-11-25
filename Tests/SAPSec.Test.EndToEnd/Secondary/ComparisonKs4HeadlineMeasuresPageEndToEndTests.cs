@@ -19,8 +19,8 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
 
     private const string CurrentSchoolUrn = "100052";
     private const string CurrentSchoolName = "Hampstead School";
-    private const string ComparatorSchoolUrn = "141617";
-    private const string ComparatorSchoolName = "The Hurlingham Academy";
+    private const string ComparatorSchoolUrn = "135600";
+    private const string ComparatorSchoolName = "Ark Academy";
 
     public override async Task InitializeAsync()
     {

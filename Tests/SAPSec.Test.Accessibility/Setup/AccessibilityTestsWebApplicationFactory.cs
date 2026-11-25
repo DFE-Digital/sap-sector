@@ -35,20 +35,20 @@ public class AccessibilityTestsWebApplicationFactory : WebApplicationFactory<Pro
         builder.UseContentRoot(webProjectPath);
         builder.UseWebRoot(Path.Combine(webProjectPath, "wwwroot"));
 
-        var configuration = new ConfigurationBuilder()
-            .AddTestDsiConfiguration()
-            .Build();
-
         builder
-            .UseConfiguration(configuration)
             .ConfigureAppConfiguration(configurationBuilder =>
             {
                 configurationBuilder.AddTestDsiConfiguration();
             })
-            .ConfigureServices(services =>
+            .ConfigureServices((context, services) =>
             {
-                services.AddJsonDependencies(configuration);
-                services.AddNestedCache<HttpRequestCache, InMemoryCache>();
+                services.AddJsonDependencies(context.Configuration);
+                services.AddCaching(context.Configuration, (services, config) =>
+                {
+                    // If caching is enabled:
+                    services.AddSingleton<HttpRequestCache>();
+                    services.AddNestedCache<HttpRequestCache, InMemoryCache>();
+                });
                 services.AddScoped<ICustomEventService, NoOpCustomEventService>();
             });
     }

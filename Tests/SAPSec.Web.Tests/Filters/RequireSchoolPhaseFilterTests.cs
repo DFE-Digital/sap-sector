@@ -11,6 +11,7 @@ using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Time;
+using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
@@ -21,7 +22,7 @@ namespace SAPSec.Web.Tests.Deprecated.Filters;
 
 public class RequireSchoolPhaseFilterTests
 {
-    private readonly Mock<GetSchoolDetailsUseCase> _getSchoolDetailsMock = new();
+    private readonly Mock<IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse>> _getSchoolDetailsMock = new();
     private readonly Mock<IFeatureFlagService> _featureFlagServiceMock = new();
 
     public RequireSchoolPhaseFilterTests()

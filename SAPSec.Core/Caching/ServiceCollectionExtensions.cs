@@ -17,6 +17,9 @@ public static class ServiceCollectionExtensions
             services.Configure<CachingSettings>(configuration.GetSection(CachingSettings.SectionName));
             services.AddSingleton<InMemoryCache>();
             configure(services, configuration);
+        } else
+        {
+            services.AddSingleton<ICache, PassThroughCache>();
         }
     }
 
