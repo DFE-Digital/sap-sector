@@ -34,9 +34,11 @@ module "application_configuration" {
     PGSSLMODE        = local.postgres_ssl_mode
   }, local.federated_auth_configmap, contains(["test", "review"], var.config) ? {
     Postgres__MaxPoolSize = tostring(var.load_testing_database_max_pool_size)
-  } : {}, var.config == "test" && var.load_testing_bypass_authentication ? {
     Postgres__ConnectionTimeoutSeconds = "60"
+  } : {}, contains(["test", "review"], var.config) && var.load_testing_bypass_authentication ? {
     Authentication__BypassAuthentication  = "true"
+  } : {}, contains(["test", "review"], var.config) && var.load_testing_enable_caching ? {
+    Caching__EnableUseCaseCaching  = "true"
   } : {})
   secret_variables = merge({
     DATABASE_URL                                = module.postgres.url
