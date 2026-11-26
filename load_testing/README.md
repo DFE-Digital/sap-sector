@@ -27,8 +27,8 @@ which can't be scripted end-to-end - a login step can't complete an MFA
 challenge automatically. Two ways to exercise these pages instead:
 
 - **`loadtest`-mode instance** (see [How the `LoadTest` mode works](#how-the-loadtest-mode-works)):
-  an app instance you run yourself with a test auth bypass, reading from a
-  Postgres database you point it at. No login of any kind needed. Only works
+  an app instance you run yourself with a test auth bypass and a seeded
+  PostgreSQL database. No login of any kind needed. Only works on an instance you
   on an instance you start yourself, never a shared deployment.
 - **Session-cookie reuse against a real environment** (see
   [Authenticated pages against a real environment](#authenticated-pages-against-a-real-environment)):
@@ -95,15 +95,13 @@ npm run test:stress
    ```bash
    dotnet dev-certs https --trust   # once, if you haven't already
    cd SAPSec.Web
-   ASPNETCORE_ENVIRONMENT=LoadTest ASPNETCORE_URLS=https://localhost:5099 dotnet run
+   dotnet run --launch-profile LoadTest
    ```
 
    On Windows PowerShell:
 
    ```powershell
-   $env:ASPNETCORE_ENVIRONMENT = "LoadTest"
-   $env:ASPNETCORE_URLS = "https://localhost:5099"
-   dotnet run --project SAPSec.Web
+   dotnet run --project SAPSec.Web --launch-profile LoadTest
    ```
 
    The app reads its data from Postgres, so set
@@ -358,11 +356,8 @@ The session uses sliding expiration, so it stays alive for the length of a
 run as long as requests keep flowing - but it will eventually expire and
 need refreshing (repeat steps 2-4) for a later run.
 
-**The URN pools in `sap-sector/data/school-urns.js` were only verified
-against the `LoadTest` mode's old JSON fixture data.** Against a real environment
-those URNs may not exist, may 404, or may belong to different schools -
-re-verify (or replace with known-good real URNs) before trusting results
-from a real-environment authenticated run.
+Verify the URN pools in `sap-sector/data/school-urns.js` against the target
+database before a stress run. Missing schools or phase data can produce 404s.
 
 This still generates real load against shared infrastructure, so the same
 rules apply as any other real-environment run - see
@@ -370,22 +365,19 @@ rules apply as any other real-environment run - see
 
 ### Running the stress staircase against test
 
-There is no `test-env:stress` npm script (the `stress` scenario is wired to
-`loadtest`/`local` only). To run the staircase against the deployed `test`
+Use k6 directly to run the staircase against the deployed `test`
 origin - as the production-tier results in
 [008-load-tests.md](../docs/testing/008-load-tests.md) were produced - point
 at the direct backend origin explicitly and coordinate with the team first
 (see the WAF note below):
 
 ```bash
-k6 run --env SCENARIO=stress --env ENVIRONMENT=test sap-sector/load-test.js
+k6 run -e SCENARIO=stress -e ENVIRONMENT=test -e "TEST_URL=https://<direct-test-origin>" sap-sector/load-test.js
 ```
 
-with `LOADTEST_URL` / the `test` origin set so requests reach the app rather
-than Front Door, and `SESSION_COOKIE` set (or a code-level auth bypass
-deployed). Confirm with a `quick` run first that content checks pass and the
-request count is roughly one HTTP request per page (no auth-redirect
-amplification) before trusting a full run.
+Set `SESSION_COOKIE` for normal DfE Sign-in or add `-e AUTH_OFF=true` if the
+restricted Test deployment has the temporary bypass enabled. Run the
+`quick` scenario first and check for failed requests and content checks.
 
 ## Running against a PR review app
 
@@ -523,29 +515,18 @@ performance-sensitive enough to justify load-testing every single one.
 
 ## Notes
 
-- **Production-tier stress result** (against `test`, database scaled to
-  production spec, auth bypassed): the service is healthy to ~150 concurrent
-  users, degrades gradually with no failures to ~850, and starts failing
-  around ~1,001. The binding constraint is the application's Npgsql
-  connection pool (100 per replica), not the database or app
-  CPU/memory - the database had spare capacity throughout. Full write-up and
-  operating targets in
-  [docs/testing/008-load-tests.md](../docs/testing/008-load-tests.md).
+- The latest Test stress runs met both targets through 100 virtual users
+  at 200 and 300 connections per replica. See the
+  [load test runbook](../docs/testing/008-load-tests.md) for the comparison
+  and the historical 100-connection baseline.
 - **Anonymous pages**, verified against the local `dotnet run` dev server: all
   requests succeed and content checks pass, but the homepage occasionally
   exceeds the 2000ms threshold under the `quick` scenario's 10-VU burst - this
   is the unoptimized Development-mode dev server (Kestrel + Razor JIT), not a
   real issue. Expect cleaner numbers against a review app, `test`, or a
   production-mode Docker build.
-- **Authenticated pages**, verified against a local `LoadTest`-mode instance
-  when it still ran on the JSON fixture (`quick` scenario, 10 VUs): all checks
-  passed, 0% error rate, across all four journeys (search, secondary school,
-  primary school, compare performance). That run predates the switch to
-  Postgres, so re-run it - see
-  [How the `LoadTest` mode works](#how-the-loadtest-mode-works).
-- `LoadTest` mode now reads from Postgres, and that local setup hasn't been
-  re-verified yet. The production-tier `test` runs did exercise the real
-  Postgres path.
+- See the [load test runbook](../docs/testing/008-load-tests.md) for the latest
+  authenticated smoke and stress results.
 
 ## Structure
 
