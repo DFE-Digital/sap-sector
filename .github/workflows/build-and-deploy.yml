@@ -36,7 +36,7 @@ on:
           - '200'
           - '300'
       load-test-auth-bypass:
-        description: "Enable synthetic authentication on a restricted Test deployment"
+        description: "Enable synthetic authentication on a restricted Test or Preapproval deployment"
         type: boolean
         default: false
   push:
@@ -750,7 +750,7 @@ jobs:
         uses: DFE-Digital/github-actions/deploy-to-aks@master
         env:
           TF_VAR_load_testing_database_max_pool_size: ${{ inputs['load-test-pool-size'] || '100' }}
-          TF_VAR_load_testing_bypass_authentication: ${{ inputs.environment == 'test' && inputs['load-test-auth-bypass'] && 'true' || 'false' }}
+          TF_VAR_load_testing_bypass_authentication: ${{ (inputs.environment == 'test' || inputs.environment == 'preapproval') && inputs['load-test-auth-bypass'] && 'true' || 'false' }}
         with:
           azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
           azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}

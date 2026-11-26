@@ -118,7 +118,7 @@ variable "load_testing_database_max_pool_size" {
 variable "load_testing_bypass_authentication" {
   type        = bool
   default     = false
-  description = "Opt in to synthetic authentication for a restricted Test load test."
+  description = "Opt in to synthetic authentication for a restricted Test or Preapproval load test."
 }
 
 variable "storage_container_delete_retention_days" {

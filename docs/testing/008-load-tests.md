@@ -19,15 +19,15 @@ Terraform supports temporary 200 or 300 overrides in Test and Review.
 Normal deployments use DfE Sign-in and retain the configured driver timeout.
 
 To reproduce the historical synthetic authentication setup on a restricted
-Test deployment, explicitly set the Terraform input
+Test or Preapproval (Preprod) deployment, explicitly set the Terraform input
 `load_testing_bypass_authentication` to `true`. This enables test
 authentication, disables DfE Analytics and sets a 60-second connection
 timeout while retaining real Postgres repositories. The flag defaults to
-false and is applied only to Test. Restore it to false after the run.
+false and is applied only to Test and Preapproval. Restore it to false after the run.
 
 For a temporary deployment override in PowerShell, set
-`$env:TF_VAR_load_testing_bypass_authentication = 'true'` for the Test
-deployment. To restore DfE Sign-in, set it to `'false'` (or remove the
+`$env:TF_VAR_load_testing_bypass_authentication = 'true'` for the Test or
+Preapproval deployment. To restore DfE Sign-in, set it to `'false'` (or remove the
 override) and redeploy. If a tfvars file sets the input, change it there
 instead because tfvars takes precedence. Restart or roll out all pods if
 they still have the old ConfigMap environment variables. Verify that a
@@ -37,9 +37,10 @@ The workflow's `auth-bypassed` input and k6's `AUTH_OFF` flag just select the
 authenticated journeys. They do not change server authentication.
 
 In the **Build and Deploy** manual workflow, select the branch containing
-these changes, choose `test`, and supply an image tag built from that branch.
-Set `load-test-pool-size` to the desired size and select
-`load-test-auth-bypass` only for a restricted Test run. To restore the
+these changes, choose `test` or `preapproval`,
+and supply an image tag built from that branch. Select
+`load-test-auth-bypass` only for a restricted deployment. For Test, set
+`load-test-pool-size` to the desired size. To restore the
 normal deployment, choose 100 and clear the bypass checkbox.
 
 The Test stress runs at 200 and 300 connections per replica both met the

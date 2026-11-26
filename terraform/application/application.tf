@@ -34,9 +34,11 @@ module "application_configuration" {
     PGSSLMODE        = local.postgres_ssl_mode
   }, local.federated_auth_configmap, contains(["test", "review"], var.config) ? {
     Database__MaxPoolSize = tostring(var.load_testing_database_max_pool_size)
-  } : {}, var.config == "test" && var.load_testing_bypass_authentication ? {
+  } : {}, contains(["test", "preapproval"], var.config) && var.load_testing_bypass_authentication ? {
     Database__ConnectionTimeoutSeconds = "60"
     LoadTesting__BypassAuthentication  = "true"
+  } : {}, var.config == "preapproval" && var.load_testing_bypass_authentication ? {
+    ASPNETCORE_ENVIRONMENT = "Preapproval"
   } : {})
   secret_variables = merge({
     DATABASE_URL                                = module.postgres.url

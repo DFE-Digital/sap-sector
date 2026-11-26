@@ -118,7 +118,8 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        var bypassTestAuthentication = builder.Environment.IsEnvironment("Test") &&
+        var bypassTestAuthentication =
+            (builder.Environment.IsEnvironment("Test") || builder.Environment.IsEnvironment("Preapproval")) &&
             builder.Configuration.GetValue<bool>("LoadTesting:BypassAuthentication");
 
         if (bypassTestAuthentication || builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest")
