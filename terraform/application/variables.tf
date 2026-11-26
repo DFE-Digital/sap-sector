@@ -121,6 +121,12 @@ variable "load_testing_bypass_authentication" {
   description = "Opt in to synthetic authentication for a restricted Test load test."
 }
 
+variable "load_testing_enable_caching" {
+  type        = bool
+  default     = false
+  description = "Enable use case caching."
+}
+
 variable "storage_container_delete_retention_days" {
   type        = number
   default     = null
