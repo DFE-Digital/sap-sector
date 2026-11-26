@@ -33,14 +33,14 @@ module "application_configuration" {
     ENVIRONMENT_NAME = var.environment
     PGSSLMODE        = local.postgres_ssl_mode
   }, local.federated_auth_configmap, contains(["test", "review"], var.config) ? {
-    Database__MaxPoolSize = tostring(var.load_testing_database_max_pool_size)
+    Postgres__MaxPoolSize = tostring(var.load_testing_database_max_pool_size)
   } : {}, var.config == "test" && var.load_testing_bypass_authentication ? {
-    Database__ConnectionTimeoutSeconds = "60"
-    LoadTesting__BypassAuthentication  = "true"
+    Postgres__ConnectionTimeoutSeconds = "60"
+    Authentication__BypassAuthentication  = "true"
   } : {})
   secret_variables = merge({
     DATABASE_URL                                = module.postgres.url
-    ConnectionStrings__PostgresConnectionString = module.postgres.dotnet_connection_string
+    Postgres__ConnectionString                  = module.postgres.dotnet_connection_string
     DsiConfiguration__ClientSecret              = data.azurerm_key_vault_secret.dsi_client_secret.value
     DsiConfiguration__ApiSecret                 = data.azurerm_key_vault_secret.dsi_api_secret.value
     SENTRY_DSN                                  = data.azurerm_key_vault_secret.sentry_dsn.value

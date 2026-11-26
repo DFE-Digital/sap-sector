@@ -105,7 +105,7 @@ npm run test:stress
    ```
 
    The app reads its data from Postgres, so set
-   `ConnectionStrings__PostgresConnectionString` to a database that contains
+   `Postgres__ConnectionString` to a database that contains
    the URNs in `data/school-urns.js`. The warm-up will fail if they're missing.
 
 2. **Run the load test** against it:
@@ -424,7 +424,7 @@ The `LoadTest` environment is configuration-driven rather than code-driven:
   (auto-authenticates every request as a fake test user, no login needed) and
   the mock DSI user/API services are registered. The app still uses the
   Postgres-backed repositories (`AddPostgresqlDependencies()`), so the data
-  comes from the database named by `ConnectionStrings__PostgresConnectionString`.
+  comes from the database named by `Postgres__ConnectionString`.
   The bypass is ignored in production.
 - [`appsettings.LoadTest.json`](../SAPSec.Web/appsettings.LoadTest.json) -
   sets `Authentication:BypassAuthentication` to `true` and turns on the

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SAPSec.Core.CustomEvents;
-using SAPSec.Web.Configuration;
+using SAPSec.Web.Analytics;
 using System.Text.RegularExpressions;
 
 namespace SAPSec.Web.Controllers;

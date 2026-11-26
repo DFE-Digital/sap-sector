@@ -51,7 +51,7 @@ written to `load_testing/`.
 ## Path B - authenticated pages too (search, school pages, compare performance)
 
 The local `LoadTest` profile bypasses DfE Sign-in and uses PostgreSQL. Seed
-a local database and set `ConnectionStrings__PostgresConnectionString` in
+a local database and set `Postgres__ConnectionString` in
 the shell before starting the app. User secrets are not loaded automatically
 in this environment.
 

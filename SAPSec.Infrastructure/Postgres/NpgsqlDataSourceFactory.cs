@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Configuration;
 using Npgsql;
-using System.Globalization;
 
 namespace SAPSec.Infrastructure.Postgres;
 
@@ -10,32 +9,32 @@ public sealed class NpgsqlDataSourceFactory
 
     public NpgsqlDataSourceFactory(IConfiguration configuration)
     {
+        var settings = configuration.GetSection(PostgresSettings.SectionName).Get<PostgresSettings>();
         _dataSource = new Lazy<NpgsqlDataSource>(() =>
         {
-            var connectionString =
-                configuration.GetConnectionString("PostgresConnectionString");
+            var connectionString = !string.IsNullOrWhiteSpace(settings?.ConnectionString)
+                ? settings.ConnectionString
+                : configuration.GetConnectionString("PostgresConnectionString");
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new InvalidOperationException(
-                    "Connection string 'ConnectionStrings:PostgresConnectionString' is not configured. " +
+                    "Connection string 'Postgres:ConnectionString' is not configured. " +
                     "Set it via User Secrets (local dev) or environment variable " +
-                    "'ConnectionStrings__PostgresConnectionString' (CI / containers).");
+                    "'Postgres__ConnectionString' (CI / containers).");
             }
 
-            var settings = new NpgsqlConnectionStringBuilder(connectionString)
+            var npgsqlSettings = new NpgsqlConnectionStringBuilder(connectionString)
             {
-                MaxPoolSize = configuration["Database:MaxPoolSize"] is { } poolSize
-                    ? int.Parse(poolSize, CultureInfo.InvariantCulture)
-                    : 100
+                MaxPoolSize = settings?.MaxPoolSize ?? 100,
             };
 
-            if (configuration["Database:ConnectionTimeoutSeconds"] is { } timeout)
+            if (settings?.ConnectionTimeoutSeconds is int timeout)
             {
-                settings.Timeout = int.Parse(timeout, CultureInfo.InvariantCulture);
+                npgsqlSettings.Timeout = timeout;
             }
 
-            return NpgsqlDataSource.Create(settings.ConnectionString);
+            return NpgsqlDataSource.Create(npgsqlSettings);
 
         }, isThreadSafe: true);
     }

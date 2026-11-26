@@ -356,7 +356,7 @@ Configuration comes from `appsettings.json`, per-environment overrides (`appsett
 | `ASPNETCORE_ENVIRONMENT` | `Development`, `Test` or `Production` | `terraform/application/config/*.yml` |
 | `ASPNETCORE_URLS` | Listening URLs (`http://+:3000` in Docker) | Dockerfile |
 | `ENVIRONMENT_NAME` | Environment name used for analytics and Sentry tagging | ConfigMap |
-| `ConnectionStrings__PostgresConnectionString` | .NET PostgreSQL connection string | Key Vault / user secrets |
+| `Postgres__ConnectionString` | .NET PostgreSQL connection string | Key Vault / user secrets |
 | `DATABASE_URL` | PostgreSQL URL used by tooling | Terraform |
 | `PGSSLMODE` | PostgreSQL SSL mode | Terraform |
 | `DsiConfiguration__ClientId` / `__ClientSecret` / `__ApiSecret` | DfE Sign-in credentials | Key Vault / user secrets |

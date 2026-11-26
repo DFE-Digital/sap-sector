@@ -14,8 +14,8 @@ public class NpgsqlDataSourceFactoryTests
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["ConnectionStrings:PostgresConnectionString"] = "Host=localhost;Database=pool_test;Maximum Pool Size=50",
-            ["Database:MaxPoolSize"] = poolSize
+            ["Postgres:ConnectionString"] = "Host=localhost;Database=pool_test;Maximum Pool Size=50",
+            ["Postgres:MaxPoolSize"] = poolSize
         }).Build();
         var factory = new NpgsqlDataSourceFactory(configuration);
 
@@ -32,12 +32,28 @@ public class NpgsqlDataSourceFactoryTests
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["ConnectionStrings:PostgresConnectionString"] = "Host=localhost;Database=pool_test;Timeout=15",
-            ["Database:ConnectionTimeoutSeconds"] = timeout
+            ["Postgres:ConnectionString"] = "Host=localhost;Database=pool_test;Timeout=15",
+            ["Postgres:ConnectionTimeoutSeconds"] = timeout
         }).Build();
 
         using var source = new NpgsqlDataSourceFactory(configuration).Create();
 
         new NpgsqlConnectionStringBuilder(source.ConnectionString).Timeout.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Create_DefaultsToConnectionStringsWhenPostgresConnectionStringMissing()
+    {
+        var connectionString = "Host=localhost;Database=pool_test;Maximum Pool Size=100";
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["ConnectionStrings:PostgresConnectionString"] = connectionString,
+        }).Build();
+        var factory = new NpgsqlDataSourceFactory(configuration);
+
+        using var source = factory.Create();
+
+        new NpgsqlConnectionStringBuilder(source.ConnectionString).ConnectionString.Should().Be(connectionString);
+        factory.Create().Should().BeSameAs(source);
     }
 }

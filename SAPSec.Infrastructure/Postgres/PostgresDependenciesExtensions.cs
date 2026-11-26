@@ -8,6 +8,7 @@ public static class PostgresDependenciesExtensions
 {
     public static IServiceCollection AddPostgresqlDependencies(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<PostgresSettings>(configuration.GetSection(PostgresSettings.SectionName));
 
         services.AddSingleton<NpgsqlDataSourceFactory>();
 
