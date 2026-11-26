@@ -10,6 +10,7 @@ on:
         type: choice
         options:
         - test
+        - preapproval
         - production
       backup-file:
         description: |
