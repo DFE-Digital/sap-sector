@@ -13,5 +13,5 @@ public interface IEstablishmentRepository
     Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn);
     Task<IReadOnlyCollection<EstablishmentLinks>> GetEstablishmentLinksAsync(string urn);
 
-    Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults);
+    Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults, bool isBroadTerm);
 }

@@ -5,7 +5,7 @@ public static class BroadSearchTerms
 {
     public const int BroadQueryLimit = 100;
 
-    private static readonly HashSet<string> Terms = new(StringComparer.Ordinal)
+    public static readonly HashSet<string> Terms = new(StringComparer.Ordinal)
     {
         "school", "schools", "academy", "academies", "primary", "secondary", "high", "college", "the", "of", "and"
     };

@@ -16,12 +16,10 @@ public class PostgresSchoolSearchIndexReader(IEstablishmentRepository establishm
             return [];
         }
 
-        // Cap very broad queries such as "school".
-        var limit = BroadSearchTerms.IsBroadQuery(tokens)
-            ? Math.Min(maxResults, BroadSearchTerms.BroadQueryLimit)
-            : maxResults;
+        // check for broad search terms such as "school".
+        var isBroadTerm = tokens.All(t => BroadSearchTerms.Terms.Contains(t));
 
-        var hits = await establishmentRepository.SearchEstablishmentsAsync(query, limit);
+        var hits = await establishmentRepository.SearchEstablishmentsAsync(query, maxResults, isBroadTerm);
 
         var results = new List<(int, string)>();
         foreach (var hit in hits)

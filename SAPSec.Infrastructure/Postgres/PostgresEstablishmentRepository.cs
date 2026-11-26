@@ -52,7 +52,7 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         return result.ToList();
     }
 
-    public async Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults)
+    public async Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults, bool isBroadTerm)
     {
         var tokens = SearchTokeniser.Tokenise(query);
         if (tokens.Count == 0)
@@ -69,9 +69,7 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
 
         var connectMs = sw.ElapsedMilliseconds;
 
-
-        // Same phase rule as CanIndexForSearch.
-        const string sql = """
+        const string RankedSql = """
             WITH q AS (
                 SELECT to_tsquery('simple', concat_ws(' & ',
                     NULLIF(array_to_string(array_remove(regexp_split_to_array(trim(normalize_text(@head)), '\s+'), ''), ' & '), ''),
@@ -87,38 +85,36 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
             ORDER BY ts_rank_cd(s."SearchFTS", q.tsq) DESC, e."EstablishmentName"
             LIMIT @maxResults;
         """;
+        
+        const string BroadTermSql = """
+            WITH q AS (
+                SELECT to_tsquery('simple', concat_ws(' & ',
+                    NULLIF(array_to_string(array_remove(regexp_split_to_array(trim(normalize_text(@head)), '\s+'), ''), ' & '), ''),
+                    @last || ':*')) AS tsq
+            ),
+            candidates AS MATERIALIZED (
+            SELECT e."URN", e."EstablishmentName", s."SearchFTS", q.tsq
+            FROM public.v_establishment e
+            JOIN public.v_establishment_search s ON s."URN" = e."URN"
+            CROSS JOIN q
+            WHERE s."SearchFTS" @@ q.tsq
+              AND (trim(e."PhaseOfEducationId") IN ('2', '4', '7')
+                   OR lower(trim(e."PhaseOfEducationName")) IN ('primary', 'secondary', 'all-through'))
+            LIMIT @candidateLimit
+        )
+        SELECT "URN", "EstablishmentName"
+        FROM candidates
+        ORDER BY ts_rank_cd("SearchFTS", tsq) DESC, "EstablishmentName"
+        LIMIT @maxResults;
+        """;
 
         var candidateLimit = Math.Max(maxResults * 5, 100);
 
-        //const string sql = """
-        //    WITH q AS (
-        //        SELECT to_tsquery('simple', concat_ws(' & ',
-        //            NULLIF(array_to_string(array_remove(regexp_split_to_array(trim(normalize_text(@head)), '\s+'), ''), ' & '), ''),
-        //            @last || ':*')) AS tsq
-        //    ),
-        //    candidates AS MATERIALIZED (
-        //    SELECT e."URN", e."EstablishmentName", s."SearchFTS", q.tsq
-        //    FROM public.v_establishment e
-        //    JOIN public.v_establishment_search s ON s."URN" = e."URN"
-        //    CROSS JOIN q
-        //    WHERE s."SearchFTS" @@ q.tsq
-        //      AND (trim(e."PhaseOfEducationId") IN ('2', '4', '7')
-        //           OR lower(trim(e."PhaseOfEducationName")) IN ('primary', 'secondary', 'all-through'))
-        //    LIMIT @candidateLimit
-        //)
-        //SELECT "URN", "EstablishmentName"
-        //FROM candidates
-        //ORDER BY ts_rank_cd("SearchFTS", tsq) DESC, "EstablishmentName"
-        //LIMIT @maxResults;
-        //""";
+        var sql = isBroadTerm ? BroadTermSql : RankedSql;
 
         var result = (await conn.QueryAsync<EstablishmentSearchHit>(sql, new { head, last, maxResults, candidateLimit })).ToList();
 
         sw.Stop();
-
-        //_logger.LogInformation(
-        //    "SearchEstablishments '{Query}' returned {Count} hits in {ElapsedMs} ms (connect {ConnectMs} ms)",
-        //    query, result.Count, sw.ElapsedMilliseconds, connectMs);
 
         Console.WriteLine($"SearchEstablishments '{query}' returned {result.Count} hits in {sw.ElapsedMilliseconds} ms (connect {connectMs} ms)");
 

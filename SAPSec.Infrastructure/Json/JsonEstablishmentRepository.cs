@@ -39,7 +39,7 @@ public class JsonEstablishmentRepository : IEstablishmentRepository
         return establishments.Where(e => urns.Contains(e.URN)).ToList().AsReadOnly();
     }
 
-    public async Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults)
+    public async Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults, bool isBroadTerm)
     {
         var establishments = await _establishmentFile.ReadAllAsync();
 
