@@ -168,6 +168,34 @@ public class Ks2ProgressScoresUseCaseTests
     }
 
     [Fact]
+    public async Task School_UseEarliestProgressYearAsLatest_LatestYearUses2022To2023Scores()
+    {
+        var response = await _school.Execute(new("100001", UseEarliestProgressYearAsLatest: true));
+
+        response.ProgressScores.Year.Should().Be(2024);
+        response.ProgressScores.Series.Should().BeEquivalentTo([
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, 0.3m, null, 0.3m),
+            // Only the current school has a 2022 to 2023 reading score among the similar schools.
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, null, null, null),
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, 0.1m, null, 0.1m),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, -0.02m, 0m, -0.02m)
+        ], o => o.WithStrictOrdering());
+
+        response.ProgressScores.TopPerformers.Should().BeEquivalentTo([
+            new TopPerformer(1, "100001", "Current School", 0.3m, IsCurrentSchool: true)
+        ]);
+    }
+
+    [Fact]
+    public async Task Comparison_UseEarliestProgressYearAsLatest_LatestYearUses2022To2023Scores()
+    {
+        var response = await _comparison.Execute(new("100001", "100002", UseEarliestProgressYearAsLatest: true));
+
+        response.ProgressScores.Series.First().Current.Should().Be(0.3m);
+        response.ProgressScores.Series.Last().Current.Should().Be(-0.02m);
+    }
+
+    [Fact]
     public async Task Comparison_ProgressPupilNumbers_ForBothSchools()
     {
         var response = await _comparison.Execute(new("100001", "100002"));

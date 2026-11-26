@@ -67,7 +67,8 @@ public class SchoolController(
     public async Task<IActionResult> Ks2PerformanceMeasures(string urn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, filters));
+        var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, filters,
+            UseEarliestProgressYearAsLatest: await featureFlagService.IsEnabledAsync(Flags.Ks2ProgressUseEarliestYearAsLatest)));
 
         var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
 

@@ -25,6 +25,7 @@ public class Ks2ProgressScoresPageIntegrationTests(
         Fixture.FeatureFlagService.ClearOverrides(Flags.EnableKs2ProgressMeasures);
         Fixture.FeatureFlagService.ClearOverrides(Flags.EnableKs2ProgressNumberOfPupils);
         Fixture.FeatureFlagService.ClearOverrides(Flags.EnableAllThroughSchools);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.Ks2ProgressUseEarliestYearAsLatest);
         return base.DisposeAsync();
     }
 
@@ -238,6 +239,43 @@ public class Ks2ProgressScoresPageIntegrationTests(
         page.ElementWithTestIdShouldExist("progress-tabs").ChildTrimmedTextContent()
             .Should().Equal("Charts", "Table", "Top performers");
         page.Source.Text.Should().NotContain(NoProgressScoresMessage);
+    }
+
+    // ---------- Testing only: 2022 to 2023 scores shown as the latest year ----------
+
+    [Fact]
+    public async Task SchoolPage_UseEarliestYearAsLatest_ShowsThe2022To2023ScoresAsTheLatestYear()
+    {
+        Fixture.FeatureFlagService.Override(Flags.Ks2ProgressUseEarliestYearAsLatest, true);
+        SetupPrimarySchoolWithSimilarSchools();
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2);
+
+        // Year labels are unchanged; the latest-year column repeats the 2022 to 2023 scores.
+        page.ElementWithTestIdShouldExist<IHtmlTableElement>("progress-table-view-table").ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "-1.8", "No available data", "-1.8"],
+            ["Similar schools average", "0.5", "No available data", "0.5"],
+            ["Local authority schools average", "-0.5", "No available data", "-0.5"],
+            ["Schools in England average", "0.0", "No available data", "0.0"]);
+
+        page.ElementWithTestIdShouldExist<IHtmlTableElement>("progress-top-performers-table")
+            .QuerySelectorAll("tbody tr").Should().HaveCount(3);
+    }
+
+    [Fact]
+    public async Task ComparisonPage_UseEarliestYearAsLatest_ShowsThe2022To2023ScoresAsTheLatestYear()
+    {
+        Fixture.FeatureFlagService.Override(Flags.Ks2ProgressUseEarliestYearAsLatest, true);
+        SetupPrimarySchoolWithSimilarSchools();
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Comparison("100002").Ks2);
+
+        page.ElementWithTestIdShouldExist<IHtmlTableElement>("progress-table-view-table").ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "-1.8", "No available data", "-1.8"],
+            ["Test School 2", "3.0", "No available data", "3.0"],
+            ["Schools in England average", "0.0", "No available data", "0.0"]);
     }
 
     // ---------- Comparing to page ----------

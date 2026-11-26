@@ -37,7 +37,8 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
             Ks2ProgressScores.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy,
+                request.UseEarliestProgressYearAsLatest),
             progressPupilNumbers,
             Ks2PerformanceMeasures.MeetingExpectedStandardRwm.ForSchool(
                 currentSchoolPerformance,
@@ -75,7 +76,8 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
 
 public record GetSchoolKs2PerformanceMeasuresRequest(
     string Urn,
-    IDictionary<string, string>? FilterBy = null);
+    IDictionary<string, string>? FilterBy = null,
+    bool UseEarliestProgressYearAsLatest = false);
 
 public record GetSchoolKs2PerformanceMeasuresResponse(
     SchoolInfo.SchoolInfo School,

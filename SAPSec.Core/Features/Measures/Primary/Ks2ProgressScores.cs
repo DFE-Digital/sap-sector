@@ -18,9 +18,10 @@ internal static class Ks2ProgressScores
     public static Measure ForSchool(
         SchoolMeasureData<Ks2PerformanceData> currentSchool,
         IEnumerable<SchoolMeasureData<Ks2PerformanceData>> similarSchools,
-        CaseInsensitiveDictionary<string> filters)
+        CaseInsensitiveDictionary<string> filters,
+        bool useEarliestYearAsLatest = false)
     {
-        var (availableFilters, fieldSelector) = ResolveFilters(filters);
+        var (availableFilters, fieldSelector) = ResolveFilters(filters, useEarliestYearAsLatest);
 
         return Measure.ForSchool(
             Ks2Progress.Key,
@@ -36,9 +37,10 @@ internal static class Ks2ProgressScores
     public static Measure ForSchoolComparison(
         SchoolMeasureData<Ks2PerformanceData> currentSchool,
         SchoolMeasureData<Ks2PerformanceData> similarSchool,
-        CaseInsensitiveDictionary<string> filters)
+        CaseInsensitiveDictionary<string> filters,
+        bool useEarliestYearAsLatest = false)
     {
-        var (availableFilters, fieldSelector) = ResolveFilters(filters);
+        var (availableFilters, fieldSelector) = ResolveFilters(filters, useEarliestYearAsLatest);
 
         return Measure.ForSchoolComparison(
             Ks2Progress.Key,
@@ -102,7 +104,8 @@ internal static class Ks2ProgressScores
     }
 
     private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<Ks2PerformanceData> FieldSelector) ResolveFilters(
-        CaseInsensitiveDictionary<string> filters)
+        CaseInsensitiveDictionary<string> filters,
+        bool useEarliestYearAsLatest)
     {
         var subject = SelectedSubject(filters);
 
@@ -148,6 +151,18 @@ internal static class Ks2ProgressScores
                 x => x?.EnglandPerformance?.ReadingProgress_Tot_Cohort_Eng_Previous_Num,
                 x => x?.EnglandPerformance?.ReadingProgress_Tot_Cohort_Eng_Previous2_Num)
         };
+
+        // TESTING ONLY (see Flags.Ks2ProgressUseEarliestYearAsLatest): show the 2022 to 2023 scores as the
+        // latest year until 2025 to 2026 data is available. The other two years are unchanged.
+        if (useEarliestYearAsLatest)
+        {
+            fieldSelector = fieldSelector with
+            {
+                SchoolCurrent = fieldSelector.SchoolPrevious2,
+                LocalAuthorityCurrent = fieldSelector.LocalAuthorityPrevious2,
+                EnglandCurrent = fieldSelector.EnglandPrevious2
+            };
+        }
 
         return (availableFilters, fieldSelector);
     }
