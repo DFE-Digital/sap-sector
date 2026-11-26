@@ -1,4 +1,7 @@
 using Microsoft.Extensions.Logging;
+using Moq;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Repositories;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Test.Common;
 using SAPSec.Test.Common.InMemory;
@@ -136,6 +139,39 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
             (100001, "*Test* School 1"),
             (100002, "*Test* School 2")
         ]);
+    }
+
+    [Fact]
+    public async Task StartAsync_WhenReadingEstablishmentsFails_RetriesAndBuildsIndex()
+    {
+        var repository = new Mock<IEstablishmentRepository>();
+        repository.SetupSequence(repo => repo.GetAllEstablishmentsAsync())
+            .ThrowsAsync(new InvalidOperationException("Establishment data is temporarily unavailable."))
+            .ReturnsAsync([
+                new Establishment { URN = "100001", EstablishmentName = "Test School", PhaseOfEducationName = "Primary" }
+            ]);
+
+        using var ctx = new LuceneIndexContext();
+        var writer = new LuceneIndexWriter(ctx);
+        using var sut = new StartupIndexBuilder(logger, writer, repository.Object,
+            IndexBuilderDataReadIntervalMilliseconds);
+
+        await sut.StartAsync(CancellationToken.None);
+        try
+        {
+            await sut.ExecuteTask!.WaitAsync(TimeSpan.FromSeconds(5));
+        }
+        finally
+        {
+            await sut.StopAsync(CancellationToken.None);
+        }
+
+        repository.Verify(repo => repo.GetAllEstablishmentsAsync(), Times.Exactly(2));
+        sut.IndexBuiltSuccessfully.Should().BeTrue();
+
+        var reader = new LuceneShoolSearchIndexReader(ctx, new LuceneTokeniser(ctx), new LuceneHighlighter());
+        var results = await reader.SearchAsync("test");
+        results.Should().BeEquivalentTo([(100001, "*Test* School")]);
     }
 
     [Fact]
