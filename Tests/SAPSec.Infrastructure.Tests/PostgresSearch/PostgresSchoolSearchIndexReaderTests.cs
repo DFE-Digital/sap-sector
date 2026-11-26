@@ -12,7 +12,7 @@ public class PostgresSchoolSearchIndexReaderTests
 
     private PostgresSchoolSearchIndexReader Reader(params EstablishmentSearchHit[] hits)
     {
-        _repo.Setup(r => r.SearchEstablishmentsAsync(It.IsAny<string>(), It.IsAny<int>()))
+        _repo.Setup(r => r.SearchEstablishmentsAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()))
             .ReturnsAsync(hits);
 
         return new PostgresSchoolSearchIndexReader(_repo.Object);
@@ -24,7 +24,7 @@ public class PostgresSchoolSearchIndexReaderTests
         var results = await Reader().SearchAsync("   ");
 
         results.Should().BeEmpty();
-        _repo.Verify(r => r.SearchEstablishmentsAsync(It.IsAny<string>(), It.IsAny<int>()), Times.Never);
+        _repo.Verify(r => r.SearchEstablishmentsAsync(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<bool>()), Times.Never);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class PostgresSchoolSearchIndexReaderTests
     {
         await Reader().SearchAsync(query, requested);
 
-        _repo.Verify(r => r.SearchEstablishmentsAsync(It.IsAny<string>(), expectedLimit), Times.Once);
+        _repo.Verify(r => r.SearchEstablishmentsAsync(It.IsAny<string>(), expectedLimit, It.IsAny<bool>()), Times.Once);
     }
 
     [Fact]

@@ -58,4 +58,9 @@ public class InMemoryEstablishmentRepository : IEstablishmentRepository
 
     public Task<IReadOnlyCollection<EstablishmentLinks>> GetEstablishmentLinksAsync(string urn)
         => Task.FromResult((IReadOnlyCollection<EstablishmentLinks>)_establishmentLinks.Where(i => i.urn == urn).ToList());
+
+    public Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults, bool isBroadTerm)
+    {
+        throw new NotImplementedException();
+    }
 }
