@@ -6,7 +6,7 @@ data pipeline runs.
 
 Expected service name:
 
-- `get-school-improvement-insights-maintenance`
+- `compare-connect-similar-schools-maintenance`
 
 Build and push example:
 
