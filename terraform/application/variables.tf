@@ -103,6 +103,24 @@ variable "replicas" {
   default     = 1
   description = "Number of replicas for the application deployment"
 }
+
+variable "load_testing_database_max_pool_size" {
+  type        = number
+  default     = 100
+  description = "Maximum Npgsql connections per application replica in Test and Review."
+
+  validation {
+    condition     = contains([100, 200, 300], var.load_testing_database_max_pool_size)
+    error_message = "Choose a database pool size of 100, 200, or 300."
+  }
+}
+
+variable "load_testing_bypass_authentication" {
+  type        = bool
+  default     = false
+  description = "Opt in to synthetic authentication for a restricted Test or Preapproval load test."
+}
+
 variable "storage_container_delete_retention_days" {
   type        = number
   default     = null
