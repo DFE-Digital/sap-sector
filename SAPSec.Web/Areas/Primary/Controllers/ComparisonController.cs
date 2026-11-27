@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core;
+using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.SchoolDetails.Comparison;
@@ -28,7 +29,8 @@ public class ComparisonController(
     IUseCase<GetPrimaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
     [FromKeyedServices(ServiceKeys.Primary)]
     IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse> getSchoolDetailsUseCase,
-    IPrimaryCharacteristicsComparisonFormatter characteristicsComparisonFormatter)
+    IPrimaryCharacteristicsComparisonFormatter characteristicsComparisonFormatter,
+    IFeatureFlagService featureFlagService)
     : Controller
 {
     private const string SimilarityView = "~/Areas/Shared/Views/Comparison/Similarity.cshtml";
@@ -58,7 +60,8 @@ public class ComparisonController(
     public async Task<IActionResult> Ks2PerformanceMeasures(string urn, string comparatorSchoolUrn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, comparatorSchoolUrn, filters));
+        var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, comparatorSchoolUrn, filters,
+            UseEarliestProgressYearAsLatest: await featureFlagService.IsEnabledAsync(Flags.Ks2ProgressUseEarliestYearAsLatest)));
 
         SetComparisonLayout(response.CurrentSchool, response.ComparatorSchool);
 
@@ -73,6 +76,24 @@ public class ComparisonController(
             MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryComparisonMeasure(response.MeetingExpectedStandardGps, response.CurrentSchool, response.ComparatorSchool),
             AchievedHigherStandardGps = MeasureViewModel.FromPrimaryComparisonMeasure(response.AchievedHigherStandardGps, response.CurrentSchool, response.ComparatorSchool),
         };
+
+        if (await featureFlagService.IsEnabledAsync(Flags.EnableKs2ProgressMeasures))
+        {
+            var progressScores = MeasureViewModel.FromPrimaryComparisonMeasure(response.ProgressScores, response.CurrentSchool, response.ComparatorSchool);
+
+            if (await featureFlagService.IsEnabledAsync(Flags.EnableKs2ProgressNumberOfPupils))
+            {
+                progressScores = Ks2ProgressScoresViewModel.WithNumberOfPupils(
+                    progressScores,
+                    response.ProgressScores,
+                    response.CurrentSchool,
+                    response.CurrentSchoolProgressPupilNumbers,
+                    response.ComparatorSchool,
+                    response.ComparatorSchoolProgressPupilNumbers);
+            }
+
+            model.ProgressScores = progressScores;
+        }
 
         return View(model);
     }

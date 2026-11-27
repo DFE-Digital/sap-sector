@@ -1,0 +1,44 @@
+@using SAPSec.Web.ViewModels.Measures
+@model MeasureViewModel
+
+@* KS2 progress scores (behind EnableKs2ProgressMeasures). Replaces _Ks2ProgressRWMInfo when the flag is on. *@
+<section class="app-measure-section" aria-labelledby="progress-rwm-heading">
+    <h2 class="govuk-heading-m" id="progress-rwm-heading" data-testid="progress-rwm-heading">@Model.MeasureInfo.Name</h2>
+
+    <details class="govuk-details app-measure-details" data-module="govuk-details" data-testid="progress-rwm-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Information about progress scores in reading, writing and maths</span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body">
+                The progress score shows how much progress pupils at this school made compared with similar pupils across England.
+            </p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>0 means pupils made about the same progress as similar pupils across England.</li>
+                <li>A positive score means pupils made more progress.</li>
+                <li>A negative score means pupils made less progress.</li>
+            </ul>
+            <p class="govuk-body">
+                To work out the progress score, we compare pupils' results with the results pupils with similar starting points typically achieve.
+            </p>
+
+            <h3 class="govuk-heading-s">How the number of pupils affects the score</h3>
+            <p class="govuk-body">
+                Progress scores based on larger numbers of pupils are usually more reliable. When there are fewer pupils, the score can be more affected by the results of individual pupils.
+            </p>
+
+            <h3 class="govuk-heading-s">Further information on progress measures</h3>
+            <p class="govuk-body">
+                Find out more about how progress scores are calculated in the
+                <a href="https://www.gov.uk/government/publications/primary-school-accountability" class="govuk-link" target="_blank" rel="noopener noreferrer" data-testid="progress-rwm-technical-guidance-link">Technical guidance on primary school accountability measures guidance (opens in new tab)</a>.
+            </p>
+            <p class="govuk-body govuk-!-margin-bottom-0">
+                Visit
+                <a href="https://explore-education-statistics.service.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer" data-testid="progress-rwm-ees-link">Explore education statistics (opens in new tab)</a>
+                for more information and data relating to KS2 official statistics.
+            </p>
+        </div>
+    </details>
+
+    <partial name="Measures/_Measure" model=@Model />
+</section>

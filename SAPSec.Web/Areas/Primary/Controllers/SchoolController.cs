@@ -67,7 +67,8 @@ public class SchoolController(
     public async Task<IActionResult> Ks2PerformanceMeasures(string urn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, filters));
+        var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, filters,
+            UseEarliestProgressYearAsLatest: await featureFlagService.IsEnabledAsync(Flags.Ks2ProgressUseEarliestYearAsLatest)));
 
         var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
 
@@ -85,6 +86,19 @@ public class SchoolController(
             MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardGps, response.School, similarSchoolsResponse.HasSimilarSchools),
             AchievedHigherStandardGps = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardGps, response.School, similarSchoolsResponse.HasSimilarSchools)
         };
+
+        if (await featureFlagService.IsEnabledAsync(Flags.EnableKs2ProgressMeasures))
+        {
+            var progressScores = MeasureViewModel.FromPrimaryMeasure(response.ProgressScores, response.School, similarSchoolsResponse.HasSimilarSchools);
+
+            if (await featureFlagService.IsEnabledAsync(Flags.EnableKs2ProgressNumberOfPupils))
+            {
+                progressScores = Ks2ProgressScoresViewModel.WithNumberOfPupils(
+                    progressScores, response.ProgressScores, response.School, response.ProgressPupilNumbers);
+            }
+
+            model.ProgressScores = progressScores;
+        }
 
         return View(SharedKs2PerformanceMeasuresView, model);
     }

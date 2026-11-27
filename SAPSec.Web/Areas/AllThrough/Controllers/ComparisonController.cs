@@ -36,7 +36,8 @@ public class ComparisonController(
     [FromKeyedServices(ServiceKeys.Secondary)]
     IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse> getSecondarySchoolDetailsUseCase,
     IPrimaryCharacteristicsComparisonFormatter primaryCharacteristicsComparisonFormatter,
-    ISecondaryCharacteristicsComparisonFormatter secondaryCharacteristicsComparisonFormatter)
+    ISecondaryCharacteristicsComparisonFormatter secondaryCharacteristicsComparisonFormatter,
+    IFeatureFlagService featureFlagService)
     : Controller
 {
     private const string SimilarityView = "~/Areas/Shared/Views/Comparison/Similarity.cshtml";
@@ -71,7 +72,8 @@ public class ComparisonController(
     public async Task<IActionResult> PrimaryKs2PerformanceMeasures(string urn, string comparatorSchoolUrn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, comparatorSchoolUrn, filters));
+        var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, comparatorSchoolUrn, filters,
+            UseEarliestProgressYearAsLatest: await featureFlagService.IsEnabledAsync(Flags.Ks2ProgressUseEarliestYearAsLatest)));
 
         SetPrimaryComparisonLayout(response.CurrentSchool, response.ComparatorSchool);
 
@@ -86,6 +88,24 @@ public class ComparisonController(
             MeetingExpectedStandardGps = MeasureViewModel.FromAllThroughPrimaryComparisonMeasure(response.MeetingExpectedStandardGps, response.CurrentSchool, response.ComparatorSchool),
             AchievedHigherStandardGps = MeasureViewModel.FromAllThroughPrimaryComparisonMeasure(response.AchievedHigherStandardGps, response.CurrentSchool, response.ComparatorSchool),
         };
+
+        if (await featureFlagService.IsEnabledAsync(Flags.EnableKs2ProgressMeasures))
+        {
+            var progressScores = MeasureViewModel.FromAllThroughPrimaryComparisonMeasure(response.ProgressScores, response.CurrentSchool, response.ComparatorSchool);
+
+            if (await featureFlagService.IsEnabledAsync(Flags.EnableKs2ProgressNumberOfPupils))
+            {
+                progressScores = Ks2ProgressScoresViewModel.WithNumberOfPupils(
+                    progressScores,
+                    response.ProgressScores,
+                    response.CurrentSchool,
+                    response.CurrentSchoolProgressPupilNumbers,
+                    response.ComparatorSchool,
+                    response.ComparatorSchoolProgressPupilNumbers);
+            }
+
+            model.ProgressScores = progressScores;
+        }
 
         return View(PrimaryKs2View, model);
     }

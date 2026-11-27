@@ -11,7 +11,14 @@
 </p>
 
 <form action="" method="get">
-    <partial name="~/Areas/Primary/Views/Shared/_Ks2ProgressRWMInfo.cshtml" />
+    @if (Model.ProgressScores is not null)
+    {
+        <partial name="~/Areas/Primary/Views/Shared/_Ks2ProgressScores.cshtml" model=@Model.ProgressScores />
+    }
+    else
+    {
+        <partial name="~/Areas/Primary/Views/Shared/_Ks2ProgressRWMInfo.cshtml" />
+    }
 
     <section class="app-measure-section" aria-labelledby="expected-rwm-heading">
         <h2 class="govuk-heading-m" id="expected-rwm-heading" data-testid="expected-rwm-heading">@Model.MeetingExpectedStandardRwm!.MeasureInfo.Name</h2>

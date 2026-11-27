@@ -1,0 +1,50 @@
+@using SAPSec.Web.ViewModels.Measures
+
+@model NumberOfPupilsViewModel
+
+@* Native <details>: collapsed by default and closed again on page refresh. *@
+<details class="govuk-details app-number-of-pupils" id="@Model.Id" data-testid="@Model.Id">
+    <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">Number of pupils</span>
+    </summary>
+    <div class="govuk-details__text">
+        <p class="govuk-body-s">
+            The number of eligible pupils included in this measure. The proportion of pupils is only available for all pupils. It is not shown for pupil characteristics.
+        </p>
+        <div class="app-number-of-pupils__table-wrapper" role="region" aria-labelledby="@Model.Id-caption" tabindex="0">
+            <table class="govuk-table app-number-of-pupils__table govuk-!-margin-bottom-0" data-testid="@Model.Id-table">
+                <caption class="govuk-visually-hidden" id="@Model.Id-caption">Number of pupils</caption>
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">School(s)</th>
+                        <th scope="col" class="govuk-table__header">Pupils</th>
+                        @foreach (var yearLabel in Model.YearLabels)
+                        {
+                            <th scope="col" class="govuk-table__header govuk-table__header--numeric">@yearLabel</th>
+                        }
+                    </tr>
+                </thead>
+                @foreach (var school in Model.Schools)
+                {
+                    <tbody class="govuk-table__body">
+                        <tr class="govuk-table__row">
+                            <th scope="rowgroup" rowspan="2" class="govuk-table__header">@school.Name</th>
+                            <th scope="row" class="govuk-table__header app-number-of-pupils__row-label">Eligible pupils at school</th>
+                            @foreach (var value in school.EligiblePupils)
+                            {
+                                <td class="govuk-table__cell govuk-table__cell--numeric">@value</td>
+                            }
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header app-number-of-pupils__row-label">Proportion of pupils included in the measure</th>
+                            @foreach (var value in school.ProportionIncluded)
+                            {
+                                <td class="govuk-table__cell govuk-table__cell--numeric">@value</td>
+                            }
+                        </tr>
+                    </tbody>
+                }
+            </table>
+        </div>
+    </div>
+</details>

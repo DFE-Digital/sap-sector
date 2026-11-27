@@ -22,9 +22,24 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
 
+        var progressPupilNumbers = similarSchoolsPerformance
+            .Prepend(currentSchoolPerformance)
+            .GroupBy(x => x.SchoolInfo.Urn, StringComparer.Ordinal)
+            .Select(x => x.First())
+            .ToDictionary(
+                x => x.SchoolInfo.Urn,
+                x => Ks2ProgressScores.PupilNumbers(x.SchoolInfo.Urn, x.Data, filterBy),
+                StringComparer.Ordinal);
+
         return new(
             currentSchoolPerformance.SchoolInfo,
             similarSchoolsPerformance.Count,
+            Ks2ProgressScores.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy,
+                request.UseEarliestProgressYearAsLatest),
+            progressPupilNumbers,
             Ks2PerformanceMeasures.MeetingExpectedStandardRwm.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
@@ -61,11 +76,14 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
 
 public record GetSchoolKs2PerformanceMeasuresRequest(
     string Urn,
-    IDictionary<string, string>? FilterBy = null);
+    IDictionary<string, string>? FilterBy = null,
+    bool UseEarliestProgressYearAsLatest = false);
 
 public record GetSchoolKs2PerformanceMeasuresResponse(
     SchoolInfo.SchoolInfo School,
     int SimilarSchoolsCount,
+    Measure ProgressScores,
+    IReadOnlyDictionary<string, SchoolPupilNumbers> ProgressPupilNumbers,
     Measure MeetingExpectedStandardRwm,
     Measure AchievedHigherStandardRwm,
     Measure AverageScaledScoreReading,

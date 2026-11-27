@@ -20,6 +20,7 @@ public class ViewSimilarSchoolsPageIntegrationTests(
     public override Task DisposeAsync()
     {
         Fixture.FeatureFlagService.ClearOverrides(Flags.EnablePrimarySchools);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnableKs2ProgressMeasures);
 
         return base.DisposeAsync();
     }
@@ -27,6 +28,7 @@ public class ViewSimilarSchoolsPageIntegrationTests(
     [Fact]
     public async Task ViewSimilarSchools_ShowsExistingSimilarSchoolFiltersAndResults()
     {
+        Fixture.FeatureFlagService.Override(Flags.EnableKs2ProgressMeasures, false);
         Fixture.EstablishmentRepository.SetupEstablishments(
             new Establishment
             {
@@ -205,6 +207,7 @@ public class ViewSimilarSchoolsPageIntegrationTests(
     [Fact]
     public async Task ViewSimilarSchools_PaginatesPrimarySimilarSchools()
     {
+        Fixture.FeatureFlagService.Override(Flags.EnableKs2ProgressMeasures, false);
         var establishments = new List<Establishment>
         {
             new()
@@ -348,6 +351,81 @@ public class ViewSimilarSchoolsPageIntegrationTests(
         list.TextContent.Should().Contain("Beta School");
         list.TextContent.Should().Contain("70%");
         list.TextContent.Should().Contain("Meeting expected standard in grammar, punctuation and spelling");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchools_ProgressFlagOn_ListsProgressSortOptionsFirstAndSortsByReadingProgress()
+    {
+        Fixture.FeatureFlagService.Override(Flags.EnableKs2ProgressMeasures, true);
+        SetupSchoolsWithProgressScores();
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").ViewSimilarSchools, HttpStatusCode.OK);
+
+        page.QuerySelectorAll("#sort-by option").Select(o => o.TextContent.Trim()).Should().Equal(
+            "Progress score in reading",
+            "Progress score in writing",
+            "Progress score in maths",
+            "Meeting expected standard in reading, writing and maths",
+            "Achieved a higher standard in reading, writing and maths",
+            "Average scaled score in reading",
+            "Average scaled score in maths",
+            "Meeting expected standard in grammar, punctuation and spelling",
+            "Achieved a higher standard in grammar, punctuation and spelling");
+        page.QuerySelector("#sort-by option[selected]")!.TextContent.Trim().Should().Be("Progress score in reading");
+
+        var results = page.ElementWithTestIdShouldExist("primary-similar-schools-list").QuerySelectorAll(".app-school-result").ToArray();
+        results.Select(r => r.QuerySelector("a")!.TextContent.Trim())
+            .Should().Equal("Beta School", "Alpha School", "Gamma School");
+        results[0].TextContent.Should().Contain("Progress score in reading: 2.5");
+        results[1].TextContent.Should().Contain("Progress score in reading: -1.3");
+        results[2].TextContent.Should().Contain("Progress score in reading: No available data");
+    }
+
+    [Theory]
+    [InlineData("WritingProgress", "Progress score in writing", new[] { "Gamma School", "Alpha School", "Beta School" }, "0.0")]
+    [InlineData("MathsProgress", "Progress score in maths", new[] { "Alpha School", "Beta School", "Gamma School" }, "4.0")]
+    public async Task ViewSimilarSchools_ProgressFlagOn_SortsBySelectedProgressScore(string sortBy, string sortName, string[] expectedOrder, string firstScore)
+    {
+        Fixture.FeatureFlagService.Override(Flags.EnableKs2ProgressMeasures, true);
+        SetupSchoolsWithProgressScores();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.PrimarySchool("100001").ViewSimilarSchools}?sortBy={sortBy}", HttpStatusCode.OK);
+
+        page.QuerySelector("#sort-by option[selected]")!.TextContent.Trim().Should().Be(sortName);
+        var results = page.ElementWithTestIdShouldExist("primary-similar-schools-list").QuerySelectorAll(".app-school-result").ToArray();
+        results.Select(r => r.QuerySelector("a")!.TextContent.Trim()).Should().Equal(expectedOrder);
+        results[0].TextContent.Should().Contain($"{sortName}: {firstScore}");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchools_ProgressFlagOff_HasNoProgressSortOptions()
+    {
+        Fixture.FeatureFlagService.Override(Flags.EnableKs2ProgressMeasures, false);
+        SetupSchoolsWithProgressScores();
+
+        var page = await Fixture.RequestPageAsync($"{Routes.PrimarySchool("100001").ViewSimilarSchools}?sortBy=ReadingProgress", HttpStatusCode.OK);
+
+        page.QuerySelector("#sort-by")!.TextContent.Should().NotContain("Progress score");
+        page.QuerySelector("#sort-by option[selected]")!.TextContent.Trim()
+            .Should().Be("Meeting expected standard in reading, writing and maths");
+    }
+
+    private void SetupSchoolsWithProgressScores()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Alpha School", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100003", "Beta School", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100004", "Gamma School", x => x.Open().Primary().InLA("001")));
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(Build.PrimaryGroup("100001", ["100002", "100003", "100004"]));
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(Build.PrimaryValues(["100001", "100002", "100003", "100004"]));
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100002", x => x
+                .WithProgress("Reading", "-1.3").WithProgress("Writing", "-0.4").WithProgress("Maths", "4")),
+            Build.Ks2Performance.Establishment("100003", x => x
+                .WithProgress("Reading", "2.5").WithProgress("Writing", "z").WithProgress("Maths", "1.25")),
+            Build.Ks2Performance.Establishment("100004", x => x
+                .WithProgress("Reading", "").WithProgress("Writing", "0").WithProgress("Maths", "")));
     }
 
     [Fact]

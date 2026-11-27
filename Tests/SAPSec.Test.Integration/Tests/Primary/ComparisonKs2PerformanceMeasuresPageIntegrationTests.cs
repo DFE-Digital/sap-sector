@@ -19,6 +19,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     public override Task DisposeAsync()
     {
         Fixture.FeatureFlagService.ClearOverrides(Flags.EnablePrimarySchools);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnableKs2ProgressMeasures);
 
         return base.DisposeAsync();
     }
@@ -60,8 +61,9 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
-    public async Task SimilarSchoolComparison_Ks2_DisplaysProgressScoreSection()
+    public async Task SimilarSchoolComparison_Ks2_ProgressScoresFlagOff_DisplaysNoProgressScoresMessage()
     {
+        Fixture.FeatureFlagService.Override(Flags.EnableKs2ProgressMeasures, false);
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Current School", x => x.Open().Primary()),
             Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));

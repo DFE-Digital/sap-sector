@@ -13,7 +13,7 @@
     var hasAnyData = Model.Averages.Any();
     var decimals = Model.MeasureInfo.DataType switch
     {
-        MeasureDataType.Score => 1,
+        MeasureDataType.Score or MeasureDataType.ProgressScore => 1,
         MeasureDataType.ScaledScore or MeasureDataType.DestinationsPercentage => 1,
         MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
         _ => 0
@@ -27,9 +27,18 @@
         _ => (0, 25, 100)
     };
     var maxDataValue = Model.Averages.Where(a => a.HasValue).Select(a => a!.Value).DefaultIfEmpty(0).Max();
-    var axisMax = maxDataValue > defaultAxisMax
+    decimal axisMax = maxDataValue > defaultAxisMax
         ? (int)(Math.Ceiling(maxDataValue / axisStep) * axisStep)
         : defaultAxisMax;
+    decimal axisMinValue = axisMin;
+    decimal axisStepValue = axisStep;
+
+    // Progress scores can be negative with no fixed range, so the axis is worked out from the data
+    // and always includes 0 (bars diverge left/right from the 0 baseline).
+    if (Model.MeasureInfo.DataType == MeasureDataType.ProgressScore)
+    {
+        (axisMinValue, axisStepValue, axisMax) = ProgressScoreAxis.For(Model.Averages);
+    }
 }
 
 <div class="app-measure-chart-container">
@@ -40,14 +49,15 @@
                   class="js-chart js-chart--school-measure-bar"
                   data-type="bar"
                   data-show-no-data-labels="true"
-                  data-axis-min="@axisMin"
-                  data-axis-step="@axisStep"
-                  data-axis-max="@axisMax"
+                  data-axis-min="@axisMinValue.ToString("0.######", System.Globalization.CultureInfo.InvariantCulture)"
+                  data-axis-step="@axisStepValue.ToString("0.######", System.Globalization.CultureInfo.InvariantCulture)"
+                  data-axis-max="@axisMax.ToString("0.######", System.Globalization.CultureInfo.InvariantCulture)"
                   data-label-decimals="@decimals"
                   data-tooltip-decimals="@decimals"
                   data-category-percentage="0.6"
                   data-bar-percentage="1"
                   data-bar-thickness="50"
+                  data-axis-include-zero="@(Model.MeasureInfo.DataType == MeasureDataType.ProgressScore ? "true" : "false")"
                   data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or 
                                                                     MeasureDataType.OverallAbsencePercentage or 
                                                                     MeasureDataType.PersistentAbsencePercentage or

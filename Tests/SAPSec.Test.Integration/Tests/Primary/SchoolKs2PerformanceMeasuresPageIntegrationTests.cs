@@ -19,13 +19,15 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     public override Task DisposeAsync()
     {
         Fixture.FeatureFlagService.ClearOverrides(Flags.EnablePrimarySchools);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnableKs2ProgressMeasures);
 
         return base.DisposeAsync();
     }
 
     [Fact]
-    public async Task Progress8_MeasureExistsOnPage()
+    public async Task ProgressScoresFlagOff_ShowsNoProgressScoresMessage()
     {
+        Fixture.FeatureFlagService.Override(Flags.EnableKs2ProgressMeasures, false);
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
 

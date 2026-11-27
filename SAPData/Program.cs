@@ -66,9 +66,16 @@ internal class Program
             Console.WriteLine($"Loaded {dataMaps.Count} DataMap rows");
 
             var rebuildAllRawTables = ShouldRebuildAllRawTables(configuration);
+            // Dated entries (e.g. edubasealldataYYYYmmDD) are resolved to the dated files downloaded for this run,
+            // because raw table names are built from the dated key and the pattern itself never matches.
             var logicalKeysToRebuild = rebuildAllRawTables
                 ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-                : LoadLogicalKeysToRebuild(rawTablesToRebuildPath);
+                : RebuildListKeys.ExpandDatedKeys(
+                    LoadLogicalKeysToRebuild(rawTablesToRebuildPath),
+                    Directory.Exists(rawInputDir)
+                        ? Directory.GetFiles(rawInputDir, "*.csv").Select(RebuildListKeys.LogicalKeyForFile)
+                        : [],
+                    Console.WriteLine);
             WriteCleanupSql(
                 Path.Combine(sqlDir, "00_cleanup.sql"),
                 logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName),

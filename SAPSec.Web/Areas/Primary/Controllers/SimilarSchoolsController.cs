@@ -38,7 +38,9 @@ public class SimilarSchoolsController(
             urn,
             filterBy,
             sortBy,
-            page));
+            page,
+            IncludeProgressScores: await featureFlagService.IsEnabledAsync(Flags.EnableKs2ProgressMeasures),
+            UseEarliestProgressYearAsLatest: await featureFlagService.IsEnabledAsync(Flags.Ks2ProgressUseEarliestYearAsLatest)));
 
         if (!response.HasSimilarSchools)
         {
