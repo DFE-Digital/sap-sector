@@ -1,7 +1,7 @@
 ARM_TEMPLATE_TAG=1.1.10
 RG_TAGS={"Product" : "Get School Improvement Insights", "Service Offering" : "Get School Improvement Insights"}
 REGION=UK South
-SERVICE_NAME=get-school-improvement-insights
+SERVICE_NAME=compare-connect-similar-schools
 SERVICE_SHORT=sapsec
 DOCKER_REPOSITORY=ghcr.io/dfe-digital/sap-sector
 

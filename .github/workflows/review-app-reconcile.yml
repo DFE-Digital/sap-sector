@@ -20,7 +20,7 @@ env:
   GLOBAL_CONFIG_PATH: global_config
   TF_VARS_PATH: terraform/application/config
   TERRAFORM_BASE: terraform/application
-  SERVICE_NAME: get-school-improvement-insights
+  SERVICE_NAME: compare-connect-similar-schools
   RESOURCE_GROUP_NAME: s189t01-sapsec-rv-rg
   STORAGE_ACCOUNT_NAME: s189t01sapsecrvtfsa
   CONTAINER_NAME: terraform-state
