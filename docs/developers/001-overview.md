@@ -22,7 +22,7 @@ It is a public-facing ASP.NET Core MVC application.
 
 - ASP.NET Core MVC (.NET)
 - PostgreSQL for data storage
-- Lucene for search
+- Postgres full text search
 - DfE Sign-in for authentication
 - GOV.UK / DfE Frontend
 - Playwright for end-to-end testing

@@ -15,6 +15,7 @@
 \ir 04_v_establishment_absence.sql
 \ir 04_v_establishment_destinations.sql
 \ir 04_v_establishment_email.sql
+\ir 04_v_establishment_exclusions.sql
 \ir 04_v_establishment_group_links.sql
 \ir 04_v_establishment_ks2_performance.sql
 \ir 04_v_establishment_links.sql
@@ -26,6 +27,7 @@
 \ir 04_v_la_ks2_performance.sql
 \ir 04_v_la_performance.sql
 \ir 04_v_la_subject_entries.sql
+\ir 05_v_establishment_search.sql
 \ir 10_indexes.sql
 \ir 50_v_similar_schools_primary_groups.sql
 \ir 50_v_similar_schools_primary_values.sql
@@ -40,6 +42,7 @@
 \ir 61_v_establishment_absence.sql
 \ir 61_v_establishment_destinations.sql
 \ir 61_v_establishment_email.sql
+\ir 61_v_establishment_exclusions.sql
 \ir 61_v_establishment_group_links.sql
 \ir 61_v_establishment_ks2_performance.sql
 \ir 61_v_establishment_links.sql

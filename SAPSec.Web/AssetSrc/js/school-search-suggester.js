@@ -89,16 +89,17 @@
 
     // debounce and/or cancel ongoing suggestions to prevent excessive requests
     let suggesting = false;
-    const source = debounce(
+    const source = window.debounce(
         (query, populateResults) => {
             const trimmedQuery = query.trim();
 
             if (suggesting) {
-                abortController.abort("Query updated");
+                abortController.abort();
                 abortController = new AbortController();
             }
 
-            if (trimmedQuery.length < 3) {
+            // the input may have been cleared/changed while this debounced call was pending
+            if (trimmedQuery.length < 3 || inputElement.value.trim() !== trimmedQuery) {
                 populateResults([]);
                 return;
             }
@@ -118,7 +119,8 @@
             suggesting = true;
             handleSuggest(trimmedQuery)
                 .then((results) => {
-                    populateResults(results);
+                    // discard responses for text that is no longer in the box
+                    populateResults(inputElement.value.trim() === trimmedQuery ? results : []);
                 })
                 .catch((e) => {
                     if (e.name !== "AbortError") {
@@ -205,6 +207,12 @@
             }
 
             inputElement.value = value;
+
+            // cancel any in-flight suggestion request once the text is too short
+            if ((value ?? "").trim().length < 3) {
+                abortController.abort();
+                abortController = new AbortController();
+            }
 
             // clear any previously selected school
             if (e.key !== "Enter") {

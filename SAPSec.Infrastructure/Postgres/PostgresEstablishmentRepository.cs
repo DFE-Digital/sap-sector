@@ -1,7 +1,9 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
+using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
+using System.Diagnostics;
 
 namespace SAPSec.Infrastructure.Postgres;
 
@@ -48,6 +50,75 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
 
         var result = await conn.QueryAsync<Establishment>(sql, new { urns = urns.ToArray() });
         return result.ToList();
+    }
+
+    public async Task<IReadOnlyCollection<EstablishmentSearchHit>> SearchEstablishmentsAsync(string query, int maxResults, bool isBroadTerm)
+    {
+        var tokens = SearchTokeniser.Tokenise(query);
+        if (tokens.Count == 0)
+        {
+            return [];
+        }
+
+        var head = string.Join(' ', tokens.Take(tokens.Count - 1));
+        var last = tokens[^1];
+
+        var sw = Stopwatch.StartNew();
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+
+        var connectMs = sw.ElapsedMilliseconds;
+
+        const string RankedSql = """
+            WITH q AS (
+                SELECT to_tsquery('simple', concat_ws(' & ',
+                    NULLIF(array_to_string(array_remove(regexp_split_to_array(trim(normalize_text(@head)), '\s+'), ''), ' & '), ''),
+                    @last || ':*')) AS tsq
+            )
+            SELECT e."URN", e."EstablishmentName"
+            FROM public.v_establishment e
+            JOIN public.v_establishment_search s ON s."URN" = e."URN"
+            CROSS JOIN q
+            WHERE s."SearchFTS" @@ q.tsq
+              AND (trim(e."PhaseOfEducationId") IN ('2', '4', '7')
+                   OR lower(trim(e."PhaseOfEducationName")) IN ('primary', 'secondary', 'all-through'))
+            ORDER BY ts_rank_cd(s."SearchFTS", q.tsq) DESC, e."EstablishmentName"
+            LIMIT @maxResults;
+        """;
+        
+        const string BroadTermSql = """
+            WITH q AS (
+                SELECT to_tsquery('simple', concat_ws(' & ',
+                    NULLIF(array_to_string(array_remove(regexp_split_to_array(trim(normalize_text(@head)), '\s+'), ''), ' & '), ''),
+                    @last || ':*')) AS tsq
+            ),
+            candidates AS MATERIALIZED (
+            SELECT e."URN", e."EstablishmentName", s."SearchFTS", q.tsq
+            FROM public.v_establishment e
+            JOIN public.v_establishment_search s ON s."URN" = e."URN"
+            CROSS JOIN q
+            WHERE s."SearchFTS" @@ q.tsq
+              AND (trim(e."PhaseOfEducationId") IN ('2', '4', '7')
+                   OR lower(trim(e."PhaseOfEducationName")) IN ('primary', 'secondary', 'all-through'))
+            LIMIT @candidateLimit
+        )
+        SELECT "URN", "EstablishmentName"
+        FROM candidates
+        ORDER BY ts_rank_cd("SearchFTS", tsq) DESC, "EstablishmentName"
+        LIMIT @maxResults;
+        """;
+
+        var candidateLimit = Math.Max(maxResults * 5, 100);
+
+        var sql = isBroadTerm ? BroadTermSql : RankedSql;
+
+        var result = (await conn.QueryAsync<EstablishmentSearchHit>(sql, new { head, last, maxResults, candidateLimit })).ToList();
+
+        sw.Stop();
+
+        Console.WriteLine($"SearchEstablishments '{query}' returned {result.Count} hits in {sw.ElapsedMilliseconds} ms (connect {connectMs} ms)");
+
+        return result;
     }
 
     public async Task<Establishment?> GetEstablishmentAsync(string urn)

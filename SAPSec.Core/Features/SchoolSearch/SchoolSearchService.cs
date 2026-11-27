@@ -14,15 +14,18 @@ public class SchoolSearchService(
     IFeatureFlagService _featureFlagService,
     ICurrentTimeProvider timeProvider) : ISchoolSearchService
 {
-    private const int MaxResults = 1000;
-    private const int MaxSuggestions = 10;
+    private const int MaxSearchResults = 1000;
+    private const int SearchReturnLimit = 1000;
+    private const int MaxSuggestionResults = 100;
+    private const int SuggestionReturnLimit = 10;
+
     private static readonly Regex Numeric = new Regex(@"^\d+$", RegexOptions.Compiled);
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
-        => await SearchInternalAsync(query, MaxResults, includeCoordinates: true);
+        => await SearchInternalAsync(query, MaxSearchResults, SearchReturnLimit, includeCoordinates: true);
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
-        => await SearchInternalAsync(queryPart, MaxSuggestions, includeCoordinates: false);
+        => await SearchInternalAsync(queryPart, MaxSuggestionResults, SuggestionReturnLimit, includeCoordinates: false);
 
     public async Task<Establishment?> SearchByNumberAsync(string schoolNumber)
     {
@@ -45,7 +48,7 @@ public class SchoolSearchService(
             : null;
     }
 
-    private async Task<IReadOnlyList<SchoolSearchResult>> SearchInternalAsync(string query, int maxResults, bool includeCoordinates)
+    private async Task<IReadOnlyList<SchoolSearchResult>> SearchInternalAsync(string query, int maxResults, int returnLimit, bool includeCoordinates)
     {
         var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(Flags.EnablePrimarySchools);
         var allThroughSchoolsEnabled = await _featureFlagService.IsEnabledAsync(Flags.EnableAllThroughSchools);
@@ -84,6 +87,6 @@ public class SchoolSearchService(
             results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, latLong));
         }
 
-        return results.OrderBy(r => r.EstablishmentName).ToList();
+        return results.Take(returnLimit).OrderBy(r => r.EstablishmentName).ToList();
     }
 }
