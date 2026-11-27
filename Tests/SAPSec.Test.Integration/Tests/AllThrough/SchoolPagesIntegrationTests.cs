@@ -23,6 +23,7 @@ public class SchoolPagesIntegrationTests(
     {
         Fixture.FeatureFlagService.ClearOverrides(Flags.EnableAllThroughSchools);
         Fixture.FeatureFlagService.ClearOverrides(Flags.EnableRiseResources);
+        Fixture.FeatureFlagService.ClearOverrides(Flags.EnableKs2ProgressMeasures);
 
         return base.DisposeAsync();
     }
@@ -243,6 +244,7 @@ public class SchoolPagesIntegrationTests(
     public async Task ViewSimilarSchoolsPage_PrimaryTab_ShowsPrimarySimilarSchoolsList()
     {
         SetupAllThroughSchoolWithPrimarySimilarSchools();
+        Fixture.FeatureFlagService.Override(Flags.EnableKs2ProgressMeasures, false);
 
         var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
 
@@ -266,9 +268,33 @@ public class SchoolPagesIntegrationTests(
     }
 
     [Fact]
+    public async Task ViewSimilarSchoolsPage_PrimaryTab_ProgressFlagOn_DefaultsToProgressScoreInReading()
+    {
+        SetupAllThroughSchoolWithPrimarySimilarSchools(count: 3);
+        Fixture.FeatureFlagService.Override(Flags.EnableKs2ProgressMeasures, true);
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100002", x => x.WithProgress("Reading", "-0.5")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithProgress("Reading", "3.1")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithProgress("Reading", "")));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+
+        page.QuerySelectorAll("#sort-by option").Select(o => o.TextContent.Trim()).Take(3)
+            .Should().Equal("Progress score in reading", "Progress score in writing", "Progress score in maths");
+        page.QuerySelector("#sort-by option[selected]")!.TextContent.Trim().Should().Be("Progress score in reading");
+
+        var results = page.ElementWithTestIdShouldExist("primary-similar-schools-list").QuerySelectorAll(".app-school-result").ToArray();
+        results.Select(r => r.QuerySelector("a")!.TextContent.Trim())
+            .Should().Equal("Similar School 02", "Similar School 01", "Similar School 03");
+        results[0].TextContent.Should().Contain("Progress score in reading: 3.1");
+        results[2].TextContent.Should().Contain("Progress score in reading: No available data");
+    }
+
+    [Fact]
     public async Task ViewSimilarSchoolsPage_PrimaryTab_ShowsPaginationForPrimarySimilarSchools()
     {
         SetupAllThroughSchoolWithPrimarySimilarSchools();
+        Fixture.FeatureFlagService.Override(Flags.EnableKs2ProgressMeasures, false);
 
         var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
 
@@ -317,6 +343,7 @@ public class SchoolPagesIntegrationTests(
         page.ElementWithTestIdShouldExist("secondary-similar-schools-filter");
         page.QuerySelector(".app-similar-schools-sort label")!.TextContent.Trim().Should().Be("Sort by");
         page.QuerySelector("#sort-by option[selected]")!.TextContent.Trim().Should().Be("Attainment 8");
+        page.QuerySelector("#sort-by")!.TextContent.Should().NotContain("Progress score");
         page.QuerySelector("#similar-schools-results-count")!.TextContent.Trim()
             .Should().Be("Showing 1-10 of 50 similar schools");
         page.QuerySelector("#toggleViewLink")!.TextContent.Trim().Should().Contain("View on map");

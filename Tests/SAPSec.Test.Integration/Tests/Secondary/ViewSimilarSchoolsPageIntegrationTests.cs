@@ -181,6 +181,8 @@ public class ViewSimilarSchoolsPageIntegrationTests(
 
         page.QuerySelector("#sort-by")?.TextContent.Should().Contain("Attainment 8");
         page.QuerySelector("#sort-by")?.TextContent.Should().Contain("English and maths GCSEs (Grade 5 and above)");
+        // Progress scores are primary only (the KS2 progress flag is on in the integration test settings).
+        page.QuerySelector("#sort-by")!.TextContent.Should().NotContain("Progress score");
 
         var links = list.QuerySelectorAll("a").Select(x => x.GetAttribute("href"));
         links.Should().BeEquivalentTo([

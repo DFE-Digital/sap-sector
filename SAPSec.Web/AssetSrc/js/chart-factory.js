@@ -460,6 +460,42 @@ function toFixedRoundedHalfAwayFromZero(value, decimals) {
     return rounded.toFixed(decimals);
 }
 
+// True when a value shows as zero once rounded for its label (e.g. 0.04 and -0.04 both show "0.0").
+function roundsToZero(value, decimals) {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
+        return false;
+    }
+
+    return Number(toFixedRoundedHalfAwayFromZero(Number(value), decimals)) === 0;
+}
+
+// Diverging (progress score) bar charts: a value whose label reads zero gets no bar, only its label
+// next to the 0 line. Otherwise minBarLength and the axis scale draw a sliver of varying width, so
+// two "0.0" labels could look different. The value is snapped to 0 so its label sits on the
+// positive side of the 0 line, like any other small positive value.
+function hideBarsThatRoundToZero(datasets, decimals) {
+    datasets.forEach(dataset => {
+        if (!Array.isArray(dataset.data)) {
+            return;
+        }
+
+        dataset.data = dataset.data.map(value => roundsToZero(value, decimals) ? 0 : value);
+
+        const isZeroBar = ctx => ctx.raw === 0;
+        const background = dataset.backgroundColor;
+        const border = dataset.borderColor;
+        const borderWidth = dataset.borderWidth;
+        const pick = (option, ctx) => Array.isArray(option) ? option[ctx.dataIndex % option.length] : option;
+
+        dataset.backgroundColor = ctx => isZeroBar(ctx) ? 'transparent' : pick(background, ctx);
+        dataset.hoverBackgroundColor = dataset.backgroundColor;
+        if (border !== undefined) {
+            dataset.borderColor = ctx => isZeroBar(ctx) ? 'transparent' : pick(border, ctx);
+        }
+        dataset.borderWidth = ctx => isZeroBar(ctx) ? 0 : (pick(borderWidth, ctx) ?? 0);
+    });
+}
+
 function formatTooltipValue(value, axisSuffix, decimals) {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
         return 'No data';
@@ -1232,6 +1268,10 @@ function initCharts(canvas) {
                 }
                 return `${toFixedRoundedHalfAwayFromZero(Number(value), labelDecimals)}${axisSuffix}`;
             };
+        }
+
+        if (diverging && labelDecimals !== null) {
+            hideBarsThatRoundToZero(config.data.datasets, labelDecimals);
         }
 
         const chart = new Chart(canvas, config);

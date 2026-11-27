@@ -39,7 +39,10 @@ public class FindPrimarySimilarSchoolsUseCase(
         var filtered = filters.Filter(data.SimilarSchools, i => i.SimilarSchool);
 
         var sortBy = request.SortBy ?? string.Empty;
-        var sorting = new PrimarySimilarSchoolsSorting(sortBy);
+        var sorting = new PrimarySimilarSchoolsSorting(
+            sortBy,
+            request.IncludeProgressScores,
+            request.UseEarliestProgressYearAsLatest);
         var sorted = sorting.Sort(filtered);
 
         var allResults = sorted
@@ -58,7 +61,7 @@ public class FindPrimarySimilarSchoolsUseCase(
 
         return new(
             currentSchoolInfo,
-            sorting.GetPossibleOptions(sortBy).ToList().AsReadOnly(),
+            sorting.GetPossibleOptions().ToList().AsReadOnly(),
             filters.AsAvailableFilters(data.SimilarSchools, i => i.SimilarSchool),
             resultsPage,
             allResults,
@@ -72,7 +75,9 @@ public record FindPrimarySimilarSchoolsRequest(
     IDictionary<string, IEnumerable<string>>? FilterBy = null,
     string? SortBy = null,
     string? Page = null,
-    int ResultsPerPage = 10);
+    int ResultsPerPage = 10,
+    bool IncludeProgressScores = false,
+    bool UseEarliestProgressYearAsLatest = false);
 
 public record FindPrimarySimilarSchoolsResponse(
     SchoolInfo.SchoolInfo CurrentSchool,

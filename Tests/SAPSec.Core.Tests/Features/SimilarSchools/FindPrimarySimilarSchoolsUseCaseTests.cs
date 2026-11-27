@@ -4698,6 +4698,194 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             .Should().Equal(expectedUrnsOnPage);
     }
 
+    private static readonly string[] AllSortKeysWithProgress = [
+        "ReadingProgress", "WritingProgress", "MathsProgress",
+        "RwmExpected", "RwmHigher", "ReadingScaledScore", "MathsScaledScore", "GpsExpected", "GpsHigher"
+    ];
+
+    private void SetupProgressSchools()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002", EstablishmentName = "Delta School" },
+            new() { URN = "100003", EstablishmentName = "Charlie School" },
+            new() { URN = "100004", EstablishmentName = "Bravo School" },
+            new() { URN = "100005", EstablishmentName = "Alpha School" },
+            new() { URN = "100006", EstablishmentName = "Echo School" }
+        );
+        _performanceRepo.SetupEstablishmentPerformance(
+            new()
+            {
+                Id = "100002",
+                ReadingProgress_Tot_Cohort_Est_Current_Num = "1.24", WritingProgress_Tot_Cohort_Est_Current_Num = "-0.5", MathsProgress_Tot_Cohort_Est_Current_Num = "3",
+                ReadingProgress_Tot_Cohort_Est_Previous2_Num = "-4"
+            },
+            new()
+            {
+                Id = "100003",
+                ReadingProgress_Tot_Cohort_Est_Current_Num = "-2.3", WritingProgress_Tot_Cohort_Est_Current_Num = "2.1", MathsProgress_Tot_Cohort_Est_Current_Num = "z",
+                ReadingProgress_Tot_Cohort_Est_Previous2_Num = "5"
+            },
+            new()
+            {
+                Id = "100004",
+                ReadingProgress_Tot_Cohort_Est_Current_Num = "z", WritingProgress_Tot_Cohort_Est_Current_Num = "0", MathsProgress_Tot_Cohort_Est_Current_Num = "-1.05",
+                ReadingProgress_Tot_Cohort_Est_Previous2_Num = "0.1"
+            },
+            new()
+            {
+                Id = "100005",
+                ReadingProgress_Tot_Cohort_Est_Current_Num = "1.2", WritingProgress_Tot_Cohort_Est_Current_Num = "", MathsProgress_Tot_Cohort_Est_Current_Num = "0.4",
+                ReadingProgress_Tot_Cohort_Est_Previous2_Num = "z"
+            },
+            new()
+            {
+                Id = "100006",
+                ReadingProgress_Tot_Cohort_Est_Current_Num = "", WritingProgress_Tot_Cohort_Est_Current_Num = "x", MathsProgress_Tot_Cohort_Est_Current_Num = "",
+                ReadingProgress_Tot_Cohort_Est_Previous2_Num = ""
+            }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" },
+            new() { URN = "100001", NeighbourURN = "100006" }
+        );
+    }
+
+    private static FindPrimarySimilarSchoolsRequest ProgressRequest(string? sortBy = null, bool useEarliestYear = false) =>
+        new("100001", new Dictionary<string, IEnumerable<string>>(), sortBy ?? "", "", IncludeProgressScores: true, UseEarliestProgressYearAsLatest: useEarliestYear);
+
+    [Fact]
+    public async Task SortBy_WithProgressScores_ListsProgressOptionsFirstInOrder()
+    {
+        SetupProgressSchools();
+
+        var response = await _sut.Execute(ProgressRequest());
+
+        response.SortOptions.Select(o => o.Key).Should().Equal(AllSortKeysWithProgress);
+        response.SortOptions.Select(o => o.Name).Should().Equal(
+            "Progress score in reading",
+            "Progress score in writing",
+            "Progress score in maths",
+            "Meeting expected standard in reading, writing and maths",
+            "Achieved a higher standard in reading, writing and maths",
+            "Average scaled score in reading",
+            "Average scaled score in maths",
+            "Meeting expected standard in grammar, punctuation and spelling",
+            "Achieved a higher standard in grammar, punctuation and spelling");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("XXX")]
+    [InlineData("ReadingProgress")]
+    [InlineData("readingprogress")]
+    public async Task SortBy_WithProgressScores_DefaultsToReadingProgress(string? sortBy)
+    {
+        SetupProgressSchools();
+
+        var response = await _sut.Execute(ProgressRequest(sortBy));
+
+        // 1.24 and 1.2 both show as 1.2, so they tie and are ordered A to Z; missing data goes last, A to Z.
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+            .Should().Equal(
+                ("100005", DataWithAvailability.Available("1.2")),
+                ("100002", DataWithAvailability.Available("1.2")),
+                ("100003", DataWithAvailability.Available("-2.3")),
+                ("100004", DataWithAvailability.NotAvailable<string>()),
+                ("100006", DataWithAvailability.NotAvailable<string>()));
+        response.AllResults.Should().AllSatisfy(r => r.SortValue.Name.Should().Be("Progress score in reading"));
+
+        response.SortOptions.Where(o => o.Selected).Select(o => o.Key).Should().Equal("ReadingProgress");
+    }
+
+    [Theory]
+    [InlineData("WritingProgress")]
+    [InlineData("writingprogress")]
+    public async Task SortBy_WritingProgress(string sortBy)
+    {
+        SetupProgressSchools();
+
+        var response = await _sut.Execute(ProgressRequest(sortBy));
+
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+            .Should().Equal(
+                ("100003", DataWithAvailability.Available("2.1")),
+                ("100004", DataWithAvailability.Available("0.0")),
+                ("100002", DataWithAvailability.Available("-0.5")),
+                ("100005", DataWithAvailability.NotAvailable<string>()),
+                ("100006", DataWithAvailability.NotAvailable<string>()));
+        response.AllResults.Should().AllSatisfy(r => r.SortValue.Name.Should().Be("Progress score in writing"));
+
+        response.SortOptions.Where(o => o.Selected).Select(o => o.Key).Should().Equal("WritingProgress");
+    }
+
+    [Theory]
+    [InlineData("MathsProgress")]
+    [InlineData("mathsprogress")]
+    public async Task SortBy_MathsProgress(string sortBy)
+    {
+        SetupProgressSchools();
+
+        var response = await _sut.Execute(ProgressRequest(sortBy));
+
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+            .Should().Equal(
+                ("100002", DataWithAvailability.Available("3.0")),
+                ("100005", DataWithAvailability.Available("0.4")),
+                ("100004", DataWithAvailability.Available("-1.1")),
+                ("100003", DataWithAvailability.NotAvailable<string>()),
+                ("100006", DataWithAvailability.NotAvailable<string>()));
+        response.AllResults.Should().AllSatisfy(r => r.SortValue.Name.Should().Be("Progress score in maths"));
+
+        response.SortOptions.Where(o => o.Selected).Select(o => o.Key).Should().Equal("MathsProgress");
+    }
+
+    [Fact]
+    public async Task SortBy_WithProgressScores_OtherMeasuresStillSort()
+    {
+        SetupProgressSchools();
+
+        var response = await _sut.Execute(ProgressRequest("GpsHigher"));
+
+        response.SortOptions.Where(o => o.Selected).Select(o => o.Key).Should().Equal("GpsHigher");
+        response.AllResults.Should().AllSatisfy(r =>
+            r.SortValue.Name.Should().Be("Achieved a higher standard in grammar, punctuation and spelling"));
+    }
+
+    [Fact]
+    public async Task SortBy_WithProgressScoresAndEarliestYearAsLatest_SortsOnEarliestYear()
+    {
+        SetupProgressSchools();
+
+        var response = await _sut.Execute(ProgressRequest(useEarliestYear: true));
+
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
+            .Should().Equal(
+                ("100003", DataWithAvailability.Available("5.0")),
+                ("100004", DataWithAvailability.Available("0.1")),
+                ("100002", DataWithAvailability.Available("-4.0")),
+                ("100005", DataWithAvailability.NotAvailable<string>()),
+                ("100006", DataWithAvailability.NotAvailable<string>()));
+    }
+
+    [Theory]
+    [InlineData("ReadingProgress")]
+    [InlineData("WritingProgress")]
+    [InlineData("MathsProgress")]
+    public async Task SortBy_WithoutProgressScores_ProgressKeysFallBackToRwmExpected(string sortBy)
+    {
+        SetupProgressSchools();
+
+        var response = await _sut.Execute(Request("100001", sortBy: sortBy));
+
+        response.SortOptions.Select(o => o.Key).Should().Equal(AllSortKeysWithProgress.Skip(3));
+        response.SortOptions.Where(o => o.Selected).Select(o => o.Key).Should().Equal("RwmExpected");
+    }
+
     private FindPrimarySimilarSchoolsRequest Request(string urn, Dictionary<string, IEnumerable<string>>? filterBy = null, string? sortBy = null, string? page = null, int? resultsPerPage = null) =>
         resultsPerPage is int rpp
             ? new(urn, filterBy ?? [], sortBy ?? "", page ?? "", rpp)
