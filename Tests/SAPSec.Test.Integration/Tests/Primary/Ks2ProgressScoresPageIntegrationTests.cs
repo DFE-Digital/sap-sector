@@ -86,11 +86,20 @@ public class Ks2ProgressScoresPageIntegrationTests(
         var details = page.ElementWithTestIdShouldExist("progress-rwm-details");
         details.TagName.Should().BeEquivalentTo("details");
         details.HasAttribute("open").Should().BeFalse();
+        details.QuerySelector("summary")!.TrimmedTextContent()
+            .Should().Be("Information about progress scores in reading, writing and maths");
+        details.QuerySelectorAll("li").Select(li => li.TrimmedTextContent()).Should().Equal(
+            "0 means pupils made about the same progress as similar pupils across England.",
+            "A positive score means pupils made more progress.",
+            "A negative score means pupils made less progress.");
+        details.QuerySelectorAll("h3").Select(h => h.TrimmedTextContent()).Should().Equal(
+            "How the number of pupils affects the score",
+            "Further information on progress measures");
 
         var technicalGuidance = page.ElementWithTestIdShouldExist<IHtmlAnchorElement>("progress-rwm-technical-guidance-link");
         technicalGuidance.Href.Should().Be("https://www.gov.uk/government/publications/primary-school-accountability");
         technicalGuidance.Target.Should().Be("_blank");
-        technicalGuidance.TrimmedTextContent().Should().StartWith("Technical guidance");
+        technicalGuidance.TrimmedTextContent().Should().Be("Technical guidance on primary school accountability measures guidance (opens in new tab)");
 
         var ees = page.ElementWithTestIdShouldExist<IHtmlAnchorElement>("progress-rwm-ees-link");
         ees.Href.Should().Be("https://explore-education-statistics.service.gov.uk/");
