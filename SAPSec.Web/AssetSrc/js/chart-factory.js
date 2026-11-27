@@ -1079,6 +1079,9 @@ function buildDatasets(type, chartData, colorConfig, barOptions) {
                 pointRadius: ds.pointRadius ?? CHART_CONFIG.line.series.pointRadius,
                 pointHoverRadius: ds.pointHoverRadius ?? CHART_CONFIG.line.series.pointHoverRadius,
                 pointBackgroundColor: ds.pointBackgroundColor || color,
+                // Don't clip points to the chart area: when the axis starts or ends exactly on a value
+                // (e.g. progress scores pinned to a 0 baseline), half the marker would be cut off.
+                clip: false,
                 ...ds,
                 pointStyle,
                 pointHoverStyle: ds.pointHoverStyle || pointStyle
