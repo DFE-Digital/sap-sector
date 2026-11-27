@@ -37,8 +37,8 @@ module "application_configuration" {
   } : {}, contains(["test", "preapproval"], var.config) && var.load_testing_bypass_authentication ? {
     Database__ConnectionTimeoutSeconds = "60"
     LoadTesting__BypassAuthentication  = "true"
-  } : {}, var.config == "preapproval" && var.load_testing_bypass_authentication ? {
-    ASPNETCORE_ENVIRONMENT = "Preapproval"
+  } : {}, var.config == "preapproval" ? {
+    ASPNETCORE_ENVIRONMENT = var.load_testing_bypass_authentication ? "Preapproval" : "Production"
   } : {})
   secret_variables = merge({
     DATABASE_URL                                = module.postgres.url
