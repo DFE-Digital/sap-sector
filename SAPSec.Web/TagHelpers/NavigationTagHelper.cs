@@ -10,7 +10,10 @@ namespace SAPSec.Web.TagHelpers;
 public class NavigationTagHelper(
     BreadcrumbManager breadcrumbManager,
     IUrlHelperFactory urlHelperFactory,
+    // SmartBreadcrumbs uses IActionContextAccessor which is deprecated in ASP.NET Core 8
+    #pragma warning disable ASPDEPR006
     IActionContextAccessor actionContextAccessor,
+    #pragma warning restore ASPDEPR006
     HtmlEncoder htmlEncoder
 ) : BreadcrumbTagHelper(breadcrumbManager, urlHelperFactory, actionContextAccessor, htmlEncoder)
 {

@@ -1,6 +1,9 @@
 ---
-# ASPNETCORE_ENVIRONMENT: "Preapproval"
+ASPNETCORE_ENVIRONMENT: "Preapproval"
 FeatureManagement__EnablePrimarySchools: "true"
 FeatureManagement__EnableAllThroughSchools: "false"
 FeatureManagement__EnableRiseResources: "true"
+FeatureManagement__EnableKs4CoreSubjectsPupilCharacteristics: "true"
 FeatureManagement__EnableFindASchool: "false"
+Caching__EnableUseCaseCaching: "true"
+Analytics__EnableAnalytics: "false"

@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SAPSec.Core.Caching;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.Exclusions;
@@ -13,7 +15,7 @@ namespace SAPSec.Infrastructure.Json;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddJsonDependencies(this IServiceCollection services)
+    public static IServiceCollection AddJsonDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         // JSON files
         services.RemoveAll<IEstablishmentRepository>();
@@ -48,7 +50,6 @@ public static class ServiceCollectionExtensions
         services.AddJsonFile<EstablishmentAbsence>(JsonDataSource.Generated);
         services.AddJsonFile<LAAbsence>(JsonDataSource.Generated);
         services.AddJsonFile<EnglandAbsence>(JsonDataSource.Generated);
-
         services.AddJsonFile<EstablishmentExclusions>(JsonDataSource.Generated);
 
         services.AddSingleton<IEstablishmentRepository, JsonEstablishmentRepository>();

@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using SAPSec.Core.Authentication;
-using SAPSec.Core.Time;
-using SAPSec.Data.Repositories;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolDetails.School;
+using SAPSec.Core.Time;
+using SAPSec.Core.UseCases;
+using SAPSec.Data.Repositories;
 using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
@@ -20,7 +22,7 @@ namespace SAPSec.Web.Tests.Deprecated.Filters;
 
 public class RequireSchoolPhaseFilterTests
 {
-    private readonly Mock<IRequestSchoolAccessor> _requestSchoolAccessorMock = new();
+    private readonly Mock<IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse>> _getSchoolDetailsMock = new();
     private readonly Mock<IFeatureFlagService> _featureFlagServiceMock = new();
 
     public RequireSchoolPhaseFilterTests()
@@ -37,9 +39,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task SecondaryFilter_WithPrimarySchoolIndex_RedirectsToPrimaryPath()
     {
         var school = CreateSchoolDetails("123456", "Primary");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.Secondary,
@@ -55,9 +57,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task PrimaryFilter_WithSecondarySchoolIndex_RedirectsToSecondaryPath()
     {
         var school = CreateSchoolDetails("123456", "Secondary");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.Primary,
@@ -74,9 +76,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task SecondaryFilter_WithPrimarySchoolOnKs4Route_PreservesPathOnPrimaryRedirect()
     {
         var school = CreateSchoolDetails("123456", "Primary");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.Secondary,
@@ -92,9 +94,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task PrimaryFilter_WithSecondarySchoolAndPathBase_PreservesPathBaseInRedirect()
     {
         var school = CreateSchoolDetails("123456", "Secondary");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.Primary,
@@ -112,9 +114,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task PrimaryFilter_WithPrimarySchoolAndPrimaryFeatureDisabled_ReturnsNotFound()
     {
         var school = CreateSchoolDetails("123456", "Primary");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(false);
@@ -133,9 +135,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task PrimaryFilter_WithAllThroughSchoolAndAllThroughFeatureDisabled_ReturnsNotFound()
     {
         var school = CreateSchoolDetails("123456", "All-through");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(false);
@@ -154,9 +156,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task PrimaryFilter_WithAllThroughSchoolAndOnlyAllThroughFeatureEnabled_RedirectsToAllThroughPath()
     {
         var school = CreateSchoolDetails("123456", "All-through");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync(Flags.EnablePrimarySchools))
             .ReturnsAsync(false);
@@ -179,9 +181,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task AllThroughFilter_WithAllThroughSchoolAndAllThroughFeatureEnabled_AllowsExecution()
     {
         var school = CreateSchoolDetails("123456", "All-through");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(true);
@@ -200,9 +202,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task AllThroughFilter_WithAllThroughSchoolAndAllThroughFeatureDisabled_ReturnsNotFound()
     {
         var school = CreateSchoolDetails("123456", "All-through");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync(Flags.EnableAllThroughSchools))
             .ReturnsAsync(false);
@@ -221,9 +223,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task SecondaryFilter_WithUnsupportedSchoolPhase_ReturnsNotFound()
     {
         var school = CreateSchoolDetails("123456", "Special");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.Secondary,
@@ -238,9 +240,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task SecondaryFilter_WithPrimarySchoolOnAttendanceRoute_RedirectsToPrimaryAttendance()
     {
         var school = CreateSchoolDetails("123456", "Primary");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.Secondary,
@@ -256,9 +258,9 @@ public class RequireSchoolPhaseFilterTests
     public async Task SecondaryFilter_WithPrimarySchoolOnDataRoute_PreservesPathOnPrimaryRedirect()
     {
         var school = CreateSchoolDetails("123456", "Primary");
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(school);
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(school));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.Secondary,
@@ -273,12 +275,12 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task SecondaryFilter_WithTwoSecondaryRouteValues_AllowsExecution()
     {
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(CreateSchoolDetails("123456", "Secondary"));
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "654321"))
-            .ReturnsAsync(CreateSchoolDetails("654321", "Secondary"));
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(CreateSchoolDetails("123456", "Secondary")));
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("654321")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(CreateSchoolDetails("654321", "Secondary")));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.Secondary,
@@ -292,12 +294,12 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task SecondaryFilter_WithTwoRouteValuesAndPrimaryMismatch_ReturnsNotFound()
     {
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
-            .ReturnsAsync(CreateSchoolDetails("123456", "Secondary"));
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "654321"))
-            .ReturnsAsync(CreateSchoolDetails("654321", "Primary"));
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("123456")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(CreateSchoolDetails("123456", "Secondary")));
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("654321")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(CreateSchoolDetails("654321", "Primary")));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.Secondary,
@@ -311,9 +313,9 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task PrimaryComparisonParticipantFilter_WithAllThroughPrimaryComparisonUrlAndSecondaryComparator_ReturnsNotFound()
     {
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "137157"))
-            .ReturnsAsync(CreateSchoolDetails("137157", "Secondary"));
+        _getSchoolDetailsMock
+            .Setup(x => x.Execute(new GetSchoolDetailsRequest("137157")))
+            .ReturnsAsync(new GetSchoolDetailsResponse(CreateSchoolDetails("137157", "Secondary")));
 
         var result = await ExecuteFilterAsync(
             ExpectedSchoolPhase.PrimaryComparisonParticipant,
@@ -361,7 +363,7 @@ public class RequireSchoolPhaseFilterTests
 
         var context = new ActionExecutingContext(actionContext, filters, actionArguments, controller: new object());
         var filter = new RequireSchoolPhaseFilter(
-            _requestSchoolAccessorMock.Object,
+            _getSchoolDetailsMock.Object,
             _featureFlagServiceMock.Object,
             new SchoolUserAccessService(
                 Mock.Of<IUserService>(), _featureFlagServiceMock.Object, Mock.Of<IDfeUserIdentifier>(),

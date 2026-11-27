@@ -1,9 +1,9 @@
 using FluentAssertions;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
-using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;
+using SAPSec.Web.Authentication;
 using SAPSec.Web.Constants;
 using System.Net;
 using System.Text.RegularExpressions;

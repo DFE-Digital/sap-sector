@@ -13,12 +13,13 @@ public class GetAllThroughSimilarSchoolPhasesUseCase(
         var primaryGroup = await similarSchoolsPrimaryRepository.GetGroupAsync(request.Urn);
         var secondaryGroup = await similarSchoolsSecondaryRepository.GetGroupAsync(request.Urn);
 
-        return new(primaryGroup.Any(), secondaryGroup.Any());
+        return new(request.Urn, primaryGroup.Any(), secondaryGroup.Any());
     }
 }
 
 public record GetAllThroughSimilarSchoolPhasesRequest(string Urn);
 
 public record GetAllThroughSimilarSchoolPhasesResponse(
+    string Urn,
     bool HasPrimary,
     bool HasSecondary);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SAPSec.Test.Common.Authentication;
+using SAPSec.Core.Caching;
+using SAPSec.Web.Authentication;
 using Xunit;
 
 namespace SAPSec.Test.EndToEnd.Setup;
@@ -12,6 +13,8 @@ public class EndToEndTestsFixture : IAsyncLifetime
 
     public TestUserOrganisation TestUser =>
         _factory!.BrowserHostServices.GetRequiredService<TestUserOrganisation>();
+
+    public ICache Cache => _factory!.Services.GetRequiredService<ICache>();
 
     public Task InitializeAsync()
     {
@@ -26,9 +29,15 @@ public class EndToEndTestsFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        await ClearDown();
         if (_factory != null)
         {
             await _factory.DisposeAsync();
         }
+    }
+
+    public async Task ClearDown()
+    {
+        await Cache.Clear();
     }
 }

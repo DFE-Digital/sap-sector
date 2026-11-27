@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NSubstitute;
 using SAPSec.Core.CustomEvents;
-using SAPSec.Web.Configuration;
+using SAPSec.Web.Analytics;
 using SAPSec.Web.Controllers;
 using System.Net;
 

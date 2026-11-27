@@ -1,14 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SAPSec.Core.Caching;
 using SAPSec.Data.Repositories;
 using SAPSec.Test.Common.InMemory;
+using SAPSec.Web.Extensions;
 
 namespace SAPSec.Test.Integration.Setup;
 
 public class InMemoryRepositoryIntegrationTestsWebApplicationFactory : IntegrationTestsWebApplicationFactory
 {
-    protected override IServiceCollection ConfigureServices(IServiceCollection services)
+    protected override IServiceCollection ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+        services.RemoveAll<ICache>();
+        services.AddSingleton<ICache, InMemoryCache>();
+
         services.RemoveAll<IEstablishmentRepository>();
         services.RemoveAll<ISimilarSchoolsPrimaryRepository>();
         services.RemoveAll<ISimilarSchoolsSecondaryRepository>();

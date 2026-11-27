@@ -32,15 +32,21 @@ module "application_configuration" {
   config_variables = merge({
     ENVIRONMENT_NAME = var.environment
     PGSSLMODE        = local.postgres_ssl_mode
-  }, local.federated_auth_configmap)
+  }, local.federated_auth_configmap, contains(["test", "review"], var.config) ? {
+    Postgres__MaxPoolSize = tostring(var.load_testing_database_max_pool_size)
+    Postgres__ConnectionTimeoutSeconds = "60"
+    Caching__EnableUseCaseCaching  = tostring(var.load_testing_enable_caching)
+    Authentication__BypassAuthentication  = tostring(var.load_testing_bypass_authentication)
+  } : {})
   secret_variables = merge({
     DATABASE_URL                                = module.postgres.url
-    ConnectionStrings__PostgresConnectionString = module.postgres.dotnet_connection_string
+    Postgres__ConnectionString                  = module.postgres.dotnet_connection_string
     DsiConfiguration__ClientSecret              = data.azurerm_key_vault_secret.dsi_client_secret.value
     DsiConfiguration__ApiSecret                 = data.azurerm_key_vault_secret.dsi_api_secret.value
     SENTRY_DSN                                  = data.azurerm_key_vault_secret.sentry_dsn.value
     StorageConnectionString                     = "DefaultEndpointsProtocol=https;AccountName=${module.storage.name};AccountKey=${module.storage.primary_access_key}"
     REDIS_CACHE_URL                             = var.deploy_managed_redis ? module.redis-managed-cache[0].url : null
+    Redis__ConnectionString                     = var.deploy_managed_redis ? module.redis-managed-cache[0].connection_string : null
   }, local.federated_auth_secrets)
 }
 

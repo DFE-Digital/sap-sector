@@ -7,8 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Infrastructure.LuceneSearch;
-using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.Common.FeatureFlags;
+using SAPSec.Web.Authentication;
 using System.Net;
 
 namespace SAPSec.Test.Integration.Setup;
@@ -62,6 +62,7 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
 
     public virtual async Task DisposeAsync()
     {
+        await ClearDown();
         Client?.Dispose();
         NonRedirectingClient?.Dispose();
 
@@ -106,5 +107,6 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
         return document;
     }
 
+    public abstract Task ClearDown();
     protected abstract IntegrationTestsWebApplicationFactory CreateWebApplicationFactory();
 }

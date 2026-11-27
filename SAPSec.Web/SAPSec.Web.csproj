@@ -37,6 +37,7 @@
 		<Content Include="Data\Files\**\*">
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
+		<Content Include="Analytics\ServiceCollectionExtensions.cs" />
 		<Content Update="AssetSrc\images\markers\marker-user.svg">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

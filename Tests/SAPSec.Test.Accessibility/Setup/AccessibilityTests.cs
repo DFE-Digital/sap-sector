@@ -44,6 +44,12 @@ public abstract class AccessibilityTests : PageTest
         Page.SetDefaultNavigationTimeout((float)TimeSpan.FromSeconds(30).TotalMilliseconds);
     }
 
+    public override async Task DisposeAsync()   
+    {
+        await Fixture.ClearDown();
+        await base.DisposeAsync();
+    }
+
     protected async Task NavigateTo(string path)
     {
         var response = await Page.GotoAsync(path);

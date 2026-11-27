@@ -45,7 +45,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
         await Page.GetByRole(AriaRole.Link, new() { Name = ComparatorSchoolName, Exact = true }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).Similarity);
         await Page.GetByRole(AriaRole.Link, new() { Name = "KS2", Exact = true }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).Ks2);
+        await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).KS2);
     }
 
     [Fact]

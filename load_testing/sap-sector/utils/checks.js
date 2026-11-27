@@ -3,6 +3,9 @@ import { Trend, Rate } from 'k6/metrics'
 
 const responseTimeTrend = new Trend('sap_sector_response_time_trend')
 const errorRate = new Rate('sap_sector_error_rate')
+// Correctness only (not latency), so a fast login or error page can't pass as
+// a good response. The capacity test sets per-step thresholds on this.
+const contentFailureRate = new Rate('sap_sector_content_failed')
 
 export function performanceCheck (response, name, threshold = 3000, acceptableStatuses = [200]) {
   responseTimeTrend.add(response.timings.duration)
@@ -27,10 +30,12 @@ export function performanceCheck (response, name, threshold = 3000, acceptableSt
 }
 
 export function contentCheck (response, expectedContent, checkName) {
-  return check(response, {
+  const passed = check(response, {
     [`${checkName}: contains expected content`]: (r) => r.body != null && r.body.includes(expectedContent)
   }, {
     content_check: checkName,
     service: 'sap-sector'
   })
+  contentFailureRate.add(!passed)
+  return passed
 }

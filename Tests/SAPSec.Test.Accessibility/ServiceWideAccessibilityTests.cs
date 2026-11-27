@@ -26,7 +26,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, IT
         new(Routes.PrimarySchool("101206").WhatIsASimilarSchool),
         new(Routes.PrimarySchool("101206").RiseResources),
         new(Routes.PrimarySchool("101206").Comparison("101230").Similarity),
-        new(Routes.PrimarySchool("101206").Comparison("101230").Ks2),
+        new(Routes.PrimarySchool("101206").Comparison("101230").KS2),
         new(Routes.PrimarySchool("101206").Comparison("101230").Attendance),
         new(Routes.PrimarySchool("101206").Comparison("101230").SchoolDetails),
 

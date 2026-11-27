@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Exceptions;
 using SAPSec.Core.FeatureFlags;
+using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
@@ -9,7 +10,6 @@ using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
-using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Components;
 
@@ -21,7 +21,7 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
 public class SimilarSchoolsController(
         IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findSimilarSchoolsUseCase,
-        IRequestSchoolAccessor requestSchoolAccessor,
+        IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
         IFeatureFlagService featureFlagService)
     : Controller
 {
@@ -54,7 +54,6 @@ public class SimilarSchoolsController(
             response.SortOptions,
             response.FilterOptions,
             response.ResultsPage,
-            response.AllResults,
             response.ValidationErrors,
             Routes.PrimarySchool(urn).ViewSimilarSchools,
             Routes.PrimarySchool(urn).WhatIsASimilarSchool,
@@ -76,7 +75,7 @@ public class SimilarSchoolsController(
             hasSimilarSchools,
             includeRise);
 
-        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
+        var schoolDetails = (await getSchoolDetailsUseCase.Execute(new(currentSchool.Urn))).SchoolDetails;
         ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
         ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
         ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);

@@ -1,11 +1,11 @@
 using Deque.AxeCore.Playwright;
 using FluentAssertions;
 using SAPSec.Core.Authentication;
-using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.Accessibility.Setup;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
 using Xunit;
+using SAPSec.Web.Authentication;
 
 namespace SAPSec.Test.Accessibility;
 
@@ -42,7 +42,7 @@ public class SchoolUserAccessibilityTests(AccessibilityTestsFixture fixture) : A
                  {
                      primary.Overview, primary.KS2, primary.Attendance, primary.ViewSimilarSchools,
                      primary.SchoolDetails, primary.WhatIsASimilarSchool, primary.RiseResources,
-                     primary.Comparison("101230").Similarity, primary.Comparison("101230").Ks2,
+                     primary.Comparison("101230").Similarity, primary.Comparison("101230").KS2,
                      primary.Comparison("101230").Attendance, primary.Comparison("101230").SchoolDetails
                  })
         {

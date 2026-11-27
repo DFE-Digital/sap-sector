@@ -2,6 +2,6 @@
 
 namespace SAPSec.Data.Repositories;
 
-public interface ISimilarSchoolsSecondaryRepository : ISimilarSchoolsRepository<SimilarSchoolsSecondaryGroupsEntry, SimilarSchoolsSecondaryValuesEntry>
+public interface ISimilarSchoolsSecondaryRepository : ISimilarSchoolsRepository<SimilarSchoolsSecondaryGroupsEntry, SimilarSchoolsSecondaryValuesEntry>, IRepository
 {
 }

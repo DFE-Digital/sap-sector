@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SAPSec.Data.Repositories;
 
@@ -5,8 +6,9 @@ namespace SAPSec.Infrastructure.Postgres;
 
 public static class PostgresDependenciesExtensions
 {
-    public static IServiceCollection AddPostgresqlDependencies(this IServiceCollection services)
+    public static IServiceCollection AddPostgresqlDependencies(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<PostgresSettings>(configuration.GetSection(PostgresSettings.SectionName));
 
         services.AddSingleton<NpgsqlDataSourceFactory>();
 
@@ -14,11 +16,11 @@ public static class PostgresDependenciesExtensions
         services.AddSingleton<IEstablishmentRepository, PostgresEstablishmentRepository>();
         services.AddSingleton<ISimilarSchoolsPrimaryRepository, PostgresSimilarSchoolsPrimaryRepository>();
         services.AddSingleton<ISimilarSchoolsSecondaryRepository, PostgresSimilarSchoolsSecondaryRepository>();
+        services.AddSingleton<IKs2PerformanceRepository, PostgresKs2PerformanceRepository>();
         services.AddSingleton<IKs4PerformanceRepository, PostgresKs4PerformanceRepository>();
         services.AddSingleton<IKs4DestinationsRepository, PostgresKs4DestinationsRepository>();
         services.AddSingleton<IAbsenceRepository, PostgresAbsenceRepository>();
         services.AddSingleton<IExclusionsRepository, PostgresExclusionsRepository>();
-        services.AddSingleton<IKs2PerformanceRepository, PostgresKs2PerformanceRepository>();
 
         return services;
     }

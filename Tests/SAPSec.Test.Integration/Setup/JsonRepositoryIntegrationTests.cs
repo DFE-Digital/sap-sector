@@ -2,7 +2,7 @@
 
 namespace SAPSec.Test.Integration.Setup;
 
-[Collection("JsonRepositoryIntegrationTestsCollection")]
+[Collection(nameof(JsonRepositoryIntegrationTestsCollection))]
 public abstract class JsonRepositoryIntegrationTests(
     JsonRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : IAsyncLifetime
@@ -11,5 +11,9 @@ public abstract class JsonRepositoryIntegrationTests(
     protected ITestOutputHelper OutputHelper => outputHelper;
 
     public virtual Task InitializeAsync() => Task.CompletedTask;
-    public virtual Task DisposeAsync() => Task.CompletedTask;
+
+    public virtual async Task DisposeAsync()
+    {
+        await Fixture.ClearDown();
+    }
 }

@@ -2,13 +2,17 @@
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Authentication;
+using SAPSec.Core.Caching;
 using SAPSec.Infrastructure.Json;
 using SAPSec.UI.Tests.TestData;
 using SAPSec.Web;
+using SAPSec.Web.Caching;
+using SAPSec.Web.Extensions;
 
 namespace SAPSec.UI.Tests.Deprecated.Infrastructure;
 
@@ -27,6 +31,9 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseContentRoot(webProjectPath);
         builder.UseWebRoot(Path.Combine(webProjectPath, "wwwroot"));
 
+        var configuration = new ConfigurationBuilder()
+            .Build();
+
         builder
             .ConfigureServices(services =>
             {
@@ -35,7 +42,8 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddScoped<IUserService, MockUserService>();
                 services.AddScoped<IDsiClient, MockDsiClient>();
 
-                services.AddJsonDependencies();
+                services.AddJsonDependencies(configuration);
+                services.AddNestedCache<HttpRequestCache, InMemoryCache>();
             });
     }
 

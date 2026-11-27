@@ -1,12 +1,12 @@
-using System.Globalization;
-using System.Net;
 using FluentAssertions;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.FeatureFlags;
 using SAPSec.Data.Dto;
-using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.Integration.Setup;
+using SAPSec.Web.Authentication;
 using SAPSec.Web.Constants;
+using System.Globalization;
+using System.Net;
 
 namespace SAPSec.Test.Integration.Tests;
 
@@ -26,29 +26,28 @@ public class SchoolUserEligibilityIntegrationTests(InMemoryRepositoryIntegration
         return Task.CompletedTask;
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
         fixture.TestUser.Reset();
         fixture.FeatureFlagService.ClearOverrides(Flags.EnableFindASchool);
         fixture.FeatureFlagService.ClearOverrides(Flags.EnablePrimarySchools);
         fixture.FeatureFlagService.ClearOverrides(Flags.EnableAllThroughSchools);
-        fixture.ClearDownRepositories();
-        return Task.CompletedTask;
+        await fixture.ClearDown();
     }
 
     public static IEnumerable<object[]> EligibilityCases()
     {
         foreach (var phase in new[] { "Primary", "Secondary", "All-through", "Nursery", "Special", "Not applicable", "Middle deemed secondary" })
-        foreach (var status in new[] { "1", "2", "3", "4" })
-        {
-            var supported = phase is "Primary" or "Secondary" or "All-through";
-            yield return [phase, status, 1, supported && status != "4"];
-            if (status == "2")
+            foreach (var status in new[] { "1", "2", "3", "4" })
             {
-                yield return [phase, status, 0, supported];
-                yield return [phase, status, -1, false];
+                var supported = phase is "Primary" or "Secondary" or "All-through";
+                yield return [phase, status, 1, supported && status != "4"];
+                if (status == "2")
+                {
+                    yield return [phase, status, 0, supported];
+                    yield return [phase, status, -1, false];
+                }
             }
-        }
     }
 
     [Theory]
@@ -94,7 +93,9 @@ public class SchoolUserEligibilityIntegrationTests(InMemoryRepositoryIntegration
         fixture.FeatureFlagService.Override(Flags.EnableFindASchool, true);
         fixture.EstablishmentRepository.SetupEstablishments(new Establishment
         {
-            URN = Urn, PhaseOfEducationName = "Primary", EstablishmentStatusId = "4"
+            URN = Urn,
+            PhaseOfEducationName = "Primary",
+            EstablishmentStatusId = "4"
         });
 
         var response = await fixture.NonRedirectingClient.GetAsync(Routes.UserHome);

@@ -5,10 +5,13 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Core.Caching;
 using SAPSec.Core.CustomEvents;
 using SAPSec.Infrastructure.Json;
-using SAPSec.Test.Common.Authentication;
 using SAPSec.Web;
+using SAPSec.Web.Authentication;
+using SAPSec.Web.Caching;
+using SAPSec.Web.Extensions;
 using SAPSec.Web.Services;
 
 namespace SAPSec.Test.Accessibility.Setup;
@@ -32,20 +35,20 @@ public class AccessibilityTestsWebApplicationFactory : WebApplicationFactory<Pro
         builder.UseContentRoot(webProjectPath);
         builder.UseWebRoot(Path.Combine(webProjectPath, "wwwroot"));
 
-        var configuration = new ConfigurationBuilder()
-            .AddTestDsiConfiguration()
-            .Build();
-
         builder
-            .UseConfiguration(configuration)
             .ConfigureAppConfiguration(configurationBuilder =>
             {
                 configurationBuilder.AddTestDsiConfiguration();
             })
-            .ConfigureServices(services =>
+            .ConfigureServices((context, services) =>
             {
-                services.AddTestDsiDependencies();
-                services.AddJsonDependencies();
+                services.AddJsonDependencies(context.Configuration);
+                services.AddCaching(context.Configuration, (services, config) =>
+                {
+                    // If caching is enabled:
+                    services.AddSingleton<HttpRequestCache>();
+                    services.AddNestedCache<HttpRequestCache, InMemoryCache>();
+                });
                 services.AddScoped<ICustomEventService, NoOpCustomEventService>();
             });
     }

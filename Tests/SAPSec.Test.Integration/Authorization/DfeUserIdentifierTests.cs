@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using SAPSec.Core.Authentication;
-using SAPSec.Test.Common.Authentication;
+using SAPSec.Web.Authentication;
 using SAPSec.Web.Authorization;
 using System.Security.Claims;
 

@@ -27,6 +27,22 @@ on:
         required: false
         type: boolean
         default: true
+      load-test-pool-size:
+        description: "Database connections per app replica for Test or Review"
+        type: choice
+        default: '100'
+        options:
+          - '100'
+          - '200'
+          - '300'
+      load-test-auth-bypass:
+        description: "Enable synthetic authentication on a restricted Test deployment"
+        type: boolean
+        default: false
+      load-test-enable-caching:
+        description: "Enable use case caching"
+        type: boolean
+        default: false
   push:
     branches:
       - main
@@ -498,6 +514,30 @@ jobs:
           echo "Review DB restore failed after $max_attempts attempts."
           exit 2
 
+      - name: Flush PR review Redis cache
+        if: ${{ steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
+        shell: bash
+        env:
+          AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}
+        run: |
+          set -euo pipefail
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          REDIS_DEPLOYMENT="get-school-improvement-insights-pr-${PR_NUMBER}-managed-redis-cache"
+          : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
+
+          if ! kubectl -n "${AKS_NAMESPACE}" get deployment "${REDIS_DEPLOYMENT}" >/dev/null 2>&1; then
+            echo "No Redis deployment ${REDIS_DEPLOYMENT}; nothing to flush."
+            exit 0
+          fi
+
+          kubectl -n "${AKS_NAMESPACE}" exec "deployment/${REDIS_DEPLOYMENT}" -- redis-cli FLUSHALL
+          if [ $? -ne 0 ]; then
+            echo "::error::Failed to flush Redis cache ${REDIS_DEPLOYMENT}"
+            exit 1
+          fi
+
+          echo "Successfully flushed Redis cache ${REDIS_DEPLOYMENT}"
+
   # ---------------------------
   # PREAPPROVAL DEPLOYMENT CHECK (AUTO-DEPLOY on MAIN IS GATED)
   # ---------------------------
@@ -736,6 +776,10 @@ jobs:
       - name: Deploy app to ${{ inputs.environment }}
         id: deploy_manual
         uses: DFE-Digital/github-actions/deploy-to-aks@master
+        env:
+          TF_VAR_load_testing_database_max_pool_size: ${{ inputs['load-test-pool-size'] || '100' }}
+          TF_VAR_load_testing_bypass_authentication: ${{ (inputs.environment == 'test' || inputs.environment == 'review') && inputs['load-test-auth-bypass'] && 'true' || 'false' }}
+          TF_VAR_load_testing_enable_caching: ${{ (inputs.environment == 'test' || inputs.environment == 'review') && inputs['load-test-enable-caching'] && 'true' || 'false' }}
         with:
           azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
           azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}

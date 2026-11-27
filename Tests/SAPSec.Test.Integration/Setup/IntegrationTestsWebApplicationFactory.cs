@@ -7,9 +7,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.CustomEvents;
 using SAPSec.Core.FeatureFlags;
-using SAPSec.Test.Common.Authentication;
 using SAPSec.Test.Common.FeatureFlags;
 using SAPSec.Web;
+using SAPSec.Web.Authentication;
 using SAPSec.Web.Services;
 
 namespace SAPSec.Test.Integration.Setup;
@@ -28,31 +28,25 @@ public abstract class IntegrationTestsWebApplicationFactory : WebApplicationFact
 
         builder.UseEnvironment("IntegrationTests");
 
-        var configuration = new ConfigurationBuilder()
-            .AddTestDsiConfiguration()
-            .Build();
-
         builder
             // This configuration is used during the creation of the application
             // (e.g. BEFORE WebApplication.CreateBuilder(args) is called in Program.cs).
-            .UseConfiguration(configuration)
             .ConfigureAppConfiguration(configurationBuilder =>
             {
                 configurationBuilder.AddTestDsiConfiguration();
             })
-            .ConfigureServices(services =>
+            .ConfigureServices((context, services) =>
             {
                 // Add or replace any services that the application needs during testing.
-                services.AddTestDsiDependencies();
                 services.AddScoped<ICustomEventService, NoOpCustomEventService>();
                 services.RemoveAll<IFeatureFlagService>();
                 services.AddSingleton<FeatureFlagService>();
                 services.AddSingleton<IFeatureFlagService>(provider =>
                     new MockFeatureFlagService(provider.GetRequiredService<FeatureFlagService>()));
 
-                ConfigureServices(services);
+                ConfigureServices(services, context.Configuration);
             });
     }
 
-    protected abstract IServiceCollection ConfigureServices(IServiceCollection services);
+    protected abstract IServiceCollection ConfigureServices(IServiceCollection services, IConfiguration configuration);
 }

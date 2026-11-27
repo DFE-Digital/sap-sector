@@ -1,5 +1,4 @@
 ﻿using GovUk.Frontend.AspNetCore;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
@@ -7,12 +6,15 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
 using SAPSec.Core;
+using SAPSec.Core.Caching;
 using SAPSec.Core.FeatureFlags;
-using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
+using SAPSec.Infrastructure.Redis;
+using SAPSec.Web.Analytics;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Authorization;
+using SAPSec.Web.Caching;
 using SAPSec.Web.Configuration;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
@@ -75,29 +77,6 @@ public class Program
         builder.Services.AddFeatureManagement();
         builder.Services.AddSingleton<IFeatureFlagService, FeatureFlagService>();
         builder.Services.AddSingleton<IStartPageService, StartPageService>();
-        builder.Services.Configure<CustomEventLocations>(builder.Configuration.GetSection("CustomEventLocations"));
-        builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
-
-        builder.Services.PostConfigure<AnalyticsSettings>(options =>
-        {
-            var environmentName = builder.Configuration["ENVIRONMENT_NAME"] ?? builder.Environment.EnvironmentName;
-            var analyticsEnvironment = IsProductionEnvironment(environmentName) ? "production" : "test";
-
-            if (options.GoogleTagManagerIds?.TryGetValue(analyticsEnvironment, out var googleTagManagerId) == true)
-            {
-                options.GoogleTagManagerId = googleTagManagerId;
-            }
-
-            if (options.GoogleTagManagerAdditionals?.TryGetValue(analyticsEnvironment, out var googleTagManagerAdditional) == true)
-            {
-                options.GoogleTagManagerAdditional = googleTagManagerAdditional;
-            }
-
-            if (options.ClarityIds?.TryGetValue(analyticsEnvironment, out var clarityId) == true)
-            {
-                options.ClarityId = clarityId;
-            }
-        });
 
         builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
         {
@@ -118,20 +97,7 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests")
-        {
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = "TestScheme";
-                options.DefaultAuthenticateScheme = "TestScheme";
-                options.DefaultChallengeScheme = "TestScheme";
-            })
-            .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
-        }
-        else
-        {
-            builder.Services.AddDsiAuthentication(builder.Configuration);
-        }
+        builder.Services.AddAuthentication(builder.Configuration, builder.Environment);
 
         builder.Services.AddAuthorization(options =>
         {
@@ -157,7 +123,7 @@ public class Program
         builder.Services.Configure<DfeUserOptions>(builder.Configuration.GetSection(DfeUserOptions.SectionName));
         builder.Services.AddScoped<IDfeUserIdentifier, DfeUserIdentifier>();
 
-        builder.Services.AddDfeAnalyticsDependencies(builder.Environment);
+        builder.Services.AddAnalytics(builder.Environment, builder.Configuration);
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -199,16 +165,22 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-        var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
-
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
         builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
-        builder.Services.AddUseCases();
+        builder.Services.AddUseCases(builder.Configuration);
         builder.Services.AddServices();
-        builder.Services.AddPostgresqlDependencies();
+        builder.Services.AddPostgresqlDependencies(builder.Configuration);
         builder.Services.AddDependencies();
+
+        builder.Services.AddCaching(builder.Configuration, (services, config) =>
+        {
+            // If caching is enabled:
+            services.AddSingleton<HttpRequestCache>();
+            services.AddRedisCache(config);
+            services.AddNestedCache<HttpRequestCache, RedisCache>();
+        });
 
         // Add custom error handler for NotFoundExceptions
         builder.Services.AddProblemDetails();
@@ -216,13 +188,11 @@ public class Program
 
         var app = builder.Build();
 
-        var isDevelopment = app.Environment.IsDevelopment();
-
         // Set up error handling
         // Note: The order of these lines is important!
         // 1. Status code pages (used by later exception handlers)
         app.UseStatusCodePagesWithReExecute("/error/{0}");
-        if (isDevelopment)
+        if (app.Environment.IsDevelopment())
         {
             // 2a. Developer exception page
             // Note: Comes first otherwise it will absorb NotFoundExceptions too which we don't want
@@ -240,12 +210,12 @@ public class Program
             app.UseExceptionHandler("/error/500");
         }
 
-        if (!isDevelopment)
+        if (!app.Environment.IsDevelopment())
         {
             app.UseHsts();
         }
         app.UseForwardedHeaders();
-        app.UseMiddleware<SecurityHeadersMiddleware>(app.Environment);
+        app.UseMiddleware<SecurityHeadersMiddleware>();
         app.UseHttpsRedirection();
 
         var provider = new FileExtensionContentTypeProvider
@@ -290,7 +260,7 @@ public class Program
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
-        app.UseAnalytics(app.Environment);
+        app.UseAnalytics(app.Configuration);
 
         app.UseMiddleware<HostUrlBannerMiddleware>();
 
@@ -306,17 +276,5 @@ public class Program
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
         app.Run();
-    }
-
-    private static bool IsProductionEnvironment(string? environmentName)
-    {
-        if (string.IsNullOrWhiteSpace(environmentName))
-        {
-            return false;
-        }
-
-        return environmentName.Equals("production", StringComparison.OrdinalIgnoreCase)
-               || environmentName.Equals("prod", StringComparison.OrdinalIgnoreCase)
-               || environmentName.Equals("pd", StringComparison.OrdinalIgnoreCase);
     }
 }

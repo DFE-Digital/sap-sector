@@ -1,6 +1,6 @@
 using SAPSec.Core.Authentication;
 
-namespace SAPSec.Test.Common.Authentication;
+namespace SAPSec.Web.Authentication;
 
 /// <summary>
 /// The organisation the test user is signed in as, and their email address. Defaults to a DfE email in a

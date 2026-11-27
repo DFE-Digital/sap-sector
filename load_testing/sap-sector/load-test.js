@@ -2,18 +2,18 @@ import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporte
 import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.2/index.js'
 
 import { sleep, group } from 'k6'
+import http from 'k6/http'
 import { getEnvironment, getConfig } from './config/environment.js'
 import { homepageJourney } from './journeys/homepage.js'
 import { staticPageJourney } from './journeys/static-pages.js'
 import { healthCheckJourney } from './journeys/health-check.js'
 import { signInRedirectJourney } from './journeys/sign-in-redirect.js'
 import { schoolSearchJourney } from './journeys/school-search.js'
-import { secondarySchoolJourney, primarySchoolJourney } from './journeys/school-overview.js'
-import { comparePerformanceJourney } from './journeys/compare-performance.js'
-import { hasSessionCookie } from './utils/auth.js'
+import { secondarySchoolJourney, primarySchoolJourney, allThroughSchoolJourney } from './journeys/school-overview.js'
+import { authParams, hasSessionCookie } from './utils/auth.js'
 import { quickTestScenario } from './scenarios/quick-test.js'
 import { baselineScenario } from './scenarios/baseline.js'
-import { peakSurgeScenario } from './scenarios/peak-surge.js'
+import { peakSurgeScenario, hugePeakSurgeScenario } from './scenarios/peak-surge.js'
 import { stressTestScenario, buildStepThresholds, applyStepTag } from './scenarios/stress-test.js'
 import { randomThinkTime } from '../shared/utils/common-helpers.js'
 
@@ -25,6 +25,8 @@ function getSelectedScenario () {
       return { sap_sector_baseline: baselineScenario }
     case 'peak-surge':
       return { sap_sector_peak_surge: peakSurgeScenario }
+    case 'huge-peak-surge':
+      return { sap_sector_huge_peak_surge: hugePeakSurgeScenario }
     case 'stress':
       return { sap_sector_stress: stressTestScenario }
     case 'quick':
@@ -64,8 +66,21 @@ export const options = {
 export function setup () {
   const environment = getEnvironment()
   const config = getConfig()
+  if (__ENV.AUTH_OFF === 'true' && !['test', 'local'].includes(environment.name)) {
+    throw new Error('AUTH_OFF is supported only for Test or a locally hosted Test instance.')
+  }
+  if (useAuthenticatedJourneys(environment)) {
+    const response = http.get(`${environment.baseUrl}/find-a-school`, authParams())
+    if (response.status !== 200 || !response.body || !response.body.includes('Find schools in England')) {
+      throw new Error(`Authenticated preflight failed for ${environment.name} (HTTP ${response.status}). Check the Test bypass setting or the DfE Sign-in session.`)
+    }
+  }
   console.log(`Testing ${config.service} - ${environment.name}: ${environment.baseUrl}`)
   return { environment, config }
+}
+
+function useAuthenticatedJourneys (environment) {
+  return environment.name === 'loadtest' || hasSessionCookie() || __ENV.AUTH_OFF === 'true'
 }
 
 export default function (data) {
@@ -91,20 +106,20 @@ export default function (data) {
   //     been switched off at the deployment (e.g. an isolated test env). No
   //     session is involved; the real service journeys just run directly.
   // Every other case sticks to the anonymous-only mix.
-  if (environment.name === 'loadtest' || hasSessionCookie() || __ENV.AUTH_OFF === 'true') {
+  if (useAuthenticatedJourneys(environment)) {
     group('SAP Sector Authenticated User Journey', function () {
       if (journeyChoice < 0.4) {
         // 40% - search for a school
         schoolSearchJourney(environment, config)
-      } else if (journeyChoice < 0.7) {
-        // 30% - view a secondary school's performance pages
+      } else if (journeyChoice < 0.6) {
+        // 20% - view a secondary school's performance pages
         secondarySchoolJourney(environment, config)
-      } else if (journeyChoice < 0.9) {
+      } else if (journeyChoice < 0.8) {
+        // 20% - view an all-through school's performance pages
+        allThroughSchoolJourney(environment, config)
+      }  else {
         // 20% - view a primary school's performance pages
         primarySchoolJourney(environment, config)
-      } else {
-        // 10% - compare performance page
-        comparePerformanceJourney(environment, config)
       }
     })
   } else {

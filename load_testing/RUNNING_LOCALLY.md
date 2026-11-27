@@ -50,12 +50,10 @@ written to `load_testing/`.
 
 ## Path B - authenticated pages too (search, school pages, compare performance)
 
-Needs the app run in a `LoadTest` mode we added, which bypasses DfE Sign-in
-and uses fixture data instead of a real database - no credentials or DB setup
-required. **Make sure your checkout includes the `LoadTest` changes to
-`SAPSec.Web`** (`Program.cs`, `appsettings.LoadTest.json`,
-`DfeAnalyticsExtensions.cs`) - on an older checkout without them you'll hit
-real DSI/Postgres errors instead of the bypass.
+The local `LoadTest` profile bypasses DfE Sign-in and uses PostgreSQL. Seed
+a local database and set `Postgres__ConnectionString` in
+the shell before starting the app. User secrets are not loaded automatically
+in this environment.
 
 1. One-time: trust the local HTTPS dev certificate, if you haven't already:
 
@@ -68,14 +66,12 @@ real DSI/Postgres errors instead of the bypass.
    *macOS/Linux*
    ```bash
    cd SAPSec.Web
-   ASPNETCORE_ENVIRONMENT=LoadTest ASPNETCORE_URLS=https://localhost:5099 dotnet run
+   dotnet run --launch-profile LoadTest
    ```
 
    *Windows PowerShell*
    ```powershell
-   $env:ASPNETCORE_ENVIRONMENT = "LoadTest"
-   $env:ASPNETCORE_URLS = "https://localhost:5099"
-   dotnet run --project SAPSec.Web
+   dotnet run --project SAPSec.Web --launch-profile LoadTest
    ```
 
 3. In another terminal:
@@ -85,10 +81,9 @@ real DSI/Postgres errors instead of the bypass.
    npm run test:loadtest:quick
    ```
 
-## Path C - authenticated pages against real data (test/review, not the fixture)
+## Path C - authenticated pages against Test or Review
 
-Path B uses JSON fixture data, not real Postgres data. If you need real
-school data, sign in once manually (as a dedicated test/service account,
+For a deployed environment, sign in once manually (as a dedicated test/service account,
 completing MFA) and reuse that session instead - see
 [Authenticated pages against a real environment](README.md#authenticated-pages-against-a-real-environment)
 in the main README for the full steps.
@@ -122,10 +117,8 @@ This prints requests, median, p95, max and failure rate at each user level,
 and flags the last level inside the p95 SLO and the first to breach. No
 dependencies needed.
 
-A local `stress` run against a `LoadTest`-mode instance uses JSON fixture data
-(no real database), so it shows the shape of the curve and any app-side limit,
-but **not** production-representative capacity numbers - those come from a run
-against a real environment with a real database. See
+A local `stress` run measures your app and local database together.
+For production sizing, use the shared Test environment with comparable infrastructure. See
 [008-load-tests.md](../docs/testing/008-load-tests.md) for the
 production-tier results.
 
@@ -140,9 +133,8 @@ production-tier results.
 - **500 error on any page with a form, Path B**: you're probably running over
   plain HTTP. The app's cookies require `Secure`, so `LoadTest` mode must be
   run over `https://`.
-- **404 on `/school/primary/...`, Path B**: make sure you picked up
-  `appsettings.LoadTest.json` - it turns on the `EnablePrimarySchools`
-  feature flag, which is off by default.
+- **404 on `/school/primary/...`, Path B**: check the app's existing primary
+  school feature toggle and verify the test URNs exist in the local database.
 - **Real DSI sign-in redirect instead of the bypass**: `ASPNETCORE_ENVIRONMENT`
   isn't set to exactly `LoadTest`, or your checkout predates the `LoadTest`
   mode changes. A quick tell: if a `stress` run shows roughly five HTTP

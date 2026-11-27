@@ -2,7 +2,7 @@
 
 namespace SAPSec.Test.Integration.Setup;
 
-[Collection("InMemoryRepositoryIntegrationTestsCollection")]
+[Collection(nameof(InMemoryRepositoryIntegrationTestsCollection))]
 public abstract class InMemoryRepositoryIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : IAsyncLifetime
@@ -12,10 +12,8 @@ public abstract class InMemoryRepositoryIntegrationTests(
 
     public virtual Task InitializeAsync() => Task.CompletedTask;
 
-    public virtual Task DisposeAsync()
+    public virtual async Task DisposeAsync()
     {
-        Fixture.ClearDownRepositories();
-
-        return Task.CompletedTask;
+        await Fixture.ClearDown();
     }
 }
